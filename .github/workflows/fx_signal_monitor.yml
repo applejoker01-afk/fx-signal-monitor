@@ -1,0 +1,84 @@
+name: FX Signal Monitor
+
+on:
+  schedule:
+    # 毎時05分に実行（UTC）
+    - cron: '5 * * * *'
+  workflow_dispatch:  # 手動実行を許可
+  push:
+    branches: [main]
+
+# GitHub Pages公式デプロイに必要な権限
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+# 同時実行を防止
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  # ─────────────────────────────
+  # Job 1: シグナルスキャンとHTML生成
+  # ─────────────────────────────
+  scan:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run FX signal scanner
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          MAIL_FROM: ${{ secrets.MAIL_FROM }}
+          MAIL_TO:   ${{ secrets.MAIL_TO }}
+        run: python signal_scanner.py
+
+      - name: Commit updated state (for diff detection)
+        run: |
+          git config --local user.email "fx-monitor-bot@github-actions"
+          git config --local user.name  "FX Monitor Bot"
+          git add docs/last_signals.json docs/index.html
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "🤖 Auto-update FX signals $(date -u +'%Y-%m-%d %H:%M UTC')"
+            git pull --rebase origin main || true
+            git push
+          fi
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./docs
+
+  # ─────────────────────────────
+  # Job 2: GitHub Pagesへデプロイ
+  # ─────────────────────────────
+  deploy:
+    needs: scan
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

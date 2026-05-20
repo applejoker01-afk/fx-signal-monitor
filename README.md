@@ -1,0 +1,243 @@
+# FX売買シグナル監視システム L3
+
+> **テクノ・ファンダメンタル戦略の完全自動実装版**
+> テクニカル指標 × 動的FAスコア × 経済指標カレンダー × 市場センチメント
+
+---
+
+## レベル3の特徴
+
+| 評価軸 | データソース | 内容 |
+|--------|-------------|------|
+| **テクニカル** | Frankfurter API（ECB） | 200/50DMA, MACD, RSI, ATR |
+| **金利・金利差** | 手動JSON + 米財務省API | 中央銀行政策金利の動的反映 |
+| **経済指標** | 手動JSON（月初メンテ） | FOMC・ECB・NFP・CPI等の前後で取引控え |
+| **市場センチメント** | Stooq | VIX・DXY・米10年債・金価格 |
+
+---
+
+## ファイル構成
+
+```
+fx-signal-monitor/
+├── signal_scanner.py                 ← メインスクリプト
+├── modules/
+│   ├── __init__.py                   ← 空ファイル（パッケージ識別子）
+│   ├── rate_fetcher.py               ← 金利・債券利回り取得
+│   ├── event_filter.py               ← 経済指標近接判定
+│   └── sentiment_monitor.py          ← VIX/DXY/金センチメント
+├── data/
+│   ├── central_bank_rates.json       ← 中央銀行金利（手動メンテ）
+│   ├── economic_calendar.json        ← 経済指標カレンダー（手動メンテ）
+│   └── sentiment_cache.json          ← 自動生成（前回値キャッシュ）
+├── docs/
+│   ├── index.html                    ← 自動生成ダッシュボード
+│   └── last_signals.json             ← 自動生成（差分検出用）
+├── .github/workflows/
+│   └── fx_signal_monitor.yml         ← GitHub Actions定義
+└── README.md
+```
+
+---
+
+## セットアップ
+
+### 1. リポジトリにファイルをアップロード
+
+GitHubリポジトリに以下のフォルダ構造でファイルをアップロードします：
+
+```
+リポジトリ直下
+├── signal_scanner.py
+├── README.md
+├── modules/
+│   ├── __init__.py
+│   ├── rate_fetcher.py
+│   ├── event_filter.py
+│   └── sentiment_monitor.py
+├── data/
+│   ├── central_bank_rates.json
+│   └── economic_calendar.json
+└── .github/workflows/
+    └── fx_signal_monitor.yml
+```
+
+**アップロード方法**：
+1. `Add file → Upload files`
+2. パス欄に必要に応じて `modules/`, `data/`, `.github/workflows/` を入力
+3. ファイルをドラッグ&ドロップ
+4. `Commit changes`
+
+### 2. GitHub Secrets の設定
+
+`Settings → Secrets and variables → Actions → New repository secret` で以下を登録：
+
+| Secret 名 | 値 | 必須 |
+|----------|---|:---:|
+| `DISCORD_WEBHOOK_URL` | Discord WebhookのURL | △ |
+| `SMTP_HOST` | `smtp.gmail.com` | △ |
+| `SMTP_PORT` | `465` | △ |
+| `SMTP_USER` | Gmailアドレス | △ |
+| `SMTP_PASS` | Gmail App Password（16桁） | △ |
+| `MAIL_FROM` | 送信元（SMTP_USERと同じ） | △ |
+| `MAIL_TO`   | 通知受信先 | △ |
+
+DiscordかメールどちらかでもOK。両方設定すれば二重通知。
+
+### 3. GitHub Pages を有効化
+
+`Settings → Pages → Source: GitHub Actions` を選択。
+
+### 4. 初回実行
+
+`Actions → FX Signal Monitor → Run workflow` で手動実行。
+
+---
+
+## 手動メンテナンス（月1回・約15分）
+
+### A. 中央銀行金利の更新
+
+`data/central_bank_rates.json` を編集。中央銀行会合があった通貨だけ更新：
+
+```json
+"USD": {"rate": 4.50, "next_meeting": "2026-07-30", "stance": "ease", "cb_name": "FRB"}
+                ↑ 4.75から4.50に変更         ↑ 次回会合日も更新   ↑ スタンスも変更
+```
+
+**`stance` の意味**：
+- `tighten`：引き締めバイアス（さらなる利上げを示唆）
+- `neutral`：中立（金利据え置きが基本）
+- `ease`：緩和バイアス（さらなる利下げを示唆）
+
+### B. 経済指標カレンダーの更新
+
+`data/economic_calendar.json` に翌月分のイベントを追加：
+
+```json
+{
+  "date": "2026-07-30T18:00:00Z",
+  "country": "US",
+  "currency": "USD",
+  "name": "FOMC",
+  "importance": "critical",
+  "affects_pairs": ["USDJPY", "EURUSD", "GBPUSD", "AUDUSD", "NZDUSD", "USDCAD", "USDCHF"]
+}
+```
+
+**`importance` の意味**：
+- `critical`：48h前から取引控え推奨（FOMC・ECB・NFP・各国中銀会合）
+- `high`：24h前から警戒（CPI・GDP・PMI・要人発言）
+- `medium`：情報提供のみ（取引制限なし）
+
+参考：日本の経済指標発表予定は[内閣府](https://www.cao.go.jp/)、米国は[BLS](https://www.bls.gov/)、欧州は[ECB](https://www.ecb.europa.eu/)から月初に確認。
+
+---
+
+## 通知例
+
+### 平常時
+
+```
+🚨 FXシグナル変化検出
+新規★4以上: 1件 / ★4→5昇格: 0件
+市場モード: NORMAL
+
+🌐 市場センチメント:
+  VIX: 16.2 (normal)
+  DXY: 105.2 (flat)
+  米10y: 4.35%
+  金: 2350.0
+
+★★★★★ AUD/JPY - ◎ 高信頼ロング
+価格: 114.39
+TA: 82/100  FA: 75/100
+金利差: +3.35%
+📊 RBA(4.10% neutral) vs 日銀(0.75% tighten) 差+3.35%
+```
+
+### イベント前
+
+```
+⏸ USDJPY - イベント前自動見送り
+  本来★5だったところを抑制
+  🛑 取引控え: 重要イベント前 (FOMC まで 23.5h)
+```
+
+### パニック時
+
+```
+🚨🚨🚨 市場パニック警告
+市場モード: PANIC
+
+🌐 市場センチメント:
+  VIX: 32.8 (panic)
+  DXY: 106.5 (strong) ↑↑
+  金: 2480.0 (surging) ↑
+
+⛔ 新興国通貨3ペアを取引停止:
+  ・TRY/JPY (本来★3→★1)
+  ・ZAR/JPY (本来★4→★1)
+  ・MXN/JPY (本来★4→★1)
+
+⚠ USD/JPY: 円買い圧力警戒
+```
+
+---
+
+## カスタマイズ
+
+### しきい値の調整
+
+`signal_scanner.py` の `evaluate_full()` 内のスコア閾値を編集：
+
+```python
+# 現状: TA≥75 かつ FA≥65 で★5
+if agree and ta["ta_score"] >= 75 and fa["score"] >= 65:
+    stars = 5
+```
+
+### 監視ペアを絞る
+
+`PAIR_API` 辞書から不要なペアを削除。
+
+### センチメント感度を調整
+
+`modules/sentiment_monitor.py` の `evaluate_market_sentiment()` 内のVIX閾値を編集：
+
+```python
+elif vix > 25:    # ←ここを変更
+    vix_level = "risk_off"
+```
+
+---
+
+## トラブルシューティング
+
+### Stooqからデータが取得できない
+
+Stooqは安定したフリーサービスですが、稀に一時障害が発生します。`sentiment_cache.json` から前回値が使われるため、シグナル評価は継続できます。
+
+恒久対策が必要な場合は、`modules/sentiment_monitor.py` の `fetch_vix()` などをYahoo Finance APIに切り替えることも可能です。
+
+### 経済指標カレンダーの更新を忘れた
+
+経済指標が空または古い場合、イベントフィルターは何も警告を出しません（取引控えなし）。月初には必ず確認してください。
+
+GitHub Issues に「月1の Reminder Issue」を作っておくと安全です。
+
+### 中央銀行金利が古い
+
+中央銀行会合は月1〜8回程度。`central_bank_rates.json` を更新しないと、誤った金利差で評価され続けます。
+
+---
+
+## ライセンスと免責
+
+本システムは外国為替市場における中長期売買シグナル分析の教育的・研究的フレームワークです。**特定の金融商品の購入・売却を推奨するものではありません**。
+
+実際の投資判断は、最新の市場情報・自己の財務状況・リスク許容度を踏まえ、自己責任のもと行ってください。
+
+---
+
+**Currents FX Signal Monitor L3 / Techno-Fundamental Strategy / 2026 Edition**
