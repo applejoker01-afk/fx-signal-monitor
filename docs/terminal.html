@@ -1435,6 +1435,62 @@ select {
   .event-row { grid-template-columns: 1fr; gap: 0.3rem; }
 }
 
+/* ===== Top Navigation Bar ===== */
+.top-nav {
+  max-width: 1400px;
+  margin: 1rem auto 0;
+  padding: 0.7rem 1.2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  position: relative;
+  z-index: 10;
+}
+.top-nav-left {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.top-nav-links {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 3px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  text-decoration: none;
+  transition: all 0.15s;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  background: var(--bg-elev);
+}
+.nav-link:hover {
+  background: var(--bg-surface);
+  color: var(--accent-gold);
+  border-color: var(--accent-gold);
+}
+.nav-link.active {
+  background: var(--signal-buy-bg);
+  color: var(--signal-buy);
+  border-color: rgba(74,222,128,0.4);
+}
+.nav-link .nav-icon {
+  font-size: 0.95rem;
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: var(--bg-surface); }
@@ -1451,6 +1507,25 @@ select {
 </style>
 </head>
 <body>
+
+<!-- ===== Top Navigation Bar ===== -->
+<nav class="top-nav">
+  <div class="top-nav-left">◇ Currents FX Suite</div>
+  <div class="top-nav-links">
+    <a href="./" class="nav-link">
+      <span class="nav-icon">📊</span>
+      <span>L3 ダッシュボード</span>
+    </a>
+    <a href="./terminal.html" class="nav-link active">
+      <span class="nav-icon">🖥</span>
+      <span>分析ターミナル</span>
+    </a>
+    <a href="./last_signals.json" class="nav-link" target="_blank" rel="noopener">
+      <span class="nav-icon">{}</span>
+      <span>Raw JSON</span>
+    </a>
+  </div>
+</nav>
 
 <!-- ===== Header ===== -->
 <header class="app-header">

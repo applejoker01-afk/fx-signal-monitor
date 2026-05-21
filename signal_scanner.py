@@ -838,6 +838,36 @@ body {{
   font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; margin-right: 0.5rem;
 }}
 
+/* Top Navigation Bar */
+.top-nav {{
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0.7rem 1.2rem; margin-bottom: 1.5rem;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 4px; flex-wrap: wrap; gap: 0.5rem;
+}}
+.top-nav-left {{
+  font-family: var(--mono); font-size: 0.72rem;
+  color: var(--text-muted); letter-spacing: 0.08em; text-transform: uppercase;
+}}
+.top-nav-links {{ display: flex; gap: 0.5rem; flex-wrap: wrap; }}
+.nav-link {{
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.45rem 0.9rem; border-radius: 3px;
+  font-family: var(--mono); font-size: 0.78rem;
+  text-decoration: none; transition: all 0.15s;
+  border: 1px solid var(--border);
+  color: var(--text-secondary); background: var(--bg-elev);
+}}
+.nav-link:hover {{
+  background: var(--bg-surface); color: var(--gold);
+  border-color: var(--gold);
+}}
+.nav-link.active {{
+  background: var(--buy-bg); color: var(--buy);
+  border-color: rgba(74,222,128,0.4);
+}}
+.nav-link .nav-icon {{ font-size: 0.95rem; }}
+
 /* Risk Banner */
 .risk-banner {{
   background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-elev) 100%);
@@ -1004,6 +1034,25 @@ body {{
 <body>
 
 <div class="container">
+
+  <!-- Top Navigation Bar -->
+  <nav class="top-nav">
+    <div class="top-nav-left">◇ Currents FX Suite</div>
+    <div class="top-nav-links">
+      <a href="./" class="nav-link active">
+        <span class="nav-icon">📊</span>
+        <span>L3 ダッシュボード</span>
+      </a>
+      <a href="./terminal.html" class="nav-link">
+        <span class="nav-icon">🖥</span>
+        <span>分析ターミナル</span>
+      </a>
+      <a href="./last_signals.json" class="nav-link" target="_blank" rel="noopener">
+        <span class="nav-icon">{{}}</span>
+        <span>Raw JSON</span>
+      </a>
+    </div>
+  </nav>
 
   <header class="app-header">
     <div class="brand">
