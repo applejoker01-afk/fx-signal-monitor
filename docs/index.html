@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="refresh" content="3600">
+<title>FX Signal Monitor L3 · Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,500;1,600&family=JetBrains+Mono:wght@400;500;700&family=Shippori+Mincho:wght@500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-deep: #0a0e1a; --bg-surface: #111726; --bg-card: #141b2d;
+  --bg-elev: #1a2235; --border: #2a3450; --border-soft: #1f273d;
+  --text-primary: #e8edf7; --text-secondary: #9aa5b8; --text-muted: #5a6378;
+  --gold: #d4a574; --amber: #e6b85c;
+  --buy: #4ade80; --buy-bg: rgba(74,222,128,0.08);
+  --sell: #f87171; --sell-bg: rgba(248,113,113,0.08);
+  --caution: #fbbf24; --caution-bg: rgba(251,191,36,0.08);
+  --neutral: #94a3b8;
+  --display: 'Cormorant Garamond', 'Shippori Mincho', serif;
+  --jp: 'Zen Kaku Gothic New', sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+  --jp-serif: 'Shippori Mincho', serif;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background: var(--bg-deep); color: var(--text-primary);
+  font-family: var(--jp); line-height: 1.6;
+  background-image:
+    radial-gradient(circle at 15% 10%, rgba(212,165,116,0.04) 0%, transparent 40%),
+    radial-gradient(circle at 85% 80%, rgba(74,222,128,0.03) 0%, transparent 40%);
+  min-height: 100vh;
+}
+.container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+
+/* Header */
+.app-header {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding-bottom: 1rem; border-bottom: 1px solid var(--border); margin-bottom: 2rem;
+  flex-wrap: wrap; gap: 1rem;
+}
+.brand { display: flex; align-items: baseline; gap: 1rem; }
+.brand-mark {
+  font-family: var(--display); font-size: 2rem; font-weight: 600;
+  font-style: italic; color: var(--gold); letter-spacing: -0.02em;
+}
+.brand-sub {
+  font-family: var(--jp-serif); font-size: 0.78rem;
+  color: var(--text-secondary); letter-spacing: 0.15em;
+}
+.header-meta { font-family: var(--mono); font-size: 0.78rem; color: var(--text-secondary); }
+.header-meta .live {
+  display: inline-block; background: var(--buy-bg); color: var(--buy);
+  padding: 0.2rem 0.6rem; border-radius: 3px; border: 1px solid rgba(74,222,128,0.3);
+  font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; margin-right: 0.5rem;
+}
+
+/* Risk Banner */
+.risk-banner {
+  background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-elev) 100%);
+  border: 1px solid var(--border); border-left: 4px solid var(--gold);
+  padding: 1.3rem 1.8rem; margin-bottom: 1.5rem; border-radius: 4px;
+  position: relative; overflow: hidden;
+}
+.risk-banner::before {
+  content: ''; position: absolute; top: -50%; right: -10%;
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(212,165,116,0.08), transparent 70%);
+  pointer-events: none;
+}
+.risk-banner.panic { border-left-color: var(--sell); }
+.risk-banner.risk_off, .risk-banner.caution { border-left-color: var(--caution); }
+.risk-banner.normal { border-left-color: var(--buy); }
+.risk-banner.complacent { border-left-color: var(--neutral); }
+
+.risk-title {
+  font-family: var(--jp-serif); font-size: 1.15rem; color: var(--gold);
+  letter-spacing: 0.04em; margin-bottom: 0.4rem; position: relative; z-index: 1;
+}
+.risk-banner.panic .risk-title { color: var(--sell); }
+.risk-banner.risk_off .risk-title, .risk-banner.caution .risk-title { color: var(--caution); }
+.risk-banner.normal .risk-title { color: var(--buy); }
+
+.risk-summary {
+  font-family: var(--mono); font-size: 0.85rem; color: var(--text-secondary);
+  position: relative; z-index: 1;
+}
+
+/* Stats grid */
+.stats-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1rem; margin-bottom: 1.5rem;
+}
+.stat-card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 4px; padding: 1.1rem;
+}
+.stat-card .stat-label {
+  font-family: var(--mono); font-size: 0.68rem; color: var(--text-muted);
+  letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.3rem;
+}
+.stat-card .stat-val {
+  font-family: var(--mono); font-size: 1.6rem; font-weight: 600;
+  color: var(--text-primary); line-height: 1;
+}
+.stat-card .stat-sub {
+  font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.3rem;
+  font-family: var(--mono);
+}
+.stat-val.buy { color: var(--buy); }
+.stat-val.sell { color: var(--sell); }
+.stat-val.caution { color: var(--caution); }
+
+/* Section heads */
+.section-head {
+  display: flex; align-items: baseline; gap: 1rem;
+  margin: 2rem 0 1rem; padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--border-soft);
+}
+.section-num {
+  font-family: var(--display); font-style: italic;
+  font-size: 1.8rem; color: var(--gold); font-weight: 500; line-height: 1;
+}
+.section-title {
+  font-family: var(--jp-serif); font-size: 1.15rem; font-weight: 600;
+  letter-spacing: 0.03em;
+}
+.section-sub {
+  font-family: var(--mono); font-size: 0.7rem; color: var(--text-muted);
+  letter-spacing: 0.15em; text-transform: uppercase; margin-left: auto;
+}
+
+/* Tables */
+.data-table {
+  width: 100%; border-collapse: collapse;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 4px; overflow: hidden;
+}
+.data-table th {
+  background: var(--bg-elev); color: var(--gold);
+  font-family: var(--jp-serif); font-weight: 600;
+  padding: 0.9rem 1rem; text-align: left;
+  font-size: 0.78rem; letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border);
+}
+.data-table td {
+  padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-soft);
+  font-size: 0.82rem;
+}
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr:hover td { background: var(--bg-surface); }
+.stars-cell { color: var(--gold); letter-spacing: 0.08em; font-family: var(--mono); white-space: nowrap; }
+.pair-cell { font-family: var(--jp); }
+.pair-main { font-family: var(--display); font-style: italic; font-size: 1.05rem; font-weight: 600; }
+.num-cell { font-family: var(--mono); color: var(--text-secondary); }
+.score-ta { color: var(--text-primary); }
+.score-fa { color: var(--gold); }
+.row-buy .verdict-cell { color: var(--buy); }
+.row-sell .verdict-cell { color: var(--sell); }
+.row-neutral .verdict-cell { color: var(--caution); }
+.row-blocked .verdict-cell { color: var(--neutral); }
+.row-blocked { opacity: 0.7; }
+.verdict-cell { font-weight: 500; }
+.fa-detail { color: var(--text-secondary); font-size: 0.76rem; font-family: var(--jp); }
+.ccy-cell { font-family: var(--mono); font-weight: 600; color: var(--gold); }
+.meta-cell { font-family: var(--mono); font-size: 0.78rem; color: var(--text-secondary); }
+
+/* Badges */
+.badge {
+  display: inline-block; padding: 0.15rem 0.45rem; border-radius: 3px;
+  font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.08em;
+  font-weight: 700; margin-left: 0.3rem;
+}
+.badge-event { background: rgba(251,191,36,0.15); color: var(--caution); border: 1px solid rgba(251,191,36,0.3); }
+.badge-sent { background: rgba(212,165,116,0.15); color: var(--gold); border: 1px solid rgba(212,165,116,0.3); }
+.warn-line {
+  font-size: 0.72rem; color: var(--caution); margin-top: 0.25rem;
+  font-family: var(--mono);
+}
+
+/* Event rows */
+.event-row {
+  display: grid; grid-template-columns: 100px 60px 1fr 90px;
+  gap: 1rem; align-items: center;
+  padding: 0.7rem 1rem; background: var(--bg-card);
+  border: 1px solid var(--border-soft); border-left: 3px solid var(--gold);
+  margin-bottom: 0.4rem; border-radius: 3px;
+  font-family: var(--jp); font-size: 0.85rem;
+}
+.event-row.event-critical { border-left-color: var(--sell); }
+.event-row.event-high { border-left-color: var(--caution); }
+.event-row.event-medium { border-left-color: var(--text-muted); }
+.event-time { font-family: var(--mono); font-size: 0.85rem; color: var(--gold); font-weight: 600; }
+.event-time small { display: block; font-size: 0.7rem; color: var(--text-muted); }
+.event-ccy { font-family: var(--mono); font-weight: 600; }
+.event-imp {
+  font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.1em;
+  text-transform: uppercase; text-align: right; font-weight: 700;
+}
+.imp-critical { color: var(--sell); }
+.imp-high { color: var(--caution); }
+.imp-medium { color: var(--text-muted); }
+
+/* Footer */
+.app-footer {
+  margin-top: 2rem; padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  color: var(--text-muted); font-size: 0.74rem;
+  font-family: var(--mono); text-align: center;
+}
+.app-footer em {
+  font-family: var(--display); font-style: italic; color: var(--gold);
+}
+
+@media (max-width: 768px) {
+  .container { padding: 1rem; }
+  .event-row { grid-template-columns: 1fr; gap: 0.3rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <header class="app-header">
+    <div class="brand">
+      <span class="brand-mark">Currents</span>
+      <span class="brand-sub">FX SIGNAL MONITOR · L3 DASHBOARD</span>
+    </div>
+    <div class="header-meta">
+      <span class="live">● LIVE</span>
+      Updated: 2026-05-21 07:55 JST · Auto-refresh: 1h · 22 pairs
+    </div>
+  </header>
+
+  <!-- Risk Banner -->
+  <div class="risk-banner normal">
+    <div class="risk-title">🟢 市場モード: NORMAL モード（平常）</div>
+    <div class="risk-summary">
+      VIX: None (unknown) &nbsp;·&nbsp;
+      DXY: 99.57 (unknown) &nbsp;·&nbsp;
+      米10年債: None% &nbsp;·&nbsp;
+      ゴールド: 4541.8 (unknown)
+    </div>
+  </div>
+
+  <!-- Stats Grid -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-label">★4以上シグナル</div>
+      <div class="stat-val buy">9</div>
+      <div class="stat-sub">/ 全22ペア</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">ロング推奨</div>
+      <div class="stat-val buy">6</div>
+      <div class="stat-sub">高信頼ロング条件成立</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">ショート推奨</div>
+      <div class="stat-val sell">3</div>
+      <div class="stat-sub">高信頼ショート条件成立</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">取引控え推奨</div>
+      <div class="stat-val caution">0</div>
+      <div class="stat-sub">イベント・センチメント警告</div>
+    </div>
+  </div>
+
+  <!-- Signal Table -->
+  <div class="section-head">
+    <div class="section-num">I.</div>
+    <h2 class="section-title">全22通貨ペアのシグナル評価</h2>
+    <span class="section-sub">TA × FA × Event × Sentiment</span>
+  </div>
+
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>シグナル</th><th>通貨ペア</th><th>価格</th>
+        <th>TA</th><th>FA</th><th>金利差</th>
+        <th>RSI</th><th>判定</th><th>マクロ分析</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr class="row-buy">
+          <td class="stars-cell">★★★★★</td>
+          <td class="pair-cell">
+            <div class="pair-main">USD/JPY </div>
+            
+          </td>
+          <td class="num-cell">159.03448</td>
+          <td class="num-cell score-ta">78.3</td>
+          <td class="num-cell score-fa">85.0</td>
+          <td class="num-cell">+4.00%</td>
+          <td class="num-cell">56.18</td>
+          <td class="verdict-cell">◎ 高信頼ロング</td>
+          <td class="fa-detail">FRB(4.75% tighten) vs 日銀(0.75% tighten) 差+4.00%</td>
+        </tr>
+        
+        <tr class="row-buy">
+          <td class="stars-cell">★★★★★</td>
+          <td class="pair-cell">
+            <div class="pair-main">HKD/JPY </div>
+            
+          </td>
+          <td class="num-cell">20.30354</td>
+          <td class="num-cell score-ta">78.3</td>
+          <td class="num-cell score-fa">85.0</td>
+          <td class="num-cell">+4.00%</td>
+          <td class="num-cell">56.05</td>
+          <td class="verdict-cell">◎ 高信頼ロング</td>
+          <td class="fa-detail">HKMA(米ドルペッグ)(4.75% tighten) vs 日銀(0.75% tighten) 差+4.00%</td>
+        </tr>
+        
+        <tr class="row-buy">
+          <td class="stars-cell">★★★★☆</td>
+          <td class="pair-cell">
+            <div class="pair-main">MXN/JPY </div>
+            
+          </td>
+          <td class="num-cell">9.15661</td>
+          <td class="num-cell score-ta">73.3</td>
+          <td class="num-cell score-fa">70</td>
+          <td class="num-cell">+6.25%</td>
+          <td class="num-cell">54.43</td>
+          <td class="verdict-cell">○ ロング条件成立</td>
+          <td class="fa-detail">Banxico(7.00% ease) vs 日銀(0.75% tighten) 差+6.25%</td>
+        </tr>
+        
+        <tr class="row-buy">
+          <td class="stars-cell">★★★★☆</td>
+          <td class="pair-cell">
+            <div class="pair-main">CAD/JPY </div>
+            
+          </td>
+          <td class="num-cell">115.59622</td>
+          <td class="num-cell score-ta">66.7</td>
+          <td class="num-cell score-fa">68.8</td>
+          <td class="num-cell">+2.50%</td>
+          <td class="num-cell">51.62</td>
+          <td class="verdict-cell">○ ロング条件成立</td>
+          <td class="fa-detail">BOC(3.25% neutral) vs 日銀(0.75% tighten) 差+2.50%</td>
+        </tr>
+        
+        <tr class="row-buy">
+          <td class="stars-cell">★★★★☆</td>
+          <td class="pair-cell">
+            <div class="pair-main">SGD/JPY </div>
+            
+          </td>
+          <td class="num-cell">124.21223</td>
+          <td class="num-cell score-ta">66.7</td>
+          <td class="num-cell score-fa">71.9</td>
+          <td class="num-cell">+2.25%</td>
+          <td class="num-cell">51.77</td>
+          <td class="verdict-cell">○ ロング条件成立</td>
+          <td class="fa-detail">MAS(3.00% tighten) vs 日銀(0.75% tighten) 差+2.25%</td>
+        </tr>
+        
+        <tr class="row-buy">
+          <td class="stars-cell">★★★★☆</td>
+          <td class="pair-cell">
+            <div class="pair-main">ZAR/JPY </div>
+            
+          </td>
+          <td class="num-cell">9.58412</td>
+          <td class="num-cell score-ta">66.7</td>
+          <td class="num-cell score-fa">70</td>
+          <td class="num-cell">+6.75%</td>
+          <td class="num-cell">51.37</td>
+          <td class="verdict-cell">○ ロング条件成立</td>
+          <td class="fa-detail">SARB(7.50% ease) vs 日銀(0.75% tighten) 差+6.75%</td>
+        </tr>
+        
+        <tr class="row-sell">
+          <td class="stars-cell">★★★★☆</td>
+          <td class="pair-cell">
+            <div class="pair-main">NZD/USD </div>
+            
+          </td>
+          <td class="num-cell">0.58465</td>
+          <td class="num-cell score-ta">40.0</td>
+          <td class="num-cell score-fa">33.1</td>
+          <td class="num-cell">-0.25%</td>
+          <td class="num-cell">43.54</td>
+          <td class="verdict-cell">○ ショート条件成立</td>
+          <td class="fa-detail">RBNZ(4.50% ease) vs FRB(4.75% tighten) 差-0.25%</td>
+        </tr>
+        
+        <tr class="row-sell">
+          <td class="stars-cell">★★★★☆</td>
+          <td class="pair-cell">
+            <div class="pair-main">EUR/AUD </div>
+            
+          </td>
+          <td class="num-cell">1.6271</td>
+          <td class="num-cell score-ta">38.3</td>
+          <td class="num-cell score-fa">39.1</td>
+          <td class="num-cell">-1.45%</td>
+          <td class="num-cell">44.28</td>
+          <td class="verdict-cell">○ ショート条件成立</td>
+          <td class="fa-detail">ECB(2.65% ease) vs RBA(4.10% neutral) 差-1.45%</td>
+        </tr>
+        
+        <tr class="row-sell">
+          <td class="stars-cell">★★★★☆</td>
+          <td class="pair-cell">
+            <div class="pair-main">EUR/USD </div>
+            
+          </td>
+          <td class="num-cell">1.16</td>
+          <td class="num-cell score-ta">26.7</td>
+          <td class="num-cell score-fa">19.2</td>
+          <td class="num-cell">-2.10%</td>
+          <td class="num-cell">38.53</td>
+          <td class="verdict-cell">○ ショート条件成立</td>
+          <td class="fa-detail">ECB(2.65% ease) vs FRB(4.75% tighten) 差-2.10%</td>
+        </tr>
+        
+        <tr class="row-buy">
+          <td class="stars-cell">★★☆☆☆</td>
+          <td class="pair-cell">
+            <div class="pair-main">CNY/JPY </div>
+            
+          </td>
+          <td class="num-cell">23.37794</td>
+          <td class="num-cell score-ta">78.3</td>
+          <td class="num-cell score-fa">57.6</td>
+          <td class="num-cell">+2.35%</td>
+          <td class="num-cell">60.76</td>
+          <td class="verdict-cell">△ 弱シグナル</td>
+          <td class="fa-detail">PBOC(3.10% ease) vs 日銀(0.75% tighten) 差+2.35%</td>
+        </tr>
+        
+        <tr class="row-buy">
+          <td class="stars-cell">★★☆☆☆</td>
+          <td class="pair-cell">
+            <div class="pair-main">AUD/JPY </div>
+            
+          </td>
+          <td class="num-cell">113.37963</td>
+          <td class="num-cell score-ta">56.7</td>
+          <td class="num-cell score-fa">75.1</td>
+          <td class="num-cell">+3.35%</td>
+          <td class="num-cell">51.09</td>
+          <td class="verdict-cell">△ 弱シグナル</td>
+          <td class="fa-detail">RBA(4.10% neutral) vs 日銀(0.75% tighten) 差+3.35%</td>
+        </tr>
+        
+        <tr class="row-buy">
+          <td class="stars-cell">★★☆☆☆</td>
+          <td class="pair-cell">
+            <div class="pair-main">AUD/USD </div>
+            
+          </td>
+          <td class="num-cell">0.71292</td>
+          <td class="num-cell score-ta">56.7</td>
+          <td class="num-cell score-fa">45.1</td>
+          <td class="num-cell">-0.65%</td>
+          <td class="num-cell">46.67</td>
+          <td class="verdict-cell">△ 弱シグナル</td>
+          <td class="fa-detail">RBA(4.10% neutral) vs FRB(4.75% tighten) 差-0.65%</td>
+        </tr>
+        
+        <tr class="row-buy">
+          <td class="stars-cell">★★☆☆☆</td>
+          <td class="pair-cell">
+            <div class="pair-main">USD/CAD </div>
+            
+          </td>
+          <td class="num-cell">1.37578</td>
+          <td class="num-cell score-ta">55.0</td>
+          <td class="num-cell score-fa">66.2</td>
+          <td class="num-cell">+1.50%</td>
+          <td class="num-cell">57.66</td>
+          <td class="verdict-cell">△ 弱シグナル</td>
+          <td class="fa-detail">FRB(4.75% tighten) vs BOC(3.25% neutral) 差+1.50%</td>
+        </tr>
+        
+        <tr class="row-buy">
+          <td class="stars-cell">★★☆☆☆</td>
+          <td class="pair-cell">
+            <div class="pair-main">USD/CHF </div>
+            
+          </td>
+          <td class="num-cell">0.79009</td>
+          <td class="num-cell score-ta">55.0</td>
+          <td class="num-cell score-fa">95</td>
+          <td class="num-cell">+4.25%</td>
+          <td class="num-cell">59.19</td>
+          <td class="verdict-cell">△ 弱シグナル</td>
+          <td class="fa-detail">FRB(4.75% tighten) vs SNB(0.50% ease) 差+4.25%</td>
+        </tr>
+        
+        <tr class="row-neutral">
+          <td class="stars-cell">★★☆☆☆</td>
+          <td class="pair-cell">
+            <div class="pair-main">EUR/JPY </div>
+            
+          </td>
+          <td class="num-cell">184.48</td>
+          <td class="num-cell score-ta">50.0</td>
+          <td class="num-cell score-fa">54.2</td>
+          <td class="num-cell">+1.90%</td>
+          <td class="num-cell">45.74</td>
+          <td class="verdict-cell">— レンジ</td>
+          <td class="fa-detail">ECB(2.65% ease) vs 日銀(0.75% tighten) 差+1.90%</td>
+        </tr>
+        
+        <tr class="row-buy">
+          <td class="stars-cell">★★☆☆☆</td>
+          <td class="pair-cell">
+            <div class="pair-main">GBP/JPY </div>
+            
+          </td>
+          <td class="num-cell">213.13616</td>
+          <td class="num-cell score-ta">50.0</td>
+          <td class="num-cell score-fa">76.2</td>
+          <td class="num-cell">+3.50%</td>
+          <td class="num-cell">48.87</td>
+          <td class="verdict-cell">△ 弱シグナル</td>
+          <td class="fa-detail">BOE(4.25% neutral) vs 日銀(0.75% tighten) 差+3.50%</td>
+        </tr>
+        
+        <tr class="row-buy">
+          <td class="stars-cell">★★☆☆☆</td>
+          <td class="pair-cell">
+            <div class="pair-main">NZD/JPY </div>
+            
+          </td>
+          <td class="num-cell">92.97918</td>
+          <td class="num-cell score-ta">50.0</td>
+          <td class="num-cell score-fa">68.1</td>
+          <td class="num-cell">+3.75%</td>
+          <td class="num-cell">47.82</td>
+          <td class="verdict-cell">△ 弱シグナル</td>
+          <td class="fa-detail">RBNZ(4.50% ease) vs 日銀(0.75% tighten) 差+3.75%</td>
+        </tr>
+        
+        <tr class="row-sell">
+          <td class="stars-cell">★★☆☆☆</td>
+          <td class="pair-cell">
+            <div class="pair-main">CHF/JPY </div>
+            
+          </td>
+          <td class="num-cell">201.28751</td>
+          <td class="num-cell score-ta">50.0</td>
+          <td class="num-cell score-fa">33.1</td>
+          <td class="num-cell">-0.25%</td>
+          <td class="num-cell">46.83</td>
+          <td class="verdict-cell">△ 弱シグナル</td>
+          <td class="fa-detail">SNB(0.50% ease) vs 日銀(0.75% tighten) 差-0.25%</td>
+        </tr>
+        
+        <tr class="row-sell">
+          <td class="stars-cell">★★☆☆☆</td>
+          <td class="pair-cell">
+            <div class="pair-main">EUR/GBP </div>
+            
+          </td>
+          <td class="num-cell">0.86555</td>
+          <td class="num-cell score-ta">48.3</td>
+          <td class="num-cell score-fa">38.0</td>
+          <td class="num-cell">-1.60%</td>
+          <td class="num-cell">45.81</td>
+          <td class="verdict-cell">△ 弱シグナル</td>
+          <td class="fa-detail">ECB(2.65% ease) vs BOE(4.25% neutral) 差-1.60%</td>
+        </tr>
+        
+        <tr class="row-sell">
+          <td class="stars-cell">★★☆☆☆</td>
+          <td class="pair-cell">
+            <div class="pair-main">GBP/USD </div>
+            
+          </td>
+          <td class="num-cell">1.34019</td>
+          <td class="num-cell score-ta">26.7</td>
+          <td class="num-cell score-fa">46.2</td>
+          <td class="num-cell">-0.50%</td>
+          <td class="num-cell">42.3</td>
+          <td class="verdict-cell">△ 弱シグナル</td>
+          <td class="fa-detail">BOE(4.25% neutral) vs FRB(4.75% tighten) 差-0.50%</td>
+        </tr>
+        
+        <tr class="row-neutral">
+          <td class="stars-cell">★☆☆☆☆</td>
+          <td class="pair-cell">
+            <div class="pair-main">TRY/JPY </div>
+            
+          </td>
+          <td class="num-cell">3.48863</td>
+          <td class="num-cell score-ta">38.3</td>
+          <td class="num-cell score-fa">70</td>
+          <td class="num-cell">+37.25%</td>
+          <td class="num-cell">43.14</td>
+          <td class="verdict-cell">⚠ 見送り（FA/TA不一致）</td>
+          <td class="fa-detail">CBRT(38.00% ease) vs 日銀(0.75% tighten) 差+37.25%</td>
+        </tr>
+        
+        <tr class="row-neutral">
+          <td class="stars-cell">★☆☆☆☆</td>
+          <td class="pair-cell">
+            <div class="pair-main">INR/JPY </div>
+            
+          </td>
+          <td class="num-cell">1.64249</td>
+          <td class="num-cell score-ta">36.7</td>
+          <td class="num-cell score-fa">80</td>
+          <td class="num-cell">+5.25%</td>
+          <td class="num-cell">28.93</td>
+          <td class="verdict-cell">⚠ 見送り（FA/TA不一致）</td>
+          <td class="fa-detail">RBI(6.00% neutral) vs 日銀(0.75% tighten) 差+5.25%</td>
+        </tr>
+        </tbody>
+  </table>
+
+  <!-- Central Bank Rates -->
+  <div class="section-head">
+    <div class="section-num">II.</div>
+    <h2 class="section-title">中央銀行政策金利マップ</h2>
+    <span class="section-sub">Central Bank Rates</span>
+  </div>
+
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>通貨</th><th>中央銀行</th><th>政策金利</th>
+        <th>スタンス</th><th>次回会合</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td class="ccy-cell">USD</td>
+          <td>FRB</td>
+          <td class="num-cell">4.75%</td>
+          <td style="color: #4ade80; font-family: var(--mono);">↑ 引締</td>
+          <td class="meta-cell">2026-06-18</td>
+        </tr>
+        
+        <tr>
+          <td class="ccy-cell">EUR</td>
+          <td>ECB</td>
+          <td class="num-cell">2.65%</td>
+          <td style="color: #f87171; font-family: var(--mono);">↓ 緩和</td>
+          <td class="meta-cell">2026-06-05</td>
+        </tr>
+        
+        <tr>
+          <td class="ccy-cell">JPY</td>
+          <td>日銀</td>
+          <td class="num-cell">0.75%</td>
+          <td style="color: #4ade80; font-family: var(--mono);">↑ 引締</td>
+          <td class="meta-cell">2026-06-17</td>
+        </tr>
+        
+        <tr>
+          <td class="ccy-cell">GBP</td>
+          <td>BOE</td>
+          <td class="num-cell">4.25%</td>
+          <td style="color: #94a3b8; font-family: var(--mono);">→ 中立</td>
+          <td class="meta-cell">2026-06-19</td>
+        </tr>
+        
+        <tr>
+          <td class="ccy-cell">AUD</td>
+          <td>RBA</td>
+          <td class="num-cell">4.1%</td>
+          <td style="color: #94a3b8; font-family: var(--mono);">→ 中立</td>
+          <td class="meta-cell">2026-06-03</td>
+        </tr>
+        
+        <tr>
+          <td class="ccy-cell">NZD</td>
+          <td>RBNZ</td>
+          <td class="num-cell">4.5%</td>
+          <td style="color: #f87171; font-family: var(--mono);">↓ 緩和</td>
+          <td class="meta-cell">2026-05-28</td>
+        </tr>
+        
+        <tr>
+          <td class="ccy-cell">CAD</td>
+          <td>BOC</td>
+          <td class="num-cell">3.25%</td>
+          <td style="color: #94a3b8; font-family: var(--mono);">→ 中立</td>
+          <td class="meta-cell">2026-06-04</td>
+        </tr>
+        
+        <tr>
+          <td class="ccy-cell">CHF</td>
+          <td>SNB</td>
+          <td class="num-cell">0.5%</td>
+          <td style="color: #f87171; font-family: var(--mono);">↓ 緩和</td>
+          <td class="meta-cell">2026-06-19</td>
+        </tr>
+        
+        <tr>
+          <td class="ccy-cell">SGD</td>
+          <td>MAS</td>
+          <td class="num-cell">3.0%</td>
+          <td style="color: #4ade80; font-family: var(--mono);">↑ 引締</td>
+          <td class="meta-cell">2026-07-15</td>
+        </tr>
+        
+        <tr>
+          <td class="ccy-cell">HKD</td>
+          <td>HKMA(米ドルペッグ)</td>
+          <td class="num-cell">4.75%</td>
+          <td style="color: #4ade80; font-family: var(--mono);">↑ 引締</td>
+          <td class="meta-cell">2026-06-18</td>
+        </tr>
+        
+        <tr>
+          <td class="ccy-cell">CNY</td>
+          <td>PBOC</td>
+          <td class="num-cell">3.1%</td>
+          <td style="color: #f87171; font-family: var(--mono);">↓ 緩和</td>
+          <td class="meta-cell">2026-06-20</td>
+        </tr>
+        
+        <tr>
+          <td class="ccy-cell">MXN</td>
+          <td>Banxico</td>
+          <td class="num-cell">7.0%</td>
+          <td style="color: #f87171; font-family: var(--mono);">↓ 緩和</td>
+          <td class="meta-cell">2026-06-26</td>
+        </tr>
+        
+        <tr>
+          <td class="ccy-cell">TRY</td>
+          <td>CBRT</td>
+          <td class="num-cell">38.0%</td>
+          <td style="color: #f87171; font-family: var(--mono);">↓ 緩和</td>
+          <td class="meta-cell">2026-06-19</td>
+        </tr>
+        
+        <tr>
+          <td class="ccy-cell">ZAR</td>
+          <td>SARB</td>
+          <td class="num-cell">7.5%</td>
+          <td style="color: #f87171; font-family: var(--mono);">↓ 緩和</td>
+          <td class="meta-cell">2026-05-29</td>
+        </tr>
+        
+        <tr>
+          <td class="ccy-cell">INR</td>
+          <td>RBI</td>
+          <td class="num-cell">6.0%</td>
+          <td style="color: #94a3b8; font-family: var(--mono);">→ 中立</td>
+          <td class="meta-cell">2026-06-06</td>
+        </tr>
+        </tbody>
+  </table>
+
+  <!-- Upcoming Events -->
+  <div class="section-head">
+    <div class="section-num">III.</div>
+    <h2 class="section-title">今後7日間の重要マクロイベント</h2>
+    <span class="section-sub">Economic Calendar</span>
+  </div>
+
+  <div style="margin-top: 1rem;">
+    <div style="color: var(--text-muted); font-family: var(--mono); font-size: 0.85rem; padding: 1rem;">今後7日間の重要イベントはありません</div>
+  </div>
+
+  <footer class="app-footer">
+    <em>Currents</em> · FX Signal Monitor L3 · Techno-Fundamental Strategy
+    <br>Generated by GitHub Actions / Data: ECB + 米財務省 + Stooq + 手動JSON / 投資判断は自己責任で
+  </footer>
+
+</div>
+
+</body>
+</html>
