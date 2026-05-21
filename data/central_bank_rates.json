@@ -1,22 +1,30 @@
 {
-  "last_updated": "2026-05-19",
-  "notes": "中央銀行会合のたびに手動更新する。stance は tighten/neutral/ease のいずれか。",
-  "data_source": "BIS (Bank for International Settlements) + 各国中央銀行公式発表",
+  "last_updated": "2026-05-21",
+  "notes": "中央銀行会合のたびに手動更新する。stance は tighten/neutral/ease のいずれか。FRED API + Finnhub API 設定済みなら週次自動更新される。",
+  "data_source": "BIS + 各国中央銀行公式発表 + Web検証 (2026-05-21)",
+  "verification_source": {
+    "USD": "Federal Reserve press release 2026-04-29 (3.5-3.75% target range)",
+    "EUR": "ECB Monetary Policy Decisions 2026-02-05 (MRO 2.15%)",
+    "GBP": "BOE MPC 2026-04-30 (Bank Rate 3.75%)",
+    "JPY": "BOJ 2026-04-28 (policy rate 0.75%)",
+    "AUD": "RBA 2026-05-05 (cash rate 4.35% - 中東情勢でインフレ警戒の利上げ局面)"
+  },
   "rates": {
-    "USD": {"rate": 4.75, "next_meeting": "2026-06-18", "stance": "tighten", "cb_name": "FRB"},
-    "EUR": {"rate": 2.65, "next_meeting": "2026-06-05", "stance": "ease", "cb_name": "ECB"},
+    "USD": {"rate": 3.75, "next_meeting": "2026-06-18", "stance": "ease", "cb_name": "FRB"},
+    "EUR": {"rate": 2.15, "next_meeting": "2026-06-05", "stance": "neutral", "cb_name": "ECB"},
     "JPY": {"rate": 0.75, "next_meeting": "2026-06-17", "stance": "tighten", "cb_name": "日銀"},
-    "GBP": {"rate": 4.25, "next_meeting": "2026-06-19", "stance": "neutral", "cb_name": "BOE"},
-    "AUD": {"rate": 4.10, "next_meeting": "2026-06-03", "stance": "neutral", "cb_name": "RBA"},
-    "NZD": {"rate": 4.50, "next_meeting": "2026-05-28", "stance": "ease", "cb_name": "RBNZ"},
-    "CAD": {"rate": 3.25, "next_meeting": "2026-06-04", "stance": "neutral", "cb_name": "BOC"},
-    "CHF": {"rate": 0.50, "next_meeting": "2026-06-19", "stance": "ease", "cb_name": "SNB"},
-    "SGD": {"rate": 3.00, "next_meeting": "2026-07-15", "stance": "tighten", "cb_name": "MAS"},
-    "HKD": {"rate": 4.75, "next_meeting": "2026-06-18", "stance": "tighten", "cb_name": "HKMA(米ドルペッグ)"},
-    "CNY": {"rate": 3.10, "next_meeting": "2026-06-20", "stance": "ease", "cb_name": "PBOC"},
-    "MXN": {"rate": 7.00, "next_meeting": "2026-06-26", "stance": "ease", "cb_name": "Banxico"},
-    "TRY": {"rate": 38.00, "next_meeting": "2026-06-19", "stance": "ease", "cb_name": "CBRT"},
-    "ZAR": {"rate": 7.50, "next_meeting": "2026-05-29", "stance": "ease", "cb_name": "SARB"},
-    "INR": {"rate": 6.00, "next_meeting": "2026-06-06", "stance": "neutral", "cb_name": "RBI"}
-  }
+    "GBP": {"rate": 3.75, "next_meeting": "2026-06-18", "stance": "ease", "cb_name": "BOE"},
+    "AUD": {"rate": 4.35, "next_meeting": "2026-06-03", "stance": "tighten", "cb_name": "RBA"},
+    "NZD": {"rate": 3.25, "next_meeting": "2026-05-28", "stance": "neutral", "cb_name": "RBNZ"},
+    "CAD": {"rate": 2.75, "next_meeting": "2026-06-04", "stance": "neutral", "cb_name": "BOC"},
+    "CHF": {"rate": 0.25, "next_meeting": "2026-06-19", "stance": "ease", "cb_name": "SNB"},
+    "SGD": {"rate": 2.50, "next_meeting": "2026-07-15", "stance": "neutral", "cb_name": "MAS"},
+    "HKD": {"rate": 3.75, "next_meeting": "2026-06-18", "stance": "ease", "cb_name": "HKMA(米ドルペッグ)"},
+    "CNY": {"rate": 3.00, "next_meeting": "2026-06-20", "stance": "ease", "cb_name": "PBOC"},
+    "MXN": {"rate": 9.00, "next_meeting": "2026-06-26", "stance": "ease", "cb_name": "Banxico"},
+    "TRY": {"rate": 46.00, "next_meeting": "2026-06-19", "stance": "ease", "cb_name": "CBRT"},
+    "ZAR": {"rate": 7.25, "next_meeting": "2026-05-29", "stance": "neutral", "cb_name": "SARB"},
+    "INR": {"rate": 5.50, "next_meeting": "2026-06-06", "stance": "ease", "cb_name": "RBI"}
+  },
+  "warning": "USD/EUR/GBP/AUD/JPYのみWeb検証済み。他通貨はAPI自動更新または手動確認が必要です。"
 }
