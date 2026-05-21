@@ -1,12 +1,13 @@
 {
-  "last_updated": "2026-05-19",
+  "last_updated": "2026-05-21",
+  "last_auto_run": "2026-05-21T09:58:12.482718+00:00",
   "notes": "月初に1ヶ月分の重要イベントを手動追加。importance: critical/high/medium",
   "importance_guide": {
     "critical": "中央銀行会合・雇用統計・CPI（48h前から取引控え）",
     "high": "GDP・PMI・小売売上・要人発言（24h前から警戒）",
-    "medium": "二次指標（情報提供のみ）"
+    "medium": "二次指標（自動取得では除外）"
   },
-  "data_source": "TradingEconomics + 投資カレンダー（手動入力）",
+  "data_source": "Finnhub API (auto) + 手動編集",
   "events": [
     {
       "date": "2026-05-19T18:00:00Z",
@@ -14,7 +15,1316 @@
       "currency": "USD",
       "name": "FRB議長講演（FOMC前）",
       "importance": "high",
-      "affects_pairs": ["USDJPY", "EURUSD", "GBPUSD", "AUDUSD", "NZDUSD", "USDCAD", "USDCHF"]
+      "affects_pairs": [
+        "USDJPY",
+        "EURUSD",
+        "GBPUSD",
+        "AUDUSD",
+        "NZDUSD",
+        "USDCAD",
+        "USDCHF"
+      ]
+    },
+    {
+      "date": "2026-05-21T00:30:00Z",
+      "country": "JP",
+      "currency": "JPY",
+      "name": "S&P Global Manufacturing PMI Flash",
+      "importance": "high",
+      "affects_pairs": [
+        "USDJPY",
+        "EURJPY",
+        "GBPJPY",
+        "AUDJPY",
+        "NZDJPY",
+        "CADJPY",
+        "CHFJPY",
+        "MXNJPY",
+        "TRYJPY",
+        "ZARJPY",
+        "INRJPY",
+        "SGDJPY",
+        "HKDJPY",
+        "CNYJPY"
+      ],
+      "source": "finnhub",
+      "actual": 54.5,
+      "estimate": 54.5,
+      "previous": 55.1
+    },
+    {
+      "date": "2026-05-21T00:30:00Z",
+      "country": "JP",
+      "currency": "JPY",
+      "name": "S&P Global Services PMI Flash",
+      "importance": "high",
+      "affects_pairs": [
+        "USDJPY",
+        "EURJPY",
+        "GBPJPY",
+        "AUDJPY",
+        "NZDJPY",
+        "CADJPY",
+        "CHFJPY",
+        "MXNJPY",
+        "TRYJPY",
+        "ZARJPY",
+        "INRJPY",
+        "SGDJPY",
+        "HKDJPY",
+        "CNYJPY"
+      ],
+      "source": "finnhub",
+      "actual": 50,
+      "estimate": null,
+      "previous": 51
+    },
+    {
+      "date": "2026-05-21T01:30:00Z",
+      "country": "JP",
+      "currency": "JPY",
+      "name": "BoJ Koeda Speech",
+      "importance": "critical",
+      "affects_pairs": [
+        "USDJPY",
+        "EURJPY",
+        "GBPJPY",
+        "AUDJPY",
+        "NZDJPY",
+        "CADJPY",
+        "CHFJPY",
+        "MXNJPY",
+        "TRYJPY",
+        "ZARJPY",
+        "INRJPY",
+        "SGDJPY",
+        "HKDJPY",
+        "CNYJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": null
+    },
+    {
+      "date": "2026-05-21T01:30:00Z",
+      "country": "AU",
+      "currency": "AUD",
+      "name": "Unemployment Rate",
+      "importance": "critical",
+      "affects_pairs": [
+        "AUDJPY",
+        "AUDUSD",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": 4.5,
+      "estimate": 4.3,
+      "previous": 4.3
+    },
+    {
+      "date": "2026-05-21T05:00:00Z",
+      "country": "IN",
+      "currency": "INR",
+      "name": "HSBC Manufacturing PMI Flash",
+      "importance": "high",
+      "affects_pairs": [
+        "INRJPY"
+      ],
+      "source": "finnhub",
+      "actual": 54.3,
+      "estimate": null,
+      "previous": 54.7
+    },
+    {
+      "date": "2026-05-21T05:00:00Z",
+      "country": "IN",
+      "currency": "INR",
+      "name": "HSBC Services PMI Flash",
+      "importance": "high",
+      "affects_pairs": [
+        "INRJPY"
+      ],
+      "source": "finnhub",
+      "actual": 58.9,
+      "estimate": null,
+      "previous": 58.8
+    },
+    {
+      "date": "2026-05-21T06:30:00Z",
+      "country": "CH",
+      "currency": "CHF",
+      "name": "Industrial Production YoY",
+      "importance": "high",
+      "affects_pairs": [
+        "USDCHF",
+        "CHFJPY"
+      ],
+      "source": "finnhub",
+      "actual": -7.1,
+      "estimate": 0.5,
+      "previous": -0.4
+    },
+    {
+      "date": "2026-05-21T07:15:00Z",
+      "country": "FR",
+      "currency": "EUR",
+      "name": "S&P Global Manufacturing PMI Flash",
+      "importance": "high",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": 48.9,
+      "estimate": 52.2,
+      "previous": 52.8
+    },
+    {
+      "date": "2026-05-21T07:15:00Z",
+      "country": "FR",
+      "currency": "EUR",
+      "name": "S&P Global Services PMI Flash",
+      "importance": "high",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": 42.9,
+      "estimate": 46.6,
+      "previous": 46.5
+    },
+    {
+      "date": "2026-05-21T07:30:00Z",
+      "country": "DE",
+      "currency": "EUR",
+      "name": "S&P Global Manufacturing PMI Flash",
+      "importance": "high",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": 49.9,
+      "estimate": 51,
+      "previous": 51.4
+    },
+    {
+      "date": "2026-05-21T07:30:00Z",
+      "country": "DE",
+      "currency": "EUR",
+      "name": "S&P Global Services PMI Flash",
+      "importance": "high",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": 47.8,
+      "estimate": 47,
+      "previous": 46.9
+    },
+    {
+      "date": "2026-05-21T08:00:00Z",
+      "country": "EU",
+      "currency": "EUR",
+      "name": "S&P Global Manufacturing PMI Flash",
+      "importance": "high",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": 51.4,
+      "estimate": 51.8,
+      "previous": 52.2
+    },
+    {
+      "date": "2026-05-21T08:00:00Z",
+      "country": "EU",
+      "currency": "EUR",
+      "name": "S&P Global Services PMI Flash",
+      "importance": "high",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": 46.4,
+      "estimate": 47.7,
+      "previous": 47.6
+    },
+    {
+      "date": "2026-05-21T08:30:00Z",
+      "country": "HK",
+      "currency": "HKD",
+      "name": "Inflation Rate MoM",
+      "importance": "critical",
+      "affects_pairs": [
+        "HKDJPY"
+      ],
+      "source": "finnhub",
+      "actual": -0.1,
+      "estimate": null,
+      "previous": 0
+    },
+    {
+      "date": "2026-05-21T08:30:00Z",
+      "country": "HK",
+      "currency": "HKD",
+      "name": "Inflation Rate YoY",
+      "importance": "critical",
+      "affects_pairs": [
+        "HKDJPY"
+      ],
+      "source": "finnhub",
+      "actual": 1.7,
+      "estimate": null,
+      "previous": 1.7
+    },
+    {
+      "date": "2026-05-21T08:30:00Z",
+      "country": "GB",
+      "currency": "GBP",
+      "name": "S&P Global Manufacturing PMI Flash",
+      "importance": "high",
+      "affects_pairs": [
+        "GBPJPY",
+        "GBPUSD",
+        "EURGBP"
+      ],
+      "source": "finnhub",
+      "actual": 53.7,
+      "estimate": 53,
+      "previous": 53.7
+    },
+    {
+      "date": "2026-05-21T08:30:00Z",
+      "country": "GB",
+      "currency": "GBP",
+      "name": "S&P Global Services PMI Flash",
+      "importance": "high",
+      "affects_pairs": [
+        "GBPJPY",
+        "GBPUSD",
+        "EURGBP"
+      ],
+      "source": "finnhub",
+      "actual": 47.9,
+      "estimate": 51.7,
+      "previous": 52.7
+    },
+    {
+      "date": "2026-05-21T12:00:00Z",
+      "country": "MX",
+      "currency": "MXN",
+      "name": "Retail Sales MoM",
+      "importance": "high",
+      "affects_pairs": [
+        "MXNJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": 0.5,
+      "previous": -0.9
+    },
+    {
+      "date": "2026-05-21T12:00:00Z",
+      "country": "MX",
+      "currency": "MXN",
+      "name": "Retail Sales YoY",
+      "importance": "high",
+      "affects_pairs": [
+        "MXNJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": 3.1,
+      "previous": 3.1
+    },
+    {
+      "date": "2026-05-21T12:30:00Z",
+      "country": "US",
+      "currency": "USD",
+      "name": "Philly Fed Business Conditions",
+      "importance": "high",
+      "affects_pairs": [
+        "USDJPY",
+        "EURUSD",
+        "GBPUSD",
+        "AUDUSD",
+        "NZDUSD",
+        "USDCAD",
+        "USDCHF"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 40.8
+    },
+    {
+      "date": "2026-05-21T12:30:00Z",
+      "country": "US",
+      "currency": "USD",
+      "name": "Philly Fed CAPEX Index",
+      "importance": "high",
+      "affects_pairs": [
+        "USDJPY",
+        "EURUSD",
+        "GBPUSD",
+        "AUDUSD",
+        "NZDUSD",
+        "USDCAD",
+        "USDCHF"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 35.2
+    },
+    {
+      "date": "2026-05-21T12:30:00Z",
+      "country": "US",
+      "currency": "USD",
+      "name": "Philly Fed Employment",
+      "importance": "high",
+      "affects_pairs": [
+        "USDJPY",
+        "EURUSD",
+        "GBPUSD",
+        "AUDUSD",
+        "NZDUSD",
+        "USDCAD",
+        "USDCHF"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": -5.1
+    },
+    {
+      "date": "2026-05-21T12:30:00Z",
+      "country": "US",
+      "currency": "USD",
+      "name": "Philly Fed New Orders",
+      "importance": "high",
+      "affects_pairs": [
+        "USDJPY",
+        "EURUSD",
+        "GBPUSD",
+        "AUDUSD",
+        "NZDUSD",
+        "USDCAD",
+        "USDCHF"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 33
+    },
+    {
+      "date": "2026-05-21T12:30:00Z",
+      "country": "US",
+      "currency": "USD",
+      "name": "Philly Fed Prices Paid",
+      "importance": "high",
+      "affects_pairs": [
+        "USDJPY",
+        "EURUSD",
+        "GBPUSD",
+        "AUDUSD",
+        "NZDUSD",
+        "USDCAD",
+        "USDCHF"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 59.3
+    },
+    {
+      "date": "2026-05-21T13:00:00Z",
+      "country": "GB",
+      "currency": "GBP",
+      "name": "BoE  Taylor Speech",
+      "importance": "critical",
+      "affects_pairs": [
+        "GBPJPY",
+        "GBPUSD",
+        "EURGBP"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": null
+    },
+    {
+      "date": "2026-05-21T13:45:00Z",
+      "country": "US",
+      "currency": "USD",
+      "name": "S&P Global Manufacturing PMI Flash",
+      "importance": "high",
+      "affects_pairs": [
+        "USDJPY",
+        "EURUSD",
+        "GBPUSD",
+        "AUDUSD",
+        "NZDUSD",
+        "USDCAD",
+        "USDCHF"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": 53.8,
+      "previous": 54.5
+    },
+    {
+      "date": "2026-05-21T13:45:00Z",
+      "country": "US",
+      "currency": "USD",
+      "name": "S&P Global Services PMI Flash",
+      "importance": "high",
+      "affects_pairs": [
+        "USDJPY",
+        "EURUSD",
+        "GBPUSD",
+        "AUDUSD",
+        "NZDUSD",
+        "USDCAD",
+        "USDCHF"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": 51.1,
+      "previous": 51
+    },
+    {
+      "date": "2026-05-21T14:00:00Z",
+      "country": "EU",
+      "currency": "EUR",
+      "name": "Consumer Confidence Flash",
+      "importance": "high",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": -20.8,
+      "previous": -20.6
+    },
+    {
+      "date": "2026-05-21T15:30:00Z",
+      "country": "EU",
+      "currency": "EUR",
+      "name": "ECB Elderson Speech",
+      "importance": "critical",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": null
+    },
+    {
+      "date": "2026-05-21T22:45:00Z",
+      "country": "NZ",
+      "currency": "NZD",
+      "name": "Retail Sales QoQ",
+      "importance": "high",
+      "affects_pairs": [
+        "NZDJPY",
+        "NZDUSD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": 0.5,
+      "previous": 0.9
+    },
+    {
+      "date": "2026-05-21T22:45:00Z",
+      "country": "NZ",
+      "currency": "NZD",
+      "name": "Retail Sales YoY",
+      "importance": "high",
+      "affects_pairs": [
+        "NZDJPY",
+        "NZDUSD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 4.4
+    },
+    {
+      "date": "2026-05-21T23:01:00Z",
+      "country": "GB",
+      "currency": "GBP",
+      "name": "Gfk Consumer Confidence",
+      "importance": "high",
+      "affects_pairs": [
+        "GBPJPY",
+        "GBPUSD",
+        "EURGBP"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": -28,
+      "previous": -25
+    },
+    {
+      "date": "2026-05-21T23:30:00Z",
+      "country": "JP",
+      "currency": "JPY",
+      "name": "Core Inflation Rate YoY",
+      "importance": "critical",
+      "affects_pairs": [
+        "USDJPY",
+        "EURJPY",
+        "GBPJPY",
+        "AUDJPY",
+        "NZDJPY",
+        "CADJPY",
+        "CHFJPY",
+        "MXNJPY",
+        "TRYJPY",
+        "ZARJPY",
+        "INRJPY",
+        "SGDJPY",
+        "HKDJPY",
+        "CNYJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": 1.7,
+      "previous": 1.8
+    },
+    {
+      "date": "2026-05-21T23:30:00Z",
+      "country": "JP",
+      "currency": "JPY",
+      "name": "Inflation Rate Ex-Food and Energy YoY",
+      "importance": "critical",
+      "affects_pairs": [
+        "USDJPY",
+        "EURJPY",
+        "GBPJPY",
+        "AUDJPY",
+        "NZDJPY",
+        "CADJPY",
+        "CHFJPY",
+        "MXNJPY",
+        "TRYJPY",
+        "ZARJPY",
+        "INRJPY",
+        "SGDJPY",
+        "HKDJPY",
+        "CNYJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 2.4
+    },
+    {
+      "date": "2026-05-21T23:30:00Z",
+      "country": "JP",
+      "currency": "JPY",
+      "name": "Inflation Rate MoM",
+      "importance": "critical",
+      "affects_pairs": [
+        "USDJPY",
+        "EURJPY",
+        "GBPJPY",
+        "AUDJPY",
+        "NZDJPY",
+        "CADJPY",
+        "CHFJPY",
+        "MXNJPY",
+        "TRYJPY",
+        "ZARJPY",
+        "INRJPY",
+        "SGDJPY",
+        "HKDJPY",
+        "CNYJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 0.4
+    },
+    {
+      "date": "2026-05-21T23:30:00Z",
+      "country": "JP",
+      "currency": "JPY",
+      "name": "Inflation Rate YoY",
+      "importance": "critical",
+      "affects_pairs": [
+        "USDJPY",
+        "EURJPY",
+        "GBPJPY",
+        "AUDJPY",
+        "NZDJPY",
+        "CADJPY",
+        "CHFJPY",
+        "MXNJPY",
+        "TRYJPY",
+        "ZARJPY",
+        "INRJPY",
+        "SGDJPY",
+        "HKDJPY",
+        "CNYJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 1.5
+    },
+    {
+      "date": "2026-05-22T01:15:00Z",
+      "country": "EU",
+      "currency": "EUR",
+      "name": "ECB Lane Speech",
+      "importance": "critical",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": null
+    },
+    {
+      "date": "2026-05-22T06:00:00Z",
+      "country": "DE",
+      "currency": "EUR",
+      "name": "GDP Growth Rate QoQ Final",
+      "importance": "critical",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": 0.3,
+      "previous": 0.2
+    },
+    {
+      "date": "2026-05-22T06:00:00Z",
+      "country": "DE",
+      "currency": "EUR",
+      "name": "GDP Growth Rate YoY Final",
+      "importance": "critical",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": 0.3,
+      "previous": 0.4
+    },
+    {
+      "date": "2026-05-22T06:00:00Z",
+      "country": "DE",
+      "currency": "EUR",
+      "name": "GfK Consumer Confidence",
+      "importance": "high",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": -34,
+      "previous": -33.3
+    },
+    {
+      "date": "2026-05-22T06:00:00Z",
+      "country": "GB",
+      "currency": "GBP",
+      "name": "Retail Sales ex Fuel MoM",
+      "importance": "high",
+      "affects_pairs": [
+        "GBPJPY",
+        "GBPUSD",
+        "EURGBP"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": -0.3,
+      "previous": 0.2
+    },
+    {
+      "date": "2026-05-22T06:00:00Z",
+      "country": "GB",
+      "currency": "GBP",
+      "name": "Retail Sales ex Fuel YoY",
+      "importance": "high",
+      "affects_pairs": [
+        "GBPJPY",
+        "GBPUSD",
+        "EURGBP"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": 1.5,
+      "previous": 1.7
+    },
+    {
+      "date": "2026-05-22T06:00:00Z",
+      "country": "GB",
+      "currency": "GBP",
+      "name": "Retail Sales MoM",
+      "importance": "high",
+      "affects_pairs": [
+        "GBPJPY",
+        "GBPUSD",
+        "EURGBP"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": -0.6,
+      "previous": 0.7
+    },
+    {
+      "date": "2026-05-22T06:00:00Z",
+      "country": "GB",
+      "currency": "GBP",
+      "name": "Retail Sales YoY",
+      "importance": "high",
+      "affects_pairs": [
+        "GBPJPY",
+        "GBPUSD",
+        "EURGBP"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": 1.3,
+      "previous": 1.7
+    },
+    {
+      "date": "2026-05-22T12:00:00Z",
+      "country": "MX",
+      "currency": "MXN",
+      "name": "GDP Growth Rate QoQ Final",
+      "importance": "critical",
+      "affects_pairs": [
+        "MXNJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": -0.8,
+      "previous": 0.9
+    },
+    {
+      "date": "2026-05-22T12:00:00Z",
+      "country": "MX",
+      "currency": "MXN",
+      "name": "GDP Growth Rate YoY Final",
+      "importance": "critical",
+      "affects_pairs": [
+        "MXNJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": 0.1,
+      "previous": 1.8
+    },
+    {
+      "date": "2026-05-22T12:00:00Z",
+      "country": "MX",
+      "currency": "MXN",
+      "name": "Mid-month Core Inflation Rate MoM",
+      "importance": "critical",
+      "affects_pairs": [
+        "MXNJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": 0.17,
+      "previous": 0.18
+    },
+    {
+      "date": "2026-05-22T12:00:00Z",
+      "country": "MX",
+      "currency": "MXN",
+      "name": "Mid-month Core Inflation Rate YoY",
+      "importance": "critical",
+      "affects_pairs": [
+        "MXNJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": 4.26,
+      "previous": 4.27
+    },
+    {
+      "date": "2026-05-22T12:00:00Z",
+      "country": "MX",
+      "currency": "MXN",
+      "name": "Mid-month Inflation Rate MoM",
+      "importance": "critical",
+      "affects_pairs": [
+        "MXNJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": -0.15,
+      "previous": 0.11
+    },
+    {
+      "date": "2026-05-22T12:00:00Z",
+      "country": "MX",
+      "currency": "MXN",
+      "name": "Mid-month Inflation Rate YoY",
+      "importance": "critical",
+      "affects_pairs": [
+        "MXNJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": 4.13,
+      "previous": 4.53
+    },
+    {
+      "date": "2026-05-22T12:30:00Z",
+      "country": "CA",
+      "currency": "CAD",
+      "name": "PPI MoM",
+      "importance": "high",
+      "affects_pairs": [
+        "USDCAD",
+        "CADJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": 1.3,
+      "previous": 2.4
+    },
+    {
+      "date": "2026-05-22T12:30:00Z",
+      "country": "CA",
+      "currency": "CAD",
+      "name": "PPI YoY",
+      "importance": "high",
+      "affects_pairs": [
+        "USDCAD",
+        "CADJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 7.8
+    },
+    {
+      "date": "2026-05-22T12:30:00Z",
+      "country": "CA",
+      "currency": "CAD",
+      "name": "Retail Sales Ex Autos MoM",
+      "importance": "high",
+      "affects_pairs": [
+        "USDCAD",
+        "CADJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": 0.9,
+      "previous": 0.5
+    },
+    {
+      "date": "2026-05-22T12:30:00Z",
+      "country": "CA",
+      "currency": "CAD",
+      "name": "Retail Sales MoM Final",
+      "importance": "high",
+      "affects_pairs": [
+        "USDCAD",
+        "CADJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": 0.6,
+      "previous": 0.7
+    },
+    {
+      "date": "2026-05-22T12:30:00Z",
+      "country": "CA",
+      "currency": "CAD",
+      "name": "Retail Sales MoM Prel",
+      "importance": "high",
+      "affects_pairs": [
+        "USDCAD",
+        "CADJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": null
+    },
+    {
+      "date": "2026-05-22T12:30:00Z",
+      "country": "CA",
+      "currency": "CAD",
+      "name": "Retail Sales YoY",
+      "importance": "high",
+      "affects_pairs": [
+        "USDCAD",
+        "CADJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 3.8
+    },
+    {
+      "date": "2026-05-25T05:00:00Z",
+      "country": "SG",
+      "currency": "SGD",
+      "name": "Core Inflation Rate YoY",
+      "importance": "critical",
+      "affects_pairs": [
+        "SGDJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 1.7
+    },
+    {
+      "date": "2026-05-25T05:00:00Z",
+      "country": "SG",
+      "currency": "SGD",
+      "name": "Inflation Rate MoM",
+      "importance": "critical",
+      "affects_pairs": [
+        "SGDJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 0.5
+    },
+    {
+      "date": "2026-05-25T05:00:00Z",
+      "country": "SG",
+      "currency": "SGD",
+      "name": "Inflation Rate YoY",
+      "importance": "critical",
+      "affects_pairs": [
+        "SGDJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 1.8
+    },
+    {
+      "date": "2026-05-26T00:00:00Z",
+      "country": "SG",
+      "currency": "SGD",
+      "name": "GDP Growth Rate QoQ Final",
+      "importance": "critical",
+      "affects_pairs": [
+        "SGDJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": -0.3,
+      "previous": 1.3
+    },
+    {
+      "date": "2026-05-26T00:00:00Z",
+      "country": "SG",
+      "currency": "SGD",
+      "name": "GDP Growth Rate YoY Final",
+      "importance": "critical",
+      "affects_pairs": [
+        "SGDJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": 4.6,
+      "previous": 5.7
+    },
+    {
+      "date": "2026-05-26T05:00:00Z",
+      "country": "SG",
+      "currency": "SGD",
+      "name": "Industrial Production MoM",
+      "importance": "high",
+      "affects_pairs": [
+        "SGDJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 4.7
+    },
+    {
+      "date": "2026-05-26T05:00:00Z",
+      "country": "SG",
+      "currency": "SGD",
+      "name": "Industrial Production YoY",
+      "importance": "high",
+      "affects_pairs": [
+        "SGDJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 10.1
+    },
+    {
+      "date": "2026-05-26T07:00:00Z",
+      "country": "ES",
+      "currency": "EUR",
+      "name": "PPI YoY",
+      "importance": "high",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 3.4
+    },
+    {
+      "date": "2026-05-26T14:00:00Z",
+      "country": "US",
+      "currency": "USD",
+      "name": "CB Consumer Confidence",
+      "importance": "high",
+      "affects_pairs": [
+        "USDJPY",
+        "EURUSD",
+        "GBPUSD",
+        "AUDUSD",
+        "NZDUSD",
+        "USDCAD",
+        "USDCHF"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 92.8
+    },
+    {
+      "date": "2026-05-27T00:00:00Z",
+      "country": "JP",
+      "currency": "JPY",
+      "name": "BoJ Gov Ueda Speech",
+      "importance": "critical",
+      "affects_pairs": [
+        "USDJPY",
+        "EURJPY",
+        "GBPJPY",
+        "AUDJPY",
+        "NZDJPY",
+        "CADJPY",
+        "CHFJPY",
+        "MXNJPY",
+        "TRYJPY",
+        "ZARJPY",
+        "INRJPY",
+        "SGDJPY",
+        "HKDJPY",
+        "CNYJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": null
+    },
+    {
+      "date": "2026-05-27T01:30:00Z",
+      "country": "AU",
+      "currency": "AUD",
+      "name": "CPI",
+      "importance": "critical",
+      "affects_pairs": [
+        "AUDJPY",
+        "AUDUSD",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 102.44
+    },
+    {
+      "date": "2026-05-27T01:30:00Z",
+      "country": "AU",
+      "currency": "AUD",
+      "name": "Inflation Rate MoM",
+      "importance": "critical",
+      "affects_pairs": [
+        "AUDJPY",
+        "AUDUSD",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 1.1
+    },
+    {
+      "date": "2026-05-27T01:30:00Z",
+      "country": "AU",
+      "currency": "AUD",
+      "name": "Inflation Rate YoY",
+      "importance": "critical",
+      "affects_pairs": [
+        "AUDJPY",
+        "AUDUSD",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 4.6
+    },
+    {
+      "date": "2026-05-27T01:30:00Z",
+      "country": "AU",
+      "currency": "AUD",
+      "name": "RBA Trimmed Mean CPI MoM",
+      "importance": "critical",
+      "affects_pairs": [
+        "AUDJPY",
+        "AUDUSD",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 0.3
+    },
+    {
+      "date": "2026-05-27T01:30:00Z",
+      "country": "AU",
+      "currency": "AUD",
+      "name": "RBA Trimmed Mean CPI YoY",
+      "importance": "critical",
+      "affects_pairs": [
+        "AUDJPY",
+        "AUDUSD",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 3.3
+    },
+    {
+      "date": "2026-05-27T01:30:00Z",
+      "country": "AU",
+      "currency": "AUD",
+      "name": "RBA Weighted Median CPI MoM",
+      "importance": "critical",
+      "affects_pairs": [
+        "AUDJPY",
+        "AUDUSD",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 0.3
+    },
+    {
+      "date": "2026-05-27T01:30:00Z",
+      "country": "AU",
+      "currency": "AUD",
+      "name": "RBA Weighted Median CPI YoY",
+      "importance": "critical",
+      "affects_pairs": [
+        "AUDJPY",
+        "AUDUSD",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 3.5
+    },
+    {
+      "date": "2026-05-27T02:00:00Z",
+      "country": "NZ",
+      "currency": "NZD",
+      "name": "RBNZ Interest Rate Decision",
+      "importance": "critical",
+      "affects_pairs": [
+        "NZDJPY",
+        "NZDUSD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 2.25
+    },
+    {
+      "date": "2026-05-27T03:00:00Z",
+      "country": "NZ",
+      "currency": "NZD",
+      "name": "RBNZ Press Conference",
+      "importance": "critical",
+      "affects_pairs": [
+        "NZDJPY",
+        "NZDUSD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": null
+    },
+    {
+      "date": "2026-05-27T06:45:00Z",
+      "country": "FR",
+      "currency": "EUR",
+      "name": "Consumer Confidence",
+      "importance": "high",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 84
     },
     {
       "date": "2026-05-28T02:00:00Z",
@@ -22,7 +1332,1067 @@
       "currency": "NZD",
       "name": "RBNZ政策金利発表",
       "importance": "critical",
-      "affects_pairs": ["NZDJPY", "NZDUSD"]
+      "affects_pairs": [
+        "NZDJPY",
+        "NZDUSD"
+      ]
+    },
+    {
+      "date": "2026-05-28T06:45:00Z",
+      "country": "FR",
+      "currency": "EUR",
+      "name": "PPI MoM",
+      "importance": "high",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 2
+    },
+    {
+      "date": "2026-05-28T06:45:00Z",
+      "country": "FR",
+      "currency": "EUR",
+      "name": "PPI YoY",
+      "importance": "high",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 0.2
+    },
+    {
+      "date": "2026-05-28T07:00:00Z",
+      "country": "ES",
+      "currency": "EUR",
+      "name": "Retail Sales MoM",
+      "importance": "high",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 1.2
+    },
+    {
+      "date": "2026-05-28T07:00:00Z",
+      "country": "ES",
+      "currency": "EUR",
+      "name": "Retail Sales YoY",
+      "importance": "high",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 4.1
+    },
+    {
+      "date": "2026-05-28T08:00:00Z",
+      "country": "IT",
+      "currency": "EUR",
+      "name": "Consumer Confidence",
+      "importance": "high",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 90.8
+    },
+    {
+      "date": "2026-05-28T08:00:00Z",
+      "country": "EU",
+      "currency": "EUR",
+      "name": "ECB Consumer Inflation Expectations",
+      "importance": "critical",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 4
+    },
+    {
+      "date": "2026-05-28T09:00:00Z",
+      "country": "EU",
+      "currency": "EUR",
+      "name": "Consumer Confidence Final",
+      "importance": "high",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": -20.6
+    },
+    {
+      "date": "2026-05-28T09:30:00Z",
+      "country": "ZA",
+      "currency": "ZAR",
+      "name": "PPI MoM",
+      "importance": "high",
+      "affects_pairs": [
+        "ZARJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 1.1
+    },
+    {
+      "date": "2026-05-28T09:30:00Z",
+      "country": "ZA",
+      "currency": "ZAR",
+      "name": "PPI YoY",
+      "importance": "high",
+      "affects_pairs": [
+        "ZARJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 2.3
+    },
+    {
+      "date": "2026-05-28T10:00:00Z",
+      "country": "IT",
+      "currency": "EUR",
+      "name": "PPI MoM",
+      "importance": "high",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 4.4
+    },
+    {
+      "date": "2026-05-28T10:00:00Z",
+      "country": "IT",
+      "currency": "EUR",
+      "name": "PPI YoY",
+      "importance": "high",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 4.2
+    },
+    {
+      "date": "2026-05-28T10:30:00Z",
+      "country": "IN",
+      "currency": "INR",
+      "name": "Industrial Production YoY",
+      "importance": "high",
+      "affects_pairs": [
+        "INRJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 4.1
+    },
+    {
+      "date": "2026-05-28T12:00:00Z",
+      "country": "MX",
+      "currency": "MXN",
+      "name": "Unemployment Rate",
+      "importance": "critical",
+      "affects_pairs": [
+        "MXNJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 2.4
+    },
+    {
+      "date": "2026-05-28T12:30:00Z",
+      "country": "US",
+      "currency": "USD",
+      "name": "GDP Growth Rate QoQ 2nd Est",
+      "importance": "critical",
+      "affects_pairs": [
+        "USDJPY",
+        "EURUSD",
+        "GBPUSD",
+        "AUDUSD",
+        "NZDUSD",
+        "USDCAD",
+        "USDCHF"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": 2,
+      "previous": 0.5
+    },
+    {
+      "date": "2026-05-28T12:30:00Z",
+      "country": "US",
+      "currency": "USD",
+      "name": "GDP Price Index QoQ 2nd Est",
+      "importance": "critical",
+      "affects_pairs": [
+        "USDJPY",
+        "EURUSD",
+        "GBPUSD",
+        "AUDUSD",
+        "NZDUSD",
+        "USDCAD",
+        "USDCHF"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": 4.5,
+      "previous": 3.7
+    },
+    {
+      "date": "2026-05-28T12:30:00Z",
+      "country": "US",
+      "currency": "USD",
+      "name": "GDP Sales QoQ 2nd Est",
+      "importance": "critical",
+      "affects_pairs": [
+        "USDJPY",
+        "EURUSD",
+        "GBPUSD",
+        "AUDUSD",
+        "NZDUSD",
+        "USDCAD",
+        "USDCHF"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": 1.6,
+      "previous": 0.3
+    },
+    {
+      "date": "2026-05-28T13:00:00Z",
+      "country": "ZA",
+      "currency": "ZAR",
+      "name": "Interest Rate Decision",
+      "importance": "critical",
+      "affects_pairs": [
+        "ZARJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 6.75
+    },
+    {
+      "date": "2026-05-28T14:00:00Z",
+      "country": "CA",
+      "currency": "CAD",
+      "name": "BoC Financial Stability Report",
+      "importance": "critical",
+      "affects_pairs": [
+        "USDCAD",
+        "CADJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": null
+    },
+    {
+      "date": "2026-05-28T22:00:00Z",
+      "country": "NZ",
+      "currency": "NZD",
+      "name": "ANZ Roy Morgan Consumer Confidence",
+      "importance": "high",
+      "affects_pairs": [
+        "NZDJPY",
+        "NZDUSD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 80.3
+    },
+    {
+      "date": "2026-05-28T23:30:00Z",
+      "country": "JP",
+      "currency": "JPY",
+      "name": "Tokyo Core CPI YoY",
+      "importance": "critical",
+      "affects_pairs": [
+        "USDJPY",
+        "EURJPY",
+        "GBPJPY",
+        "AUDJPY",
+        "NZDJPY",
+        "CADJPY",
+        "CHFJPY",
+        "MXNJPY",
+        "TRYJPY",
+        "ZARJPY",
+        "INRJPY",
+        "SGDJPY",
+        "HKDJPY",
+        "CNYJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 1.5
+    },
+    {
+      "date": "2026-05-28T23:30:00Z",
+      "country": "JP",
+      "currency": "JPY",
+      "name": "Tokyo CPI Ex Food and Energy YoY",
+      "importance": "critical",
+      "affects_pairs": [
+        "USDJPY",
+        "EURJPY",
+        "GBPJPY",
+        "AUDJPY",
+        "NZDJPY",
+        "CADJPY",
+        "CHFJPY",
+        "MXNJPY",
+        "TRYJPY",
+        "ZARJPY",
+        "INRJPY",
+        "SGDJPY",
+        "HKDJPY",
+        "CNYJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 1.5
+    },
+    {
+      "date": "2026-05-28T23:30:00Z",
+      "country": "JP",
+      "currency": "JPY",
+      "name": "Tokyo CPI YoY",
+      "importance": "critical",
+      "affects_pairs": [
+        "USDJPY",
+        "EURJPY",
+        "GBPJPY",
+        "AUDJPY",
+        "NZDJPY",
+        "CADJPY",
+        "CHFJPY",
+        "MXNJPY",
+        "TRYJPY",
+        "ZARJPY",
+        "INRJPY",
+        "SGDJPY",
+        "HKDJPY",
+        "CNYJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 1.5
+    },
+    {
+      "date": "2026-05-28T23:30:00Z",
+      "country": "JP",
+      "currency": "JPY",
+      "name": "Unemployment Rate",
+      "importance": "critical",
+      "affects_pairs": [
+        "USDJPY",
+        "EURJPY",
+        "GBPJPY",
+        "AUDJPY",
+        "NZDJPY",
+        "CADJPY",
+        "CHFJPY",
+        "MXNJPY",
+        "TRYJPY",
+        "ZARJPY",
+        "INRJPY",
+        "SGDJPY",
+        "HKDJPY",
+        "CNYJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 2.7
+    },
+    {
+      "date": "2026-05-28T23:50:00Z",
+      "country": "JP",
+      "currency": "JPY",
+      "name": "Industrial Production MoM Prel",
+      "importance": "high",
+      "affects_pairs": [
+        "USDJPY",
+        "EURJPY",
+        "GBPJPY",
+        "AUDJPY",
+        "NZDJPY",
+        "CADJPY",
+        "CHFJPY",
+        "MXNJPY",
+        "TRYJPY",
+        "ZARJPY",
+        "INRJPY",
+        "SGDJPY",
+        "HKDJPY",
+        "CNYJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": -0.4
+    },
+    {
+      "date": "2026-05-28T23:50:00Z",
+      "country": "JP",
+      "currency": "JPY",
+      "name": "Industrial Production YoY Prel",
+      "importance": "high",
+      "affects_pairs": [
+        "USDJPY",
+        "EURJPY",
+        "GBPJPY",
+        "AUDJPY",
+        "NZDJPY",
+        "CADJPY",
+        "CHFJPY",
+        "MXNJPY",
+        "TRYJPY",
+        "ZARJPY",
+        "INRJPY",
+        "SGDJPY",
+        "HKDJPY",
+        "CNYJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 2.4
+    },
+    {
+      "date": "2026-05-29T03:30:00Z",
+      "country": "SG",
+      "currency": "SGD",
+      "name": "PPI YoY",
+      "importance": "high",
+      "affects_pairs": [
+        "SGDJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 21.6
+    },
+    {
+      "date": "2026-05-29T05:00:00Z",
+      "country": "JP",
+      "currency": "JPY",
+      "name": "Consumer Confidence",
+      "importance": "high",
+      "affects_pairs": [
+        "USDJPY",
+        "EURJPY",
+        "GBPJPY",
+        "AUDJPY",
+        "NZDJPY",
+        "CADJPY",
+        "CHFJPY",
+        "MXNJPY",
+        "TRYJPY",
+        "ZARJPY",
+        "INRJPY",
+        "SGDJPY",
+        "HKDJPY",
+        "CNYJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 32.2
+    },
+    {
+      "date": "2026-05-29T06:45:00Z",
+      "country": "FR",
+      "currency": "EUR",
+      "name": "GDP Growth Rate QoQ Final",
+      "importance": "critical",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": 0,
+      "previous": 0.2
+    },
+    {
+      "date": "2026-05-29T06:45:00Z",
+      "country": "FR",
+      "currency": "EUR",
+      "name": "GDP Growth Rate YoY Final",
+      "importance": "critical",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 1.3
+    },
+    {
+      "date": "2026-05-29T06:45:00Z",
+      "country": "FR",
+      "currency": "EUR",
+      "name": "Harmonised Inflation Rate MoM Prel",
+      "importance": "critical",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": null
+    },
+    {
+      "date": "2026-05-29T06:45:00Z",
+      "country": "FR",
+      "currency": "EUR",
+      "name": "Harmonised Inflation Rate YoY Prel",
+      "importance": "critical",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": null
+    },
+    {
+      "date": "2026-05-29T06:45:00Z",
+      "country": "FR",
+      "currency": "EUR",
+      "name": "Inflation Rate MoM Prel",
+      "importance": "critical",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 1
+    },
+    {
+      "date": "2026-05-29T06:45:00Z",
+      "country": "FR",
+      "currency": "EUR",
+      "name": "Inflation Rate YoY Prel",
+      "importance": "critical",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 2.2
+    },
+    {
+      "date": "2026-05-29T07:00:00Z",
+      "country": "ES",
+      "currency": "EUR",
+      "name": "Core Inflation Rate YoY Prel",
+      "importance": "critical",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 2.8
+    },
+    {
+      "date": "2026-05-29T07:00:00Z",
+      "country": "ES",
+      "currency": "EUR",
+      "name": "Harmonised Inflation Rate MoM Prel",
+      "importance": "critical",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 0.7
+    },
+    {
+      "date": "2026-05-29T07:00:00Z",
+      "country": "ES",
+      "currency": "EUR",
+      "name": "Harmonised Inflation Rate YoY Prel",
+      "importance": "critical",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 3.5
+    },
+    {
+      "date": "2026-05-29T07:00:00Z",
+      "country": "ES",
+      "currency": "EUR",
+      "name": "Inflation Rate MoM Prel",
+      "importance": "critical",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 0.4
+    },
+    {
+      "date": "2026-05-29T07:00:00Z",
+      "country": "ES",
+      "currency": "EUR",
+      "name": "Inflation Rate YoY Prel",
+      "importance": "critical",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 3.2
+    },
+    {
+      "date": "2026-05-29T07:55:00Z",
+      "country": "DE",
+      "currency": "EUR",
+      "name": "Unemployment Rate",
+      "importance": "critical",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 6.4
+    },
+    {
+      "date": "2026-05-29T08:00:00Z",
+      "country": "DE",
+      "currency": "EUR",
+      "name": "Baden Wuerttemberg CPI MoM",
+      "importance": "critical",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 0.6
+    },
+    {
+      "date": "2026-05-29T08:00:00Z",
+      "country": "DE",
+      "currency": "EUR",
+      "name": "Baden Wuerttemberg CPI YoY",
+      "importance": "critical",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 2.6
+    },
+    {
+      "date": "2026-05-29T08:00:00Z",
+      "country": "DE",
+      "currency": "EUR",
+      "name": "Bavaria CPI MoM",
+      "importance": "critical",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 0.5
+    },
+    {
+      "date": "2026-05-29T08:00:00Z",
+      "country": "DE",
+      "currency": "EUR",
+      "name": "Bavaria CPI YoY",
+      "importance": "critical",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 2.9
+    },
+    {
+      "date": "2026-05-29T08:00:00Z",
+      "country": "DE",
+      "currency": "EUR",
+      "name": "Brandenburg CPI MoM",
+      "importance": "critical",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 0.6
+    },
+    {
+      "date": "2026-05-29T08:00:00Z",
+      "country": "DE",
+      "currency": "EUR",
+      "name": "Brandenburg CPI YoY",
+      "importance": "critical",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 2.9
+    },
+    {
+      "date": "2026-05-29T08:00:00Z",
+      "country": "DE",
+      "currency": "EUR",
+      "name": "Hesse CPI MoM",
+      "importance": "critical",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 0.4
+    },
+    {
+      "date": "2026-05-29T08:00:00Z",
+      "country": "DE",
+      "currency": "EUR",
+      "name": "Hesse CPI YoY",
+      "importance": "critical",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 2.8
+    },
+    {
+      "date": "2026-05-29T08:00:00Z",
+      "country": "DE",
+      "currency": "EUR",
+      "name": "North Rhine Westphalia CPI MoM",
+      "importance": "critical",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 0.4
+    },
+    {
+      "date": "2026-05-29T08:00:00Z",
+      "country": "DE",
+      "currency": "EUR",
+      "name": "North Rhine Westphalia CPI YoY",
+      "importance": "critical",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 2.7
+    },
+    {
+      "date": "2026-05-29T08:00:00Z",
+      "country": "DE",
+      "currency": "EUR",
+      "name": "Saxony CPI MoM",
+      "importance": "critical",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 0.6
+    },
+    {
+      "date": "2026-05-29T08:00:00Z",
+      "country": "DE",
+      "currency": "EUR",
+      "name": "Saxony CPI YoY",
+      "importance": "critical",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 2.9
+    },
+    {
+      "date": "2026-05-29T08:00:00Z",
+      "country": "IT",
+      "currency": "EUR",
+      "name": "Unemployment Rate",
+      "importance": "critical",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 5.2
+    },
+    {
+      "date": "2026-05-29T09:00:00Z",
+      "country": "IT",
+      "currency": "EUR",
+      "name": "Harmonised Inflation Rate MoM Prel",
+      "importance": "critical",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 1.6
+    },
+    {
+      "date": "2026-05-29T09:00:00Z",
+      "country": "IT",
+      "currency": "EUR",
+      "name": "Harmonised Inflation Rate YoY Prel",
+      "importance": "critical",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 2.8
+    },
+    {
+      "date": "2026-05-29T09:00:00Z",
+      "country": "IT",
+      "currency": "EUR",
+      "name": "Inflation Rate MoM Prel",
+      "importance": "critical",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 1.1
+    },
+    {
+      "date": "2026-05-29T09:00:00Z",
+      "country": "IT",
+      "currency": "EUR",
+      "name": "Inflation Rate YoY Prel",
+      "importance": "critical",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 2.7
+    },
+    {
+      "date": "2026-05-29T10:00:00Z",
+      "country": "IT",
+      "currency": "EUR",
+      "name": "GDP Growth Rate QoQ Final",
+      "importance": "critical",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": 0.2,
+      "previous": 0.3
+    },
+    {
+      "date": "2026-05-29T10:00:00Z",
+      "country": "IT",
+      "currency": "EUR",
+      "name": "GDP Growth Rate YoY Final",
+      "importance": "critical",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": 0.8,
+      "previous": 0.8
+    },
+    {
+      "date": "2026-05-29T10:30:00Z",
+      "country": "IN",
+      "currency": "INR",
+      "name": "GDP Growth Rate YoY",
+      "importance": "critical",
+      "affects_pairs": [
+        "INRJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 7.8
     },
     {
       "date": "2026-05-29T11:00:00Z",
@@ -30,7 +2400,226 @@
       "currency": "ZAR",
       "name": "SARB政策金利発表",
       "importance": "critical",
-      "affects_pairs": ["ZARJPY"]
+      "affects_pairs": [
+        "ZARJPY"
+      ]
+    },
+    {
+      "date": "2026-05-29T12:00:00Z",
+      "country": "DE",
+      "currency": "EUR",
+      "name": "Harmonised Inflation Rate MoM Prel",
+      "importance": "critical",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 0.5
+    },
+    {
+      "date": "2026-05-29T12:00:00Z",
+      "country": "DE",
+      "currency": "EUR",
+      "name": "Harmonised Inflation Rate YoY Prel",
+      "importance": "critical",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 2.9
+    },
+    {
+      "date": "2026-05-29T12:00:00Z",
+      "country": "DE",
+      "currency": "EUR",
+      "name": "Inflation Rate MoM Prel",
+      "importance": "critical",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 0.6
+    },
+    {
+      "date": "2026-05-29T12:00:00Z",
+      "country": "DE",
+      "currency": "EUR",
+      "name": "Inflation Rate YoY Prel",
+      "importance": "critical",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 2.9
+    },
+    {
+      "date": "2026-05-29T12:30:00Z",
+      "country": "CA",
+      "currency": "CAD",
+      "name": "GDP Growth Rate Annualized",
+      "importance": "critical",
+      "affects_pairs": [
+        "USDCAD",
+        "CADJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": -0.6
+    },
+    {
+      "date": "2026-05-29T12:30:00Z",
+      "country": "CA",
+      "currency": "CAD",
+      "name": "GDP Growth Rate QoQ",
+      "importance": "critical",
+      "affects_pairs": [
+        "USDCAD",
+        "CADJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": -0.2
+    },
+    {
+      "date": "2026-05-29T12:30:00Z",
+      "country": "CA",
+      "currency": "CAD",
+      "name": "GDP Implicit Price QoQ",
+      "importance": "critical",
+      "affects_pairs": [
+        "USDCAD",
+        "CADJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 0.7
+    },
+    {
+      "date": "2026-05-29T12:30:00Z",
+      "country": "CA",
+      "currency": "CAD",
+      "name": "GDP MoM",
+      "importance": "critical",
+      "affects_pairs": [
+        "USDCAD",
+        "CADJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 0.2
+    },
+    {
+      "date": "2026-05-29T12:30:00Z",
+      "country": "CA",
+      "currency": "CAD",
+      "name": "GDP MoM Prel",
+      "importance": "critical",
+      "affects_pairs": [
+        "USDCAD",
+        "CADJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": null
+    },
+    {
+      "date": "2026-05-29T12:30:00Z",
+      "country": "US",
+      "currency": "USD",
+      "name": "Goods Trade Balance Adv",
+      "importance": "high",
+      "affects_pairs": [
+        "USDJPY",
+        "EURUSD",
+        "GBPUSD",
+        "AUDUSD",
+        "NZDUSD",
+        "USDCAD",
+        "USDCHF"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": -87.45
+    },
+    {
+      "date": "2026-05-29T23:50:00Z",
+      "country": "JP",
+      "currency": "JPY",
+      "name": "Retail Sales MoM",
+      "importance": "high",
+      "affects_pairs": [
+        "USDJPY",
+        "EURJPY",
+        "GBPJPY",
+        "AUDJPY",
+        "NZDJPY",
+        "CADJPY",
+        "CHFJPY",
+        "MXNJPY",
+        "TRYJPY",
+        "ZARJPY",
+        "INRJPY",
+        "SGDJPY",
+        "HKDJPY",
+        "CNYJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 1.3
+    },
+    {
+      "date": "2026-05-29T23:50:00Z",
+      "country": "JP",
+      "currency": "JPY",
+      "name": "Retail Sales YoY",
+      "importance": "high",
+      "affects_pairs": [
+        "USDJPY",
+        "EURJPY",
+        "GBPJPY",
+        "AUDJPY",
+        "NZDJPY",
+        "CADJPY",
+        "CHFJPY",
+        "MXNJPY",
+        "TRYJPY",
+        "ZARJPY",
+        "INRJPY",
+        "SGDJPY",
+        "HKDJPY",
+        "CNYJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 1.7
     },
     {
       "date": "2026-05-30T23:30:00Z",
@@ -38,7 +2627,808 @@
       "currency": "JPY",
       "name": "東京都区部CPI",
       "importance": "medium",
-      "affects_pairs": ["USDJPY", "EURJPY", "GBPJPY", "AUDJPY"]
+      "affects_pairs": [
+        "USDJPY",
+        "EURJPY",
+        "GBPJPY",
+        "AUDJPY"
+      ]
+    },
+    {
+      "date": "2026-05-31T01:30:00Z",
+      "country": "CN",
+      "currency": "CNY",
+      "name": "NBS Manufacturing PMI",
+      "importance": "high",
+      "affects_pairs": [
+        "CNYJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 50.3
+    },
+    {
+      "date": "2026-05-31T01:30:00Z",
+      "country": "CN",
+      "currency": "CNY",
+      "name": "NBS Non Manufacturing PMI",
+      "importance": "high",
+      "affects_pairs": [
+        "CNYJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 49.4
+    },
+    {
+      "date": "2026-05-31T23:00:00Z",
+      "country": "AU",
+      "currency": "AUD",
+      "name": "S&P Global Manufacturing PMI Final",
+      "importance": "high",
+      "affects_pairs": [
+        "AUDJPY",
+        "AUDUSD",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 51.3
+    },
+    {
+      "date": "2026-06-01T00:30:00Z",
+      "country": "JP",
+      "currency": "JPY",
+      "name": "S&P Global Manufacturing PMI Final",
+      "importance": "high",
+      "affects_pairs": [
+        "USDJPY",
+        "EURJPY",
+        "GBPJPY",
+        "AUDJPY",
+        "NZDJPY",
+        "CADJPY",
+        "CHFJPY",
+        "MXNJPY",
+        "TRYJPY",
+        "ZARJPY",
+        "INRJPY",
+        "SGDJPY",
+        "HKDJPY",
+        "CNYJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 55.1
+    },
+    {
+      "date": "2026-06-01T01:45:00Z",
+      "country": "CN",
+      "currency": "CNY",
+      "name": "RatingDog Manufacturing PMI",
+      "importance": "high",
+      "affects_pairs": [
+        "CNYJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 52.2
+    },
+    {
+      "date": "2026-06-01T05:00:00Z",
+      "country": "IN",
+      "currency": "INR",
+      "name": "HSBC Manufacturing PMI Final",
+      "importance": "high",
+      "affects_pairs": [
+        "INRJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": null
+    },
+    {
+      "date": "2026-06-01T06:00:00Z",
+      "country": "DE",
+      "currency": "EUR",
+      "name": "Retail Sales MoM",
+      "importance": "high",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": -2
+    },
+    {
+      "date": "2026-06-01T06:00:00Z",
+      "country": "DE",
+      "currency": "EUR",
+      "name": "Retail Sales YoY",
+      "importance": "high",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": -2
+    },
+    {
+      "date": "2026-06-01T07:00:00Z",
+      "country": "TR",
+      "currency": "TRY",
+      "name": "GDP Growth Rate QoQ",
+      "importance": "critical",
+      "affects_pairs": [
+        "TRYJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 0.4
+    },
+    {
+      "date": "2026-06-01T07:00:00Z",
+      "country": "CH",
+      "currency": "CHF",
+      "name": "GDP Growth Rate QoQ Final",
+      "importance": "critical",
+      "affects_pairs": [
+        "USDCHF",
+        "CHFJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": 0.5,
+      "previous": 0.2
+    },
+    {
+      "date": "2026-06-01T07:00:00Z",
+      "country": "CH",
+      "currency": "CHF",
+      "name": "GDP Growth Rate YoY",
+      "importance": "critical",
+      "affects_pairs": [
+        "USDCHF",
+        "CHFJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 0.7
+    },
+    {
+      "date": "2026-06-01T07:00:00Z",
+      "country": "TR",
+      "currency": "TRY",
+      "name": "GDP Growth Rate YoY",
+      "importance": "critical",
+      "affects_pairs": [
+        "TRYJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 3.4
+    },
+    {
+      "date": "2026-06-01T07:00:00Z",
+      "country": "TR",
+      "currency": "TRY",
+      "name": "Istanbul Chamber of Industry Manufacturing PMI",
+      "importance": "high",
+      "affects_pairs": [
+        "TRYJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 45.7
+    },
+    {
+      "date": "2026-06-01T07:15:00Z",
+      "country": "ES",
+      "currency": "EUR",
+      "name": "S&P Global Manufacturing PMI",
+      "importance": "high",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 51.7
+    },
+    {
+      "date": "2026-06-01T07:30:00Z",
+      "country": "CH",
+      "currency": "CHF",
+      "name": "procure.ch Manufacturing PMI",
+      "importance": "high",
+      "affects_pairs": [
+        "USDCHF",
+        "CHFJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 54.5
+    },
+    {
+      "date": "2026-06-01T07:45:00Z",
+      "country": "IT",
+      "currency": "EUR",
+      "name": "S&P Global Manufacturing PMI",
+      "importance": "high",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 52.1
+    },
+    {
+      "date": "2026-06-01T07:50:00Z",
+      "country": "FR",
+      "currency": "EUR",
+      "name": "S&P Global Manufacturing PMI Final",
+      "importance": "high",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 52.8
+    },
+    {
+      "date": "2026-06-01T07:55:00Z",
+      "country": "DE",
+      "currency": "EUR",
+      "name": "S&P Global Manufacturing PMI Final",
+      "importance": "high",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 51.4
+    },
+    {
+      "date": "2026-06-01T08:00:00Z",
+      "country": "EU",
+      "currency": "EUR",
+      "name": "S&P Global Manufacturing PMI Final",
+      "importance": "high",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 52.2
+    },
+    {
+      "date": "2026-06-01T08:30:00Z",
+      "country": "GB",
+      "currency": "GBP",
+      "name": "S&P Global Manufacturing PMI Final",
+      "importance": "high",
+      "affects_pairs": [
+        "GBPJPY",
+        "GBPUSD",
+        "EURGBP"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 53.7
+    },
+    {
+      "date": "2026-06-01T09:00:00Z",
+      "country": "ZA",
+      "currency": "ZAR",
+      "name": "ABSA Manufacturing PMI",
+      "importance": "high",
+      "affects_pairs": [
+        "ZARJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 52.6
+    },
+    {
+      "date": "2026-06-01T09:00:00Z",
+      "country": "EU",
+      "currency": "EUR",
+      "name": "Unemployment Rate",
+      "importance": "critical",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 6.2
+    },
+    {
+      "date": "2026-06-01T13:30:00Z",
+      "country": "CA",
+      "currency": "CAD",
+      "name": "S&P Global Manufacturing PMI",
+      "importance": "high",
+      "affects_pairs": [
+        "USDCAD",
+        "CADJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 53.3
+    },
+    {
+      "date": "2026-06-01T13:45:00Z",
+      "country": "US",
+      "currency": "USD",
+      "name": "S&P Global Manufacturing PMI Final",
+      "importance": "high",
+      "affects_pairs": [
+        "USDJPY",
+        "EURUSD",
+        "GBPUSD",
+        "AUDUSD",
+        "NZDUSD",
+        "USDCAD",
+        "USDCHF"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 54.5
+    },
+    {
+      "date": "2026-06-01T14:00:00Z",
+      "country": "US",
+      "currency": "USD",
+      "name": "ISM Manufacturing Employment",
+      "importance": "high",
+      "affects_pairs": [
+        "USDJPY",
+        "EURUSD",
+        "GBPUSD",
+        "AUDUSD",
+        "NZDUSD",
+        "USDCAD",
+        "USDCHF"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 46.4
+    },
+    {
+      "date": "2026-06-01T14:00:00Z",
+      "country": "US",
+      "currency": "USD",
+      "name": "ISM Manufacturing New Orders",
+      "importance": "high",
+      "affects_pairs": [
+        "USDJPY",
+        "EURUSD",
+        "GBPUSD",
+        "AUDUSD",
+        "NZDUSD",
+        "USDCAD",
+        "USDCHF"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 54.1
+    },
+    {
+      "date": "2026-06-01T14:00:00Z",
+      "country": "US",
+      "currency": "USD",
+      "name": "ISM Manufacturing PMI",
+      "importance": "high",
+      "affects_pairs": [
+        "USDJPY",
+        "EURUSD",
+        "GBPUSD",
+        "AUDUSD",
+        "NZDUSD",
+        "USDCAD",
+        "USDCHF"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 52.7
+    },
+    {
+      "date": "2026-06-01T14:00:00Z",
+      "country": "US",
+      "currency": "USD",
+      "name": "ISM Manufacturing Prices",
+      "importance": "high",
+      "affects_pairs": [
+        "USDJPY",
+        "EURUSD",
+        "GBPUSD",
+        "AUDUSD",
+        "NZDUSD",
+        "USDCAD",
+        "USDCHF"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 84.6
+    },
+    {
+      "date": "2026-06-01T15:00:00Z",
+      "country": "MX",
+      "currency": "MXN",
+      "name": "S&P Global Manufacturing PMI",
+      "importance": "high",
+      "affects_pairs": [
+        "MXNJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 47.7
+    },
+    {
+      "date": "2026-06-02T01:30:00Z",
+      "country": "AU",
+      "currency": "AUD",
+      "name": "Net Exports Contribution to GDP",
+      "importance": "critical",
+      "affects_pairs": [
+        "AUDJPY",
+        "AUDUSD",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": -0.1
+    },
+    {
+      "date": "2026-06-02T06:30:00Z",
+      "country": "CH",
+      "currency": "CHF",
+      "name": "Retail Sales MoM",
+      "importance": "high",
+      "affects_pairs": [
+        "USDCHF",
+        "CHFJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 0.1
+    },
+    {
+      "date": "2026-06-02T06:30:00Z",
+      "country": "CH",
+      "currency": "CHF",
+      "name": "Retail Sales YoY",
+      "importance": "high",
+      "affects_pairs": [
+        "USDCHF",
+        "CHFJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 0.5
+    },
+    {
+      "date": "2026-06-02T08:30:00Z",
+      "country": "GB",
+      "currency": "GBP",
+      "name": "BoE Consumer Credit",
+      "importance": "critical",
+      "affects_pairs": [
+        "GBPJPY",
+        "GBPUSD",
+        "EURGBP"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 1.895
+    },
+    {
+      "date": "2026-06-02T08:30:00Z",
+      "country": "HK",
+      "currency": "HKD",
+      "name": "Retail Sales YoY",
+      "importance": "high",
+      "affects_pairs": [
+        "HKDJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 9.8
+    },
+    {
+      "date": "2026-06-02T09:00:00Z",
+      "country": "EU",
+      "currency": "EUR",
+      "name": "Core Inflation Rate YoY Flash",
+      "importance": "critical",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 2.2
+    },
+    {
+      "date": "2026-06-02T09:00:00Z",
+      "country": "EU",
+      "currency": "EUR",
+      "name": "CPI Flash",
+      "importance": "critical",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 103.04
+    },
+    {
+      "date": "2026-06-02T09:00:00Z",
+      "country": "EU",
+      "currency": "EUR",
+      "name": "Inflation Rate MoM Flash",
+      "importance": "critical",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 1
+    },
+    {
+      "date": "2026-06-02T09:00:00Z",
+      "country": "EU",
+      "currency": "EUR",
+      "name": "Inflation Rate YoY Flash",
+      "importance": "critical",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 3
+    },
+    {
+      "date": "2026-06-02T13:00:00Z",
+      "country": "SG",
+      "currency": "SGD",
+      "name": "SIPMM Manufacturing PMI",
+      "importance": "high",
+      "affects_pairs": [
+        "SGDJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 50.7
+    },
+    {
+      "date": "2026-06-02T14:10:00Z",
+      "country": "US",
+      "currency": "USD",
+      "name": "RCM/TIPP Economic Optimism Index",
+      "importance": "high",
+      "affects_pairs": [
+        "USDJPY",
+        "EURUSD",
+        "GBPUSD",
+        "AUDUSD",
+        "NZDUSD",
+        "USDCAD",
+        "USDCHF"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 42.6
+    },
+    {
+      "date": "2026-06-02T23:00:00Z",
+      "country": "AU",
+      "currency": "AUD",
+      "name": "S&P Global Services PMI Final",
+      "importance": "high",
+      "affects_pairs": [
+        "AUDJPY",
+        "AUDUSD",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 50.7
+    },
+    {
+      "date": "2026-06-03T00:30:00Z",
+      "country": "JP",
+      "currency": "JPY",
+      "name": "S&P Global Services PMI Final",
+      "importance": "high",
+      "affects_pairs": [
+        "USDJPY",
+        "EURJPY",
+        "GBPJPY",
+        "AUDJPY",
+        "NZDJPY",
+        "CADJPY",
+        "CHFJPY",
+        "MXNJPY",
+        "TRYJPY",
+        "ZARJPY",
+        "INRJPY",
+        "SGDJPY",
+        "HKDJPY",
+        "CNYJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 51
+    },
+    {
+      "date": "2026-06-03T01:30:00Z",
+      "country": "AU",
+      "currency": "AUD",
+      "name": "GDP Capital Expenditure QoQ",
+      "importance": "critical",
+      "affects_pairs": [
+        "AUDJPY",
+        "AUDUSD",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 0.7
+    },
+    {
+      "date": "2026-06-03T01:30:00Z",
+      "country": "AU",
+      "currency": "AUD",
+      "name": "GDP Chain Price Index QoQ",
+      "importance": "critical",
+      "affects_pairs": [
+        "AUDJPY",
+        "AUDUSD",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 1.4
+    },
+    {
+      "date": "2026-06-03T01:30:00Z",
+      "country": "AU",
+      "currency": "AUD",
+      "name": "GDP Final Consumption QoQ",
+      "importance": "critical",
+      "affects_pairs": [
+        "AUDJPY",
+        "AUDUSD",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 0.5
+    },
+    {
+      "date": "2026-06-03T01:30:00Z",
+      "country": "AU",
+      "currency": "AUD",
+      "name": "GDP Growth Rate QoQ",
+      "importance": "critical",
+      "affects_pairs": [
+        "AUDJPY",
+        "AUDUSD",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 0.8
+    },
+    {
+      "date": "2026-06-03T01:30:00Z",
+      "country": "AU",
+      "currency": "AUD",
+      "name": "GDP Growth Rate YoY",
+      "importance": "critical",
+      "affects_pairs": [
+        "AUDJPY",
+        "AUDUSD",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 2.6
+    },
+    {
+      "date": "2026-06-03T01:45:00Z",
+      "country": "CN",
+      "currency": "CNY",
+      "name": "RatingDog Services PMI",
+      "importance": "high",
+      "affects_pairs": [
+        "CNYJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 52.6
     },
     {
       "date": "2026-06-03T04:30:00Z",
@@ -46,7 +3436,449 @@
       "currency": "AUD",
       "name": "RBA政策金利発表",
       "importance": "critical",
-      "affects_pairs": ["AUDJPY", "AUDUSD", "EURAUD"]
+      "affects_pairs": [
+        "AUDJPY",
+        "AUDUSD",
+        "EURAUD"
+      ]
+    },
+    {
+      "date": "2026-06-03T05:00:00Z",
+      "country": "IN",
+      "currency": "INR",
+      "name": "HSBC Services PMI Final",
+      "importance": "high",
+      "affects_pairs": [
+        "INRJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": null
+    },
+    {
+      "date": "2026-06-03T07:15:00Z",
+      "country": "ES",
+      "currency": "EUR",
+      "name": "S&P Global Services PMI",
+      "importance": "high",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": null
+    },
+    {
+      "date": "2026-06-03T07:45:00Z",
+      "country": "IT",
+      "currency": "EUR",
+      "name": "S&P Global Services PMI",
+      "importance": "high",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 49.8
+    },
+    {
+      "date": "2026-06-03T07:50:00Z",
+      "country": "FR",
+      "currency": "EUR",
+      "name": "S&P Global Services PMI Final",
+      "importance": "high",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 46.5
+    },
+    {
+      "date": "2026-06-03T07:55:00Z",
+      "country": "DE",
+      "currency": "EUR",
+      "name": "S&P Global Services PMI Final",
+      "importance": "high",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 46.9
+    },
+    {
+      "date": "2026-06-03T08:00:00Z",
+      "country": "EU",
+      "currency": "EUR",
+      "name": "S&P Global Services PMI Final",
+      "importance": "high",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 47.6
+    },
+    {
+      "date": "2026-06-03T08:30:00Z",
+      "country": "GB",
+      "currency": "GBP",
+      "name": "S&P Global Services PMI Final",
+      "importance": "high",
+      "affects_pairs": [
+        "GBPJPY",
+        "GBPUSD",
+        "EURGBP"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 52.7
+    },
+    {
+      "date": "2026-06-03T09:00:00Z",
+      "country": "EU",
+      "currency": "EUR",
+      "name": "PPI MoM",
+      "importance": "high",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 3.4
+    },
+    {
+      "date": "2026-06-03T09:00:00Z",
+      "country": "EU",
+      "currency": "EUR",
+      "name": "PPI YoY",
+      "importance": "high",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 2.1
+    },
+    {
+      "date": "2026-06-03T09:30:00Z",
+      "country": "ZA",
+      "currency": "ZAR",
+      "name": "GDP Growth Rate QoQ",
+      "importance": "critical",
+      "affects_pairs": [
+        "ZARJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 0.4
+    },
+    {
+      "date": "2026-06-03T09:30:00Z",
+      "country": "ZA",
+      "currency": "ZAR",
+      "name": "GDP Growth Rate YoY",
+      "importance": "critical",
+      "affects_pairs": [
+        "ZARJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 0.8
+    },
+    {
+      "date": "2026-06-03T13:30:00Z",
+      "country": "CA",
+      "currency": "CAD",
+      "name": "S&P Global Services PMI",
+      "importance": "high",
+      "affects_pairs": [
+        "USDCAD",
+        "CADJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 49.2
+    },
+    {
+      "date": "2026-06-03T13:45:00Z",
+      "country": "US",
+      "currency": "USD",
+      "name": "S&P Global Services PMI Final",
+      "importance": "high",
+      "affects_pairs": [
+        "USDJPY",
+        "EURUSD",
+        "GBPUSD",
+        "AUDUSD",
+        "NZDUSD",
+        "USDCAD",
+        "USDCHF"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 51
+    },
+    {
+      "date": "2026-06-03T14:00:00Z",
+      "country": "US",
+      "currency": "USD",
+      "name": "ISM Services Business Activity",
+      "importance": "high",
+      "affects_pairs": [
+        "USDJPY",
+        "EURUSD",
+        "GBPUSD",
+        "AUDUSD",
+        "NZDUSD",
+        "USDCAD",
+        "USDCHF"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 55.9
+    },
+    {
+      "date": "2026-06-03T14:00:00Z",
+      "country": "US",
+      "currency": "USD",
+      "name": "ISM Services Employment",
+      "importance": "high",
+      "affects_pairs": [
+        "USDJPY",
+        "EURUSD",
+        "GBPUSD",
+        "AUDUSD",
+        "NZDUSD",
+        "USDCAD",
+        "USDCHF"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 48
+    },
+    {
+      "date": "2026-06-03T14:00:00Z",
+      "country": "US",
+      "currency": "USD",
+      "name": "ISM Services New Orders",
+      "importance": "high",
+      "affects_pairs": [
+        "USDJPY",
+        "EURUSD",
+        "GBPUSD",
+        "AUDUSD",
+        "NZDUSD",
+        "USDCAD",
+        "USDCHF"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 53.5
+    },
+    {
+      "date": "2026-06-03T14:00:00Z",
+      "country": "US",
+      "currency": "USD",
+      "name": "ISM Services PMI",
+      "importance": "high",
+      "affects_pairs": [
+        "USDJPY",
+        "EURUSD",
+        "GBPUSD",
+        "AUDUSD",
+        "NZDUSD",
+        "USDCAD",
+        "USDCHF"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 53.6
+    },
+    {
+      "date": "2026-06-03T14:00:00Z",
+      "country": "US",
+      "currency": "USD",
+      "name": "ISM Services Prices",
+      "importance": "high",
+      "affects_pairs": [
+        "USDJPY",
+        "EURUSD",
+        "GBPUSD",
+        "AUDUSD",
+        "NZDUSD",
+        "USDCAD",
+        "USDCHF"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 70.7
+    },
+    {
+      "date": "2026-06-04T00:00:00Z",
+      "country": "AU",
+      "currency": "AUD",
+      "name": "RBA Payments System Board Meeting",
+      "importance": "critical",
+      "affects_pairs": [
+        "AUDJPY",
+        "AUDUSD",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": null
+    },
+    {
+      "date": "2026-06-04T06:30:00Z",
+      "country": "CH",
+      "currency": "CHF",
+      "name": "Inflation Rate MoM",
+      "importance": "critical",
+      "affects_pairs": [
+        "USDCHF",
+        "CHFJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 0.3
+    },
+    {
+      "date": "2026-06-04T06:30:00Z",
+      "country": "CH",
+      "currency": "CHF",
+      "name": "Inflation Rate YoY",
+      "importance": "critical",
+      "affects_pairs": [
+        "USDCHF",
+        "CHFJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 0.6
+    },
+    {
+      "date": "2026-06-04T07:00:00Z",
+      "country": "ES",
+      "currency": "EUR",
+      "name": "Industrial Production YoY",
+      "importance": "high",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 1.8
+    },
+    {
+      "date": "2026-06-04T07:00:00Z",
+      "country": "CH",
+      "currency": "CHF",
+      "name": "Unemployment Rate",
+      "importance": "critical",
+      "affects_pairs": [
+        "USDCHF",
+        "CHFJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 3
+    },
+    {
+      "date": "2026-06-04T07:00:00Z",
+      "country": "TR",
+      "currency": "TRY",
+      "name": "Unemployment Rate",
+      "importance": "critical",
+      "affects_pairs": [
+        "TRYJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 8.1
+    },
+    {
+      "date": "2026-06-04T09:00:00Z",
+      "country": "EU",
+      "currency": "EUR",
+      "name": "Retail Sales MoM",
+      "importance": "high",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": -0.1
+    },
+    {
+      "date": "2026-06-04T09:00:00Z",
+      "country": "EU",
+      "currency": "EUR",
+      "name": "Retail Sales YoY",
+      "importance": "high",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 1.2
     },
     {
       "date": "2026-06-04T13:45:00Z",
@@ -54,7 +3886,251 @@
       "currency": "CAD",
       "name": "BOC政策金利発表",
       "importance": "critical",
-      "affects_pairs": ["USDCAD", "CADJPY"]
+      "affects_pairs": [
+        "USDCAD",
+        "CADJPY"
+      ]
+    },
+    {
+      "date": "2026-06-05T04:30:00Z",
+      "country": "IN",
+      "currency": "INR",
+      "name": "RBI Interest Rate Decision",
+      "importance": "critical",
+      "affects_pairs": [
+        "INRJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 5.25
+    },
+    {
+      "date": "2026-06-05T05:00:00Z",
+      "country": "SG",
+      "currency": "SGD",
+      "name": "Retail Sales MoM",
+      "importance": "high",
+      "affects_pairs": [
+        "SGDJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 3.7
+    },
+    {
+      "date": "2026-06-05T05:00:00Z",
+      "country": "SG",
+      "currency": "SGD",
+      "name": "Retail Sales YoY",
+      "importance": "high",
+      "affects_pairs": [
+        "SGDJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 4.8
+    },
+    {
+      "date": "2026-06-05T06:45:00Z",
+      "country": "FR",
+      "currency": "EUR",
+      "name": "Industrial Production MoM",
+      "importance": "high",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 1
+    },
+    {
+      "date": "2026-06-05T07:00:00Z",
+      "country": "TR",
+      "currency": "TRY",
+      "name": "Inflation Rate MoM",
+      "importance": "critical",
+      "affects_pairs": [
+        "TRYJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 4.18
+    },
+    {
+      "date": "2026-06-05T07:00:00Z",
+      "country": "TR",
+      "currency": "TRY",
+      "name": "Inflation Rate YoY",
+      "importance": "critical",
+      "affects_pairs": [
+        "TRYJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 32.37
+    },
+    {
+      "date": "2026-06-05T07:00:00Z",
+      "country": "TR",
+      "currency": "TRY",
+      "name": "PPI MoM",
+      "importance": "high",
+      "affects_pairs": [
+        "TRYJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 3.2
+    },
+    {
+      "date": "2026-06-05T07:00:00Z",
+      "country": "TR",
+      "currency": "TRY",
+      "name": "PPI YoY",
+      "importance": "high",
+      "affects_pairs": [
+        "TRYJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 28.59
+    },
+    {
+      "date": "2026-06-05T08:30:00Z",
+      "country": "GB",
+      "currency": "GBP",
+      "name": "DMP 1Y CPI Expectations",
+      "importance": "critical",
+      "affects_pairs": [
+        "GBPJPY",
+        "GBPUSD",
+        "EURGBP"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 4
+    },
+    {
+      "date": "2026-06-05T09:00:00Z",
+      "country": "EU",
+      "currency": "EUR",
+      "name": "GDP Growth Rate QoQ 3rd Est",
+      "importance": "critical",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": 0.1,
+      "previous": 0.2
+    },
+    {
+      "date": "2026-06-05T09:00:00Z",
+      "country": "EU",
+      "currency": "EUR",
+      "name": "GDP Growth Rate YoY 3rd Est",
+      "importance": "critical",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": 0.8,
+      "previous": 1.2
+    },
+    {
+      "date": "2026-06-05T09:00:00Z",
+      "country": "IT",
+      "currency": "EUR",
+      "name": "Retail Sales MoM",
+      "importance": "high",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 0.8
+    },
+    {
+      "date": "2026-06-05T09:00:00Z",
+      "country": "IT",
+      "currency": "EUR",
+      "name": "Retail Sales YoY",
+      "importance": "high",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 3.7
+    },
+    {
+      "date": "2026-06-05T10:30:00Z",
+      "country": "IN",
+      "currency": "INR",
+      "name": "Fiscal Year GDP Growth 3rd Est",
+      "importance": "critical",
+      "affects_pairs": [
+        "INRJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 7.1
+    },
+    {
+      "date": "2026-06-05T10:30:00Z",
+      "country": "IN",
+      "currency": "INR",
+      "name": "GDP Growth Rate YoY",
+      "importance": "critical",
+      "affects_pairs": [
+        "INRJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 7.8
+    },
+    {
+      "date": "2026-06-05T12:00:00Z",
+      "country": "MX",
+      "currency": "MXN",
+      "name": "Consumer Confidence",
+      "importance": "high",
+      "affects_pairs": [
+        "MXNJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 44.4
     },
     {
       "date": "2026-06-05T12:15:00Z",
@@ -62,7 +4138,67 @@
       "currency": "EUR",
       "name": "ECB理事会・政策金利発表",
       "importance": "critical",
-      "affects_pairs": ["EURUSD", "EURJPY", "EURGBP", "EURAUD"]
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ]
+    },
+    {
+      "date": "2026-06-05T12:30:00Z",
+      "country": "US",
+      "currency": "USD",
+      "name": "U-6 Unemployment Rate",
+      "importance": "critical",
+      "affects_pairs": [
+        "USDJPY",
+        "EURUSD",
+        "GBPUSD",
+        "AUDUSD",
+        "NZDUSD",
+        "USDCAD",
+        "USDCHF"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 8.2
+    },
+    {
+      "date": "2026-06-05T12:30:00Z",
+      "country": "CA",
+      "currency": "CAD",
+      "name": "Unemployment Rate",
+      "importance": "critical",
+      "affects_pairs": [
+        "USDCAD",
+        "CADJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 6.9
+    },
+    {
+      "date": "2026-06-05T12:30:00Z",
+      "country": "US",
+      "currency": "USD",
+      "name": "Unemployment Rate",
+      "importance": "critical",
+      "affects_pairs": [
+        "USDJPY",
+        "EURUSD",
+        "GBPUSD",
+        "AUDUSD",
+        "NZDUSD",
+        "USDCAD",
+        "USDCHF"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 4.3
     },
     {
       "date": "2026-06-06T12:30:00Z",
@@ -70,7 +4206,697 @@
       "currency": "USD",
       "name": "雇用統計（NFP・失業率・賃金）",
       "importance": "critical",
-      "affects_pairs": ["USDJPY", "EURUSD", "GBPUSD", "AUDUSD", "NZDUSD", "USDCAD", "USDCHF"]
+      "affects_pairs": [
+        "USDJPY",
+        "EURUSD",
+        "GBPUSD",
+        "AUDUSD",
+        "NZDUSD",
+        "USDCAD",
+        "USDCHF"
+      ]
+    },
+    {
+      "date": "2026-06-07T23:50:00Z",
+      "country": "JP",
+      "currency": "JPY",
+      "name": "GDP Capital Expenditure QoQ Final",
+      "importance": "critical",
+      "affects_pairs": [
+        "USDJPY",
+        "EURJPY",
+        "GBPJPY",
+        "AUDJPY",
+        "NZDJPY",
+        "CADJPY",
+        "CHFJPY",
+        "MXNJPY",
+        "TRYJPY",
+        "ZARJPY",
+        "INRJPY",
+        "SGDJPY",
+        "HKDJPY",
+        "CNYJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": 0.3,
+      "previous": 1.4
+    },
+    {
+      "date": "2026-06-07T23:50:00Z",
+      "country": "JP",
+      "currency": "JPY",
+      "name": "GDP External Demand QoQ Final",
+      "importance": "critical",
+      "affects_pairs": [
+        "USDJPY",
+        "EURJPY",
+        "GBPJPY",
+        "AUDJPY",
+        "NZDJPY",
+        "CADJPY",
+        "CHFJPY",
+        "MXNJPY",
+        "TRYJPY",
+        "ZARJPY",
+        "INRJPY",
+        "SGDJPY",
+        "HKDJPY",
+        "CNYJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": 0.3,
+      "previous": 0
+    },
+    {
+      "date": "2026-06-07T23:50:00Z",
+      "country": "JP",
+      "currency": "JPY",
+      "name": "GDP Growth Annualized Final",
+      "importance": "critical",
+      "affects_pairs": [
+        "USDJPY",
+        "EURJPY",
+        "GBPJPY",
+        "AUDJPY",
+        "NZDJPY",
+        "CADJPY",
+        "CHFJPY",
+        "MXNJPY",
+        "TRYJPY",
+        "ZARJPY",
+        "INRJPY",
+        "SGDJPY",
+        "HKDJPY",
+        "CNYJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": 2.1,
+      "previous": 0.8
+    },
+    {
+      "date": "2026-06-07T23:50:00Z",
+      "country": "JP",
+      "currency": "JPY",
+      "name": "GDP Growth Rate QoQ Final",
+      "importance": "critical",
+      "affects_pairs": [
+        "USDJPY",
+        "EURJPY",
+        "GBPJPY",
+        "AUDJPY",
+        "NZDJPY",
+        "CADJPY",
+        "CHFJPY",
+        "MXNJPY",
+        "TRYJPY",
+        "ZARJPY",
+        "INRJPY",
+        "SGDJPY",
+        "HKDJPY",
+        "CNYJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": 0.5,
+      "previous": 0.2
+    },
+    {
+      "date": "2026-06-07T23:50:00Z",
+      "country": "JP",
+      "currency": "JPY",
+      "name": "GDP Price Index YoY Final",
+      "importance": "critical",
+      "affects_pairs": [
+        "USDJPY",
+        "EURJPY",
+        "GBPJPY",
+        "AUDJPY",
+        "NZDJPY",
+        "CADJPY",
+        "CHFJPY",
+        "MXNJPY",
+        "TRYJPY",
+        "ZARJPY",
+        "INRJPY",
+        "SGDJPY",
+        "HKDJPY",
+        "CNYJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": 3.4,
+      "previous": 3.4
+    },
+    {
+      "date": "2026-06-07T23:50:00Z",
+      "country": "JP",
+      "currency": "JPY",
+      "name": "GDP Private Consumption QoQ Final",
+      "importance": "critical",
+      "affects_pairs": [
+        "USDJPY",
+        "EURJPY",
+        "GBPJPY",
+        "AUDJPY",
+        "NZDJPY",
+        "CADJPY",
+        "CHFJPY",
+        "MXNJPY",
+        "TRYJPY",
+        "ZARJPY",
+        "INRJPY",
+        "SGDJPY",
+        "HKDJPY",
+        "CNYJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": 0.3,
+      "previous": 0
+    },
+    {
+      "date": "2026-06-08T07:00:00Z",
+      "country": "CH",
+      "currency": "CHF",
+      "name": "Consumer Confidence",
+      "importance": "high",
+      "affects_pairs": [
+        "USDCHF",
+        "CHFJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": -40
+    },
+    {
+      "date": "2026-06-08T23:01:00Z",
+      "country": "GB",
+      "currency": "GBP",
+      "name": "BRC Retail Sales Monitor YoY",
+      "importance": "high",
+      "affects_pairs": [
+        "GBPJPY",
+        "GBPUSD",
+        "EURGBP"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": -3.4
+    },
+    {
+      "date": "2026-06-09T06:00:00Z",
+      "country": "DE",
+      "currency": "EUR",
+      "name": "Industrial Production MoM",
+      "importance": "high",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": -0.7
+    },
+    {
+      "date": "2026-06-09T10:00:00Z",
+      "country": "US",
+      "currency": "USD",
+      "name": "NFIB Business Optimism Index",
+      "importance": "high",
+      "affects_pairs": [
+        "USDJPY",
+        "EURUSD",
+        "GBPUSD",
+        "AUDUSD",
+        "NZDUSD",
+        "USDCAD",
+        "USDCHF"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 95.9
+    },
+    {
+      "date": "2026-06-09T12:00:00Z",
+      "country": "MX",
+      "currency": "MXN",
+      "name": "Core Inflation Rate MoM",
+      "importance": "critical",
+      "affects_pairs": [
+        "MXNJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 0.31
+    },
+    {
+      "date": "2026-06-09T12:00:00Z",
+      "country": "MX",
+      "currency": "MXN",
+      "name": "Core Inflation Rate YoY",
+      "importance": "critical",
+      "affects_pairs": [
+        "MXNJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 4.26
+    },
+    {
+      "date": "2026-06-09T12:00:00Z",
+      "country": "MX",
+      "currency": "MXN",
+      "name": "Inflation Rate MoM",
+      "importance": "critical",
+      "affects_pairs": [
+        "MXNJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 0.2
+    },
+    {
+      "date": "2026-06-09T12:00:00Z",
+      "country": "MX",
+      "currency": "MXN",
+      "name": "Inflation Rate YoY",
+      "importance": "critical",
+      "affects_pairs": [
+        "MXNJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 4.45
+    },
+    {
+      "date": "2026-06-09T12:00:00Z",
+      "country": "MX",
+      "currency": "MXN",
+      "name": "PPI MoM",
+      "importance": "high",
+      "affects_pairs": [
+        "MXNJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 0.04
+    },
+    {
+      "date": "2026-06-09T12:00:00Z",
+      "country": "MX",
+      "currency": "MXN",
+      "name": "PPI YoY",
+      "importance": "high",
+      "affects_pairs": [
+        "MXNJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 2.56
+    },
+    {
+      "date": "2026-06-09T23:50:00Z",
+      "country": "JP",
+      "currency": "JPY",
+      "name": "PPI MoM",
+      "importance": "high",
+      "affects_pairs": [
+        "USDJPY",
+        "EURJPY",
+        "GBPJPY",
+        "AUDJPY",
+        "NZDJPY",
+        "CADJPY",
+        "CHFJPY",
+        "MXNJPY",
+        "TRYJPY",
+        "ZARJPY",
+        "INRJPY",
+        "SGDJPY",
+        "HKDJPY",
+        "CNYJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 2.3
+    },
+    {
+      "date": "2026-06-09T23:50:00Z",
+      "country": "JP",
+      "currency": "JPY",
+      "name": "PPI YoY",
+      "importance": "high",
+      "affects_pairs": [
+        "USDJPY",
+        "EURJPY",
+        "GBPJPY",
+        "AUDJPY",
+        "NZDJPY",
+        "CADJPY",
+        "CHFJPY",
+        "MXNJPY",
+        "TRYJPY",
+        "ZARJPY",
+        "INRJPY",
+        "SGDJPY",
+        "HKDJPY",
+        "CNYJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 4.9
+    },
+    {
+      "date": "2026-06-10T00:30:00Z",
+      "country": "AU",
+      "currency": "AUD",
+      "name": "Westpac Consumer Confidence Change",
+      "importance": "high",
+      "affects_pairs": [
+        "AUDJPY",
+        "AUDUSD",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 3.5
+    },
+    {
+      "date": "2026-06-10T00:30:00Z",
+      "country": "AU",
+      "currency": "AUD",
+      "name": "Westpac Consumer Confidence Index",
+      "importance": "high",
+      "affects_pairs": [
+        "AUDJPY",
+        "AUDUSD",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 83
+    },
+    {
+      "date": "2026-06-10T01:30:00Z",
+      "country": "CN",
+      "currency": "CNY",
+      "name": "Inflation Rate MoM",
+      "importance": "critical",
+      "affects_pairs": [
+        "CNYJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 0.3
+    },
+    {
+      "date": "2026-06-10T01:30:00Z",
+      "country": "CN",
+      "currency": "CNY",
+      "name": "Inflation Rate YoY",
+      "importance": "critical",
+      "affects_pairs": [
+        "CNYJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 1.2
+    },
+    {
+      "date": "2026-06-10T01:30:00Z",
+      "country": "CN",
+      "currency": "CNY",
+      "name": "PPI YoY",
+      "importance": "high",
+      "affects_pairs": [
+        "CNYJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 2.8
+    },
+    {
+      "date": "2026-06-10T07:00:00Z",
+      "country": "TR",
+      "currency": "TRY",
+      "name": "Industrial Production MoM",
+      "importance": "high",
+      "affects_pairs": [
+        "TRYJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": -0.8
+    },
+    {
+      "date": "2026-06-10T07:00:00Z",
+      "country": "TR",
+      "currency": "TRY",
+      "name": "Industrial Production YoY",
+      "importance": "high",
+      "affects_pairs": [
+        "TRYJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": -1.1
+    },
+    {
+      "date": "2026-06-10T07:00:00Z",
+      "country": "TR",
+      "currency": "TRY",
+      "name": "Retail Sales MoM",
+      "importance": "high",
+      "affects_pairs": [
+        "TRYJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 2.6
+    },
+    {
+      "date": "2026-06-10T07:00:00Z",
+      "country": "TR",
+      "currency": "TRY",
+      "name": "Retail Sales YoY",
+      "importance": "high",
+      "affects_pairs": [
+        "TRYJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 21.2
+    },
+    {
+      "date": "2026-06-10T08:00:00Z",
+      "country": "IT",
+      "currency": "EUR",
+      "name": "Industrial Production MoM",
+      "importance": "high",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 0.7
+    },
+    {
+      "date": "2026-06-10T08:00:00Z",
+      "country": "IT",
+      "currency": "EUR",
+      "name": "Industrial Production YoY",
+      "importance": "high",
+      "affects_pairs": [
+        "EURUSD",
+        "EURJPY",
+        "EURGBP",
+        "EURAUD"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 1.5
+    },
+    {
+      "date": "2026-06-10T12:30:00Z",
+      "country": "US",
+      "currency": "USD",
+      "name": "Core Inflation Rate MoM",
+      "importance": "critical",
+      "affects_pairs": [
+        "USDJPY",
+        "EURUSD",
+        "GBPUSD",
+        "AUDUSD",
+        "NZDUSD",
+        "USDCAD",
+        "USDCHF"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 0.4
+    },
+    {
+      "date": "2026-06-10T12:30:00Z",
+      "country": "US",
+      "currency": "USD",
+      "name": "Core Inflation Rate YoY",
+      "importance": "critical",
+      "affects_pairs": [
+        "USDJPY",
+        "EURUSD",
+        "GBPUSD",
+        "AUDUSD",
+        "NZDUSD",
+        "USDCAD",
+        "USDCHF"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 2.8
+    },
+    {
+      "date": "2026-06-10T12:30:00Z",
+      "country": "US",
+      "currency": "USD",
+      "name": "CPI",
+      "importance": "critical",
+      "affects_pairs": [
+        "USDJPY",
+        "EURUSD",
+        "GBPUSD",
+        "AUDUSD",
+        "NZDUSD",
+        "USDCAD",
+        "USDCHF"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 333.02
+    },
+    {
+      "date": "2026-06-10T12:30:00Z",
+      "country": "US",
+      "currency": "USD",
+      "name": "CPI s.a",
+      "importance": "critical",
+      "affects_pairs": [
+        "USDJPY",
+        "EURUSD",
+        "GBPUSD",
+        "AUDUSD",
+        "NZDUSD",
+        "USDCAD",
+        "USDCHF"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 332.407
+    },
+    {
+      "date": "2026-06-10T12:30:00Z",
+      "country": "US",
+      "currency": "USD",
+      "name": "Inflation Rate MoM",
+      "importance": "critical",
+      "affects_pairs": [
+        "USDJPY",
+        "EURUSD",
+        "GBPUSD",
+        "AUDUSD",
+        "NZDUSD",
+        "USDCAD",
+        "USDCHF"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 0.6
+    },
+    {
+      "date": "2026-06-10T12:30:00Z",
+      "country": "US",
+      "currency": "USD",
+      "name": "Inflation Rate YoY",
+      "importance": "critical",
+      "affects_pairs": [
+        "USDJPY",
+        "EURUSD",
+        "GBPUSD",
+        "AUDUSD",
+        "NZDUSD",
+        "USDCAD",
+        "USDCHF"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": 3.8
+    },
+    {
+      "date": "2026-06-10T13:45:00Z",
+      "country": "CA",
+      "currency": "CAD",
+      "name": "BoC Interest Rate Decision",
+      "importance": "critical",
+      "affects_pairs": [
+        "USDCAD",
+        "CADJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": null
+    },
+    {
+      "date": "2026-06-10T14:30:00Z",
+      "country": "CA",
+      "currency": "CAD",
+      "name": "BoC Press Conference",
+      "importance": "critical",
+      "affects_pairs": [
+        "USDCAD",
+        "CADJPY"
+      ],
+      "source": "finnhub",
+      "actual": null,
+      "estimate": null,
+      "previous": null
     },
     {
       "date": "2026-06-11T12:30:00Z",
@@ -78,7 +4904,15 @@
       "currency": "USD",
       "name": "米CPI（消費者物価指数）",
       "importance": "critical",
-      "affects_pairs": ["USDJPY", "EURUSD", "GBPUSD", "AUDUSD", "NZDUSD", "USDCAD", "USDCHF"]
+      "affects_pairs": [
+        "USDJPY",
+        "EURUSD",
+        "GBPUSD",
+        "AUDUSD",
+        "NZDUSD",
+        "USDCAD",
+        "USDCHF"
+      ]
     },
     {
       "date": "2026-06-17T03:00:00Z",
@@ -86,7 +4920,22 @@
       "currency": "JPY",
       "name": "日銀金融政策決定会合",
       "importance": "critical",
-      "affects_pairs": ["USDJPY", "EURJPY", "GBPJPY", "AUDJPY", "NZDJPY", "CADJPY", "CHFJPY", "MXNJPY", "TRYJPY", "ZARJPY", "INRJPY", "SGDJPY", "HKDJPY", "CNYJPY"]
+      "affects_pairs": [
+        "USDJPY",
+        "EURJPY",
+        "GBPJPY",
+        "AUDJPY",
+        "NZDJPY",
+        "CADJPY",
+        "CHFJPY",
+        "MXNJPY",
+        "TRYJPY",
+        "ZARJPY",
+        "INRJPY",
+        "SGDJPY",
+        "HKDJPY",
+        "CNYJPY"
+      ]
     },
     {
       "date": "2026-06-18T18:00:00Z",
@@ -94,15 +4943,15 @@
       "currency": "USD",
       "name": "FOMC（連邦公開市場委員会）",
       "importance": "critical",
-      "affects_pairs": ["USDJPY", "EURUSD", "GBPUSD", "AUDUSD", "NZDUSD", "USDCAD", "USDCHF"]
-    },
-    {
-      "date": "2026-06-19T11:00:00Z",
-      "country": "GB",
-      "currency": "GBP",
-      "name": "BOE金融政策委員会",
-      "importance": "critical",
-      "affects_pairs": ["GBPJPY", "GBPUSD", "EURGBP"]
+      "affects_pairs": [
+        "USDJPY",
+        "EURUSD",
+        "GBPUSD",
+        "AUDUSD",
+        "NZDUSD",
+        "USDCAD",
+        "USDCHF"
+      ]
     },
     {
       "date": "2026-06-19T07:30:00Z",
@@ -110,7 +4959,22 @@
       "currency": "CHF",
       "name": "SNB政策金利発表",
       "importance": "critical",
-      "affects_pairs": ["USDCHF", "CHFJPY"]
+      "affects_pairs": [
+        "USDCHF",
+        "CHFJPY"
+      ]
+    },
+    {
+      "date": "2026-06-19T11:00:00Z",
+      "country": "GB",
+      "currency": "GBP",
+      "name": "BOE金融政策委員会",
+      "importance": "critical",
+      "affects_pairs": [
+        "GBPJPY",
+        "GBPUSD",
+        "EURGBP"
+      ]
     },
     {
       "date": "2026-06-19T11:00:00Z",
@@ -118,7 +4982,9 @@
       "currency": "TRY",
       "name": "CBRT政策金利発表",
       "importance": "critical",
-      "affects_pairs": ["TRYJPY"]
+      "affects_pairs": [
+        "TRYJPY"
+      ]
     },
     {
       "date": "2026-06-26T18:00:00Z",
@@ -126,7 +4992,9 @@
       "currency": "MXN",
       "name": "Banxico政策金利発表",
       "importance": "critical",
-      "affects_pairs": ["MXNJPY"]
+      "affects_pairs": [
+        "MXNJPY"
+      ]
     }
   ]
 }
