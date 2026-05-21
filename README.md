@@ -1,11 +1,11 @@
-# FX売買シグナル監視システム L3
+# FX売買シグナル監視システム L3 + Obsidian Wiki統合版
 
-> **テクノ・ファンダメンタル戦略の完全自動実装版**
-> テクニカル指標 × 動的FAスコア × 経済指標カレンダー × 市場センチメント
+> **テクノ・ファンダメンタル戦略 + 個人ナレッジベース統合**
+> テクニカル指標 × 動的FAスコア × 経済指標カレンダー × 市場センチメント × **Obsidian Wiki知識**
 
 ---
 
-## レベル3の特徴
+## レベル3+の特徴
 
 | 評価軸 | データソース | 内容 |
 |--------|-------------|------|
@@ -13,6 +13,7 @@
 | **金利・金利差** | 手動JSON + 米財務省API | 中央銀行政策金利の動的反映 |
 | **経済指標** | 手動JSON（月初メンテ） | FOMC・ECB・NFP・CPI等の前後で取引控え |
 | **市場センチメント** | Stooq | VIX・DXY・米10年債・金価格 |
+| **🆕 Obsidian Wiki** | Private GitHub repo | 個人の投資戦略・分析・取引日記・教訓を自動反映 |
 
 ---
 
@@ -22,12 +23,15 @@
 fx-signal-monitor/
 ├── signal_scanner.py                 ← メインスクリプト
 ├── modules/
-│   ├── __init__.py                   ← 空ファイル（パッケージ識別子）
+│   ├── __init__.py
 │   ├── rate_fetcher.py               ← 金利・債券利回り取得
 │   ├── event_filter.py               ← 経済指標近接判定
-│   └── sentiment_monitor.py          ← VIX/DXY/金センチメント
+│   ├── sentiment_monitor.py          ← VIX/DXY/金センチメント
+│   ├── obsidian_extractor.py         ← 🆕 Obsidian Vault読込
+│   └── custom_rules_engine.py        ← 🆕 Wikiルール適用エンジン
 ├── data/
 │   ├── central_bank_rates.json       ← 中央銀行金利（手動メンテ）
+│   ├── economic_calendar.json        ← 経済指標カレンダー（手動メンテ）
 │   ├── economic_calendar.json        ← 経済指標カレンダー（手動メンテ）
 │   └── sentiment_cache.json          ← 自動生成（前回値キャッシュ）
 ├── docs/
@@ -41,6 +45,8 @@ fx-signal-monitor/
 ---
 
 ## セットアップ
+
+### 基本セットアップ（既存ユーザーは飛ばしてOK）
 
 ### 1. リポジトリにファイルをアップロード
 
@@ -91,6 +97,127 @@ DiscordかメールどちらかでもOK。両方設定すれば二重通知。
 ### 4. 初回実行
 
 `Actions → FX Signal Monitor → Run workflow` で手動実行。
+
+---
+
+## 🆕 Obsidian Wiki 統合（任意・推奨）
+
+ナナのパパさんのObsidian Vault内に蓄積された投資戦略・分析・取引日記・教訓を、L3スキャナーが自動的に読み取り、シグナル判定に反映します。
+
+### セットアップ手順
+
+詳細な手順は別途用意した以下のガイドを参照してください：
+
+- **`docs_setup/01_Vault同期セットアップガイド.md`**：Obsidian VaultをGitHub Privateリポジトリで同期する手順
+- **`docs_setup/02_YAML_frontmatter_標準スキーマ.md`**：Wikiノートに付ける標準frontmatter形式
+
+### 概要
+
+1. Obsidian Git Plugin で Vault を **Private** リポジトリに同期
+2. **Fine-grained Personal Access Token (PAT)** を Read-only 権限で発行
+3. `fx-signal-monitor` の Secret に以下を追加：
+   - `OBSIDIAN_VAULT_PAT` : 発行したPAT
+   - `OBSIDIAN_VAULT_OWNER` : GitHubアカウント名（例: `applejoker01-afk`）
+   - `OBSIDIAN_VAULT_REPO` : リポジトリ名（例: `obsidian-vault`）
+   - `OBSIDIAN_VAULT_PATH` : 読み取り対象パス（例: `02_Domains/finance`）
+
+### ノートの書き方
+
+Obsidian Vault の `02_Domains/finance/` 配下に、以下のような frontmatter 付き Markdown を作成すると、L3が自動的に読み取って反映します。
+
+#### 例1: シグナルルール（signal_rule）
+
+```markdown
+---
+domain: finance
+type: signal_rule
+status: active
+pairs: [USDJPY]
+priority: high
+confidence: 0.85
+tags: [介入, USDJPY, リスク管理]
+rule:
+  name: "USDJPY 介入警戒水準"
+  when:
+    - "price >= 155.0"
+  then:
+    action: downgrade_long
+    severity: 2
+---
+
+# USDJPY 介入警戒水準
+
+財務省の介入実績から、USDJPYが155円を超えた時点で...
+```
+
+→ USDJPYが155円超になると、ロングシグナルが自動で2段階下がります
+
+#### 例2: 取引分析（analysis）
+
+```markdown
+---
+domain: finance
+type: analysis
+pairs: [AUDJPY]
+title: "AUDJPY 2026年下期見通し"
+---
+
+# AUDJPY 2026年下期見通し
+
+RBAの金利据え置きと中国需要を背景に...
+```
+
+→ AUDJPYのシグナル発生時、この分析が通知に自動添付されます
+
+#### 例3: 取引日記（journal）
+
+```markdown
+---
+domain: finance
+type: journal
+pairs: [USDJPY]
+trade_date: 2026-05-15
+result: profit          # profit / loss / breakeven
+pips: 45
+---
+
+# 2026-05-15 USDJPYロング
+
+エントリー: 156.50円、決済: 156.95円...
+```
+
+→ 過去30日の同通貨ペア勝率が通知に表示されます
+
+#### 例4: 教訓（lesson）
+
+```markdown
+---
+domain: finance
+type: lesson
+pairs: [all]
+priority: high
+trigger_pattern:
+  - "macd_divergence == 'bearish'"
+  - "rsi > 65"
+---
+
+# ピラミッディング失敗教訓
+
+買い増しタイミングを早まり…
+```
+
+→ 該当条件が成立した時、過去の教訓が通知に添付されます
+
+### 動作モード
+
+| 状況 | L3の動作 |
+|------|---------|
+| OBSIDIAN_VAULT_PAT 未設定 | Obsidian統合をスキップ。既存機能のみで動作（後方互換） |
+| Vault接続成功・ノート0件 | 既存機能のみで動作 |
+| Vault接続成功・ノートあり | 各シグナル評価時にWikiルール適用・関連分析添付 |
+| Vault接続失敗（PAT期限切れ等） | 警告ログを出して既存機能のみで継続動作 |
+
+**重要**：Obsidian統合は完全に任意機能です。設定しなくてもL3の既存機能は何も影響を受けません。
 
 ---
 

@@ -36,6 +36,8 @@ from modules.event_filter import (
 from modules.sentiment_monitor import (
     evaluate_market_sentiment, apply_sentiment_filter, classify_pair
 )
+from modules.obsidian_extractor import fetch_and_save as fetch_obsidian
+from modules.custom_rules_engine import apply_obsidian_intelligence
 
 
 # ============================================================================
@@ -335,7 +337,7 @@ def load_previous_state():
         return {}
 
 
-def save_current_state(results, sentiment, us_yields, cb_rates):
+def save_current_state(results, sentiment, us_yields, cb_rates, obsidian_data=None):
     os.makedirs(os.path.dirname(STATE_FILE), exist_ok=True)
     state = {
         "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -345,6 +347,14 @@ def save_current_state(results, sentiment, us_yields, cb_rates):
         "us_yields": us_yields,
         "central_bank_rates": cb_rates,
     }
+    if obsidian_data:
+        state["obsidian_summary"] = {
+            "signal_rules_count": len(obsidian_data.get("signal_rules", [])),
+            "analyses_count": len(obsidian_data.get("analyses", [])),
+            "journals_count": len(obsidian_data.get("journals", [])),
+            "lessons_count": len(obsidian_data.get("lessons", [])),
+            "last_fetched": obsidian_data.get("fetched_at"),
+        }
     with open(STATE_FILE, "w", encoding="utf-8") as f:
         json.dump(state, f, ensure_ascii=False, indent=2, default=str)
 
@@ -399,6 +409,31 @@ def format_signal_block_text(r):
     )
     txt += format_event_block(r)
     txt += format_sentiment_block(r)
+
+    # Obsidian カスタムルール適用結果
+    if r.get("obsidian_rules_applied"):
+        txt += "  📚 Wiki規則適用:\n"
+        for rule in r["obsidian_rules_applied"]:
+            txt += (f"    ・{rule.get('rule_name', 'unnamed')} "
+                    f"[{rule.get('action', '?')}] (source: {rule.get('filename', '?')})\n")
+
+    # 関連する過去レッスン（教訓）
+    if r.get("relevant_lessons"):
+        txt += "  📖 関連する過去の教訓:\n"
+        for les in r["relevant_lessons"][:3]:
+            txt += f"    ・{les.get('title', 'untitled')}\n"
+
+    # 関連する Wiki 分析記事
+    if r.get("wiki_analyses"):
+        txt += "  🔍 参照すべきWiki分析:\n"
+        for ana in r["wiki_analyses"][:2]:
+            txt += f"    ・{ana.get('title', 'untitled')}\n"
+
+    # 過去30日間の取引日記統計
+    if r.get("journal_stats_30d"):
+        js = r["journal_stats_30d"]
+        txt += (f"  📔 過去30日のこのペア取引: {js.get('count', 0)}回 "
+                f"(勝率: {js.get('win_rate', 'N/A')})\n")
 
     upc = r.get("upcoming_events", [])
     if upc:
@@ -493,6 +528,20 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results, sentiment)
             value += f"\n⚠ {r['event_warning']}"
         if r.get("sentiment_notes"):
             value += f"\n🌐 " + " / ".join(r["sentiment_notes"])
+        # Obsidian カスタムルール適用結果
+        if r.get("obsidian_rules_applied"):
+            rule_names = [
+                f"・{rule.get('rule_name', 'unnamed')}"
+                for rule in r["obsidian_rules_applied"][:3]
+            ]
+            value += f"\n📚 Wiki規則:\n" + "\n".join(rule_names)
+        # 関連する過去レッスン（教訓）
+        if r.get("relevant_lessons"):
+            lesson_titles = [
+                f"・{les.get('title', 'untitled')}"
+                for les in r["relevant_lessons"][:2]
+            ]
+            value += f"\n📖 関連教訓:\n" + "\n".join(lesson_titles)
 
         embeds[0]["fields"].append({
             "name": f"{stars_to_text(r['stars'])} {r['label']} - {r['verdict']}",
@@ -1090,6 +1139,24 @@ def main():
     sentiment = evaluate_market_sentiment()
     print(f"[OK] Sentiment: VIX={sentiment.get('vix')} mode={sentiment.get('risk_mode')}")
 
+    # 4.5. Obsidian Wiki ノート取得（オプション・失敗してもスキャンは継続）
+    print("\n[INFO] Fetching Obsidian Vault notes...")
+    try:
+        obsidian_data = fetch_obsidian()
+        if obsidian_data:
+            sig_count = len(obsidian_data.get("signal_rules", []))
+            ana_count = len(obsidian_data.get("analyses", []))
+            jrn_count = len(obsidian_data.get("journals", []))
+            les_count = len(obsidian_data.get("lessons", []))
+            print(f"[OK] Obsidian: {sig_count} rules / {ana_count} analyses / "
+                  f"{jrn_count} journals / {les_count} lessons")
+        else:
+            print("[INFO] Obsidian Vault not configured (OBSIDIAN_VAULT_PAT missing) - skipping")
+            obsidian_data = None
+    except Exception as e:
+        print(f"[WARN] Obsidian fetch failed (continuing without it): {e}")
+        obsidian_data = None
+
     # 5. 全ペア評価
     print("\n[INFO] Evaluating 22 pairs...")
     results = []
@@ -1105,12 +1172,17 @@ def main():
         prices.append(price)
         try:
             r = evaluate_full(pair, price, prices, cb_rates, sentiment, now)
+            # 5.5. Obsidian カスタムルール適用
+            if obsidian_data:
+                r = apply_obsidian_intelligence(r, sentiment, obsidian_data, now)
             results.append(r)
             warn = ""
             if r.get("event_warning"):
                 warn = " ⏸EVT"
             if r.get("sentiment_notes"):
                 warn += " 🌐SENT"
+            if r.get("obsidian_rules_applied"):
+                warn += f" 📚OBS({len(r['obsidian_rules_applied'])})"
             print(
                 f"  [{stars_to_text(r['stars'])}] {pair:8} {price:>10.4f}  "
                 f"TA={r['ta_score']:.0f} FA={r['fa_score']:.0f}  "
@@ -1150,7 +1222,7 @@ def main():
         print("[INFO] No significant changes, skipping notifications")
 
     # 8. 状態保存
-    save_current_state(results, sentiment, us_yields, cb_rates)
+    save_current_state(results, sentiment, us_yields, cb_rates, obsidian_data)
 
     # 9. HTMLレポート
     html = generate_html_report(results, sentiment, us_yields, cb_rates, now)

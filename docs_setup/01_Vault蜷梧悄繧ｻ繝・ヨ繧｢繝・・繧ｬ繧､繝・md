@@ -1,0 +1,218 @@
+# Obsidian Vault GitHub同期 セットアップガイド
+
+> ナナのパパさんのObsidian VaultをGitHub Privateリポジトリで同期し、L3シグナルシステムから知識を参照できるようにします。
+> 既存のメモやノートには一切影響しません。
+
+---
+
+## 全体図
+
+```
+PC（Obsidian Vault）
+    ↓ Obsidian Git プラグインで自動コミット&プッシュ
+GitHub: obsidian-vault (Private)
+    ↓ fx-signal-monitorのGitHub Actionsが読み取り（PAT認証）
+L3シグナルシステムに統合
+```
+
+---
+
+## ステップ1: Vault用Privateリポジトリを作成
+
+### 1-1. GitHubで新規リポジトリ作成
+1. https://github.com/new を開く
+2. 以下を入力：
+   - Repository name: `obsidian-vault`
+   - Description: `My personal Obsidian Vault (Private)`
+   - **🔒 Private を選択（重要：絶対にPublicにしない）**
+   - 「Add a README file」のチェックは外す
+3. `Create repository` をクリック
+
+---
+
+## ステップ2: Obsidian Git プラグインを導入
+
+### 2-1. プラグインのインストール
+1. Obsidianを開く
+2. `設定（⚙）→ コミュニティプラグイン`
+3. 「制限モード」がオンの場合は「制限モードをオフにする」をクリック
+4. `閲覧` をクリック
+5. 検索欄に `Obsidian Git` と入力
+6. `Obsidian Git` をクリック → `インストール` → `有効化`
+
+### 2-2. Git本体のインストール（PCに未導入の場合）
+
+**Windowsの場合**：
+1. https://git-scm.com/download/win を開く
+2. インストーラーを実行
+3. インストール時はすべてデフォルトでOK
+4. インストール後、コマンドプロンプトで `git --version` が動作するか確認
+
+**Macの場合**：
+- Xcode Command Line Toolsが必要：ターミナルで `xcode-select --install`
+
+### 2-3. Git初期設定（初回のみ）
+コマンドプロンプト / ターミナルで：
+```bash
+git config --global user.name "applejoker01-afk"
+git config --global user.email "あなたのGitHubメールアドレス"
+```
+
+---
+
+## ステップ3: VaultをGitHubに接続
+
+### 3-1. Vaultフォルダで初期化
+コマンドプロンプト / ターミナルでVaultフォルダに移動：
+```bash
+cd "C:\Users\あなた\Documents\ObsidianVault"   # 実際のVaultパスに変更
+git init
+git branch -M main
+git remote add origin https://github.com/applejoker01-afk/obsidian-vault.git
+```
+
+### 3-2. .gitignore を作成
+Vaultのルートに `.gitignore` ファイルを作成し、以下の内容を貼り付け：
+
+```
+# Obsidianの個人設定（同期不要）
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.obsidian/cache
+.obsidian/plugins/*/data.json
+
+# システムファイル
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+
+# 一時ファイル
+.trash/
+.obsidian-history/
+```
+
+### 3-3. 初回コミット&プッシュ
+```bash
+git add .
+git commit -m "Initial Vault commit"
+git push -u origin main
+```
+
+GitHubのユーザー名とPersonal Access Token（次ステップで取得）が必要になります。
+
+---
+
+## ステップ4: Personal Access Token (PAT) を作成
+
+### 4-1. PAT作成
+1. GitHub右上のアイコン → `Settings`
+2. 左サイドバー一番下の `Developer settings`
+3. `Personal access tokens` → `Tokens (classic)`
+4. `Generate new token` → `Generate new token (classic)`
+5. 入力：
+   - Note: `Obsidian Vault Sync`
+   - Expiration: `No expiration`（または1年）
+   - Scope: **`repo`にだけチェック**（必須・他は不要）
+6. `Generate token`
+7. **表示されたトークンをすぐにコピー**（再表示できません）
+   - 例: `ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
+
+### 4-2. Vault同期時の認証
+ステップ3-3の `git push` 時に：
+- Username: `applejoker01-afk`
+- Password: **PATを貼り付け**（パスワード文字は表示されません）
+
+### 4-3. Obsidian Git プラグインに登録
+1. Obsidianの `設定 → Obsidian Git → Authentication`
+2. **Username**: `applejoker01-afk`
+3. **Personal Access Token**: 上で取得したPAT
+4. 設定を閉じる
+
+---
+
+## ステップ5: 自動コミット設定
+
+### 5-1. プラグイン設定
+`設定 → Obsidian Git` で以下を設定：
+
+| 設定項目 | 推奨値 |
+|---------|-------|
+| **Vault backup interval** (minutes) | `10`（10分ごとに自動コミット） |
+| **Auto pull interval** (minutes) | `60`（1時間ごとに同期） |
+| **Pull updates on startup** | ON |
+| **Push on backup** | ON |
+| **Commit message** | `vault backup {{date}}` |
+
+### 5-2. 動作確認
+1. Vault内の適当なノートを編集して保存
+2. 10分以内に自動でコミット&プッシュされるか確認
+3. GitHubで `obsidian-vault` リポジトリを開いて更新を確認
+
+---
+
+## ステップ6: fx-signal-monitorからVaultを読めるようにする
+
+L3システム（Public）がPrivateな `obsidian-vault` を読むには、専用のPATが必要です。
+
+### 6-1. 読み取り専用PATを作成
+1. ステップ4と同じ手順で **別のPATをもう1つ作成**
+2. Note: `FX Monitor - Vault Read Access`
+3. Scope: **`repo` のみチェック**（読み取りに必要）
+4. 生成されたトークンをコピー
+
+### 6-2. fx-signal-monitorリポジトリにSecret追加
+1. `applejoker01-afk/fx-signal-monitor` リポジトリを開く
+2. `Settings → Secrets and variables → Actions → New repository secret`
+3. 以下を登録：
+   - **Name**: `OBSIDIAN_VAULT_PAT`
+   - **Secret**: ステップ6-1で取得したPAT
+4. `Add secret`
+
+これでL3システムがVaultを参照できるようになります。
+
+---
+
+## トラブルシューティング
+
+### Q1. `git push` で「Permission denied」と出る
+PATの権限不足です。`repo` スコープが正しくチェックされているか確認してください。
+
+### Q2. Obsidian Git でエラーが出る
+1. ObsidianのDeveloperツール（Ctrl+Shift+I）でエラー詳細を確認
+2. プラグインを一度無効化→有効化
+3. それでもダメな場合はObsidianを再起動
+
+### Q3. Vaultが大きすぎてプッシュできない
+画像や添付ファイルが多い場合は `.gitignore` に追加：
+```
+*.png
+*.jpg
+*.pdf
+attachments/
+```
+
+### Q4. 機密情報を間違ってコミットしてしまった
+すぐに以下を実行：
+```bash
+git rm --cached 機密ファイル
+git commit -m "Remove sensitive file"
+git push
+```
+ただし、Git履歴には残るため、本当に機密性が高い情報の場合は **PATを再発行** することを推奨します。
+
+---
+
+## セキュリティチェックリスト
+
+セットアップ完了前に必ず確認してください：
+
+- [ ] `obsidian-vault` リポジトリが **🔒 Private** になっている
+- [ ] `.gitignore` が正しく機能している（`.obsidian/workspace.json` 等が無視されているか）
+- [ ] パスワード・APIキー・個人情報が記載されたノートがVaultに含まれていない
+- [ ] PATが安全に保管されている（メモ帳等に保存していないか）
+- [ ] PATの有効期限を把握している（期限切れ時の更新を忘れずに）
+
+---
+
+**設定完了後、`02_Domains/finance/` フォルダに投資関連ノートを集約していけば、自動的にL3システムから参照されます。**

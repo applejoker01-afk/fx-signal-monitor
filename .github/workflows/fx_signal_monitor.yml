@@ -36,6 +36,11 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyyaml
+
       - name: Run FX signal scanner
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
@@ -45,13 +50,18 @@ jobs:
           SMTP_PASS: ${{ secrets.SMTP_PASS }}
           MAIL_FROM: ${{ secrets.MAIL_FROM }}
           MAIL_TO:   ${{ secrets.MAIL_TO }}
+          # Obsidian Vault連携（任意。未設定でもスキャンは継続）
+          OBSIDIAN_VAULT_PAT:   ${{ secrets.OBSIDIAN_VAULT_PAT }}
+          OBSIDIAN_VAULT_OWNER: ${{ secrets.OBSIDIAN_VAULT_OWNER }}
+          OBSIDIAN_VAULT_REPO:  ${{ secrets.OBSIDIAN_VAULT_REPO }}
+          OBSIDIAN_VAULT_PATH:  ${{ secrets.OBSIDIAN_VAULT_PATH }}
         run: python signal_scanner.py
 
       - name: Commit updated state (for diff detection)
         run: |
           git config --local user.email "fx-monitor-bot@github-actions"
           git config --local user.name  "FX Monitor Bot"
-          git add docs/last_signals.json docs/index.html
+          git add docs/last_signals.json docs/index.html data/obsidian_cache.json 2>/dev/null || true
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else

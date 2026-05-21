@@ -1,0 +1,287 @@
+# 投資ノート YAML frontmatter 標準スキーマ仕様
+
+> ナナのパパさんのObsidian Wikiから L3シグナルシステムが自動的にルールを抽出するため、
+> 投資関連ノートに記載するYAML frontmatterの標準フォーマットを定義します。
+
+---
+
+## 設計思想
+
+1. **既存のメモ運用を壊さない** — 任意項目はすべてオプショナル
+2. **段階的に詳細化できる** — 最小構成から始めて徐々にルール化
+3. **人間が読みやすい** — 機械可読性を保ちつつ、Markdownエディタで自然に編集できる
+4. **Obsidianの既存タグやリンクとの共存** — YAMLとObsidian機能が併用できる
+
+---
+
+## 5種類のノートタイプ
+
+L3システムは以下の `type` で分類します：
+
+| type | 用途 | L3への影響 |
+|------|------|-----------|
+| `signal_rule` | 売買シグナルに直接影響するルール | ★ シグナル評価に組み込み |
+| `analysis` | 通貨ペアやテーマの分析メモ | 関連通貨ペアの注意事項として表示 |
+| `journal` | トレード日誌・振り返り | 通知に「過去ノート参照」リンク追加 |
+| `lesson` | 失敗・成功から学んだ教訓 | パターンマッチで関連時に喚起 |
+| `strategy` | 戦略全体の方針メモ | システム全体の方針として参照 |
+
+---
+
+## 共通frontmatter（全タイプ必須）
+
+```yaml
+---
+domain: finance              # 必須・"finance" 固定
+type: signal_rule            # 必須・上記5種類のいずれか
+status: active               # active / draft / archived (default: active)
+created: 2026-05-20          # 任意・ISO 8601日付
+updated: 2026-05-20          # 任意・ISO 8601日付
+tags: [テクニカル分析, MACD]  # 任意・Obsidianタグと併用OK
+---
+```
+
+---
+
+## type別の追加スキーマ
+
+### Type 1: `signal_rule`（シグナルルール）
+
+実際の売買判断に影響する機械可読ルールを記載します。
+
+```yaml
+---
+domain: finance
+type: signal_rule
+status: active
+pairs: [USDJPY, EURUSD]      # 対象通貨ペア配列（[all] で全ペア）
+priority: high                # critical / high / medium / low
+confidence: 0.8               # 0.0〜1.0 自分の確信度（任意）
+tags: [テクニカル, レジスタンス]
+
+rule:
+  when:                       # 条件（全てANDで結合）
+    - "price >= 155.0"        # 価格条件
+    - "rsi > 70"              # RSI条件
+  then:                       # アクション
+    action: downgrade_long    # 下記アクション一覧から選択
+    severity: 2               # 1〜3 (3が最強)
+  
+  note: "財務省介入実績ライン"  # 任意・人間向けコメント
+---
+
+# USD/JPY 155円介入警戒ライン
+
+過去の財務省介入実績から、USD/JPYが155円を超えると...
+（自由なMarkdown記述）
+```
+
+#### 使用可能な条件式（when）
+
+| カテゴリ | 式の例 | 説明 |
+|---------|-------|------|
+| **価格** | `price > 155.0` `price <= 100.0` | 現在の価格 |
+| **テクニカル** | `rsi > 70` `rsi <= 30` | RSI(14)の値 |
+| | `macd_signal == 'golden_cross'` | MACDゴールデンクロス |
+| | `macd_signal == 'dead_cross'` | MACDデッドクロス |
+| | `macd_divergence == 'bearish'` | 弱気ダイバージェンス |
+| | `macd_divergence == 'bullish'` | 強気ダイバージェンス |
+| | `above_200dma == true` | 200日線上 |
+| | `below_200dma == true` | 200日線下 |
+| | `golden_cross_50_200 == true` | 50-200ゴールデンクロス |
+| **ファンダメンタル** | `rate_diff > 4.0` | 金利差4%超 |
+| | `fa_score > 70` | FAスコア70超 |
+| | `cb_stance_from == 'tighten'` | 通貨1の中銀タカ派 |
+| **センチメント** | `vix > 25` | VIX 25超 |
+| | `vix > 30` | VIX 30超（パニック） |
+| | `dxy_trend == 'strong'` | DXY上昇トレンド |
+| | `gold_trend == 'surging'` | 金急騰 |
+| | `risk_mode == 'panic'` | パニックモード |
+| **時間** | `hour_jst >= 9 and hour_jst < 18` | JST 9-18時 |
+| | `day_of_week == 'friday'` | 金曜日 |
+
+#### 使用可能なアクション（then.action）
+
+| アクション | 効果 |
+|-----------|------|
+| `upgrade_long` | ロングシグナルの★を上げる |
+| `downgrade_long` | ロングシグナルの★を下げる |
+| `upgrade_short` | ショートシグナルの★を上げる |
+| `downgrade_short` | ショートシグナルの★を下げる |
+| `block_trade` | 取引を完全に控える（★1強制） |
+| `warn` | 警告のみ表示（★は変えない） |
+| `force_review` | 通知に「要確認」フラグ |
+
+`severity` は 1〜3 で、★の変動幅を示します。
+
+---
+
+### Type 2: `analysis`（分析メモ）
+
+通貨ペアやテーマの解説・現状認識を記録します。シグナルには直接影響しませんが、関連通貨ペアの表示時に参照されます。
+
+```yaml
+---
+domain: finance
+type: analysis
+pairs: [AUDJPY]
+tags: [豪ドル, 資源国通貨, RBA]
+topic: "AUDJPY 中長期見通し 2026Q2"
+summary: "RBA金利据え置きと資源需要で115円水準維持の可能性"
+---
+
+# AUD/JPY 中長期分析
+
+オーストラリア準備銀行（RBA）の政策金利は4.10%で...
+```
+
+`summary` は通知メッセージに表示されます。
+
+---
+
+### Type 3: `journal`（トレード日誌）
+
+実際のトレード記録。レビュー時の参照用。
+
+```yaml
+---
+domain: finance
+type: journal
+pairs: [USDJPY]
+trade_date: 2026-05-15
+direction: long
+entry_price: 157.20
+exit_price: 158.50
+result: profit               # profit / loss / breakeven
+pips: 130
+risk_percent: 1.5
+tags: [スイング, ピラミッディング成功]
+---
+
+# USDJPY ロング 5/15
+
+エントリー判断: 200日線サポート反発 + MACDゴールデンクロス
+```
+
+---
+
+### Type 4: `lesson`(教訓)
+
+失敗や成功から得た知見。類似状況で自動的に通知に含まれます。
+
+```yaml
+---
+domain: finance
+type: lesson
+pairs: [all]                  # 全ペアに適用
+trigger_pattern:              # この条件で関連性ありと判定
+  - "vix > 25"
+  - "stars_changed_from <= 3 and stars_changed_to >= 4"
+priority: high
+tags: [リスク管理, パニック対応]
+title: "VIX急騰時の安易なロング追加は禁止"
+---
+
+# VIX急騰時の安易なロング追加は禁止
+
+2026年3月、VIX 28への急騰時にAUD/JPYロング追加して...
+```
+
+`trigger_pattern` の条件にマッチすると、通知メッセージに「📚 過去の教訓: ○○」として表示されます。
+
+---
+
+### Type 5: `strategy`(戦略方針)
+
+ポートフォリオレベルの戦略方針。
+
+```yaml
+---
+domain: finance
+type: strategy
+status: active
+scope: global                # global / pair_specific
+tags: [資金管理, ポートフォリオ]
+title: "2026年下期 ポジションサイジング方針"
+
+global_rules:
+  max_pairs_concurrent: 3     # 同時保有最大ペア数
+  max_risk_per_trade: 2.0     # 1トレードあたり最大リスク%
+  max_total_exposure: 10.0    # 合計エクスポージャー上限%
+  
+preferred_pairs:              # 優先取引ペア
+  - USDJPY
+  - AUDJPY
+  - EURUSD
+
+avoid_pairs:                  # 避けるペア
+  - TRYJPY                    # 高ボラ
+---
+```
+
+---
+
+## ファイル命名と配置の推奨
+
+Obsidian Vault内：
+
+```
+02_Domains/
+└── finance/
+    ├── rules/
+    │   ├── USDJPY_155円介入警戒.md          (signal_rule)
+    │   ├── VIX25超_新興国回避.md             (signal_rule)
+    │   └── MACDダイバージェンス検出時補正.md  (signal_rule)
+    ├── analysis/
+    │   ├── AUDJPY_2026Q2見通し.md           (analysis)
+    │   └── EUR_ECB利下げシナリオ.md          (analysis)
+    ├── journal/
+    │   ├── 2026-05-15_USDJPY_long.md       (journal)
+    │   └── 2026-05-18_EURUSD_short.md      (journal)
+    ├── lessons/
+    │   ├── VIX急騰時の失敗.md                (lesson)
+    │   └── ピラミッディング成功要因.md         (lesson)
+    └── strategy/
+        ├── 2026下期_資金管理方針.md         (strategy)
+        └── キャリートレード戦略.md          (strategy)
+```
+
+---
+
+## 段階的な移行戦略
+
+### Phase A（即日できる）
+- 既存ノートに最低限のfrontmatter（`domain`, `type`）だけ追加
+- L3システムは「analysisノート」として認識し、関連時に参照
+
+### Phase B（週末などまとめて）
+- 重要な売買ルールを `signal_rule` 形式で記載
+- まずは5〜10ルールから始める
+
+### Phase C（継続的に）
+- トレード日誌を `journal` で記録
+- 失敗・成功時に `lesson` を追加
+- 戦略変更時に `strategy` を更新
+
+---
+
+## サンプルノート
+
+`samples_obsidian/` フォルダに具体的なサンプルノートを5本用意しています：
+
+1. `01_USDJPY_介入警戒.md` (signal_rule)
+2. `02_VIX急騰時_新興国回避.md` (signal_rule)
+3. `03_AUDJPY_中長期見通し.md` (analysis)
+4. `04_2026-05-15_USDJPYロング.md` (journal)
+5. `05_ピラミッディング失敗教訓.md` (lesson)
+
+これらをObsidianの `02_Domains/finance/` 配下にコピーして始めるのが最速です。
+
+---
+
+## バリデーション
+
+frontmatterが正しいかは、L3システムの自動抽出時にチェックされます。
+誤りがあるノートはスキップされ、GitHub ActionsのログにWARNINGが残ります。
+
+必要に応じて手動チェック用のスクリプト `scripts/validate_notes.py`(別途提供) を実行することも可能です。
