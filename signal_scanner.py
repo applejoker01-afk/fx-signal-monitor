@@ -556,15 +556,24 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results, sentiment)
         })
 
     try:
+        payload = json.dumps({"embeds": embeds}).encode("utf-8")
         req = urllib.request.Request(
             webhook_url,
-            data=json.dumps({"embeds": embeds}).encode("utf-8"),
-            headers={"Content-Type": "application/json"},
+            data=payload,
+            headers={
+                "Content-Type": "application/json",
+                "User-Agent": "DiscordBot (fx-signal-monitor, 1.0)",
+                "X-RateLimit-Precision": "millisecond",
+            },
             method="POST"
         )
         with urllib.request.urlopen(req, timeout=15) as resp:
             print(f"[OK] Discord sent (HTTP {resp.status})")
             return True
+    except urllib.error.HTTPError as e:
+        body = e.read().decode("utf-8", errors="ignore")[:200]
+        print(f"[ERROR] Discord send failed: HTTP {e.code} {e.reason} | body={body}")
+        return False
     except Exception as e:
         print(f"[ERROR] Discord send failed: {e}")
         return False
@@ -1255,6 +1264,7 @@ def main():
     # 7. 通知
     if newly or upgraded or (is_first and newly):
         _wh = os.environ.get("DISCORD_WEBHOOK_URL", "")
+        # discordapp.com は旧ドメイン・discord.com に自動変換
         _wh = _wh.replace("discordapp.com", "discord.com")
         print(f"[DEBUG] Webhook URL先頭40字: {_wh[:40]!r}")
         send_discord(
