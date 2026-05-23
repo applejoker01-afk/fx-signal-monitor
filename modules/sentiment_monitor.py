@@ -46,12 +46,14 @@ def fetch_stooq(symbol):
         text = http_get(url, timeout=10)
         lines = text.strip().split("\n")
         if len(lines) < 2:
+            print(f"[WARN] Stooq {symbol}: レスポンスが空")
             return None
         header = [h.strip().lower() for h in lines[0].split(",")]
         values = lines[1].split(",")
         row = dict(zip(header, values))
         close = row.get("close", "").strip()
         if close in ("N/D", "", None):
+            print(f"[WARN] Stooq {symbol}: N/D（データなし）raw={lines[1][:80]}")
             return None
         return float(close)
     except Exception as e:
@@ -117,11 +119,12 @@ def save_sentiment_cache(data):
 # ---------------------------------------------------------------------------
 
 def fetch_vix():
-    """VIX恐怖指数"""
-    val = fetch_stooq("^vix")
-    if val is None:
-        val = fetch_stooq("^vix.us")
-    return val
+    """VIX恐怖指数 - Stooqの^シンボルが不安定なため複数フォールバック"""
+    for symbol in ("vix.us", "^vix", "^vix.us", "vix"):
+        val = fetch_stooq(symbol)
+        if val is not None:
+            return val
+    return None
 
 
 def fetch_dxy():
@@ -133,13 +136,15 @@ def fetch_dxy():
 
 
 def fetch_us10y():
-    """米10年債利回り（TNX）"""
-    val = fetch_stooq("^tnx")
-    if val is None:
-        val = fetch_stooq("^tnx.us")
-    if val is not None and val > 50:
-        val = val / 10  # TNXは利回り×10で表示される場合がある
-    return val
+    """米10年債利回り - Stooqの^シンボルが不安定なため複数フォールバック"""
+    for symbol in ("10us.b", "tnx.us", "^tnx", "^tnx.us", "us10yt=x"):
+        val = fetch_stooq(symbol)
+        if val is not None:
+            # TNXは利回り×10で表示される場合がある
+            if val > 50:
+                val = val / 10
+            return val
+    return None
 
 
 def fetch_gold():
