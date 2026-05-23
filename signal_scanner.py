@@ -1255,6 +1255,7 @@ def main():
     # 7. 通知
     if newly or upgraded or (is_first and newly):
         _wh = os.environ.get("DISCORD_WEBHOOK_URL", "")
+        _wh = _wh.replace("discordapp.com", "discord.com")
         print(f"[DEBUG] Webhook URL先頭40字: {_wh[:40]!r}")
         send_discord(
             _wh,
