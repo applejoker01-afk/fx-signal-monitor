@@ -1254,8 +1254,10 @@ def main():
 
     # 7. 通知
     if newly or upgraded or (is_first and newly):
+        _wh = os.environ.get("DISCORD_WEBHOOK_URL", "")
+        print(f"[DEBUG] Webhook URL先頭40字: {_wh[:40]!r}")
         send_discord(
-            os.environ.get("DISCORD_WEBHOOK_URL"),
+            _wh,
             newly, upgraded, is_first, results, sentiment
         )
         send_email(
