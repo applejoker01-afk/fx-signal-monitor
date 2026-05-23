@@ -118,32 +118,73 @@ def save_sentiment_cache(data):
 # 個別指標の取得（フォールバック付き）
 # ---------------------------------------------------------------------------
 
+def fetch_yahoo(symbol):
+    """
+    Yahoo Finance から最新値を取得。
+    VIX: ^VIX, 米10年債: ^TNX
+    """
+    url = (
+        f"https://query1.finance.yahoo.com/v8/finance/chart/{symbol}"
+        "?interval=1d&range=5d"
+    )
+    try:
+        text = http_get(url, timeout=15)
+        data = json.loads(text)
+        closes = (data["chart"]["result"][0]
+                  ["indicators"]["quote"][0]["close"])
+        # 末尾から最初のNoneでない値を返す
+        for v in reversed(closes):
+            if v is not None:
+                return round(float(v), 4)
+    except Exception as e:
+        print(f"[WARN] Yahoo Finance fetch failed for {symbol}: {e}")
+    return None
+
+
 def fetch_vix():
-    """VIX恐怖指数 - Stooqの^シンボルが不安定なため複数フォールバック"""
+    """VIX恐怖指数 - Yahoo Finance優先、Stooqフォールバック"""
+    # Yahoo Finance（最優先）
+    val = fetch_yahoo("%5EVIX")   # ^VIX をURLエンコード
+    if val is not None:
+        print(f"[OK] VIX from Yahoo Finance: {val}")
+        return val
+    # Stooqフォールバック
     for symbol in ("vix.us", "^vix", "^vix.us", "vix"):
         val = fetch_stooq(symbol)
         if val is not None:
             return val
+    print("[WARN] VIX: 全データソース取得失敗")
     return None
 
 
 def fetch_dxy():
     """ドルインデックス"""
-    val = fetch_stooq("dx.f")  # Dollar Index futures
+    val = fetch_stooq("dx.f")
     if val is None:
         val = fetch_stooq("usdx")
+    if val is None:
+        val = fetch_yahoo("DX-Y.NYB")
     return val
 
 
 def fetch_us10y():
-    """米10年債利回り - Stooqの^シンボルが不安定なため複数フォールバック"""
-    for symbol in ("10us.b", "tnx.us", "^tnx", "^tnx.us", "us10yt=x"):
+    """米10年債利回り - Yahoo Finance優先、Stooqフォールバック"""
+    # Yahoo Finance（最優先）
+    val = fetch_yahoo("%5ETNX")   # ^TNX をURLエンコード
+    if val is not None:
+        # TNXは利回り×10で返ってくる場合がある
+        if val > 50:
+            val = val / 10
+        print(f"[OK] US10Y from Yahoo Finance: {val}")
+        return val
+    # Stooqフォールバック
+    for symbol in ("10us.b", "tnx.us", "^tnx", "^tnx.us"):
         val = fetch_stooq(symbol)
         if val is not None:
-            # TNXは利回り×10で表示される場合がある
             if val > 50:
                 val = val / 10
             return val
+    print("[WARN] US10Y: 全データソース取得失敗")
     return None
 
 
