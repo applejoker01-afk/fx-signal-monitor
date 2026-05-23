@@ -1266,7 +1266,6 @@ def main():
         _wh = os.environ.get("DISCORD_WEBHOOK_URL", "")
         # discordapp.com は旧ドメイン・discord.com に自動変換
         _wh = _wh.replace("discordapp.com", "discord.com")
-        print(f"[DEBUG] Webhook URL先頭40字: {_wh[:40]!r}")
         send_discord(
             _wh,
             newly, upgraded, is_first, results, sentiment
