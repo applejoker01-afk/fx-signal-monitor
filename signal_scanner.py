@@ -494,7 +494,7 @@ embeds = [{
         "title": title, "description": desc, "color": color,
         "url": "https://applejoker01-afk.github.io/fx-signal-monitor/",
         "timestamp": jst.isoformat(),
-　　　　 "footer": {"text": f"Currents FX Terminal L3 | {timestamp} | https://applejoker01-afk.github.io/fx-signal-monitor/"},
+        "footer": {"text": f"Currents FX Terminal L3 | {timestamp} | https://applejoker01-afk.github.io/fx-signal-monitor/"},
         "fields": []
     }]
 
