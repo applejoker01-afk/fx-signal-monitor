@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """
-FX売買シグナル監視スキャナー（レベル3 Advanced）
-8つの高度分析機能を統合した最終版。
+FX売買シグナル監視スキャナー（レベル3：フルファンダメンタルズ統合版）
 """
 
 import os
@@ -25,13 +24,6 @@ from modules.sentiment_monitor import (
 )
 from modules.obsidian_extractor import fetch_and_save as fetch_obsidian
 from modules.custom_rules_engine import apply_obsidian_intelligence
-from modules.advanced_analytics import (
-    run_advanced_analytics,
-    calc_portfolio_analytics,
-    calc_global_analytics,
-    get_pair_strength_context,
-)
-from modules.weekly_report import save_signal_snapshot
 
 PAGES_URL = "https://applejoker01-afk.github.io/fx-signal-monitor/"
 
@@ -200,7 +192,9 @@ def compute_ta_score(price, prices):
 
     return {
         "ta_score": round((dma_score + macd_score + rsi_score) / 3, 1),
-        "dma_score": dma_score, "macd_score": macd_score, "rsi_score": rsi_score,
+        "dma_score": dma_score,
+        "macd_score": macd_score,
+        "rsi_score": rsi_score,
         "dma200": round(dma200, 5) if dma200 else None,
         "dma50": round(dma50, 5) if dma50 else None,
         "rsi": round(rsi_v, 2) if rsi_v else None,
@@ -220,17 +214,25 @@ def evaluate_full(pair, price, prices, cb_rates, sentiment, now):
     conflict = ta_sign != fa_sign and ta_sign != 0 and fa_sign != 0
 
     if agree and ta["ta_score"] >= 75 and fa["score"] >= 65:
-        stars = 5; verdict = "◎ 高信頼ロング" if fa_sign > 0 else "◎ 高信頼ショート"
+        stars = 5
+        verdict = "◎ 高信頼ロング" if fa_sign > 0 else "◎ 高信頼ショート"
         direction = "LONG" if fa_sign > 0 else "SHORT"
     elif agree and ta["ta_score"] >= 60 and fa["score"] >= 55:
-        stars = 4; verdict = "○ ロング条件成立" if fa_sign > 0 else "○ ショート条件成立"
+        stars = 4
+        verdict = "○ ロング条件成立" if fa_sign > 0 else "○ ショート条件成立"
         direction = "LONG" if fa_sign > 0 else "SHORT"
     elif agree and ta["ta_score"] <= 25 and fa["score"] <= 35:
-        stars = 5; verdict = "◎ 高信頼ショート"; direction = "SHORT"
+        stars = 5
+        verdict = "◎ 高信頼ショート"
+        direction = "SHORT"
     elif agree and ta["ta_score"] <= 40 and fa["score"] <= 45:
-        stars = 4; verdict = "○ ショート条件成立"; direction = "SHORT"
+        stars = 4
+        verdict = "○ ショート条件成立"
+        direction = "SHORT"
     elif conflict:
-        stars = 1; verdict = "⚠ 見送り（FA/TA不一致）"; direction = "NO_TRADE"
+        stars = 1
+        verdict = "⚠ 見送り（FA/TA不一致）"
+        direction = "NO_TRADE"
     elif fa_sign == 0 and ta_sign == 0:
         stars = 2; verdict = "— レンジ"; direction = "NO_TRADE"
     else:
@@ -238,11 +240,17 @@ def evaluate_full(pair, price, prices, cb_rates, sentiment, now):
         direction = "LIGHT_" + ("LONG" if (ta_sign + fa_sign) > 0 else "SHORT")
 
     result = {
-        "pair": pair, "label": PAIR_LABEL[pair], "price": round(price, 5),
+        "pair": pair,
+        "label": PAIR_LABEL[pair],
+        "price": round(price, 5),
         **ta,
-        "fa_score": fa["score"], "fa_direction": fa["direction"],
-        "fa_rate_diff": fa["rate_diff"], "fa_detail": fa["detail"],
-        "stars": stars, "verdict": verdict, "direction": direction,
+        "fa_score": fa["score"],
+        "fa_direction": fa["direction"],
+        "fa_rate_diff": fa["rate_diff"],
+        "fa_detail": fa["detail"],
+        "stars": stars,
+        "verdict": verdict,
+        "direction": direction,
         "pair_type": classify_pair(pair),
     }
 
@@ -260,6 +268,7 @@ def evaluate_full(pair, price, prices, cb_rates, sentiment, now):
 
     result = apply_sentiment_filter(pair, result, sentiment)
     result["upcoming_events"] = upcoming_events_for(pair, hours_ahead=168)
+
     return result
 
 
@@ -275,9 +284,7 @@ def load_previous_state():
         return {}
 
 
-def save_current_state(results, sentiment, us_yields, cb_rates,
-                       obsidian_data=None, currency_strength=None,
-                       portfolio_risk=None):
+def save_current_state(results, sentiment, us_yields, cb_rates, obsidian_data=None):
     os.makedirs(os.path.dirname(STATE_FILE), exist_ok=True)
     state = {
         "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -293,11 +300,8 @@ def save_current_state(results, sentiment, us_yields, cb_rates,
             "analyses_count": len(obsidian_data.get("analyses", [])),
             "journals_count": len(obsidian_data.get("journals", [])),
             "lessons_count": len(obsidian_data.get("lessons", [])),
+            "last_fetched": obsidian_data.get("fetched_at"),
         }
-    if currency_strength:
-        state["currency_strength"] = currency_strength
-    if portfolio_risk:
-        state["portfolio_risk"] = portfolio_risk
     with open(STATE_FILE, "w", encoding="utf-8") as f:
         json.dump(state, f, ensure_ascii=False, indent=2, default=str)
 
@@ -317,14 +321,86 @@ def stars_to_text(n):
     return "★" * n + "☆" * (5 - n)
 
 
-def send_discord(webhook_url, newly, upgraded, is_first, all_results,
-                 sentiment, currency_strength=None, portfolio_risk=None):
+def format_event_block(r):
+    if "event_warning" not in r:
+        return ""
+    ev = r.get("event_info", {})
+    return (
+        f"  取引控え: {r['event_warning']}\n"
+        f"  {ev.get('name', 'N/A')} | "
+        f"重要度: {ev.get('importance', 'N/A')}\n"
+    )
+
+
+def format_sentiment_block(r):
+    notes = r.get("sentiment_notes", [])
+    if not notes:
+        return ""
+    return "  センチメント: " + " / ".join(notes) + "\n"
+
+
+def format_signal_block_text(r):
+    txt = (
+        f"{stars_to_text(r['stars'])}  {r['label']}  {r['price']}\n"
+        f"  {r['verdict']} / {r['direction']}\n"
+        f"  TA={r['ta_score']}/100  FA={r['fa_score']}/100 "
+        f"(金利差{r.get('fa_rate_diff', 'N/A'):+.2f}%)\n"
+        f"  RSI={r['rsi']}  MACD={r['macd']}  ATR={r['atr']}\n"
+        f"  {r['fa_detail']}\n"
+    )
+    txt += format_event_block(r)
+    txt += format_sentiment_block(r)
+
+    if r.get("obsidian_rules_applied"):
+        txt += "  Wiki規則適用:\n"
+        for rule in r["obsidian_rules_applied"]:
+            txt += (f"    ・{rule.get('rule_name', 'unnamed')} "
+                    f"[{rule.get('action', '?')}]\n")
+
+    if r.get("relevant_lessons"):
+        txt += "  関連する過去の教訓:\n"
+        for les in r["relevant_lessons"][:3]:
+            txt += f"    ・{les.get('title', 'untitled')}\n"
+
+    if r.get("wiki_analyses"):
+        txt += "  参照すべきWiki分析:\n"
+        for ana in r["wiki_analyses"][:2]:
+            txt += f"    ・{ana.get('title', 'untitled')}\n"
+
+    if r.get("journal_stats_30d"):
+        js = r["journal_stats_30d"]
+        txt += (f"  過去30日のこのペア取引: {js.get('count', 0)}回 "
+                f"(勝率: {js.get('win_rate', 'N/A')})\n")
+
+    upc = r.get("upcoming_events", [])
+    if upc:
+        txt += "  今後7日: "
+        for e in upc[:3]:
+            txt += f"{e['name']}({e['hours_until']:.0f}h) "
+        txt += "\n"
+    return txt
+
+
+def format_sentiment_summary(s):
+    if not s:
+        return "  センチメント取得失敗\n"
+    return (
+        f"  VIX: {s.get('vix', 'N/A')} [{s.get('vix_level', '?')}]\n"
+        f"  DXY: {s.get('dxy', 'N/A')} [{s.get('dxy_trend', '?')}]\n"
+        f"  米10y: {s.get('us10y', 'N/A')}% [{s.get('bond_pressure', '?')}]\n"
+        f"  ゴールド: {s.get('gold', 'N/A')} [{s.get('gold_trend', '?')}]\n"
+        f"  リスクモード: {s.get('risk_mode', 'N/A').upper()}\n"
+    )
+
+
+def send_discord(webhook_url, newly, upgraded, is_first, all_results, sentiment):
     if not webhook_url:
         print("[INFO] Discord webhook not configured")
         return False
 
     jst = datetime.now(timezone.utc) + timedelta(hours=9)
     timestamp = jst.strftime("%Y-%m-%d %H:%M JST")
+
     risk_mode = sentiment.get("risk_mode", "normal") if sentiment else "unknown"
     risk_emoji = {
         "panic": "🚨🚨🚨", "risk_off": "⚠️", "caution": "⚠",
@@ -333,7 +409,7 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results,
 
     if is_first:
         title = f"🚀 FXシグナル監視開始 {risk_emoji}"
-        desc = f"監視開始。★4以上: **{len(newly)}件** / 市場: **{risk_mode}**"
+        desc = f"監視開始。現在の★4以上: **{len(newly)}件** / 市場: **{risk_mode}**"
         color = 0xD4A574
     elif newly or upgraded:
         title = f"{risk_emoji} FXシグナル変化検出"
@@ -351,14 +427,15 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results,
         return False
 
     embeds = [{
-        "title": title, "description": desc, "color": color,
+        "title": title,
+        "description": desc,
+        "color": color,
         "url": PAGES_URL,
         "timestamp": jst.isoformat(),
         "footer": {"text": f"Currents FX Terminal L3 | {timestamp} | {PAGES_URL}"},
         "fields": []
     }]
 
-    # 市場センチメント
     if sentiment:
         embeds[0]["fields"].append({
             "name": "🌐 市場センチメント",
@@ -373,100 +450,43 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results,
             "inline": False
         })
 
-    # ① 通貨強弱メーター（上位3・下位3）
-    if currency_strength:
-        sorted_ccys = sorted(currency_strength.items(), key=lambda x: -x[1]["score"])
-        strong = [f"{c}({v['score']:+.0f})" for c, v in sorted_ccys[:3]]
-        weak = [f"{c}({v['score']:+.0f})" for c, v in sorted_ccys[-3:]]
-        embeds[0]["fields"].append({
-            "name": "💪 通貨強弱",
-            "value": f"強: {' > '.join(strong)}\n弱: {' < '.join(reversed(weak))}",
-            "inline": False
-        })
-
-    # ④ 相関リスク警告
-    if portfolio_risk and portfolio_risk.get("warnings"):
-        warnings_text = "\n".join(portfolio_risk["warnings"][:3])
-        embeds[0]["fields"].append({
-            "name": f"⚠ ポジション相関リスク [{portfolio_risk.get('risk_level','').upper()}]",
-            "value": warnings_text + f"\n→ {portfolio_risk.get('recommendation', '')}",
-            "inline": False
-        })
-
-    # 各シグナル
     for r in newly:
         rate_diff_str = (
             f"{r.get('fa_rate_diff', 0):+.2f}%"
             if r.get("fa_rate_diff") is not None else "N/A"
         )
-        regime = r.get("volatility_regime", {})
-        staged = r.get("staged_tp", {})
-        carry = r.get("carry_score", {})
-        sr = r.get("support_resistance", {})
-        interv = r.get("intervention_risk", {})
-        strength_ctx = r.get("strength_context", {})
-
-        # 基本情報
         value = (
-            f"```\n"
-            f"価格: {r['price']}\n"
+            f"```\n価格: {r['price']}\n"
             f"方向: {r['direction']}\n"
             f"TA: {r['ta_score']}/100  FA: {r['fa_score']}/100\n"
-            f"金利差: {rate_diff_str}\n"
+            f"金利差: {rate_diff_str}\n```\n"
+            f"📊 {r['fa_detail']}"
         )
-
-        # ② ボラレジーム + ③ 段階的TP
-        if regime:
-            value += f"ボラ: {regime.get('regime_label','')} (ATR比{regime.get('atr_ratio',1):.1f}倍)\n"
-        if staged:
-            value += (
-                f"SL: {staged.get('sl','?')} | "
-                f"TP1: {staged.get('tp1','?')} | "
-                f"TP2: {staged.get('tp2','?')} | "
-                f"TP3: {staged.get('tp3','?')}\n"
-                f"RR: 1:{staged.get('rr_tp1','?')} / 1:{staged.get('rr_tp2','?')} / 1:{staged.get('rr_tp3','?')}\n"
-            )
-        value += "```\n"
-        value += f"📊 {r['fa_detail']}"
-
-        # ① 通貨強弱コンテキスト
-        if strength_ctx:
-            value += f"\n💪 {strength_ctx.get('context', '')}"
-
-        # ⑤ キャリースコア
-        if carry and r.get("fa_rate_diff", 0) and r.get("fa_rate_diff", 0) > 0:
-            value += (
-                f"\n💰 キャリー: {carry.get('label','')} "
-                f"(スコア{carry.get('carry_score','?'):.1f} | "
-                f"SL回収{carry.get('breakeven_days','?')}日)"
-            )
-
-        # ⑥ SR
-        if sr and sr.get("context"):
-            value += f"\n📐 {sr.get('context','')}"
-
-        # ⑧ 介入リスク
-        if interv:
-            risk_lv = interv.get("risk_level", "")
-            if risk_lv in ("HIGH", "CRITICAL"):
-                value += (
-                    f"\n🚨 介入リスク{risk_lv} (スコア{interv.get('risk_score','?')}/100)\n"
-                    f"   {interv.get('recommendation','')}"
-                )
-
         if r.get("event_warning"):
             value += f"\n⚠ {r['event_warning']}"
         if r.get("sentiment_notes"):
             value += f"\n🌐 " + " / ".join(r["sentiment_notes"])
+        if r.get("obsidian_rules_applied"):
+            rule_names = [
+                f"・{rule.get('rule_name', 'unnamed')}"
+                for rule in r["obsidian_rules_applied"][:3]
+            ]
+            value += f"\n📚 Wiki規則:\n" + "\n".join(rule_names)
+        if r.get("relevant_lessons"):
+            lesson_titles = [
+                f"・{les.get('title', 'untitled')}"
+                for les in r["relevant_lessons"][:2]
+            ]
+            value += f"\n📖 関連教訓:\n" + "\n".join(lesson_titles)
 
         embeds[0]["fields"].append({
             "name": f"{stars_to_text(r['stars'])} {r['label']} - {r['verdict']}",
-            "value": value[:1024], "inline": False
+            "value": value, "inline": False
         })
 
     for r in upgraded:
         embeds[0]["fields"].append({
-            "name": f"⬆ 昇格: {r['label']} ★4→★5",
+            "name": f"⬆ 昇格: {r['label']} ★4 → ★5",
             "value": f"```\n価格: {r['price']}  方向: {r['direction']}\n```",
             "inline": False
         })
@@ -474,7 +494,8 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results,
     try:
         payload = json.dumps({"embeds": embeds}).encode("utf-8")
         req = urllib.request.Request(
-            webhook_url, data=payload,
+            webhook_url,
+            data=payload,
             headers={
                 "Content-Type": "application/json",
                 "User-Agent": "DiscordBot (fx-signal-monitor, 1.0)",
@@ -487,7 +508,7 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results,
             return True
     except urllib.error.HTTPError as e:
         body = e.read().decode("utf-8", errors="ignore")[:200]
-        print(f"[ERROR] Discord send failed: HTTP {e.code} | {body}")
+        print(f"[ERROR] Discord send failed: HTTP {e.code} {e.reason} | body={body}")
         return False
     except Exception as e:
         print(f"[ERROR] Discord send failed: {e}")
@@ -505,59 +526,72 @@ def send_email(smtp_host, smtp_port, smtp_user, smtp_pass,
     timestamp = jst.strftime("%Y-%m-%d %H:%M JST")
     risk_mode = sentiment.get("risk_mode", "?") if sentiment else "?"
 
-    subject = (
-        f"[FX Monitor L3] 監視開始 - ★4以上{len(newly)}件 / 市場:{risk_mode}"
-        if is_first else
-        f"[FX Monitor L3] 新規{len(newly)} / 昇格{len(upgraded)} / 市場:{risk_mode} ({timestamp})"
-    )
+    if is_first:
+        subject = f"[FX Monitor L3] 監視開始 - ★4以上{len(newly)}件 / 市場:{risk_mode}"
+    else:
+        subject = (
+            f"[FX Monitor L3] 新規{len(newly)} / 昇格{len(upgraded)} "
+            f"/ 市場:{risk_mode} ({timestamp})"
+        )
 
-    def fmt_signal(r):
-        staged = r.get("staged_tp", {})
-        regime = r.get("volatility_regime", {})
-        carry = r.get("carry_score", {})
-        sr = r.get("support_resistance", {})
-        interv = r.get("intervention_risk", {})
-        lines = [
-            f"{stars_to_text(r['stars'])} {r['label']} @ {r['price']}",
-            f"  {r['verdict']} / {r['direction']}",
-            f"  TA={r['ta_score']}/100  FA={r['fa_score']}/100  金利差{r.get('fa_rate_diff','N/A'):+.2f}%",
-            f"  {r['fa_detail']}",
-        ]
-        if regime:
-            lines.append(f"  ② ボラ: {regime.get('regime_label','')} (比率{regime.get('atr_ratio',1):.1f}x)")
-        if staged:
-            lines.append(f"  ③ SL:{staged.get('sl','?')} TP1:{staged.get('tp1','?')} TP2:{staged.get('tp2','?')} TP3:{staged.get('tp3','?')}")
-            lines.append(f"     戦略: {staged.get('strategy','')}")
-        if carry and r.get("fa_rate_diff", 0) and r.get("fa_rate_diff", 0) > 0:
-            lines.append(f"  ⑤ キャリー: {carry.get('label','')} | SL回収{carry.get('breakeven_days','?')}日")
-        if sr and sr.get("context"):
-            lines.append(f"  ⑥ SR: {sr.get('context','')}")
-        if interv and interv.get("risk_level") in ("HIGH", "CRITICAL"):
-            lines.append(f"  ⑧ 介入リスク: {interv.get('risk_label','')} ({interv.get('risk_score',0)}/100)")
-        return "\n".join(lines)
+    lines = [
+        "=" * 64,
+        f"  FX売買シグナル通知  {timestamp}",
+        "=" * 64, "",
+        "【市場センチメント】",
+        format_sentiment_summary(sentiment),
+    ]
 
-    body_lines = ["=" * 60, f"  FX売買シグナル通知  {timestamp}", "=" * 60, ""]
+    if us_yields:
+        lines.append("【米国債利回り】")
+        lines.append(
+            f"  2y: {us_yields.get('2y', 'N/A')}%  "
+            f"10y: {us_yields.get('10y', 'N/A')}%  "
+            f"30y: {us_yields.get('30y', 'N/A')}%  "
+            f"10y-2y: {us_yields.get('spread_10y2y', 'N/A')}%"
+        )
+        lines.append("")
+
     if newly:
-        body_lines.append("【★4以上の新規シグナル】")
+        lines.append("【★4以上の新規シグナル】")
+        lines.append("")
         for r in newly:
-            body_lines.append(fmt_signal(r))
-            body_lines.append("")
+            lines.append(format_signal_block_text(r))
+
     if upgraded:
-        body_lines.append("【★4→★5 昇格】")
+        lines.append("【★4→★5 への昇格】")
+        lines.append("")
         for r in upgraded:
-            body_lines.append(fmt_signal(r))
-            body_lines.append("")
-    body_lines.extend([
-        "=" * 60,
-        f"  ダッシュボード: {PAGES_URL}",
-        "  本通知は教育・研究目的。投資判断は自己責任で。",
-        "=" * 60,
+            lines.append(format_signal_block_text(r))
+
+    lines.extend([
+        "=" * 64,
+        "【全22ペアの状態】",
+        "=" * 64, "",
     ])
+    for r in sorted(all_results, key=lambda x: -x["stars"]):
+        fa_diff = r.get("fa_rate_diff")
+        diff_str = f"{fa_diff:+.2f}%" if fa_diff is not None else "  N/A "
+        lines.append(
+            f"  {stars_to_text(r['stars'])} {r['label']:<10} "
+            f"{r['price']:>10}  金利差{diff_str}  {r['verdict']}"
+        )
+
+    lines.extend([
+        "",
+        "=" * 64,
+        f"  ダッシュボード: {PAGES_URL}",
+        "  Currents FX Signal Monitor L3 / Techno-Fundamental Strategy",
+        "  本通知は教育・研究目的。投資判断は自己責任で行ってください。",
+        "=" * 64,
+    ])
+    body = "\n".join(lines)
 
     msg = MIMEMultipart("alternative")
     msg["Subject"] = Header(subject, "utf-8")
-    msg["From"] = from_addr; msg["To"] = to_addr
-    msg.attach(MIMEText("\n".join(body_lines), "plain", "utf-8"))
+    msg["From"] = from_addr
+    msg["To"] = to_addr
+    msg.attach(MIMEText(body, "plain", "utf-8"))
 
     try:
         with smtplib.SMTP_SSL(smtp_host, int(smtp_port or 465), timeout=20) as s:
@@ -570,17 +604,24 @@ def send_email(smtp_host, smtp_port, smtp_user, smtp_pass,
         return False
 
 
-def generate_html_report(results, sentiment, us_yields, cb_rates,
-                         generated_at, currency_strength=None, portfolio_risk=None):
+def generate_html_report(results, sentiment, us_yields, cb_rates, generated_at):
     jst = generated_at + timedelta(hours=9)
     sorted_results = sorted(results, key=lambda x: (-x["stars"], -x["ta_score"]))
 
     risk_mode = sentiment.get("risk_mode", "unknown") if sentiment else "unknown"
-    risk_label_map = {
-        "panic": "🚨 PANIC モード", "risk_off": "⚠ RISK-OFF モード",
-        "caution": "⚠ CAUTION モード", "normal": "🟢 NORMAL モード",
-        "complacent": "🟡 COMPLACENT モード", "unknown": "❓ UNKNOWN",
+    risk_emoji_map = {
+        "panic": "🚨🚨🚨", "risk_off": "⚠", "caution": "⚠",
+        "normal": "🟢", "complacent": "🟡", "unknown": "❓"
     }
+    risk_label_map = {
+        "panic": "PANIC モード（新興国通貨取引停止）",
+        "risk_off": "RISK-OFF モード（リスクオフ警戒）",
+        "caution": "CAUTION モード（注意）",
+        "normal": "NORMAL モード（平常）",
+        "complacent": "COMPLACENT モード（過信警戒）",
+        "unknown": "UNKNOWN（取得失敗）"
+    }
+    risk_emoji = risk_emoji_map.get(risk_mode, "")
     risk_label = risk_label_map.get(risk_mode, risk_mode)
 
     strong_count = sum(1 for r in results if r["stars"] >= 4)
@@ -588,140 +629,39 @@ def generate_html_report(results, sentiment, us_yields, cb_rates,
     long_count = sum(1 for r in results if r["direction"].endswith("LONG") and r["stars"] >= 4)
     short_count = sum(1 for r in results if r["direction"].endswith("SHORT") and r["stars"] >= 4)
 
-    # 通貨強弱テーブル
-    strength_html = ""
-    if currency_strength:
-        sorted_strength = sorted(currency_strength.items(), key=lambda x: -x[1]["score"])
-        rows = []
-        for ccy, info in sorted_strength:
-            score = info["score"]
-            bar_width = abs(score)
-            bar_color = "#4ade80" if score >= 0 else "#f87171"
-            rows.append(f"""
-            <tr>
-              <td style="font-family:var(--mono);font-weight:600;color:var(--gold)">{ccy}</td>
-              <td>
-                <div style="display:flex;align-items:center;gap:0.5rem">
-                  <div style="width:{bar_width:.0f}px;height:8px;background:{bar_color};border-radius:2px;min-width:2px"></div>
-                  <span style="font-family:var(--mono);font-size:0.8rem;color:{'#4ade80' if score>=0 else '#f87171'}">{score:+.1f}</span>
-                </div>
-              </td>
-              <td style="font-size:0.8rem;color:var(--text-secondary)">{info['label']}</td>
-              <td style="font-family:var(--mono);color:var(--text-muted);font-size:0.75rem">#{info['rank']}</td>
-            </tr>""")
-        strength_html = f"""
-        <div class="section-head">
-          <div class="section-num">Ⅰ.</div>
-          <h2 class="section-title">通貨強弱メーター</h2>
-          <span class="section-sub">Currency Strength · 30d</span>
-        </div>
-        <table class="data-table" style="margin-bottom:1.5rem">
-          <thead><tr><th>通貨</th><th>強弱スコア</th><th>判定</th><th>ランク</th></tr></thead>
-          <tbody>{''.join(rows)}</tbody>
-        </table>"""
-
-    # 相関リスクバナー
-    portfolio_html = ""
-    if portfolio_risk and portfolio_risk.get("warnings"):
-        risk_lv = portfolio_risk.get("risk_level", "low")
-        lv_color = {"high": "#f87171", "medium": "#fbbf24", "low": "#4ade80"}.get(risk_lv, "#94a3b8")
-        warnings_html = "".join(f"<div>・{w}</div>" for w in portfolio_risk["warnings"])
-        portfolio_html = f"""
-        <div style="background:var(--bg-card);border:1px solid var(--border);border-left:4px solid {lv_color};
-                    padding:1rem 1.5rem;margin-bottom:1.5rem;border-radius:4px">
-          <div style="font-family:var(--jp-serif);font-size:1rem;color:{lv_color};margin-bottom:0.5rem">
-            ⚠ ポジション相関リスク [{risk_lv.upper()}]
-          </div>
-          <div style="font-size:0.83rem;color:var(--text-secondary)">{warnings_html}</div>
-          <div style="margin-top:0.5rem;font-size:0.8rem;color:var(--text-muted)">
-            → {portfolio_risk.get('recommendation','')}
-          </div>
-        </div>"""
-
-    # シグナルテーブル行
-    rows_html = []
+    rows = []
     for r in sorted_results:
-        row_cls = (
-            "buy" if r["direction"].endswith("LONG") else
-            "sell" if r["direction"].endswith("SHORT") else
-            "blocked" if r["direction"] in ("WAIT_EVENT", "BLOCKED_PANIC") else
-            "neutral"
-        )
+        if r["direction"].endswith("LONG"):
+            row_cls = "buy"
+        elif r["direction"].endswith("SHORT"):
+            row_cls = "sell"
+        elif r["direction"] in ("WAIT_EVENT", "BLOCKED_PANIC"):
+            row_cls = "blocked"
+        else:
+            row_cls = "neutral"
+
         fa_diff = r.get("fa_rate_diff")
         diff_str = f"{fa_diff:+.2f}%" if fa_diff is not None else "—"
 
-        badges = []
+        warn_badges = []
         if r.get("event_warning"):
-            badges.append('<span class="badge badge-event">⏸EVT</span>')
+            warn_badges.append('<span class="badge badge-event">⏸ EVT</span>')
         if r.get("sentiment_notes"):
-            badges.append('<span class="badge badge-sent">🌐SENT</span>')
-        regime = r.get("volatility_regime", {})
-        if regime.get("regime") == "high":
-            badges.append('<span class="badge" style="background:rgba(248,113,113,0.15);color:#f87171;border:1px solid rgba(248,113,113,0.3)">⚡高ボラ</span>')
-        interv = r.get("intervention_risk", {})
-        if interv.get("risk_level") in ("HIGH", "CRITICAL"):
-            badges.append(f'<span class="badge" style="background:rgba(248,113,113,0.15);color:#f87171;border:1px solid rgba(248,113,113,0.3)">🚨介入{interv.get("risk_score",0)}</span>')
+            warn_badges.append('<span class="badge badge-sent">🌐 SENT</span>')
+        warn_html = " ".join(warn_badges)
 
-        # SR最近傍
-        sr = r.get("support_resistance", {})
-        sr_str = ""
-        if sr.get("nearest_resistance") and row_cls == "buy":
-            nr = sr["nearest_resistance"]
-            if nr["distance_pct"] < 0.5:
-                sr_str = f'<div class="warn-line">⚠ レジスタンス({nr["price"]})まで{nr["distance_pct"]:.2f}%</div>'
-        elif sr.get("nearest_support") and row_cls == "sell":
-            ns = sr["nearest_support"]
-            if ns["distance_pct"] < 0.5:
-                sr_str = f'<div class="warn-line">⚠ サポート({ns["price"]})まで{ns["distance_pct"]:.2f}%</div>'
-
-        # TP情報
-        staged = r.get("staged_tp", {})
-        tp_str = ""
-        if staged:
-            tp_str = (
-                f'<div style="font-family:var(--mono);font-size:0.7rem;color:var(--text-muted);margin-top:0.2rem">'
-                f'SL:{staged.get("sl","?")} TP1:{staged.get("tp1","?")} '
-                f'TP2:{staged.get("tp2","?")} TP3:{staged.get("tp3","?")}'
-                f'</div>'
-            )
-
-        warn_html = " ".join(badges)
         event_html = ""
         if r.get("event_warning"):
             event_html = f'<div class="warn-line">⏸ {r["event_warning"]}</div>'
         if r.get("sentiment_notes"):
             event_html += '<div class="warn-line">🌐 ' + " / ".join(r["sentiment_notes"]) + '</div>'
 
-        # 通貨強弱コンテキスト
-        sc = r.get("strength_context", {})
-        strength_ctx_str = ""
-        if sc:
-            base = sc.get("base_currency", "")
-            quote = sc.get("quote_currency", "")
-            bs = sc.get("base_score", 0)
-            qs = sc.get("quote_score", 0)
-            strength_ctx_str = (
-                f'<div style="font-size:0.7rem;color:var(--text-muted);font-family:var(--mono)">'
-                f'{base}({bs:+.0f}) vs {quote}({qs:+.0f})'
-                f'</div>'
-            )
-
-        # キャリースコア
-        carry = r.get("carry_score", {})
-        carry_str = ""
-        if carry and fa_diff and fa_diff > 0:
-            carry_str = (
-                f'<div style="font-size:0.7rem;color:var(--gold);font-family:var(--mono)">'
-                f'💰キャリー:{carry.get("carry_score","?"):.1f} | {carry.get("breakeven_days","?")}日でSL回収'
-                f'</div>'
-            )
-
-        rows_html.append(f"""
+        rows.append(f"""
         <tr class="row-{row_cls}">
           <td class="stars-cell">{stars_to_text(r['stars'])}</td>
           <td class="pair-cell">
             <div class="pair-main">{r['label']} {warn_html}</div>
-            {strength_ctx_str}{event_html}{sr_str}{tp_str}{carry_str}
+            {event_html}
           </td>
           <td class="num-cell">{r['price']}</td>
           <td class="num-cell score-ta">{r['ta_score']}</td>
@@ -730,28 +670,27 @@ def generate_html_report(results, sentiment, us_yields, cb_rates,
           <td class="num-cell">{r['rsi']}</td>
           <td class="verdict-cell">{r['verdict']}</td>
           <td class="fa-detail">{r['fa_detail']}</td>
-        </tr>""")
+        </tr>
+        """)
 
-    # 中央銀行金利テーブル
     stance_map = {
         "tighten": ("↑", "#4ade80", "引締"),
         "neutral": ("→", "#94a3b8", "中立"),
         "ease": ("↓", "#f87171", "緩和")
     }
-    cb_rows_html = []
+    cb_rows = []
     for ccy, info in (cb_rates or {}).items():
         icon, color, label = stance_map.get(info.get("stance", "neutral"), ("?", "#94a3b8", "?"))
-        # キャリースコアを表示（いずれかのJPYペアから取得）
-        cb_rows_html.append(f"""
+        cb_rows.append(f"""
         <tr>
           <td class="ccy-cell">{ccy}</td>
           <td>{info.get('cb_name', '—')}</td>
           <td class="num-cell">{info.get('rate', '—')}%</td>
-          <td style="color:{color};font-family:var(--mono)">{icon} {label}</td>
+          <td style="color: {color}; font-family: var(--mono);">{icon} {label}</td>
           <td class="meta-cell">{info.get('next_meeting', '—')}</td>
-        </tr>""")
+        </tr>
+        """)
 
-    # 経済指標
     upcoming_events = {}
     for r in results:
         for ev in (r.get("upcoming_events") or []):
@@ -759,19 +698,21 @@ def generate_html_report(results, sentiment, us_yields, cb_rates,
             if key not in upcoming_events or upcoming_events[key]["hours_until"] > ev["hours_until"]:
                 upcoming_events[key] = ev
     event_list = sorted(upcoming_events.values(), key=lambda e: e["hours_until"])
-    event_rows_html = []
+
+    event_rows = []
     for ev in event_list[:20]:
         dt = datetime.fromisoformat(ev["date"].replace("Z", "+00:00"))
-        jst_ev = dt + timedelta(hours=9)
-        time_str = jst_ev.strftime("%m/%d %H:%M")
+        jst_event = dt + timedelta(hours=9)
+        time_str = jst_event.strftime("%m/%d %H:%M")
         imp = ev["importance"]
-        event_rows_html.append(f"""
+        event_rows.append(f"""
         <div class="event-row event-{imp}">
           <div class="event-time">{time_str}<small>+{ev['hours_until']:.1f}h</small></div>
           <div class="event-ccy">{ev['currency']}</div>
           <div class="event-name">{ev['name']}</div>
           <div class="event-imp imp-{imp}">{imp}</div>
-        </div>""")
+        </div>
+        """)
 
     return f"""<!DOCTYPE html>
 <html lang="ja">
@@ -779,72 +720,135 @@ def generate_html_report(results, sentiment, us_yields, cb_rates,
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="refresh" content="3600">
-<title>FX Signal Monitor L3 Advanced · Dashboard</title>
+<title>FX Signal Monitor L3 · Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,500;1,600&family=JetBrains+Mono:wght@400;500;700&family=Shippori+Mincho:wght@500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-:root{{--bg-deep:#0a0e1a;--bg-surface:#111726;--bg-card:#141b2d;--bg-elev:#1a2235;--border:#2a3450;--border-soft:#1f273d;--text-primary:#e8edf7;--text-secondary:#9aa5b8;--text-muted:#5a6378;--gold:#d4a574;--buy:#4ade80;--buy-bg:rgba(74,222,128,0.08);--sell:#f87171;--sell-bg:rgba(248,113,113,0.08);--caution:#fbbf24;--neutral:#94a3b8;--display:'Cormorant Garamond','Shippori Mincho',serif;--jp:'Zen Kaku Gothic New',sans-serif;--mono:'JetBrains Mono',monospace;--jp-serif:'Shippori Mincho',serif;}}
-*{{margin:0;padding:0;box-sizing:border-box;}}
-body{{background:var(--bg-deep);color:var(--text-primary);font-family:var(--jp);line-height:1.6;min-height:100vh;}}
-.container{{max-width:1400px;margin:0 auto;padding:2rem;}}
-.app-header{{display:flex;justify-content:space-between;align-items:baseline;padding-bottom:1rem;border-bottom:1px solid var(--border);margin-bottom:2rem;flex-wrap:wrap;gap:1rem;}}
-.brand{{display:flex;align-items:baseline;gap:1rem;}}
-.brand-mark{{font-family:var(--display);font-size:2rem;font-weight:600;font-style:italic;color:var(--gold);}}
-.brand-sub{{font-family:var(--jp-serif);font-size:0.78rem;color:var(--text-secondary);letter-spacing:0.15em;}}
-.header-meta{{font-family:var(--mono);font-size:0.78rem;color:var(--text-secondary);}}
-.live{{display:inline-block;background:var(--buy-bg);color:var(--buy);padding:0.2rem 0.6rem;border-radius:3px;border:1px solid rgba(74,222,128,0.3);font-size:0.7rem;font-weight:700;margin-right:0.5rem;}}
-.top-nav{{display:flex;justify-content:space-between;align-items:center;padding:0.7rem 1.2rem;margin-bottom:1.5rem;background:var(--bg-card);border:1px solid var(--border);border-radius:4px;flex-wrap:wrap;gap:0.5rem;}}
-.top-nav-left{{font-family:var(--mono);font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;}}
-.top-nav-links{{display:flex;gap:0.5rem;flex-wrap:wrap;}}
-.nav-link{{display:inline-flex;align-items:center;gap:0.4rem;padding:0.45rem 0.9rem;border-radius:3px;font-family:var(--mono);font-size:0.78rem;text-decoration:none;transition:all 0.15s;border:1px solid var(--border);color:var(--text-secondary);background:var(--bg-elev);}}
-.nav-link:hover{{background:var(--bg-surface);color:var(--gold);border-color:var(--gold);}}
-.nav-link.active{{background:var(--buy-bg);color:var(--buy);border-color:rgba(74,222,128,0.4);}}
-.risk-banner{{background:linear-gradient(135deg,var(--bg-card) 0%,var(--bg-elev) 100%);border:1px solid var(--border);border-left:4px solid var(--gold);padding:1.3rem 1.8rem;margin-bottom:1.5rem;border-radius:4px;}}
-.risk-banner.panic{{border-left-color:var(--sell);}}
-.risk-banner.risk_off,.risk-banner.caution{{border-left-color:var(--caution);}}
-.risk-banner.normal{{border-left-color:var(--buy);}}
-.risk-title{{font-family:var(--jp-serif);font-size:1.15rem;color:var(--gold);margin-bottom:0.4rem;}}
-.risk-banner.normal .risk-title{{color:var(--buy);}}
-.risk-banner.panic .risk-title{{color:var(--sell);}}
-.risk-summary{{font-family:var(--mono);font-size:0.85rem;color:var(--text-secondary);}}
-.stats-grid{{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin-bottom:1.5rem;}}
-.stat-card{{background:var(--bg-card);border:1px solid var(--border);border-radius:4px;padding:1.1rem;}}
-.stat-label{{font-family:var(--mono);font-size:0.68rem;color:var(--text-muted);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.3rem;}}
-.stat-val{{font-family:var(--mono);font-size:1.6rem;font-weight:600;color:var(--text-primary);line-height:1;}}
-.stat-sub{{font-size:0.75rem;color:var(--text-secondary);margin-top:0.3rem;font-family:var(--mono);}}
-.stat-val.buy{{color:var(--buy);}} .stat-val.sell{{color:var(--sell);}} .stat-val.caution{{color:var(--caution);}}
-.section-head{{display:flex;align-items:baseline;gap:1rem;margin:2rem 0 1rem;padding-bottom:0.6rem;border-bottom:1px solid var(--border-soft);}}
-.section-num{{font-family:var(--display);font-style:italic;font-size:1.8rem;color:var(--gold);font-weight:500;line-height:1;}}
-.section-title{{font-family:var(--jp-serif);font-size:1.15rem;font-weight:600;}}
-.section-sub{{font-family:var(--mono);font-size:0.7rem;color:var(--text-muted);letter-spacing:0.15em;text-transform:uppercase;margin-left:auto;}}
-.data-table{{width:100%;border-collapse:collapse;background:var(--bg-card);border:1px solid var(--border);border-radius:4px;overflow:hidden;}}
-.data-table th{{background:var(--bg-elev);color:var(--gold);font-family:var(--jp-serif);font-weight:600;padding:0.9rem 1rem;text-align:left;font-size:0.78rem;border-bottom:1px solid var(--border);}}
-.data-table td{{padding:0.75rem 1rem;border-bottom:1px solid var(--border-soft);font-size:0.82rem;}}
-.data-table tr:last-child td{{border-bottom:none;}}
-.data-table tr:hover td{{background:var(--bg-surface);}}
-.stars-cell{{color:var(--gold);font-family:var(--mono);white-space:nowrap;}}
-.pair-main{{font-family:var(--display);font-style:italic;font-size:1.05rem;font-weight:600;}}
-.num-cell{{font-family:var(--mono);color:var(--text-secondary);}}
-.score-ta{{color:var(--text-primary);}} .score-fa{{color:var(--gold);}}
-.row-buy .verdict-cell{{color:var(--buy);}} .row-sell .verdict-cell{{color:var(--sell);}}
-.row-neutral .verdict-cell{{color:var(--caution);}} .row-blocked{{opacity:0.7;}}
-.verdict-cell{{font-weight:500;}}
-.fa-detail{{color:var(--text-secondary);font-size:0.76rem;}}
-.ccy-cell{{font-family:var(--mono);font-weight:600;color:var(--gold);}}
-.meta-cell{{font-family:var(--mono);font-size:0.78rem;color:var(--text-secondary);}}
-.badge{{display:inline-block;padding:0.15rem 0.45rem;border-radius:3px;font-family:var(--mono);font-size:0.65rem;font-weight:700;margin-left:0.3rem;}}
-.badge-event{{background:rgba(251,191,36,0.15);color:var(--caution);border:1px solid rgba(251,191,36,0.3);}}
-.badge-sent{{background:rgba(212,165,116,0.15);color:var(--gold);border:1px solid rgba(212,165,116,0.3);}}
-.warn-line{{font-size:0.72rem;color:var(--caution);margin-top:0.25rem;font-family:var(--mono);}}
-.event-row{{display:grid;grid-template-columns:100px 60px 1fr 90px;gap:1rem;align-items:center;padding:0.7rem 1rem;background:var(--bg-card);border:1px solid var(--border-soft);border-left:3px solid var(--gold);margin-bottom:0.4rem;border-radius:3px;font-size:0.85rem;}}
-.event-row.event-critical{{border-left-color:var(--sell);}} .event-row.event-high{{border-left-color:var(--caution);}}
-.event-time{{font-family:var(--mono);color:var(--gold);font-weight:600;}}
-.event-time small{{display:block;font-size:0.7rem;color:var(--text-muted);}}
-.event-ccy{{font-family:var(--mono);font-weight:600;}}
-.event-imp{{font-family:var(--mono);font-size:0.7rem;text-transform:uppercase;text-align:right;font-weight:700;}}
-.imp-critical{{color:var(--sell);}} .imp-high{{color:var(--caution);}} .imp-medium{{color:var(--text-muted);}}
-.app-footer{{margin-top:2rem;padding-top:1rem;border-top:1px solid var(--border);color:var(--text-muted);font-size:0.74rem;font-family:var(--mono);text-align:center;}}
-.app-footer em{{font-family:var(--display);font-style:italic;color:var(--gold);}}
-@media(max-width:768px){{.container{{padding:1rem;}} .event-row{{grid-template-columns:1fr;}}}}
+:root {{
+  --bg-deep: #0a0e1a; --bg-surface: #111726; --bg-card: #141b2d;
+  --bg-elev: #1a2235; --border: #2a3450; --border-soft: #1f273d;
+  --text-primary: #e8edf7; --text-secondary: #9aa5b8; --text-muted: #5a6378;
+  --gold: #d4a574; --amber: #e6b85c;
+  --buy: #4ade80; --buy-bg: rgba(74,222,128,0.08);
+  --sell: #f87171; --sell-bg: rgba(248,113,113,0.08);
+  --caution: #fbbf24; --caution-bg: rgba(251,191,36,0.08);
+  --neutral: #94a3b8;
+  --display: 'Cormorant Garamond', 'Shippori Mincho', serif;
+  --jp: 'Zen Kaku Gothic New', sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+  --jp-serif: 'Shippori Mincho', serif;
+}}
+* {{ margin:0; padding:0; box-sizing:border-box; }}
+body {{
+  background: var(--bg-deep); color: var(--text-primary);
+  font-family: var(--jp); line-height: 1.6;
+  background-image:
+    radial-gradient(circle at 15% 10%, rgba(212,165,116,0.04) 0%, transparent 40%),
+    radial-gradient(circle at 85% 80%, rgba(74,222,128,0.03) 0%, transparent 40%);
+  min-height: 100vh;
+}}
+.container {{ max-width: 1400px; margin: 0 auto; padding: 2rem; }}
+.app-header {{
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding-bottom: 1rem; border-bottom: 1px solid var(--border); margin-bottom: 2rem;
+  flex-wrap: wrap; gap: 1rem;
+}}
+.brand {{ display: flex; align-items: baseline; gap: 1rem; }}
+.brand-mark {{
+  font-family: var(--display); font-size: 2rem; font-weight: 600;
+  font-style: italic; color: var(--gold); letter-spacing: -0.02em;
+}}
+.brand-sub {{
+  font-family: var(--jp-serif); font-size: 0.78rem;
+  color: var(--text-secondary); letter-spacing: 0.15em;
+}}
+.header-meta {{ font-family: var(--mono); font-size: 0.78rem; color: var(--text-secondary); }}
+.header-meta .live {{
+  display: inline-block; background: var(--buy-bg); color: var(--buy);
+  padding: 0.2rem 0.6rem; border-radius: 3px; border: 1px solid rgba(74,222,128,0.3);
+  font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; margin-right: 0.5rem;
+}}
+.top-nav {{
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0.7rem 1.2rem; margin-bottom: 1.5rem;
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: 4px; flex-wrap: wrap; gap: 0.5rem;
+}}
+.top-nav-left {{
+  font-family: var(--mono); font-size: 0.72rem;
+  color: var(--text-muted); letter-spacing: 0.08em; text-transform: uppercase;
+}}
+.top-nav-links {{ display: flex; gap: 0.5rem; flex-wrap: wrap; }}
+.nav-link {{
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.45rem 0.9rem; border-radius: 3px;
+  font-family: var(--mono); font-size: 0.78rem;
+  text-decoration: none; transition: all 0.15s;
+  border: 1px solid var(--border);
+  color: var(--text-secondary); background: var(--bg-elev);
+}}
+.nav-link:hover {{ background: var(--bg-surface); color: var(--gold); border-color: var(--gold); }}
+.nav-link.active {{ background: var(--buy-bg); color: var(--buy); border-color: rgba(74,222,128,0.4); }}
+.risk-banner {{
+  background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-elev) 100%);
+  border: 1px solid var(--border); border-left: 4px solid var(--gold);
+  padding: 1.3rem 1.8rem; margin-bottom: 1.5rem; border-radius: 4px;
+}}
+.risk-banner.panic {{ border-left-color: var(--sell); }}
+.risk-banner.risk_off, .risk-banner.caution {{ border-left-color: var(--caution); }}
+.risk-banner.normal {{ border-left-color: var(--buy); }}
+.risk-title {{ font-family: var(--jp-serif); font-size: 1.15rem; color: var(--gold); margin-bottom: 0.4rem; }}
+.risk-banner.panic .risk-title {{ color: var(--sell); }}
+.risk-banner.normal .risk-title {{ color: var(--buy); }}
+.risk-summary {{ font-family: var(--mono); font-size: 0.85rem; color: var(--text-secondary); }}
+.stats-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }}
+.stat-card {{ background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; padding: 1.1rem; }}
+.stat-label {{ font-family: var(--mono); font-size: 0.68rem; color: var(--text-muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.3rem; }}
+.stat-val {{ font-family: var(--mono); font-size: 1.6rem; font-weight: 600; color: var(--text-primary); line-height: 1; }}
+.stat-sub {{ font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.3rem; font-family: var(--mono); }}
+.stat-val.buy {{ color: var(--buy); }}
+.stat-val.sell {{ color: var(--sell); }}
+.stat-val.caution {{ color: var(--caution); }}
+.section-head {{ display: flex; align-items: baseline; gap: 1rem; margin: 2rem 0 1rem; padding-bottom: 0.6rem; border-bottom: 1px solid var(--border-soft); }}
+.section-num {{ font-family: var(--display); font-style: italic; font-size: 1.8rem; color: var(--gold); font-weight: 500; line-height: 1; }}
+.section-title {{ font-family: var(--jp-serif); font-size: 1.15rem; font-weight: 600; letter-spacing: 0.03em; }}
+.section-sub {{ font-family: var(--mono); font-size: 0.7rem; color: var(--text-muted); letter-spacing: 0.15em; text-transform: uppercase; margin-left: auto; }}
+.data-table {{ width: 100%; border-collapse: collapse; background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }}
+.data-table th {{ background: var(--bg-elev); color: var(--gold); font-family: var(--jp-serif); font-weight: 600; padding: 0.9rem 1rem; text-align: left; font-size: 0.78rem; letter-spacing: 0.05em; border-bottom: 1px solid var(--border); }}
+.data-table td {{ padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-soft); font-size: 0.82rem; }}
+.data-table tr:last-child td {{ border-bottom: none; }}
+.data-table tr:hover td {{ background: var(--bg-surface); }}
+.stars-cell {{ color: var(--gold); letter-spacing: 0.08em; font-family: var(--mono); white-space: nowrap; }}
+.pair-main {{ font-family: var(--display); font-style: italic; font-size: 1.05rem; font-weight: 600; }}
+.num-cell {{ font-family: var(--mono); color: var(--text-secondary); }}
+.score-ta {{ color: var(--text-primary); }}
+.score-fa {{ color: var(--gold); }}
+.row-buy .verdict-cell {{ color: var(--buy); }}
+.row-sell .verdict-cell {{ color: var(--sell); }}
+.row-neutral .verdict-cell {{ color: var(--caution); }}
+.row-blocked {{ opacity: 0.7; }}
+.verdict-cell {{ font-weight: 500; }}
+.fa-detail {{ color: var(--text-secondary); font-size: 0.76rem; }}
+.ccy-cell {{ font-family: var(--mono); font-weight: 600; color: var(--gold); }}
+.meta-cell {{ font-family: var(--mono); font-size: 0.78rem; color: var(--text-secondary); }}
+.badge {{ display: inline-block; padding: 0.15rem 0.45rem; border-radius: 3px; font-family: var(--mono); font-size: 0.65rem; font-weight: 700; margin-left: 0.3rem; }}
+.badge-event {{ background: rgba(251,191,36,0.15); color: var(--caution); border: 1px solid rgba(251,191,36,0.3); }}
+.badge-sent {{ background: rgba(212,165,116,0.15); color: var(--gold); border: 1px solid rgba(212,165,116,0.3); }}
+.warn-line {{ font-size: 0.72rem; color: var(--caution); margin-top: 0.25rem; font-family: var(--mono); }}
+.event-row {{ display: grid; grid-template-columns: 100px 60px 1fr 90px; gap: 1rem; align-items: center; padding: 0.7rem 1rem; background: var(--bg-card); border: 1px solid var(--border-soft); border-left: 3px solid var(--gold); margin-bottom: 0.4rem; border-radius: 3px; font-size: 0.85rem; }}
+.event-row.event-critical {{ border-left-color: var(--sell); }}
+.event-row.event-high {{ border-left-color: var(--caution); }}
+.event-time {{ font-family: var(--mono); font-size: 0.85rem; color: var(--gold); font-weight: 600; }}
+.event-time small {{ display: block; font-size: 0.7rem; color: var(--text-muted); }}
+.event-ccy {{ font-family: var(--mono); font-weight: 600; }}
+.event-imp {{ font-family: var(--mono); font-size: 0.7rem; text-transform: uppercase; text-align: right; font-weight: 700; }}
+.imp-critical {{ color: var(--sell); }}
+.imp-high {{ color: var(--caution); }}
+.imp-medium {{ color: var(--text-muted); }}
+.app-footer {{ margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 0.74rem; font-family: var(--mono); text-align: center; }}
+.app-footer em {{ font-family: var(--display); font-style: italic; color: var(--gold); }}
+@media (max-width: 768px) {{ .container {{ padding: 1rem; }} .event-row {{ grid-template-columns: 1fr; gap: 0.3rem; }} }}
 </style>
 </head>
 <body>
@@ -854,54 +858,51 @@ body{{background:var(--bg-deep);color:var(--text-primary);font-family:var(--jp);
     <div class="top-nav-links">
       <a href="./" class="nav-link active"><span>📊</span><span>L3 ダッシュボード</span></a>
       <a href="./terminal.html" class="nav-link"><span>🖥</span><span>分析ターミナル</span></a>
-      <a href="./last_signals.json" class="nav-link" target="_blank"><span>{{}}</span><span>Raw JSON</span></a>
+      <a href="./last_signals.json" class="nav-link" target="_blank" rel="noopener"><span>{{}}</span><span>Raw JSON</span></a>
     </div>
   </nav>
   <header class="app-header">
     <div class="brand">
       <span class="brand-mark">Currents</span>
-      <span class="brand-sub">FX SIGNAL MONITOR · L3 ADVANCED</span>
+      <span class="brand-sub">FX SIGNAL MONITOR · L3 DASHBOARD</span>
     </div>
     <div class="header-meta">
       <span class="live">● LIVE</span>
-      {jst.strftime('%Y-%m-%d %H:%M JST')} · Auto-refresh: 1h · 22 pairs · 8 Analytics
+      Updated: {jst.strftime('%Y-%m-%d %H:%M JST')} · Auto-refresh: 1h · 22 pairs
     </div>
   </header>
   <div class="risk-banner {risk_mode}">
-    <div class="risk-title">{risk_label}</div>
+    <div class="risk-title">{risk_emoji} 市場モード: {risk_label}</div>
     <div class="risk-summary">
-      VIX: {sentiment.get('vix','—') if sentiment else '—'} ({sentiment.get('vix_level','?') if sentiment else '?'}) &nbsp;·&nbsp;
-      DXY: {sentiment.get('dxy','—') if sentiment else '—'} &nbsp;·&nbsp;
-      米10y: {sentiment.get('us10y','—') if sentiment else '—'}% &nbsp;·&nbsp;
-      Gold: {sentiment.get('gold','—') if sentiment else '—'}
+      VIX: {sentiment.get('vix', '—') if sentiment else '—'} ({sentiment.get('vix_level', '?') if sentiment else '?'}) &nbsp;·&nbsp;
+      DXY: {sentiment.get('dxy', '—') if sentiment else '—'} ({sentiment.get('dxy_trend', '?') if sentiment else '?'}) &nbsp;·&nbsp;
+      米10年債: {sentiment.get('us10y', '—') if sentiment else '—'}% &nbsp;·&nbsp;
+      ゴールド: {sentiment.get('gold', '—') if sentiment else '—'}
     </div>
   </div>
-  {portfolio_html}
   <div class="stats-grid">
-    <div class="stat-card"><div class="stat-label">★4以上</div><div class="stat-val {'buy' if strong_count>0 else ''}">{strong_count}</div><div class="stat-sub">/ 全{len(results)}ペア</div></div>
-    <div class="stat-card"><div class="stat-label">ロング推奨</div><div class="stat-val buy">{long_count}</div><div class="stat-sub">高信頼ロング</div></div>
-    <div class="stat-card"><div class="stat-label">ショート推奨</div><div class="stat-val sell">{short_count}</div><div class="stat-sub">高信頼ショート</div></div>
-    <div class="stat-card"><div class="stat-label">取引控え</div><div class="stat-val caution">{blocked_count}</div><div class="stat-sub">イベント・センチメント</div></div>
+    <div class="stat-card"><div class="stat-label">★4以上シグナル</div><div class="stat-val {('buy' if strong_count > 0 else '')}">{strong_count}</div><div class="stat-sub">/ 全{len(results)}ペア</div></div>
+    <div class="stat-card"><div class="stat-label">ロング推奨</div><div class="stat-val buy">{long_count}</div><div class="stat-sub">高信頼ロング条件成立</div></div>
+    <div class="stat-card"><div class="stat-label">ショート推奨</div><div class="stat-val sell">{short_count}</div><div class="stat-sub">高信頼ショート条件成立</div></div>
+    <div class="stat-card"><div class="stat-label">取引控え推奨</div><div class="stat-val caution">{blocked_count}</div><div class="stat-sub">イベント・センチメント警告</div></div>
   </div>
-  {strength_html}
-  <div class="section-head"><div class="section-num">Ⅱ.</div><h2 class="section-title">全22通貨ペア シグナル評価</h2><span class="section-sub">TA × FA × Event × Sentiment × SR × TP</span></div>
+  <div class="section-head"><div class="section-num">I.</div><h2 class="section-title">全22通貨ペアのシグナル評価</h2><span class="section-sub">TA × FA × Event × Sentiment</span></div>
   <table class="data-table">
-    <thead><tr><th>シグナル</th><th>通貨ペア / 分析</th><th>価格</th><th>TA</th><th>FA</th><th>金利差</th><th>RSI</th><th>判定</th><th>ファンダ詳細</th></tr></thead>
-    <tbody>{''.join(rows_html)}</tbody>
+    <thead><tr><th>シグナル</th><th>通貨ペア</th><th>価格</th><th>TA</th><th>FA</th><th>金利差</th><th>RSI</th><th>判定</th><th>マクロ分析</th></tr></thead>
+    <tbody>{''.join(rows)}</tbody>
   </table>
-  <div class="section-head"><div class="section-num">Ⅲ.</div><h2 class="section-title">中央銀行政策金利</h2><span class="section-sub">Central Bank Rates</span></div>
+  <div class="section-head"><div class="section-num">II.</div><h2 class="section-title">中央銀行政策金利マップ</h2><span class="section-sub">Central Bank Rates</span></div>
   <table class="data-table">
     <thead><tr><th>通貨</th><th>中央銀行</th><th>政策金利</th><th>スタンス</th><th>次回会合</th></tr></thead>
-    <tbody>{''.join(cb_rows_html)}</tbody>
+    <tbody>{''.join(cb_rows)}</tbody>
   </table>
-  <div class="section-head"><div class="section-num">Ⅳ.</div><h2 class="section-title">今後7日間の重要イベント</h2><span class="section-sub">Economic Calendar</span></div>
-  <div style="margin-top:1rem">
-    {''.join(event_rows_html) if event_rows_html else '<div style="color:var(--text-muted);font-family:var(--mono);font-size:0.85rem;padding:1rem">今後7日間の重要イベントはありません</div>'}
+  <div class="section-head"><div class="section-num">III.</div><h2 class="section-title">今後7日間の重要マクロイベント</h2><span class="section-sub">Economic Calendar</span></div>
+  <div style="margin-top: 1rem;">
+    {''.join(event_rows) if event_rows else '<div style="color: var(--text-muted); font-family: var(--mono); font-size: 0.85rem; padding: 1rem;">今後7日間の重要イベントはありません</div>'}
   </div>
   <footer class="app-footer">
-    <em>Currents</em> · FX Signal Monitor L3 Advanced · <a href="{PAGES_URL}" style="color:var(--gold)">{PAGES_URL}</a>
-    <br>8 Analytics: 通貨強弱 / ボラレジーム / 段階TP / 相関リスク / キャリー / SR / 介入リスク / 週次レポート
-    <br>Data: ECB Frankfurter + US Treasury + Yahoo Finance + 手動JSON / 投資判断は自己責任で
+    <em>Currents</em> · FX Signal Monitor L3 · <a href="{PAGES_URL}" style="color: var(--gold);">{PAGES_URL}</a>
+    <br>Generated by GitHub Actions / Data: ECB + 米財務省 + Yahoo Finance + 手動JSON / 投資判断は自己責任で
   </footer>
 </div>
 </body>
@@ -910,49 +911,46 @@ body{{background:var(--bg-deep);color:var(--text-primary);font-family:var(--jp);
 
 def main():
     print("=" * 64)
-    print(f"FX Signal Monitor L3 Advanced - {datetime.now(timezone.utc).isoformat()}")
+    print(f"FX Signal Monitor L3 - {datetime.now(timezone.utc).isoformat()}")
     print("=" * 64)
 
     now = datetime.now(timezone.utc)
 
-    # 1. 最新レート
     try:
         latest = fetch_latest_rates()
     except Exception as e:
         print(f"[FATAL] Cannot fetch latest rates: {e}")
         sys.exit(1)
 
-    # 2. 中央銀行金利
     cb_rates = load_central_bank_rates()
-    print(f"[OK] Central bank rates: {len(cb_rates)} currencies")
+    print(f"[OK] Central bank rates loaded: {len(cb_rates)} currencies")
 
-    # 3. 米国債利回り
     us_yields = fetch_us_treasury_yields()
     print(f"[OK] US yields: 10y={us_yields.get('10y')}%")
 
-    # 4. 市場センチメント
     print("[INFO] Fetching market sentiment...")
     sentiment = evaluate_market_sentiment()
     print(f"[OK] Sentiment: VIX={sentiment.get('vix')} mode={sentiment.get('risk_mode')}")
 
-    # 4.5 Obsidian Wiki
     print("\n[INFO] Fetching Obsidian Vault notes...")
     try:
         obsidian_data = fetch_obsidian()
         if obsidian_data:
-            print(f"[OK] Obsidian: {len(obsidian_data.get('signal_rules',[]))} rules")
+            sig_count = len(obsidian_data.get("signal_rules", []))
+            ana_count = len(obsidian_data.get("analyses", []))
+            jrn_count = len(obsidian_data.get("journals", []))
+            les_count = len(obsidian_data.get("lessons", []))
+            print(f"[OK] Obsidian: {sig_count} rules / {ana_count} analyses / "
+                  f"{jrn_count} journals / {les_count} lessons")
         else:
-            print("[INFO] Obsidian not configured - skipping")
+            print("[INFO] Obsidian Vault not configured - skipping")
             obsidian_data = None
     except Exception as e:
-        print(f"[WARN] Obsidian failed: {e}")
+        print(f"[WARN] Obsidian fetch failed (continuing without it): {e}")
         obsidian_data = None
 
-    # 5. 全ペア評価（価格履歴も保存して通貨強弱計算に使う）
     print("\n[INFO] Evaluating 22 pairs...")
     results = []
-    all_pair_prices = {}  # ① 通貨強弱メーター用
-
     for pair in PAIR_API:
         price = latest["pairs"].get(pair)
         if not price:
@@ -963,32 +961,18 @@ def main():
             print(f"[SKIP] {pair}: insufficient history")
             continue
         prices.append(price)
-
-        # 通貨強弱用に30日分を保存
-        all_pair_prices[pair] = {"current": price, "prices_30d": prices[-30:]}
-
         try:
             r = evaluate_full(pair, price, prices, cb_rates, sentiment, now)
-
-            # Obsidian Wikiルール適用
             if obsidian_data:
                 r = apply_obsidian_intelligence(r, sentiment, obsidian_data, now)
-
-            # 高度分析（②③⑤⑥⑧）を適用
-            r = run_advanced_analytics(
-                r, prices, all_pair_prices, PAIR_API, cb_rates, sentiment, results
-            )
-
             results.append(r)
-
-            regime = r.get("volatility_regime", {})
-            staged = r.get("staged_tp", {})
             warn = ""
-            if r.get("event_warning"): warn += " EVT"
-            if r.get("sentiment_notes"): warn += " SENT"
-            if regime.get("regime") == "high": warn += f" ⚡HighVol"
-            if r.get("intervention_risk", {}).get("risk_level") in ("HIGH","CRITICAL"):
-                warn += f" 🚨介入"
+            if r.get("event_warning"):
+                warn = " EVT"
+            if r.get("sentiment_notes"):
+                warn += " SENT"
+            if r.get("obsidian_rules_applied"):
+                warn += f" OBS({len(r['obsidian_rules_applied'])})"
             print(
                 f"  [{stars_to_text(r['stars'])}] {pair:8} {price:>10.4f}  "
                 f"TA={r['ta_score']:.0f} FA={r['fa_score']:.0f}  "
@@ -996,77 +980,37 @@ def main():
             )
         except Exception as e:
             print(f"[ERROR] evaluate {pair}: {e}")
-            import traceback; traceback.print_exc()
+            import traceback
+            traceback.print_exc()
 
     if not results:
         print("[FATAL] No results")
         sys.exit(1)
 
-    # ① 通貨強弱メーター（全ペア評価後に計算）
-    print("\n[INFO] Calculating currency strength...")
-    currency_strength = calc_global_analytics(all_pair_prices, PAIR_API)
-    if currency_strength:
-        print("[OK] Currency strength:")
-        sorted_strength = sorted(currency_strength.items(), key=lambda x: -x[1]["score"])
-        for ccy, info in sorted_strength:
-            print(f"  {ccy}: {info['score']:+.1f} ({info['label']}) #{info['rank']}")
-
-        # 各ペアに通貨強弱コンテキストを付与
-        for r in results:
-            ctx = get_pair_strength_context(r["pair"], PAIR_API, currency_strength)
-            r["strength_context"] = ctx
-
-    # ④ ポートフォリオ相関リスク
-    print("\n[INFO] Calculating correlation risk...")
-    portfolio_risk = calc_portfolio_analytics(results, PAIR_API)
-    if portfolio_risk.get("warnings"):
-        print(f"[WARN] Correlation risk [{portfolio_risk['risk_level'].upper()}]:")
-        for w in portfolio_risk["warnings"]:
-            print(f"  {w}")
-    else:
-        print(f"[OK] Correlation risk: {portfolio_risk.get('risk_level','low')}")
-
-    # 6. 差分検出
     previous_stars = load_previous_state()
     newly, upgraded, is_first = detect_changes(results, previous_stars)
     print(f"\n[INFO] Changes: {len(newly)} new strong, {len(upgraded)} upgraded "
           f"(first run: {is_first})")
 
-    # 7. 通知
     if newly or upgraded or (is_first and newly):
         _wh = os.environ.get("DISCORD_WEBHOOK_URL", "")
         _wh = _wh.replace("discordapp.com", "discord.com")
-        send_discord(
-            _wh, newly, upgraded, is_first, results, sentiment,
-            currency_strength=currency_strength,
-            portfolio_risk=portfolio_risk,
-        )
+        send_discord(_wh, newly, upgraded, is_first, results, sentiment)
         send_email(
             os.environ.get("SMTP_HOST", "smtp.gmail.com"),
             os.environ.get("SMTP_PORT", "465"),
-            os.environ.get("SMTP_USER"), os.environ.get("SMTP_PASS"),
-            os.environ.get("MAIL_FROM"), os.environ.get("MAIL_TO"),
+            os.environ.get("SMTP_USER"),
+            os.environ.get("SMTP_PASS"),
+            os.environ.get("MAIL_FROM"),
+            os.environ.get("MAIL_TO"),
             newly, upgraded, is_first, results, sentiment, us_yields
         )
     else:
         print("[INFO] No significant changes, skipping notifications")
 
-    # 8. 状態保存
-    save_current_state(
-        results, sentiment, us_yields, cb_rates, obsidian_data,
-        currency_strength=currency_strength,
-        portfolio_risk=portfolio_risk,
-    )
+    save_current_state(results, sentiment, us_yields, cb_rates, obsidian_data)
 
-    # ⑦ 週次レポート用の履歴スナップショットを保存
-    save_signal_snapshot(results, sentiment, now)
-
-    # 9. HTMLレポート
-    html = generate_html_report(
-        results, sentiment, us_yields, cb_rates, now,
-        currency_strength=currency_strength,
-        portfolio_risk=portfolio_risk,
-    )
+    html = generate_html_report(results, sentiment, us_yields, cb_rates, now)
     os.makedirs("docs", exist_ok=True)
     with open("docs/index.html", "w", encoding="utf-8") as f:
         f.write(html)
