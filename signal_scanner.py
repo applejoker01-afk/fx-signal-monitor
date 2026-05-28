@@ -1,19 +1,6 @@
 #!/usr/bin/env python3
 """
 FX売買シグナル監視スキャナー（レベル3：フルファンダメンタルズ統合版）
-
-統合される要素:
-  ① テクニカル: 200/50DMA, MACD, RSI, ATR
-  ② ファンダメンタル金利差: 中央銀行政策金利の動的反映
-  ③ 経済指標カレンダー: 重要イベント前の取引控え
-  ④ 市場センチメント: VIX, DXY, 米10年債, 金価格
-  ⑤ 通知: Discord Webhook + Gmail SMTP
-
-データソース:
-  - Frankfurter API (ECB公式為替)
-  - U.S. Treasury Fiscal Data API (米国債利回り)
-  - Stooq (VIX, DXY, 金, 米10年債)
-  - 手動メンテJSON (中央銀行金利・経済指標)
 """
 
 import os
@@ -26,7 +13,6 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.header import Header
 
-# モジュール読込
 from modules.rate_fetcher import (
     load_central_bank_rates, fetch_us_treasury_yields, compute_fa_score
 )
@@ -39,10 +25,7 @@ from modules.sentiment_monitor import (
 from modules.obsidian_extractor import fetch_and_save as fetch_obsidian
 from modules.custom_rules_engine import apply_obsidian_intelligence
 
-
-# ============================================================================
-# 設定: 22通貨ペア
-# ============================================================================
+PAGES_URL = "https://applejoker01-afk.github.io/fx-signal-monitor/"
 
 PAIR_API = {
     "USDJPY": ("USD", "JPY"), "EURJPY": ("EUR", "JPY"),
@@ -78,10 +61,6 @@ LATEST_ENDPOINTS = [
      f"https://api.frankfurter.app/latest?from=EUR&to={API_SYMBOLS}"),
 ]
 
-
-# ============================================================================
-# 為替データ取得
-# ============================================================================
 
 def http_get_json(url, timeout=15):
     req = urllib.request.Request(
@@ -132,10 +111,6 @@ def fetch_history(pair, days=280):
     return None
 
 
-# ============================================================================
-# テクニカル指標
-# ============================================================================
-
 def sma(arr, n):
     return sum(arr[-n:]) / n if len(arr) >= n else None
 
@@ -184,10 +159,6 @@ def atr_calc(prices, period=14):
     return a
 
 
-# ============================================================================
-# テクニカルスコア（既存ロジック）
-# ============================================================================
-
 def compute_ta_score(price, prices):
     dma200 = sma(prices, 200) or sma(prices, len(prices))
     dma50 = sma(prices, 50) or sma(prices, min(50, len(prices)))
@@ -233,26 +204,10 @@ def compute_ta_score(price, prices):
     }
 
 
-# ============================================================================
-# 統合シグナル評価（レベル3: TA + FA + Event + Sentiment）
-# ============================================================================
-
 def evaluate_full(pair, price, prices, cb_rates, sentiment, now):
-    """
-    フル統合評価:
-      Step1: テクニカル → TAスコア
-      Step2: 金利差 → FAスコア（動的）
-      Step3: TA+FA合議で★算出
-      Step4: 経済指標近接チェック → 必要なら★抑制
-      Step5: 市場センチメントフィルター適用
-    """
-    # Step1: テクニカル
     ta = compute_ta_score(price, prices)
-
-    # Step2: 動的FAスコア
     fa = compute_fa_score(pair, PAIR_API, cb_rates)
 
-    # Step3: TA+FA統合で★判定
     ta_sign = 1 if ta["ta_score"] > 50 else (-1 if ta["ta_score"] < 50 else 0)
     fa_sign = 1 if fa["direction"] == "buy" else (-1 if fa["direction"] == "sell" else 0)
     agree = ta_sign == fa_sign and ta_sign != 0
@@ -299,7 +254,6 @@ def evaluate_full(pair, price, prices, cb_rates, sentiment, now):
         "pair_type": classify_pair(pair),
     }
 
-    # Step4: 経済指標近接チェック
     event_check = check_event_proximity(pair, now)
     if event_check["status"] == "block":
         result["original_stars"] = stars
@@ -312,18 +266,11 @@ def evaluate_full(pair, price, prices, cb_rates, sentiment, now):
         result["event_warning"] = event_check["reason"]
         result["event_info"] = event_check["event"]
 
-    # Step5: 市場センチメントフィルター
     result = apply_sentiment_filter(pair, result, sentiment)
-
-    # 今後7日のイベント情報を添付
     result["upcoming_events"] = upcoming_events_for(pair, hours_ahead=168)
 
     return result
 
-
-# ============================================================================
-# 状態管理
-# ============================================================================
 
 STATE_FILE = "docs/last_signals.json"
 
@@ -370,32 +317,26 @@ def detect_changes(current, previous_stars):
     return newly, upgraded, is_first
 
 
-# ============================================================================
-# 通知
-# ============================================================================
-
 def stars_to_text(n):
     return "★" * n + "☆" * (5 - n)
 
 
 def format_event_block(r):
-    """イベント警告のブロック生成"""
     if "event_warning" not in r:
         return ""
     ev = r.get("event_info", {})
     return (
-        f"  🛑 取引控え: {r['event_warning']}\n"
-        f"  📅 {ev.get('name', 'N/A')} | "
+        f"  取引控え: {r['event_warning']}\n"
+        f"  {ev.get('name', 'N/A')} | "
         f"重要度: {ev.get('importance', 'N/A')}\n"
     )
 
 
 def format_sentiment_block(r):
-    """センチメント警告のブロック生成"""
     notes = r.get("sentiment_notes", [])
     if not notes:
         return ""
-    return "  🌐 センチメント: " + " / ".join(notes) + "\n"
+    return "  センチメント: " + " / ".join(notes) + "\n"
 
 
 def format_signal_block_text(r):
@@ -405,39 +346,35 @@ def format_signal_block_text(r):
         f"  TA={r['ta_score']}/100  FA={r['fa_score']}/100 "
         f"(金利差{r.get('fa_rate_diff', 'N/A'):+.2f}%)\n"
         f"  RSI={r['rsi']}  MACD={r['macd']}  ATR={r['atr']}\n"
-        f"  📊 {r['fa_detail']}\n"
+        f"  {r['fa_detail']}\n"
     )
     txt += format_event_block(r)
     txt += format_sentiment_block(r)
 
-    # Obsidian カスタムルール適用結果
     if r.get("obsidian_rules_applied"):
-        txt += "  📚 Wiki規則適用:\n"
+        txt += "  Wiki規則適用:\n"
         for rule in r["obsidian_rules_applied"]:
             txt += (f"    ・{rule.get('rule_name', 'unnamed')} "
-                    f"[{rule.get('action', '?')}] (source: {rule.get('filename', '?')})\n")
+                    f"[{rule.get('action', '?')}]\n")
 
-    # 関連する過去レッスン（教訓）
     if r.get("relevant_lessons"):
-        txt += "  📖 関連する過去の教訓:\n"
+        txt += "  関連する過去の教訓:\n"
         for les in r["relevant_lessons"][:3]:
             txt += f"    ・{les.get('title', 'untitled')}\n"
 
-    # 関連する Wiki 分析記事
     if r.get("wiki_analyses"):
-        txt += "  🔍 参照すべきWiki分析:\n"
+        txt += "  参照すべきWiki分析:\n"
         for ana in r["wiki_analyses"][:2]:
             txt += f"    ・{ana.get('title', 'untitled')}\n"
 
-    # 過去30日間の取引日記統計
     if r.get("journal_stats_30d"):
         js = r["journal_stats_30d"]
-        txt += (f"  📔 過去30日のこのペア取引: {js.get('count', 0)}回 "
+        txt += (f"  過去30日のこのペア取引: {js.get('count', 0)}回 "
                 f"(勝率: {js.get('win_rate', 'N/A')})\n")
 
     upc = r.get("upcoming_events", [])
     if upc:
-        txt += "  📅 今後7日: "
+        txt += "  今後7日: "
         for e in upc[:3]:
             txt += f"{e['name']}({e['hours_until']:.0f}h) "
         txt += "\n"
@@ -445,7 +382,6 @@ def format_signal_block_text(r):
 
 
 def format_sentiment_summary(s):
-    """市場センチメントのサマリー"""
     if not s:
         return "  センチメント取得失敗\n"
     return (
@@ -453,7 +389,7 @@ def format_sentiment_summary(s):
         f"  DXY: {s.get('dxy', 'N/A')} [{s.get('dxy_trend', '?')}]\n"
         f"  米10y: {s.get('us10y', 'N/A')}% [{s.get('bond_pressure', '?')}]\n"
         f"  ゴールド: {s.get('gold', 'N/A')} [{s.get('gold_trend', '?')}]\n"
-        f"  ▶ リスクモード: {s.get('risk_mode', 'N/A').upper()}\n"
+        f"  リスクモード: {s.get('risk_mode', 'N/A').upper()}\n"
     )
 
 
@@ -490,15 +426,16 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results, sentiment)
     else:
         return False
 
-embeds = [{
-        "title": title, "description": desc, "color": color,
-        "url": "https://applejoker01-afk.github.io/fx-signal-monitor/",
+    embeds = [{
+        "title": title,
+        "description": desc,
+        "color": color,
+        "url": PAGES_URL,
         "timestamp": jst.isoformat(),
-        "footer": {"text": f"Currents FX Terminal L3 | {timestamp} | https://applejoker01-afk.github.io/fx-signal-monitor/"},
+        "footer": {"text": f"Currents FX Terminal L3 | {timestamp} | {PAGES_URL}"},
         "fields": []
     }]
 
-    # 市場センチメント概要
     if sentiment:
         embeds[0]["fields"].append({
             "name": "🌐 市場センチメント",
@@ -529,14 +466,12 @@ embeds = [{
             value += f"\n⚠ {r['event_warning']}"
         if r.get("sentiment_notes"):
             value += f"\n🌐 " + " / ".join(r["sentiment_notes"])
-        # Obsidian カスタムルール適用結果
         if r.get("obsidian_rules_applied"):
             rule_names = [
                 f"・{rule.get('rule_name', 'unnamed')}"
                 for rule in r["obsidian_rules_applied"][:3]
             ]
             value += f"\n📚 Wiki規則:\n" + "\n".join(rule_names)
-        # 関連する過去レッスン（教訓）
         if r.get("relevant_lessons"):
             lesson_titles = [
                 f"・{les.get('title', 'untitled')}"
@@ -600,15 +535,15 @@ def send_email(smtp_host, smtp_port, smtp_user, smtp_pass,
         )
 
     lines = [
-        "━" * 64,
-        f"  FX売買シグナル通知（テクノ・ファンダメンタル統合）  {timestamp}",
-        "━" * 64, "",
-        "【🌐 市場センチメント】",
+        "=" * 64,
+        f"  FX売買シグナル通知  {timestamp}",
+        "=" * 64, "",
+        "【市場センチメント】",
         format_sentiment_summary(sentiment),
     ]
 
     if us_yields:
-        lines.append("【💵 米国債利回り】")
+        lines.append("【米国債利回り】")
         lines.append(
             f"  2y: {us_yields.get('2y', 'N/A')}%  "
             f"10y: {us_yields.get('10y', 'N/A')}%  "
@@ -624,15 +559,15 @@ def send_email(smtp_host, smtp_port, smtp_user, smtp_pass,
             lines.append(format_signal_block_text(r))
 
     if upgraded:
-        lines.append("【★4 → ★5 への昇格】")
+        lines.append("【★4→★5 への昇格】")
         lines.append("")
         for r in upgraded:
             lines.append(format_signal_block_text(r))
 
     lines.extend([
-        "━" * 64,
+        "=" * 64,
         "【全22ペアの状態】",
-        "━" * 64, "",
+        "=" * 64, "",
     ])
     for r in sorted(all_results, key=lambda x: -x["stars"]):
         fa_diff = r.get("fa_rate_diff")
@@ -644,11 +579,11 @@ def send_email(smtp_host, smtp_port, smtp_user, smtp_pass,
 
     lines.extend([
         "",
-        "━" * 64,
+        "=" * 64,
+        f"  ダッシュボード: {PAGES_URL}",
         "  Currents FX Signal Monitor L3 / Techno-Fundamental Strategy",
-        "  Data: ECB(Frankfurter)+米財務省+Stooq+手動JSON / 完全自動分析",
         "  本通知は教育・研究目的。投資判断は自己責任で行ってください。",
-        "━" * 64,
+        "=" * 64,
     ])
     body = "\n".join(lines)
 
@@ -669,16 +604,10 @@ def send_email(smtp_host, smtp_port, smtp_user, smtp_pass,
         return False
 
 
-# ============================================================================
-# HTMLレポート（ターミナル風リデザイン版）
-# ============================================================================
-
 def generate_html_report(results, sentiment, us_yields, cb_rates, generated_at):
-    """HTMLターミナルと統一されたデザインの本格ダッシュボードを生成"""
     jst = generated_at + timedelta(hours=9)
     sorted_results = sorted(results, key=lambda x: (-x["stars"], -x["ta_score"]))
 
-    # 市場モード
     risk_mode = sentiment.get("risk_mode", "unknown") if sentiment else "unknown"
     risk_emoji_map = {
         "panic": "🚨🚨🚨", "risk_off": "⚠", "caution": "⚠",
@@ -695,13 +624,11 @@ def generate_html_report(results, sentiment, us_yields, cb_rates, generated_at):
     risk_emoji = risk_emoji_map.get(risk_mode, "")
     risk_label = risk_label_map.get(risk_mode, risk_mode)
 
-    # サマリー統計
     strong_count = sum(1 for r in results if r["stars"] >= 4)
     blocked_count = sum(1 for r in results if r.get("event_warning") or r.get("sentiment_notes"))
     long_count = sum(1 for r in results if r["direction"].endswith("LONG") and r["stars"] >= 4)
     short_count = sum(1 for r in results if r["direction"].endswith("SHORT") and r["stars"] >= 4)
 
-    # 各シグナル行
     rows = []
     for r in sorted_results:
         if r["direction"].endswith("LONG"):
@@ -723,7 +650,6 @@ def generate_html_report(results, sentiment, us_yields, cb_rates, generated_at):
             warn_badges.append('<span class="badge badge-sent">🌐 SENT</span>')
         warn_html = " ".join(warn_badges)
 
-        # イベント情報
         event_html = ""
         if r.get("event_warning"):
             event_html = f'<div class="warn-line">⏸ {r["event_warning"]}</div>'
@@ -747,7 +673,6 @@ def generate_html_report(results, sentiment, us_yields, cb_rates, generated_at):
         </tr>
         """)
 
-    # 中央銀行金利テーブル
     stance_map = {
         "tighten": ("↑", "#4ade80", "引締"),
         "neutral": ("→", "#94a3b8", "中立"),
@@ -766,7 +691,6 @@ def generate_html_report(results, sentiment, us_yields, cb_rates, generated_at):
         </tr>
         """)
 
-    # 近接イベント抽出
     upcoming_events = {}
     for r in results:
         for ev in (r.get("upcoming_events") or []):
@@ -825,8 +749,6 @@ body {{
   min-height: 100vh;
 }}
 .container {{ max-width: 1400px; margin: 0 auto; padding: 2rem; }}
-
-/* Header */
 .app-header {{
   display: flex; justify-content: space-between; align-items: baseline;
   padding-bottom: 1rem; border-bottom: 1px solid var(--border); margin-bottom: 2rem;
@@ -847,8 +769,6 @@ body {{
   padding: 0.2rem 0.6rem; border-radius: 3px; border: 1px solid rgba(74,222,128,0.3);
   font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; margin-right: 0.5rem;
 }}
-
-/* Top Navigation Bar */
 .top-nav {{
   display: flex; justify-content: space-between; align-items: center;
   padding: 0.7rem 1.2rem; margin-bottom: 1.5rem;
@@ -868,112 +788,38 @@ body {{
   border: 1px solid var(--border);
   color: var(--text-secondary); background: var(--bg-elev);
 }}
-.nav-link:hover {{
-  background: var(--bg-surface); color: var(--gold);
-  border-color: var(--gold);
-}}
-.nav-link.active {{
-  background: var(--buy-bg); color: var(--buy);
-  border-color: rgba(74,222,128,0.4);
-}}
-.nav-link .nav-icon {{ font-size: 0.95rem; }}
-
-/* Risk Banner */
+.nav-link:hover {{ background: var(--bg-surface); color: var(--gold); border-color: var(--gold); }}
+.nav-link.active {{ background: var(--buy-bg); color: var(--buy); border-color: rgba(74,222,128,0.4); }}
 .risk-banner {{
   background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-elev) 100%);
   border: 1px solid var(--border); border-left: 4px solid var(--gold);
   padding: 1.3rem 1.8rem; margin-bottom: 1.5rem; border-radius: 4px;
-  position: relative; overflow: hidden;
-}}
-.risk-banner::before {{
-  content: ''; position: absolute; top: -50%; right: -10%;
-  width: 300px; height: 300px;
-  background: radial-gradient(circle, rgba(212,165,116,0.08), transparent 70%);
-  pointer-events: none;
 }}
 .risk-banner.panic {{ border-left-color: var(--sell); }}
 .risk-banner.risk_off, .risk-banner.caution {{ border-left-color: var(--caution); }}
 .risk-banner.normal {{ border-left-color: var(--buy); }}
-.risk-banner.complacent {{ border-left-color: var(--neutral); }}
-
-.risk-title {{
-  font-family: var(--jp-serif); font-size: 1.15rem; color: var(--gold);
-  letter-spacing: 0.04em; margin-bottom: 0.4rem; position: relative; z-index: 1;
-}}
+.risk-title {{ font-family: var(--jp-serif); font-size: 1.15rem; color: var(--gold); margin-bottom: 0.4rem; }}
 .risk-banner.panic .risk-title {{ color: var(--sell); }}
-.risk-banner.risk_off .risk-title, .risk-banner.caution .risk-title {{ color: var(--caution); }}
 .risk-banner.normal .risk-title {{ color: var(--buy); }}
-
-.risk-summary {{
-  font-family: var(--mono); font-size: 0.85rem; color: var(--text-secondary);
-  position: relative; z-index: 1;
-}}
-
-/* Stats grid */
-.stats-grid {{
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 1rem; margin-bottom: 1.5rem;
-}}
-.stat-card {{
-  background: var(--bg-card); border: 1px solid var(--border);
-  border-radius: 4px; padding: 1.1rem;
-}}
-.stat-card .stat-label {{
-  font-family: var(--mono); font-size: 0.68rem; color: var(--text-muted);
-  letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.3rem;
-}}
-.stat-card .stat-val {{
-  font-family: var(--mono); font-size: 1.6rem; font-weight: 600;
-  color: var(--text-primary); line-height: 1;
-}}
-.stat-card .stat-sub {{
-  font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.3rem;
-  font-family: var(--mono);
-}}
+.risk-summary {{ font-family: var(--mono); font-size: 0.85rem; color: var(--text-secondary); }}
+.stats-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }}
+.stat-card {{ background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; padding: 1.1rem; }}
+.stat-label {{ font-family: var(--mono); font-size: 0.68rem; color: var(--text-muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.3rem; }}
+.stat-val {{ font-family: var(--mono); font-size: 1.6rem; font-weight: 600; color: var(--text-primary); line-height: 1; }}
+.stat-sub {{ font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.3rem; font-family: var(--mono); }}
 .stat-val.buy {{ color: var(--buy); }}
 .stat-val.sell {{ color: var(--sell); }}
 .stat-val.caution {{ color: var(--caution); }}
-
-/* Section heads */
-.section-head {{
-  display: flex; align-items: baseline; gap: 1rem;
-  margin: 2rem 0 1rem; padding-bottom: 0.6rem;
-  border-bottom: 1px solid var(--border-soft);
-}}
-.section-num {{
-  font-family: var(--display); font-style: italic;
-  font-size: 1.8rem; color: var(--gold); font-weight: 500; line-height: 1;
-}}
-.section-title {{
-  font-family: var(--jp-serif); font-size: 1.15rem; font-weight: 600;
-  letter-spacing: 0.03em;
-}}
-.section-sub {{
-  font-family: var(--mono); font-size: 0.7rem; color: var(--text-muted);
-  letter-spacing: 0.15em; text-transform: uppercase; margin-left: auto;
-}}
-
-/* Tables */
-.data-table {{
-  width: 100%; border-collapse: collapse;
-  background: var(--bg-card); border: 1px solid var(--border);
-  border-radius: 4px; overflow: hidden;
-}}
-.data-table th {{
-  background: var(--bg-elev); color: var(--gold);
-  font-family: var(--jp-serif); font-weight: 600;
-  padding: 0.9rem 1rem; text-align: left;
-  font-size: 0.78rem; letter-spacing: 0.05em;
-  border-bottom: 1px solid var(--border);
-}}
-.data-table td {{
-  padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-soft);
-  font-size: 0.82rem;
-}}
+.section-head {{ display: flex; align-items: baseline; gap: 1rem; margin: 2rem 0 1rem; padding-bottom: 0.6rem; border-bottom: 1px solid var(--border-soft); }}
+.section-num {{ font-family: var(--display); font-style: italic; font-size: 1.8rem; color: var(--gold); font-weight: 500; line-height: 1; }}
+.section-title {{ font-family: var(--jp-serif); font-size: 1.15rem; font-weight: 600; letter-spacing: 0.03em; }}
+.section-sub {{ font-family: var(--mono); font-size: 0.7rem; color: var(--text-muted); letter-spacing: 0.15em; text-transform: uppercase; margin-left: auto; }}
+.data-table {{ width: 100%; border-collapse: collapse; background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }}
+.data-table th {{ background: var(--bg-elev); color: var(--gold); font-family: var(--jp-serif); font-weight: 600; padding: 0.9rem 1rem; text-align: left; font-size: 0.78rem; letter-spacing: 0.05em; border-bottom: 1px solid var(--border); }}
+.data-table td {{ padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-soft); font-size: 0.82rem; }}
 .data-table tr:last-child td {{ border-bottom: none; }}
 .data-table tr:hover td {{ background: var(--bg-surface); }}
 .stars-cell {{ color: var(--gold); letter-spacing: 0.08em; font-family: var(--mono); white-space: nowrap; }}
-.pair-cell {{ font-family: var(--jp); }}
 .pair-main {{ font-family: var(--display); font-style: italic; font-size: 1.05rem; font-weight: 600; }}
 .num-cell {{ font-family: var(--mono); color: var(--text-secondary); }}
 .score-ta {{ color: var(--text-primary); }}
@@ -981,89 +827,40 @@ body {{
 .row-buy .verdict-cell {{ color: var(--buy); }}
 .row-sell .verdict-cell {{ color: var(--sell); }}
 .row-neutral .verdict-cell {{ color: var(--caution); }}
-.row-blocked .verdict-cell {{ color: var(--neutral); }}
 .row-blocked {{ opacity: 0.7; }}
 .verdict-cell {{ font-weight: 500; }}
-.fa-detail {{ color: var(--text-secondary); font-size: 0.76rem; font-family: var(--jp); }}
+.fa-detail {{ color: var(--text-secondary); font-size: 0.76rem; }}
 .ccy-cell {{ font-family: var(--mono); font-weight: 600; color: var(--gold); }}
 .meta-cell {{ font-family: var(--mono); font-size: 0.78rem; color: var(--text-secondary); }}
-
-/* Badges */
-.badge {{
-  display: inline-block; padding: 0.15rem 0.45rem; border-radius: 3px;
-  font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.08em;
-  font-weight: 700; margin-left: 0.3rem;
-}}
+.badge {{ display: inline-block; padding: 0.15rem 0.45rem; border-radius: 3px; font-family: var(--mono); font-size: 0.65rem; font-weight: 700; margin-left: 0.3rem; }}
 .badge-event {{ background: rgba(251,191,36,0.15); color: var(--caution); border: 1px solid rgba(251,191,36,0.3); }}
 .badge-sent {{ background: rgba(212,165,116,0.15); color: var(--gold); border: 1px solid rgba(212,165,116,0.3); }}
-.warn-line {{
-  font-size: 0.72rem; color: var(--caution); margin-top: 0.25rem;
-  font-family: var(--mono);
-}}
-
-/* Event rows */
-.event-row {{
-  display: grid; grid-template-columns: 100px 60px 1fr 90px;
-  gap: 1rem; align-items: center;
-  padding: 0.7rem 1rem; background: var(--bg-card);
-  border: 1px solid var(--border-soft); border-left: 3px solid var(--gold);
-  margin-bottom: 0.4rem; border-radius: 3px;
-  font-family: var(--jp); font-size: 0.85rem;
-}}
+.warn-line {{ font-size: 0.72rem; color: var(--caution); margin-top: 0.25rem; font-family: var(--mono); }}
+.event-row {{ display: grid; grid-template-columns: 100px 60px 1fr 90px; gap: 1rem; align-items: center; padding: 0.7rem 1rem; background: var(--bg-card); border: 1px solid var(--border-soft); border-left: 3px solid var(--gold); margin-bottom: 0.4rem; border-radius: 3px; font-size: 0.85rem; }}
 .event-row.event-critical {{ border-left-color: var(--sell); }}
 .event-row.event-high {{ border-left-color: var(--caution); }}
-.event-row.event-medium {{ border-left-color: var(--text-muted); }}
 .event-time {{ font-family: var(--mono); font-size: 0.85rem; color: var(--gold); font-weight: 600; }}
 .event-time small {{ display: block; font-size: 0.7rem; color: var(--text-muted); }}
 .event-ccy {{ font-family: var(--mono); font-weight: 600; }}
-.event-imp {{
-  font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.1em;
-  text-transform: uppercase; text-align: right; font-weight: 700;
-}}
+.event-imp {{ font-family: var(--mono); font-size: 0.7rem; text-transform: uppercase; text-align: right; font-weight: 700; }}
 .imp-critical {{ color: var(--sell); }}
 .imp-high {{ color: var(--caution); }}
 .imp-medium {{ color: var(--text-muted); }}
-
-/* Footer */
-.app-footer {{
-  margin-top: 2rem; padding-top: 1rem;
-  border-top: 1px solid var(--border);
-  color: var(--text-muted); font-size: 0.74rem;
-  font-family: var(--mono); text-align: center;
-}}
-.app-footer em {{
-  font-family: var(--display); font-style: italic; color: var(--gold);
-}}
-
-@media (max-width: 768px) {{
-  .container {{ padding: 1rem; }}
-  .event-row {{ grid-template-columns: 1fr; gap: 0.3rem; }}
-}}
+.app-footer {{ margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 0.74rem; font-family: var(--mono); text-align: center; }}
+.app-footer em {{ font-family: var(--display); font-style: italic; color: var(--gold); }}
+@media (max-width: 768px) {{ .container {{ padding: 1rem; }} .event-row {{ grid-template-columns: 1fr; gap: 0.3rem; }} }}
 </style>
 </head>
 <body>
-
 <div class="container">
-
-  <!-- Top Navigation Bar -->
   <nav class="top-nav">
     <div class="top-nav-left">◇ Currents FX Suite</div>
     <div class="top-nav-links">
-      <a href="./" class="nav-link active">
-        <span class="nav-icon">📊</span>
-        <span>L3 ダッシュボード</span>
-      </a>
-      <a href="./terminal.html" class="nav-link">
-        <span class="nav-icon">🖥</span>
-        <span>分析ターミナル</span>
-      </a>
-      <a href="./last_signals.json" class="nav-link" target="_blank" rel="noopener">
-        <span class="nav-icon">{{}}</span>
-        <span>Raw JSON</span>
-      </a>
+      <a href="./" class="nav-link active"><span>📊</span><span>L3 ダッシュボード</span></a>
+      <a href="./terminal.html" class="nav-link"><span>🖥</span><span>分析ターミナル</span></a>
+      <a href="./last_signals.json" class="nav-link" target="_blank" rel="noopener"><span>{{}}</span><span>Raw JSON</span></a>
     </div>
   </nav>
-
   <header class="app-header">
     <div class="brand">
       <span class="brand-mark">Currents</span>
@@ -1074,102 +871,43 @@ body {{
       Updated: {jst.strftime('%Y-%m-%d %H:%M JST')} · Auto-refresh: 1h · 22 pairs
     </div>
   </header>
-
-  <!-- Risk Banner -->
   <div class="risk-banner {risk_mode}">
     <div class="risk-title">{risk_emoji} 市場モード: {risk_label}</div>
     <div class="risk-summary">
       VIX: {sentiment.get('vix', '—') if sentiment else '—'} ({sentiment.get('vix_level', '?') if sentiment else '?'}) &nbsp;·&nbsp;
       DXY: {sentiment.get('dxy', '—') if sentiment else '—'} ({sentiment.get('dxy_trend', '?') if sentiment else '?'}) &nbsp;·&nbsp;
       米10年債: {sentiment.get('us10y', '—') if sentiment else '—'}% &nbsp;·&nbsp;
-      ゴールド: {sentiment.get('gold', '—') if sentiment else '—'} ({sentiment.get('gold_trend', '?') if sentiment else '?'})
+      ゴールド: {sentiment.get('gold', '—') if sentiment else '—'}
     </div>
   </div>
-
-  <!-- Stats Grid -->
   <div class="stats-grid">
-    <div class="stat-card">
-      <div class="stat-label">★4以上シグナル</div>
-      <div class="stat-val {('buy' if strong_count > 0 else '')}">{strong_count}</div>
-      <div class="stat-sub">/ 全{len(results)}ペア</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">ロング推奨</div>
-      <div class="stat-val buy">{long_count}</div>
-      <div class="stat-sub">高信頼ロング条件成立</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">ショート推奨</div>
-      <div class="stat-val sell">{short_count}</div>
-      <div class="stat-sub">高信頼ショート条件成立</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">取引控え推奨</div>
-      <div class="stat-val caution">{blocked_count}</div>
-      <div class="stat-sub">イベント・センチメント警告</div>
-    </div>
+    <div class="stat-card"><div class="stat-label">★4以上シグナル</div><div class="stat-val {('buy' if strong_count > 0 else '')}">{strong_count}</div><div class="stat-sub">/ 全{len(results)}ペア</div></div>
+    <div class="stat-card"><div class="stat-label">ロング推奨</div><div class="stat-val buy">{long_count}</div><div class="stat-sub">高信頼ロング条件成立</div></div>
+    <div class="stat-card"><div class="stat-label">ショート推奨</div><div class="stat-val sell">{short_count}</div><div class="stat-sub">高信頼ショート条件成立</div></div>
+    <div class="stat-card"><div class="stat-label">取引控え推奨</div><div class="stat-val caution">{blocked_count}</div><div class="stat-sub">イベント・センチメント警告</div></div>
   </div>
-
-  <!-- Signal Table -->
-  <div class="section-head">
-    <div class="section-num">I.</div>
-    <h2 class="section-title">全22通貨ペアのシグナル評価</h2>
-    <span class="section-sub">TA × FA × Event × Sentiment</span>
-  </div>
-
+  <div class="section-head"><div class="section-num">I.</div><h2 class="section-title">全22通貨ペアのシグナル評価</h2><span class="section-sub">TA × FA × Event × Sentiment</span></div>
   <table class="data-table">
-    <thead>
-      <tr>
-        <th>シグナル</th><th>通貨ペア</th><th>価格</th>
-        <th>TA</th><th>FA</th><th>金利差</th>
-        <th>RSI</th><th>判定</th><th>マクロ分析</th>
-      </tr>
-    </thead>
+    <thead><tr><th>シグナル</th><th>通貨ペア</th><th>価格</th><th>TA</th><th>FA</th><th>金利差</th><th>RSI</th><th>判定</th><th>マクロ分析</th></tr></thead>
     <tbody>{''.join(rows)}</tbody>
   </table>
-
-  <!-- Central Bank Rates -->
-  <div class="section-head">
-    <div class="section-num">II.</div>
-    <h2 class="section-title">中央銀行政策金利マップ</h2>
-    <span class="section-sub">Central Bank Rates</span>
-  </div>
-
+  <div class="section-head"><div class="section-num">II.</div><h2 class="section-title">中央銀行政策金利マップ</h2><span class="section-sub">Central Bank Rates</span></div>
   <table class="data-table">
-    <thead>
-      <tr>
-        <th>通貨</th><th>中央銀行</th><th>政策金利</th>
-        <th>スタンス</th><th>次回会合</th>
-      </tr>
-    </thead>
+    <thead><tr><th>通貨</th><th>中央銀行</th><th>政策金利</th><th>スタンス</th><th>次回会合</th></tr></thead>
     <tbody>{''.join(cb_rows)}</tbody>
   </table>
-
-  <!-- Upcoming Events -->
-  <div class="section-head">
-    <div class="section-num">III.</div>
-    <h2 class="section-title">今後7日間の重要マクロイベント</h2>
-    <span class="section-sub">Economic Calendar</span>
-  </div>
-
+  <div class="section-head"><div class="section-num">III.</div><h2 class="section-title">今後7日間の重要マクロイベント</h2><span class="section-sub">Economic Calendar</span></div>
   <div style="margin-top: 1rem;">
     {''.join(event_rows) if event_rows else '<div style="color: var(--text-muted); font-family: var(--mono); font-size: 0.85rem; padding: 1rem;">今後7日間の重要イベントはありません</div>'}
   </div>
-
   <footer class="app-footer">
-    <em>Currents</em> · FX Signal Monitor L3 · Techno-Fundamental Strategy
-    <br>Generated by GitHub Actions / Data: ECB + 米財務省 + Stooq + 手動JSON / 投資判断は自己責任で
+    <em>Currents</em> · FX Signal Monitor L3 · <a href="{PAGES_URL}" style="color: var(--gold);">{PAGES_URL}</a>
+    <br>Generated by GitHub Actions / Data: ECB + 米財務省 + Yahoo Finance + 手動JSON / 投資判断は自己責任で
   </footer>
-
 </div>
-
 </body>
 </html>"""
 
-
-# ============================================================================
-# メインフロー
-# ============================================================================
 
 def main():
     print("=" * 64)
@@ -1178,27 +916,22 @@ def main():
 
     now = datetime.now(timezone.utc)
 
-    # 1. 為替最新値
     try:
         latest = fetch_latest_rates()
     except Exception as e:
         print(f"[FATAL] Cannot fetch latest rates: {e}")
         sys.exit(1)
 
-    # 2. 中央銀行金利の読込
     cb_rates = load_central_bank_rates()
     print(f"[OK] Central bank rates loaded: {len(cb_rates)} currencies")
 
-    # 3. 米国債利回り
     us_yields = fetch_us_treasury_yields()
     print(f"[OK] US yields: 10y={us_yields.get('10y')}%")
 
-    # 4. 市場センチメント
     print("[INFO] Fetching market sentiment...")
     sentiment = evaluate_market_sentiment()
     print(f"[OK] Sentiment: VIX={sentiment.get('vix')} mode={sentiment.get('risk_mode')}")
 
-    # 4.5. Obsidian Wiki ノート取得（オプション・失敗してもスキャンは継続）
     print("\n[INFO] Fetching Obsidian Vault notes...")
     try:
         obsidian_data = fetch_obsidian()
@@ -1210,13 +943,12 @@ def main():
             print(f"[OK] Obsidian: {sig_count} rules / {ana_count} analyses / "
                   f"{jrn_count} journals / {les_count} lessons")
         else:
-            print("[INFO] Obsidian Vault not configured (OBSIDIAN_VAULT_PAT missing) - skipping")
+            print("[INFO] Obsidian Vault not configured - skipping")
             obsidian_data = None
     except Exception as e:
         print(f"[WARN] Obsidian fetch failed (continuing without it): {e}")
         obsidian_data = None
 
-    # 5. 全ペア評価
     print("\n[INFO] Evaluating 22 pairs...")
     results = []
     for pair in PAIR_API:
@@ -1231,17 +963,16 @@ def main():
         prices.append(price)
         try:
             r = evaluate_full(pair, price, prices, cb_rates, sentiment, now)
-            # 5.5. Obsidian カスタムルール適用
             if obsidian_data:
                 r = apply_obsidian_intelligence(r, sentiment, obsidian_data, now)
             results.append(r)
             warn = ""
             if r.get("event_warning"):
-                warn = " ⏸EVT"
+                warn = " EVT"
             if r.get("sentiment_notes"):
-                warn += " 🌐SENT"
+                warn += " SENT"
             if r.get("obsidian_rules_applied"):
-                warn += f" 📚OBS({len(r['obsidian_rules_applied'])})"
+                warn += f" OBS({len(r['obsidian_rules_applied'])})"
             print(
                 f"  [{stars_to_text(r['stars'])}] {pair:8} {price:>10.4f}  "
                 f"TA={r['ta_score']:.0f} FA={r['fa_score']:.0f}  "
@@ -1256,21 +987,15 @@ def main():
         print("[FATAL] No results")
         sys.exit(1)
 
-    # 6. 差分検出
     previous_stars = load_previous_state()
     newly, upgraded, is_first = detect_changes(results, previous_stars)
     print(f"\n[INFO] Changes: {len(newly)} new strong, {len(upgraded)} upgraded "
           f"(first run: {is_first})")
 
-    # 7. 通知
     if newly or upgraded or (is_first and newly):
         _wh = os.environ.get("DISCORD_WEBHOOK_URL", "")
-        # discordapp.com は旧ドメイン・discord.com に自動変換
         _wh = _wh.replace("discordapp.com", "discord.com")
-        send_discord(
-            _wh,
-            newly, upgraded, is_first, results, sentiment
-        )
+        send_discord(_wh, newly, upgraded, is_first, results, sentiment)
         send_email(
             os.environ.get("SMTP_HOST", "smtp.gmail.com"),
             os.environ.get("SMTP_PORT", "465"),
@@ -1283,10 +1008,8 @@ def main():
     else:
         print("[INFO] No significant changes, skipping notifications")
 
-    # 8. 状態保存
     save_current_state(results, sentiment, us_yields, cb_rates, obsidian_data)
 
-    # 9. HTMLレポート
     html = generate_html_report(results, sentiment, us_yields, cb_rates, now)
     os.makedirs("docs", exist_ok=True)
     with open("docs/index.html", "w", encoding="utf-8") as f:
