@@ -32,6 +32,11 @@ from modules.advanced_analytics import (
     get_pair_strength_context,
 )
 from modules.trade_tracker import update_trades
+from modules.performance_intelligence import (
+    build_pair_performance_map, apply_performance_weighting,
+    check_drawdown_alert, detect_market_regime,
+)
+from modules.ai_commentary import generate_market_commentary
 
 PAGES_URL = "https://applejoker01-afk.github.io/fx-signal-monitor/"
 
@@ -318,7 +323,9 @@ def stars_to_text(n):
 
 
 def send_discord(webhook_url, newly, upgraded, is_first, all_results,
-                 sentiment, currency_strength=None, portfolio_risk=None):
+                 sentiment, currency_strength=None, portfolio_risk=None,
+                 trade_update=None, open_trades=None,
+                 drawdown=None, ai_commentary=None):
     if not webhook_url:
         print("[INFO] Discord webhook not configured")
         return False
@@ -354,9 +361,30 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results,
         "title": title, "description": desc, "color": color,
         "url": PAGES_URL,
         "timestamp": jst.isoformat(),
-        "footer": {"text": f"Currents FX Terminal L3 | {timestamp} | {PAGES_URL}"},
+        "footer": {"text": f"Currents FX Terminal L3 | {timestamp}"},
         "fields": []
     }]
+
+    # ⑮ AI市況コメンタリー（最上部に表示）
+    if ai_commentary:
+        embeds[0]["fields"].append({
+            "name": "🤖 AI市況コメンタリー",
+            "value": ai_commentary[:1024],
+            "inline": False
+        })
+
+    # ⑪ ドローダウン警告（重要なので上部に）
+    if drawdown and drawdown.get("alert"):
+        lv = drawdown.get("level", "warning")
+        embeds[0]["fields"].append({
+            "name": f"🛑 ドローダウン警告 [{lv.upper()}]",
+            "value": (
+                f"{drawdown.get('message','')}\n"
+                f"直近{drawdown.get('recent_total',0)}件の損益: {drawdown.get('recent_pips',0):+.4f}\n"
+                f"→ {drawdown.get('recommendation','')}"
+            ),
+            "inline": False
+        })
 
     # 市場センチメント
     if sentiment:
@@ -392,6 +420,74 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results,
             "value": warnings_text + f"\n→ {portfolio_risk.get('recommendation', '')}",
             "inline": False
         })
+
+    # ⑦ トレード情報（新規エントリー・決済・保有中）
+    if trade_update:
+        # 新規エントリー
+        newly_opened = trade_update.get("newly_opened", [])
+        if newly_opened:
+            lines = []
+            for t in newly_opened[:5]:
+                lines.append(
+                    f"+ {t['pair']} {t['direction']} @ {t['entry_price']}\n"
+                    f"   SL:{t.get('sl','?')} / TP1:{t.get('tp1','?')} / "
+                    f"TP2:{t.get('tp2','?')} / TP3:{t.get('tp3','?')}"
+                )
+            embeds[0]["fields"].append({
+                "name": f"📌 新規エントリー（{len(newly_opened)}件）",
+                "value": "```diff\n" + "\n".join(lines) + "\n```",
+                "inline": False
+            })
+
+        # 決済
+        newly_closed = trade_update.get("newly_closed", [])
+        if newly_closed:
+            reason_label = {
+                "TP3_HIT": "🏆TP3到達",
+                "TP2_HIT": "✅TP2到達",
+                "TP1_HIT": "✅TP1到達",
+                "SL_HIT": "❌SL到達",
+                "SIGNAL_LOST": "➖シグナル消滅",
+                "REVERSED": "🔄方向反転",
+            }
+            lines = []
+            for t in newly_closed[:5]:
+                rl = reason_label.get(t.get("exit_reason"), t.get("exit_reason", "?"))
+                prefix = "+" if t.get("result") == "WIN" else ("-" if t.get("result") == "LOSS" else " ")
+                lines.append(
+                    f"{prefix} {t['pair']} {t['direction']} {rl}\n"
+                    f"   {t.get('entry_price','?')} → {t.get('exit_price','?')} "
+                    f"({t.get('pips',0):+.4f}) 保有{t.get('hold_hours',0)}h"
+                )
+            embeds[0]["fields"].append({
+                "name": f"💼 決済完了（{len(newly_closed)}件）",
+                "value": "```diff\n" + "\n".join(lines) + "\n```",
+                "inline": False
+            })
+
+    # 現在保有中（オープントレード一覧）
+    if open_trades:
+        from datetime import datetime as _dt
+        now_utc = _dt.now(timezone.utc)
+        lines = []
+        for pair, t in list(open_trades.items())[:8]:
+            try:
+                entry_dt = _dt.fromisoformat(t["entry_time"])
+                if entry_dt.tzinfo is None:
+                    entry_dt = entry_dt.replace(tzinfo=timezone.utc)
+                hours_held = (now_utc - entry_dt).total_seconds() / 3600
+                hold_str = f"{hours_held:.0f}h"
+            except Exception:
+                hold_str = "?"
+            lines.append(
+                f"・{pair} {t['direction']} @ {t['entry_price']} (経過{hold_str})"
+            )
+        if lines:
+            embeds[0]["fields"].append({
+                "name": f"📦 現在保有中（{len(open_trades)}件）",
+                "value": "\n".join(lines),
+                "inline": False
+            })
 
     # 各シグナル
     for r in newly:
@@ -470,6 +566,17 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results,
             "value": f"```\n価格: {r['price']}  方向: {r['direction']}\n```",
             "inline": False
         })
+
+    # 🔗 ダッシュボードリンク（最後に必ず追加）
+    embeds[0]["fields"].append({
+        "name": "🔗 ダッシュボード",
+        "value": (
+            f"**[📊 L3 ダッシュボードを開く]({PAGES_URL})**\n"
+            f"[🖥 分析ターミナル]({PAGES_URL}terminal.html) "
+            f"・ [{{}} Raw JSON]({PAGES_URL}last_signals.json)"
+        ),
+        "inline": False
+    })
 
     try:
         payload = json.dumps({"embeds": embeds}).encode("utf-8")
@@ -950,8 +1057,19 @@ def main():
 
     # 5. 全ペア評価（価格履歴も保存して通貨強弱計算に使う）
     print("\n[INFO] Evaluating 22 pairs...")
+
+    # ⑩ 自己学習: 過去の決済実績からペア別信頼度マップを構築
+    from modules.trade_tracker import load_closed_trades
+    closed_trades_all = load_closed_trades(days_back=90)
+    perf_map = build_pair_performance_map(closed_trades_all, min_trades=5)
+    if perf_map:
+        adjusted = [p for p, v in perf_map.items() if v.get("adjustment", 0) != 0]
+        if adjusted:
+            print(f"[OK] 自己学習: {len(adjusted)}ペアに実績調整を適用")
+
     results = []
-    all_pair_prices = {}  # ① 通貨強弱メーター用
+    all_pair_prices = {}   # ① 通貨強弱メーター用
+    all_histories = {}     # ⑨ バックテスト用（フル履歴）
 
     for pair in PAIR_API:
         price = latest["pairs"].get(pair)
@@ -966,6 +1084,8 @@ def main():
 
         # 通貨強弱用に30日分を保存
         all_pair_prices[pair] = {"current": price, "prices_30d": prices[-30:]}
+        # バックテスト用にフル履歴を保存
+        all_histories[pair] = prices
 
         try:
             r = evaluate_full(pair, price, prices, cb_rates, sentiment, now)
@@ -978,6 +1098,12 @@ def main():
             r = run_advanced_analytics(
                 r, prices, all_pair_prices, PAIR_API, cb_rates, sentiment, results
             )
+
+            # ⑬ 相場局面判定（トレンド/レンジ）
+            r["market_regime"] = detect_market_regime(prices)
+
+            # ⑩ 自己学習による信頼度調整
+            r = apply_performance_weighting(r, perf_map)
 
             results.append(r)
 
@@ -1032,14 +1158,58 @@ def main():
     print(f"\n[INFO] Changes: {len(newly)} new strong, {len(upgraded)} upgraded "
           f"(first run: {is_first})")
 
-    # 7. 通知
+    # ⑦ トレードのライフサイクル管理（通知の前に実行して情報を取得）
+    from modules.trade_tracker import load_open_trades
+    trade_update = update_trades(results, now)
+    if trade_update["newly_opened"]:
+        print(f"\n[TRADE] 新規エントリー {len(trade_update['newly_opened'])}件:")
+        for t in trade_update["newly_opened"]:
+            print(f"  + {t['pair']} {t['direction']} @ {t['entry_price']} "
+                  f"(SL:{t.get('sl')} TP1:{t.get('tp1')})")
+    if trade_update["newly_closed"]:
+        print(f"[TRADE] 決済 {len(trade_update['newly_closed'])}件:")
+        for t in trade_update["newly_closed"]:
+            print(f"  - {t['pair']} {t['direction']} {t['result']} "
+                  f"({t['exit_reason']}) {t.get('pips',0):+.4f} "
+                  f"保有{t.get('hold_hours',0)}h")
+    print(f"[TRADE] 現在保有中: {trade_update['still_open']}件")
+    open_trades = load_open_trades()
+
+    # ⑪ ドローダウン監視（決済後の全履歴で連敗チェック）
+    closed_after = load_closed_trades(days_back=14)
+    drawdown = check_drawdown_alert(closed_after, recent_n=5)
+    if drawdown.get("alert"):
+        print(f"[DRAWDOWN] {drawdown['message']} → {drawdown['recommendation']}")
+
+    # ⑬ 主要ペアの相場局面（USDJPYを代表として全体表示用に）
+    market_regime = None
+    for r in results:
+        if r["pair"] == "USDJPY":
+            market_regime = r.get("market_regime")
+            break
+
+    # ⑮ AI市況コメンタリー（ANTHROPIC_API_KEY設定時のみ）
+    ai_commentary = None
     if newly or upgraded or (is_first and newly):
+        ai_commentary = generate_market_commentary(
+            results, sentiment, currency_strength, market_regime
+        )
+        if ai_commentary:
+            print(f"[AI] 市況コメンタリー生成完了")
+
+    # 7. 通知（トレード情報も同梱・決済が出たら必ず送信）
+    has_trade_change = bool(trade_update.get("newly_opened") or trade_update.get("newly_closed"))
+    if newly or upgraded or (is_first and newly) or has_trade_change or drawdown.get("alert"):
         _wh = os.environ.get("DISCORD_WEBHOOK_URL", "")
         _wh = _wh.replace("discordapp.com", "discord.com")
         send_discord(
             _wh, newly, upgraded, is_first, results, sentiment,
             currency_strength=currency_strength,
             portfolio_risk=portfolio_risk,
+            trade_update=trade_update,
+            open_trades=open_trades,
+            drawdown=drawdown,
+            ai_commentary=ai_commentary,
         )
         send_email(
             os.environ.get("SMTP_HOST", "smtp.gmail.com"),
@@ -1057,21 +1227,6 @@ def main():
         currency_strength=currency_strength,
         portfolio_risk=portfolio_risk,
     )
-
-    # ⑦ トレードのライフサイクル管理（エントリー/決済の追跡）
-    trade_update = update_trades(results, now)
-    if trade_update["newly_opened"]:
-        print(f"\n[TRADE] 新規エントリー {len(trade_update['newly_opened'])}件:")
-        for t in trade_update["newly_opened"]:
-            print(f"  + {t['pair']} {t['direction']} @ {t['entry_price']} "
-                  f"(SL:{t.get('sl')} TP1:{t.get('tp1')})")
-    if trade_update["newly_closed"]:
-        print(f"[TRADE] 決済 {len(trade_update['newly_closed'])}件:")
-        for t in trade_update["newly_closed"]:
-            print(f"  - {t['pair']} {t['direction']} {t['result']} "
-                  f"({t['exit_reason']}) {t.get('pips',0):+.4f} "
-                  f"保有{t.get('hold_hours',0)}h")
-    print(f"[TRADE] 現在保有中: {trade_update['still_open']}件")
 
     # 9. HTMLレポート
     html = generate_html_report(

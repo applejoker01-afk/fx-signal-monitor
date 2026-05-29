@@ -147,6 +147,19 @@ def send_weekly_report(webhook_url: str):
         "inline": False,
     })
 
+    # ⑰ AI週次総括（ANTHROPIC_API_KEY設定時のみ）
+    try:
+        from modules.ai_commentary import generate_weekly_summary
+        ai_summary = generate_weekly_summary(stats)
+        if ai_summary:
+            fields.insert(0, {
+                "name": "🤖 AI週次総括",
+                "value": ai_summary[:1024],
+                "inline": False,
+            })
+    except Exception as e:
+        print(f"[WARN] AI weekly summary skipped: {e}")
+
     embeds = [{
         "title": f"📊 週次トレードレポート {week_start}〜{week_end}",
         "description": f"先週の決済トレード勝率: **{win_rate}%** ({wins}勝{losses}敗 / 計{total}件)",
