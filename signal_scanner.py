@@ -37,6 +37,7 @@ from modules.performance_intelligence import (
     check_drawdown_alert, detect_market_regime,
 )
 from modules.ai_commentary import generate_market_commentary
+from modules.ambush_alert import evaluate_ambush, collect_ambush_alerts
 
 PAGES_URL = "https://applejoker01-afk.github.io/fx-signal-monitor/"
 
@@ -325,7 +326,7 @@ def stars_to_text(n):
 def send_discord(webhook_url, newly, upgraded, is_first, all_results,
                  sentiment, currency_strength=None, portfolio_risk=None,
                  trade_update=None, open_trades=None,
-                 drawdown=None, ai_commentary=None):
+                 drawdown=None, ai_commentary=None, ambush_alerts=None):
     if not webhook_url:
         print("[INFO] Discord webhook not configured")
         return False
@@ -372,6 +373,36 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results,
             "value": ai_commentary[:1024],
             "inline": False
         })
+
+    # 🎯 待ち伏せアラート（高確度ゾーン・最重要）
+    if ambush_alerts and ambush_alerts.get("high_confidence"):
+        lines = []
+        for a in ambush_alerts["high_confidence"][:5]:
+            n = a["nearest"]
+            lines.append(
+                f"{'★'*a['stars']} {a['label']} {a['direction']}\n"
+                f"  {n['role']}({n['price']}) あと{n['distance_pct']:.2f}% — {a['quality']}"
+            )
+        embeds[0]["fields"].append({
+            "name": "🎯 高確度ゾーン到達（待ち伏せ）",
+            "value": "\n".join(lines),
+            "inline": False
+        })
+
+    # 🎯 POI接近中（シグナル未成立だが重要価格に近い）
+    if ambush_alerts and ambush_alerts.get("approaching"):
+        lines = []
+        for a in ambush_alerts["approaching"][:6]:
+            n = a["nearest"]
+            lines.append(
+                f"・{a['label']} {n['role']}({n['price']}) あと{n['distance_pct']:.2f}%"
+            )
+        if lines:
+            embeds[0]["fields"].append({
+                "name": "👀 重要価格に接近中（監視推奨）",
+                "value": "\n".join(lines),
+                "inline": False
+            })
 
     # ⑪ ドローダウン警告（重要なので上部に）
     if drawdown and drawdown.get("alert"):
@@ -1105,6 +1136,9 @@ def main():
             # ⑩ 自己学習による信頼度調整
             r = apply_performance_weighting(r, perf_map)
 
+            # 🎯 待ち伏せ型アラート（重要価格への接近を判定）
+            r = evaluate_ambush(r, prices, atr_threshold=0.5)
+
             results.append(r)
 
             regime = r.get("volatility_regime", {})
@@ -1188,6 +1222,16 @@ def main():
             market_regime = r.get("market_regime")
             break
 
+    # 🎯 待ち伏せアラート集約
+    ambush_alerts = collect_ambush_alerts(results)
+    if ambush_alerts["high_confidence"]:
+        print(f"\n[AMBUSH] 高確度ゾーン {len(ambush_alerts['high_confidence'])}件:")
+        for a in ambush_alerts["high_confidence"]:
+            print(f"  ★{a['stars']} {a['pair']} {a['direction']} "
+                  f"→ {a['nearest']['role']} あと{a['nearest']['distance_pct']:.2f}%")
+    if ambush_alerts["approaching"]:
+        print(f"[AMBUSH] POI接近中 {len(ambush_alerts['approaching'])}件")
+
     # ⑮ AI市況コメンタリー（ANTHROPIC_API_KEY設定時のみ）
     ai_commentary = None
     if newly or upgraded or (is_first and newly):
@@ -1199,7 +1243,8 @@ def main():
 
     # 7. 通知（トレード情報も同梱・決済が出たら必ず送信）
     has_trade_change = bool(trade_update.get("newly_opened") or trade_update.get("newly_closed"))
-    if newly or upgraded or (is_first and newly) or has_trade_change or drawdown.get("alert"):
+    has_ambush = bool(ambush_alerts.get("high_confidence"))
+    if newly or upgraded or (is_first and newly) or has_trade_change or drawdown.get("alert") or has_ambush:
         _wh = os.environ.get("DISCORD_WEBHOOK_URL", "")
         _wh = _wh.replace("discordapp.com", "discord.com")
         send_discord(
@@ -1210,6 +1255,7 @@ def main():
             open_trades=open_trades,
             drawdown=drawdown,
             ai_commentary=ai_commentary,
+            ambush_alerts=ambush_alerts,
         )
         send_email(
             os.environ.get("SMTP_HOST", "smtp.gmail.com"),
