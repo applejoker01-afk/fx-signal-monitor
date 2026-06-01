@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Currents FX · 15分足デイトレ反発モニター</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,500;1,600&family=JetBrains+Mono:wght@400;500;700&family=Shippori+Mincho:wght@500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-deep:#0a0e1a;--bg-surface:#111726;--bg-card:#141b2d;--bg-elev:#1a2235;
+  --border:#2a3450;--border-soft:#1f273d;
+  --text-primary:#e8edf7;--text-secondary:#9aa5b8;--text-muted:#5a6378;
+  --gold:#d4a574;--buy:#4ade80;--buy-bg:rgba(74,222,128,0.08);
+  --sell:#f87171;--sell-bg:rgba(248,113,113,0.08);
+  --caution:#fbbf24;--neutral:#94a3b8;
+  --display:'Cormorant Garamond','Shippori Mincho',serif;
+  --jp:'Zen Kaku Gothic New',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+  --jp-serif:'Shippori Mincho',serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg-deep);color:var(--text-primary);font-family:var(--jp);
+  line-height:1.6;min-height:100vh;
+  background-image:radial-gradient(circle at 15% 10%,rgba(212,165,116,0.04) 0%,transparent 40%),
+    radial-gradient(circle at 85% 80%,rgba(74,222,128,0.03) 0%,transparent 40%);}
+.container{max-width:1200px;margin:0 auto;padding:2rem;}
+.app-header{display:flex;justify-content:space-between;align-items:baseline;
+  padding-bottom:1rem;border-bottom:1px solid var(--border);margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;}
+.brand{display:flex;align-items:baseline;gap:1rem;}
+.brand-mark{font-family:var(--display);font-size:2rem;font-weight:600;font-style:italic;color:var(--gold);}
+.brand-sub{font-family:var(--jp-serif);font-size:0.78rem;color:var(--text-secondary);letter-spacing:0.12em;}
+.header-meta{font-family:var(--mono);font-size:0.75rem;color:var(--text-secondary);}
+.live{display:inline-block;padding:0.2rem 0.6rem;border-radius:3px;font-size:0.7rem;font-weight:700;
+  letter-spacing:0.08em;margin-right:0.5rem;}
+.live.on{background:var(--buy-bg);color:var(--buy);border:1px solid rgba(74,222,128,0.3);}
+.live.off{background:var(--sell-bg);color:var(--sell);border:1px solid rgba(248,113,113,0.3);}
+
+/* Control panel */
+.control-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:6px;
+  padding:1.2rem 1.5rem;margin-bottom:1.5rem;}
+.control-row{display:flex;gap:1rem;align-items:center;flex-wrap:wrap;margin-bottom:0.8rem;}
+.control-row:last-child{margin-bottom:0;}
+.control-label{font-family:var(--mono);font-size:0.75rem;color:var(--text-muted);
+  text-transform:uppercase;letter-spacing:0.08em;min-width:130px;}
+.input-field{background:var(--bg-elev);border:1px solid var(--border);border-radius:4px;
+  color:var(--text-primary);font-family:var(--mono);font-size:0.82rem;padding:0.5rem 0.8rem;flex:1;min-width:200px;}
+.input-field:focus{outline:none;border-color:var(--gold);}
+.btn{font-family:var(--jp);font-size:0.85rem;font-weight:600;padding:0.55rem 1.4rem;border-radius:4px;
+  border:1px solid var(--border);cursor:pointer;transition:all 0.15s;background:var(--bg-elev);color:var(--text-primary);}
+.btn:hover{border-color:var(--gold);color:var(--gold);}
+.btn.primary{background:var(--buy-bg);color:var(--buy);border-color:rgba(74,222,128,0.4);}
+.btn.primary:hover{background:rgba(74,222,128,0.15);}
+.btn.danger{background:var(--sell-bg);color:var(--sell);border-color:rgba(248,113,113,0.4);}
+
+/* Status bar */
+.status-bar{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.5rem;}
+.status-chip{background:var(--bg-card);border:1px solid var(--border);border-radius:4px;
+  padding:0.6rem 1rem;font-family:var(--mono);font-size:0.78rem;flex:1;min-width:140px;}
+.status-chip .k{color:var(--text-muted);font-size:0.66rem;text-transform:uppercase;display:block;margin-bottom:0.2rem;}
+.status-chip .v{color:var(--text-primary);font-size:1.1rem;font-weight:600;}
+
+/* Pair grid */
+.section-head{display:flex;align-items:baseline;gap:1rem;margin:1.5rem 0 1rem;
+  padding-bottom:0.6rem;border-bottom:1px solid var(--border-soft);}
+.section-num{font-family:var(--display);font-style:italic;font-size:1.6rem;color:var(--gold);line-height:1;}
+.section-title{font-family:var(--jp-serif);font-size:1.1rem;font-weight:600;}
+.pair-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:1rem;}
+.pair-card{background:var(--bg-card);border:1px solid var(--border);border-radius:6px;padding:1.1rem 1.3rem;
+  transition:border-color 0.2s;}
+.pair-card.signal-long{border-color:rgba(74,222,128,0.5);box-shadow:0 0 16px rgba(74,222,128,0.1);}
+.pair-card.signal-short{border-color:rgba(248,113,113,0.5);box-shadow:0 0 16px rgba(248,113,113,0.1);}
+.pair-card.watching{border-color:rgba(251,191,36,0.3);}
+.pair-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:0.6rem;}
+.pair-name{font-family:var(--display);font-style:italic;font-size:1.3rem;font-weight:600;}
+.pair-price{font-family:var(--mono);font-size:1.05rem;color:var(--gold);}
+.pair-meta{font-family:var(--mono);font-size:0.72rem;color:var(--text-secondary);line-height:1.7;}
+.pair-state{margin-top:0.6rem;padding-top:0.6rem;border-top:1px solid var(--border-soft);
+  font-family:var(--mono);font-size:0.78rem;}
+.state-tag{display:inline-block;padding:0.15rem 0.5rem;border-radius:3px;font-size:0.68rem;font-weight:700;
+  letter-spacing:0.05em;margin-right:0.4rem;}
+.tag-long{background:var(--buy-bg);color:var(--buy);}
+.tag-short{background:var(--sell-bg);color:var(--sell);}
+.tag-watch{background:rgba(251,191,36,0.12);color:var(--caution);}
+.tag-idle{background:var(--bg-elev);color:var(--text-muted);}
+.plan-line{font-size:0.72rem;color:var(--text-secondary);margin-top:0.3rem;}
+
+/* Log */
+.log-box{background:var(--bg-card);border:1px solid var(--border);border-radius:6px;
+  padding:1rem 1.3rem;max-height:300px;overflow-y:auto;font-family:var(--mono);font-size:0.76rem;}
+.log-entry{padding:0.3rem 0;border-bottom:1px solid var(--border-soft);color:var(--text-secondary);}
+.log-entry:last-child{border-bottom:none;}
+.log-entry .ts{color:var(--text-muted);margin-right:0.6rem;}
+.log-entry.fire{color:var(--buy);font-weight:600;}
+.log-entry.err{color:var(--sell);}
+
+.footer{margin-top:2rem;padding-top:1rem;border-top:1px solid var(--border);
+  font-family:var(--mono);font-size:0.72rem;color:var(--text-muted);text-align:center;}
+.disclaimer{margin-top:0.5rem;color:var(--text-muted);font-size:0.7rem;}
+a{color:var(--gold);}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header class="app-header">
+    <div class="brand">
+      <span class="brand-mark">Currents</span>
+      <span class="brand-sub">15分足 デイトレ反発モニター · M15 AMBUSH</span>
+    </div>
+    <div class="header-meta">
+      <span id="liveStatus" class="live off">● 停止中</span>
+      <span id="lastUpdate">未取得</span>
+    </div>
+  </header>
+
+  <!-- 設定パネル -->
+  <div class="control-panel">
+    <div class="control-row">
+      <span class="control-label">Discord Webhook</span>
+      <input id="webhookUrl" class="input-field" type="text"
+             placeholder="https://discord.com/api/webhooks/...（反発確定をスマホへ通知）">
+    </div>
+    <div class="control-row">
+      <span class="control-label">更新間隔</span>
+      <select id="interval" class="input-field" style="flex:0 0 auto;min-width:120px;">
+        <option value="300">5分ごと</option>
+        <option value="600">10分ごと</option>
+        <option value="900" selected>15分ごと</option>
+      </select>
+      <button id="startBtn" class="btn primary">監視開始</button>
+      <button id="stopBtn" class="btn danger" disabled>停止</button>
+      <button id="testBtn" class="btn">通知テスト</button>
+      <button id="soundBtn" class="btn">🔔 音ON</button>
+    </div>
+  </div>
+
+  <!-- ステータス -->
+  <div class="status-bar">
+    <div class="status-chip"><span class="k">監視ペア</span><span class="v" id="statPairs">6</span></div>
+    <div class="status-chip"><span class="k">本日の発火</span><span class="v" id="statFires">0</span></div>
+    <div class="status-chip"><span class="k">監視中（接近）</span><span class="v" id="statWatch">0</span></div>
+    <div class="status-chip"><span class="k">次回更新まで</span><span class="v" id="statCountdown">--</span></div>
+  </div>
+
+  <!-- ペアカード -->
+  <div class="section-head">
+    <div class="section-num">I.</div>
+    <h2 class="section-title">通貨ペア監視状況</h2>
+  </div>
+  <div class="pair-grid" id="pairGrid"></div>
+
+  <!-- ログ -->
+  <div class="section-head">
+    <div class="section-num">II.</div>
+    <h2 class="section-title">イベントログ</h2>
+  </div>
+  <div class="log-box" id="logBox"></div>
+
+  <footer class="footer">
+    <em style="font-family:var(--display);font-style:italic;color:var(--gold);">Currents</em>
+    · M15 Ambush Monitor · 反発確定シグナル · Yahoo Finance 15分足
+    <div class="disclaimer">
+      本ツールは教育・研究目的です。反発は確定後も突き抜ける（ダマシ）ことがあります。<br>
+      最終的な投資判断はご自身の責任で行ってください。PCを起動しブラウザを開いている間のみ動作します。
+    </div>
+  </footer>
+
+</div>
+
+<script>
+// ============================================================
+// 設定
+// ============================================================
+const PAIRS = [
+  { key: "USDJPY", label: "USD/JPY", yahoo: "USDJPY=X", decimals: 2 },
+  { key: "EURUSD", label: "EUR/USD", yahoo: "EURUSD=X", decimals: 5 },
+  { key: "GBPJPY", label: "GBP/JPY", yahoo: "GBPJPY=X", decimals: 2 },
+  { key: "AUDJPY", label: "AUD/JPY", yahoo: "AUDJPY=X", decimals: 2 },
+  { key: "EURJPY", label: "EUR/JPY", yahoo: "EURJPY=X", decimals: 2 },
+  { key: "AUDUSD", label: "AUD/USD", yahoo: "AUDUSD=X", decimals: 5 },
+];
+
+// CORSプロキシ候補（順に試す）。直接 → プロキシの順。
+const FETCH_STRATEGIES = [
+  (url) => url, // 直接（通れば最良）
+  (url) => "https://corsproxy.io/?url=" + encodeURIComponent(url),
+  (url) => "https://api.allorigins.win/raw?url=" + encodeURIComponent(url),
+];
+
+// 状態
+let timer = null;
+let countdownTimer = null;
+let secondsLeft = 0;
+let soundOn = false;
+let fireCount = 0;
+const pairState = {}; // key -> { phase: 'idle'|'watching'|'fired', lastSignalTime }
+
+// ============================================================
+// テクニカル計算
+// ============================================================
+function ema(arr, period) {
+  if (arr.length < period) return null;
+  const k = 2 / (period + 1);
+  let e = arr.slice(0, period).reduce((a, b) => a + b, 0) / period;
+  for (let i = period; i < arr.length; i++) e = arr[i] * k + e * (1 - k);
+  return e;
+}
+function atr(highs, lows, closes, period = 14) {
+  if (closes.length < period + 1) return null;
+  const tr = [];
+  for (let i = 1; i < closes.length; i++) {
+    tr.push(Math.max(
+      highs[i] - lows[i],
+      Math.abs(highs[i] - closes[i-1]),
+      Math.abs(lows[i] - closes[i-1])
+    ));
+  }
+  let a = tr.slice(0, period).reduce((x, y) => x + y, 0) / period;
+  for (let i = period; i < tr.length; i++) a = (a * (period - 1) + tr[i]) / period;
+  return a;
+}
+function pivot(h, l, c) {
+  const pp = (h + l + c) / 3;
+  return { pp, r1: 2*pp - l, s1: 2*pp - h, r2: pp + (h-l), s2: pp - (h-l) };
+}
+
+// ============================================================
+// POIと反発確定の判定
+// ============================================================
+function buildPOIs(closes, highs, lows) {
+  const price = closes[closes.length - 1];
+  const pois = [];
+  const e50 = ema(closes, 50);
+  const e200 = ema(closes, 200);
+  if (e50) pois.push({ type: "50EMA", price: e50, kind: price > e50 ? "support" : "resistance" });
+  if (e200) pois.push({ type: "200EMA", price: e200, kind: price > e200 ? "support" : "resistance" });
+  // 前日相当（直近96本=約1日分の高安）
+  const n = Math.min(96, closes.length);
+  const dayHigh = Math.max(...highs.slice(-n));
+  const dayLow = Math.min(...lows.slice(-n));
+  const piv = pivot(dayHigh, dayLow, price);
+  pois.push({ type: "PP", price: piv.pp, kind: piv.pp < price ? "support" : "resistance" });
+  pois.push({ type: "R1", price: piv.r1, kind: "resistance" });
+  pois.push({ type: "S1", price: piv.s1, kind: "support" });
+  pois.push({ type: "前日高値", price: dayHigh, kind: "resistance" });
+  pois.push({ type: "前日安値", price: dayLow, kind: "support" });
+  return pois;
+}
+
+// 反発確定の判定（核心ロジック）
+function detectReversal(closes, highs, lows, atrVal) {
+  if (closes.length < 3 || !atrVal) return null;
+  const price = closes[closes.length - 1];
+  const prevClose = closes[closes.length - 2];
+  const lastHigh = highs[highs.length - 1];
+  const lastLow = lows[lows.length - 1];
+  const pois = buildPOIs(closes, highs, lows);
+  const touchZone = atrVal * 0.5; // タッチ判定の許容幅
+
+  for (const poi of pois) {
+    if (poi.kind === "support") {
+      // サポートでの反発ロング確定:
+      // 直近足の安値がPOIにタッチ AND 終値がPOIより上で確定 AND 陽線（反発）
+      const touched = lastLow <= poi.price + touchZone && lastLow >= poi.price - touchZone;
+      const closedAbove = price > poi.price;
+      const bullish = price > prevClose; // 直近足が上昇（反発）
+      if (touched && closedAbove && bullish) {
+        return makePlan("LONG", poi, price, atrVal);
+      }
+    } else {
+      // レジスタンスでの反落ショート確定
+      const touched = lastHigh >= poi.price - touchZone && lastHigh <= poi.price + touchZone;
+      const closedBelow = price < poi.price;
+      const bearish = price < prevClose;
+      if (touched && closedBelow && bearish) {
+        return makePlan("SHORT", poi, price, atrVal);
+      }
+    }
+  }
+  return null;
+}
+
+// 接近のみ（発火前の監視状態）判定
+function detectApproach(closes, highs, lows, atrVal) {
+  if (!atrVal) return null;
+  const price = closes[closes.length - 1];
+  const pois = buildPOIs(closes, highs, lows);
+  const zone = atrVal * 0.5;
+  let nearest = null, minDist = Infinity;
+  for (const poi of pois) {
+    const d = Math.abs(price - poi.price);
+    if (d <= zone && d < minDist) { minDist = d; nearest = poi; }
+  }
+  if (!nearest) return null;
+  return { poi: nearest, distPct: minDist / price * 100 };
+}
+
+function makePlan(direction, poi, price, atrVal) {
+  const slMult = 1.5, tpMults = [1.5, 3.0, 5.0];
+  const entry = price;
+  let sl, tp1, tp2, tp3;
+  if (direction === "LONG") {
+    sl = poi.price - atrVal * slMult;
+    tp1 = entry + atrVal * tpMults[0];
+    tp2 = entry + atrVal * tpMults[1];
+    tp3 = entry + atrVal * tpMults[2];
+  } else {
+    sl = poi.price + atrVal * slMult;
+    tp1 = entry - atrVal * tpMults[0];
+    tp2 = entry - atrVal * tpMults[1];
+    tp3 = entry - atrVal * tpMults[2];
+  }
+  return { direction, poi, entry, sl, tp1, tp2, tp3 };
+}
+
+// ============================================================
+// データ取得（Yahoo 15分足・複数戦略でフォールバック）
+// ============================================================
+async function fetchM15(pair) {
+  const base = `https://query1.finance.yahoo.com/v8/finance/chart/${pair.yahoo}?interval=15m&range=5d`;
+  for (const strat of FETCH_STRATEGIES) {
+    try {
+      const res = await fetch(strat(base), { cache: "no-store" });
+      if (!res.ok) continue;
+      const data = await res.json();
+      const r = data.chart.result[0];
+      const q = r.indicators.quote[0];
+      const closes = [], highs = [], lows = [];
+      for (let i = 0; i < q.close.length; i++) {
+        if (q.close[i] != null) {
+          closes.push(q.close[i]);
+          highs.push(q.high[i] ?? q.close[i]);
+          lows.push(q.low[i] ?? q.close[i]);
+        }
+      }
+      if (closes.length >= 50) return { closes, highs, lows };
+    } catch (e) { /* 次の戦略へ */ }
+  }
+  // 全戦略失敗 → GitHub Pagesのフォールバックを試す
+  try {
+    const res = await fetch(`./m15_${pair.key}.json`, { cache: "no-store" });
+    if (res.ok) {
+      const d = await res.json();
+      if (d.closes && d.closes.length >= 50) return d;
+    }
+  } catch (e) {}
+  return null;
+}
+
+// ============================================================
+// メイン監視ループ
+// ============================================================
+async function scanAll() {
+  log("スキャン開始...");
+  let watchCount = 0;
+  for (const pair of PAIRS) {
+    try {
+      const m = await fetchM15(pair);
+      if (!m) { setPairCard(pair, { error: true }); log(`${pair.label} 取得失敗`, "err"); continue; }
+
+      const atrVal = atr(m.highs, m.lows, m.closes);
+      const price = m.closes[m.closes.length - 1];
+      const e50 = ema(m.closes, 50);
+      const e200 = ema(m.closes, 200);
+
+      // 反発確定の判定
+      const reversal = detectReversal(m.closes, m.highs, m.lows, atrVal);
+      const approach = detectApproach(m.closes, m.highs, m.lows, atrVal);
+
+      const st = pairState[pair.key] || { phase: "idle", lastSignalTime: 0 };
+
+      if (reversal) {
+        // 同じシグナルの連続発火を防ぐ（1時間クールダウン）
+        const now = Date.now();
+        if (now - st.lastSignalTime > 3600 * 1000 || st.phase !== "fired") {
+          fireSignal(pair, reversal, price, atrVal, e50, e200);
+          st.phase = "fired";
+          st.lastSignalTime = now;
+        }
+        setPairCard(pair, { price, atrVal, e50, e200, reversal });
+      } else if (approach) {
+        st.phase = "watching";
+        watchCount++;
+        setPairCard(pair, { price, atrVal, e50, e200, approach });
+      } else {
+        st.phase = "idle";
+        setPairCard(pair, { price, atrVal, e50, e200 });
+      }
+      pairState[pair.key] = st;
+
+    } catch (e) {
+      log(`${pair.label} エラー: ${e.message}`, "err");
+    }
+    await new Promise(r => setTimeout(r, 300)); // レート制限対策
+  }
+  document.getElementById("statWatch").textContent = watchCount;
+  document.getElementById("lastUpdate").textContent =
+    "更新: " + new Date().toLocaleTimeString("ja-JP");
+  log("スキャン完了");
+}
+
+// ============================================================
+// 発火処理（通知）
+// ============================================================
+function fireSignal(pair, plan, price, atrVal, e50, e200) {
+  fireCount++;
+  document.getElementById("statFires").textContent = fireCount;
+  const d = pair.decimals;
+  const dirLabel = plan.direction === "LONG" ? "🟢 ロング（反発確定）" : "🔴 ショート（反落確定）";
+  const msg =
+    `${dirLabel}\n` +
+    `${pair.label} @ ${price.toFixed(d)}\n` +
+    `${plan.poi.type}(${plan.poi.price.toFixed(d)})で反発確定\n` +
+    `SL:${plan.sl.toFixed(d)} / TP1:${plan.tp1.toFixed(d)} / TP2:${plan.tp2.toFixed(d)} / TP3:${plan.tp3.toFixed(d)}`;
+
+  log(`🎯 発火 ${pair.label} ${plan.direction} @ ${price.toFixed(d)} (${plan.poi.type})`, "fire");
+
+  // ブラウザ通知
+  if (Notification.permission === "granted") {
+    new Notification(`🎯 ${pair.label} ${plan.direction} 反発確定`, {
+      body: `${plan.poi.type}で反発 @ ${price.toFixed(d)}\nSL:${plan.sl.toFixed(d)} TP1:${plan.tp1.toFixed(d)}`,
+    });
+  }
+  // 音
+  if (soundOn) playBeep();
+  // Discord
+  sendDiscord(pair, plan, price);
+}
+
+function playBeep() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.frequency.value = 880; o.type = "sine";
+    g.gain.setValueAtTime(0.3, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+    o.start(); o.stop(ctx.currentTime + 0.5);
+  } catch (e) {}
+}
+
+async function sendDiscord(pair, plan, price) {
+  let url = document.getElementById("webhookUrl").value.trim();
+  if (!url) return;
+  url = url.replace("discordapp.com", "discord.com");
+  const d = pair.decimals;
+  const color = plan.direction === "LONG" ? 0x4ade80 : 0xf87171;
+  const dirJp = plan.direction === "LONG" ? "ロング（反発確定）" : "ショート（反落確定）";
+  const embed = {
+    title: `🎯 ${pair.label} ${dirJp}`,
+    color: color,
+    description:
+      `**${plan.poi.type}**(${plan.poi.price.toFixed(d)})で反発確定\n` +
+      `エントリー: **${price.toFixed(d)}**\n` +
+      `SL: ${plan.sl.toFixed(d)} / TP1: ${plan.tp1.toFixed(d)} / TP2: ${plan.tp2.toFixed(d)} / TP3: ${plan.tp3.toFixed(d)}`,
+    footer: { text: `Currents M15 Ambush · ${new Date().toLocaleString("ja-JP")}` },
+  };
+  try {
+    await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ embeds: [embed] }),
+    });
+    log(`Discord通知送信: ${pair.label}`, "fire");
+  } catch (e) {
+    log(`Discord送信失敗: ${e.message}`, "err");
+  }
+}
+
+// ============================================================
+// UI描画
+// ============================================================
+function setPairCard(pair, info) {
+  let card = document.getElementById("card-" + pair.key);
+  const d = pair.decimals;
+  let cls = "pair-card", stateHtml = "";
+
+  if (info.error) {
+    stateHtml = `<span class="state-tag tag-idle">取得失敗</span>`;
+  } else if (info.reversal) {
+    const p = info.reversal;
+    cls += p.direction === "LONG" ? " signal-long" : " signal-short";
+    const tag = p.direction === "LONG" ? "tag-long" : "tag-short";
+    const dirJp = p.direction === "LONG" ? "🟢 反発ロング" : "🔴 反落ショート";
+    stateHtml = `<span class="state-tag ${tag}">${dirJp}</span>確定<br>
+      <div class="plan-line">${p.poi.type}(${p.poi.price.toFixed(d)})で反発<br>
+      SL:${p.sl.toFixed(d)} / TP1:${p.tp1.toFixed(d)} / TP2:${p.tp2.toFixed(d)} / TP3:${p.tp3.toFixed(d)}</div>`;
+  } else if (info.approach) {
+    cls += " watching";
+    const a = info.approach;
+    stateHtml = `<span class="state-tag tag-watch">👀 監視中</span>
+      ${a.poi.type}(${a.poi.price.toFixed(d)}) あと${a.distPct.toFixed(2)}%<br>
+      <div class="plan-line">反発を待機中…確定で発火します</div>`;
+  } else {
+    stateHtml = `<span class="state-tag tag-idle">待機</span>重要価格から離れています`;
+  }
+
+  const metaHtml = info.price ?
+    `現在: ${info.price.toFixed(d)}　ATR: ${info.atrVal ? info.atrVal.toFixed(d) : "—"}<br>
+     50EMA: ${info.e50 ? info.e50.toFixed(d) : "—"}　200EMA: ${info.e200 ? info.e200.toFixed(d) : "—"}` : "—";
+
+  const html = `
+    <div class="pair-top">
+      <span class="pair-name">${pair.label}</span>
+      <span class="pair-price">${info.price ? info.price.toFixed(d) : "—"}</span>
+    </div>
+    <div class="pair-meta">${metaHtml}</div>
+    <div class="pair-state">${stateHtml}</div>`;
+
+  if (!card) {
+    card = document.createElement("div");
+    card.id = "card-" + pair.key;
+    document.getElementById("pairGrid").appendChild(card);
+  }
+  card.className = cls;
+  card.innerHTML = html;
+}
+
+function log(msg, type = "") {
+  const box = document.getElementById("logBox");
+  const e = document.createElement("div");
+  e.className = "log-entry " + type;
+  e.innerHTML = `<span class="ts">${new Date().toLocaleTimeString("ja-JP")}</span>${msg}`;
+  box.insertBefore(e, box.firstChild);
+  while (box.children.length > 50) box.removeChild(box.lastChild);
+}
+
+// ============================================================
+// 制御
+// ============================================================
+function start() {
+  const sec = parseInt(document.getElementById("interval").value);
+  document.getElementById("startBtn").disabled = true;
+  document.getElementById("stopBtn").disabled = false;
+  document.getElementById("liveStatus").className = "live on";
+  document.getElementById("liveStatus").textContent = "● 監視中";
+  if (Notification.permission === "default") Notification.requestPermission();
+  log(`監視開始（${sec/60}分間隔）`);
+  scanAll();
+  timer = setInterval(scanAll, sec * 1000);
+  secondsLeft = sec;
+  countdownTimer = setInterval(() => {
+    secondsLeft--;
+    if (secondsLeft < 0) secondsLeft = sec;
+    const m = Math.floor(secondsLeft / 60), s = secondsLeft % 60;
+    document.getElementById("statCountdown").textContent = `${m}:${String(s).padStart(2,"0")}`;
+  }, 1000);
+}
+function stop() {
+  clearInterval(timer); clearInterval(countdownTimer);
+  document.getElementById("startBtn").disabled = false;
+  document.getElementById("stopBtn").disabled = true;
+  document.getElementById("liveStatus").className = "live off";
+  document.getElementById("liveStatus").textContent = "● 停止中";
+  document.getElementById("statCountdown").textContent = "--";
+  log("監視停止");
+}
+
+document.getElementById("startBtn").onclick = start;
+document.getElementById("stopBtn").onclick = stop;
+document.getElementById("soundBtn").onclick = function() {
+  soundOn = !soundOn;
+  this.textContent = soundOn ? "🔔 音ON" : "🔕 音OFF";
+  if (soundOn) playBeep();
+};
+document.getElementById("testBtn").onclick = function() {
+  const testPair = PAIRS[0];
+  const plan = { direction: "LONG", poi: { type: "200EMA", price: 158.40 },
+    entry: 159.20, sl: 157.78, tp1: 159.83, tp2: 160.46, tp3: 161.30 };
+  log("通知テスト実行");
+  if (Notification.permission === "default") Notification.requestPermission();
+  fireSignal(testPair, plan, 159.20, 0.42, 158.9, 158.4);
+};
+
+// 初期カード描画
+PAIRS.forEach(p => setPairCard(p, {}));
+document.getElementById("statPairs").textContent = PAIRS.length;
+log("準備完了。Discord Webhookを入力して「監視開始」を押してください。");
+</script>
+</body>
+</html>

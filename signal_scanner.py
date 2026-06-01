@@ -404,16 +404,24 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results,
 
     # 🎯 POI接近中（シグナル未成立だが重要価格に近い）
     if ambush_alerts and ambush_alerts.get("approaching"):
+        held_pairs = set((open_trades or {}).keys())
         lines = []
         for a in ambush_alerts["approaching"][:6]:
             n = a["nearest"]
-            lines.append(
-                f"・{a['label']} {n['role']}({n['price']}) あと{n['distance_pct']:.2f}%"
-            )
+            plan = a.get("plan")
+            hold = " 📦保有中" if a["pair"] in held_pairs else ""
+            block = f"・{a['label']}{hold} | {n['role']}({n['price']}) あと{n['distance_pct']:.2f}%"
+            if plan:
+                block += (
+                    f"\n  → {plan['direction']} "
+                    f"SL:{plan['sl']} / TP1:{plan['tp1']} / TP2:{plan['tp2']} / TP3:{plan['tp3']} "
+                    f"(RR 1:{plan['rr1']}/1:{plan['rr2']}/1:{plan['rr3']})"
+                )
+            lines.append(block)
         if lines:
             embeds[0]["fields"].append({
-                "name": "👀 重要価格に接近中（監視推奨）",
-                "value": "\n".join(lines),
+                "name": "👀 重要価格に接近中（反発狙いの監視）",
+                "value": "\n\n".join(lines)[:1024],
                 "inline": False
             })
 

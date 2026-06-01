@@ -206,6 +206,69 @@ def evaluate_ambush(result, prices, atr_threshold=0.5):
     return result
 
 
+def calc_poi_trade_plan(poi, atr, sl_mult=1.5, tp_mults=(1.5, 3.0, 5.0)):
+    """
+    POI（重要価格）での反発を狙うトレードプランを算出。
+
+    考え方:
+      サポート系POI → 反発でロング（POIで買い、下にSL、上にTP）
+      レジスタンス系POI → 反落でショート（POIで売り、上にSL、下にTP）
+
+    Args:
+        poi: build_poi_levelsの1要素（price, kind を含む）
+        atr: そのペアのATR
+        sl_mult: SLのATR乗数（POIの外側へのバッファ。理論の1.5倍）
+        tp_mults: (TP1, TP2, TP3) のATR乗数
+
+    Returns:
+        {
+          "direction": "LONG" or "SHORT",
+          "entry": 159.50,   # POI価格（反発の起点）
+          "sl": 158.75,
+          "tp1": 160.25, "tp2": 161.0, "tp3": 161.75,
+          "rr1": 1.0, "rr2": 2.0, "rr3": 3.3,
+        }
+    """
+    if not atr or atr == 0:
+        return None
+
+    entry = poi["price"]
+    kind = poi.get("kind", "")
+
+    # pip精度（JPYクロスは2桁、その他5桁）
+    decimals = 2 if entry > 10 else 5
+
+    if kind == "support":
+        # 反発ロング: POIで買い、SLはPOIの下（ATR×1.5バッファ）
+        direction = "LONG（反発）"
+        sl = entry - atr * sl_mult
+        tp1 = entry + atr * tp_mults[0]
+        tp2 = entry + atr * tp_mults[1]
+        tp3 = entry + atr * tp_mults[2]
+    else:
+        # 反落ショート: POIで売り、SLはPOIの上
+        direction = "SHORT（反落）"
+        sl = entry + atr * sl_mult
+        tp1 = entry - atr * tp_mults[0]
+        tp2 = entry - atr * tp_mults[1]
+        tp3 = entry - atr * tp_mults[2]
+
+    sl_width = abs(entry - sl)
+    rr1 = round(abs(tp1 - entry) / sl_width, 1) if sl_width else 0
+    rr2 = round(abs(tp2 - entry) / sl_width, 1) if sl_width else 0
+    rr3 = round(abs(tp3 - entry) / sl_width, 1) if sl_width else 0
+
+    return {
+        "direction": direction,
+        "entry": round(entry, decimals),
+        "sl": round(sl, decimals),
+        "tp1": round(tp1, decimals),
+        "tp2": round(tp2, decimals),
+        "tp3": round(tp3, decimals),
+        "rr1": rr1, "rr2": rr2, "rr3": rr3,
+    }
+
+
 def collect_ambush_alerts(all_results):
     """
     全ペアから待ち伏せアラートを集約。
@@ -242,12 +305,14 @@ def collect_ambush_alerts(all_results):
             })
         else:
             # ★4未満でもPOI接近は「待ち伏せ候補」として拾う
+            plan = calc_poi_trade_plan(ambush["nearest"], r.get("atr"))
             approaching.append({
                 "pair": r["pair"],
                 "label": r.get("label", r["pair"]),
                 "price": r["price"],
                 "stars": r.get("stars", 0),
                 "nearest": ambush["nearest"],
+                "plan": plan,
             })
 
     # 重要度順
