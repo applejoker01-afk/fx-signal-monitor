@@ -376,16 +376,29 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results,
 
     # 🎯 待ち伏せアラート（高確度ゾーン・最重要）
     if ambush_alerts and ambush_alerts.get("high_confidence"):
+        held_pairs = set((open_trades or {}).keys())
         lines = []
         for a in ambush_alerts["high_confidence"][:5]:
             n = a["nearest"]
-            lines.append(
-                f"{'★'*a['stars']} {a['label']} {a['direction']}\n"
+            # 保有中か新規かを明示
+            if a["pair"] in held_pairs:
+                hold_tag = "📦保有中（追加せず継続推奨）"
+            else:
+                hold_tag = "🆕新規候補"
+            block = (
+                f"{'★'*a['stars']} {a['label']} {a['direction']} [{hold_tag}]\n"
                 f"  {n['role']}({n['price']}) あと{n['distance_pct']:.2f}% — {a['quality']}"
             )
+            # TP/SL目安を追加
+            if a.get("sl") is not None:
+                block += (
+                    f"\n  SL:{a.get('sl')} / TP1:{a.get('tp1')} / "
+                    f"TP2:{a.get('tp2')} / TP3:{a.get('tp3')}"
+                )
+            lines.append(block)
         embeds[0]["fields"].append({
             "name": "🎯 高確度ゾーン到達（待ち伏せ）",
-            "value": "\n".join(lines),
+            "value": "\n\n".join(lines)[:1024],
             "inline": False
         })
 

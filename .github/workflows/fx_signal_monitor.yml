@@ -26,7 +26,6 @@ jobs:
   scan:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -50,6 +49,7 @@ jobs:
           SMTP_PASS: ${{ secrets.SMTP_PASS }}
           MAIL_FROM: ${{ secrets.MAIL_FROM }}
           MAIL_TO:   ${{ secrets.MAIL_TO }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           # Obsidian Vault連携（任意。未設定でもスキャンは継続）
           OBSIDIAN_VAULT_PAT:   ${{ secrets.OBSIDIAN_VAULT_PAT }}
           OBSIDIAN_VAULT_OWNER: ${{ secrets.OBSIDIAN_VAULT_OWNER }}
@@ -61,7 +61,7 @@ jobs:
         run: |
           git config --local user.email "fx-monitor-bot@github-actions"
           git config --local user.name  "FX Monitor Bot"
-          git add docs/last_signals.json docs/index.html data/obsidian_cache.json 2>/dev/null || true
+          git add docs/last_signals.json docs/index.html data/ 2>/dev/null || true
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
@@ -87,7 +87,6 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-
     steps:
       - name: Deploy to GitHub Pages
         id: deployment

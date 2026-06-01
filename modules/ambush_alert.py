@@ -226,6 +226,7 @@ def collect_ambush_alerts(all_results):
             continue
 
         if r.get("high_confidence_zone"):
+            staged = r.get("staged_tp", {})
             high_confidence.append({
                 "pair": r["pair"],
                 "label": r.get("label", r["pair"]),
@@ -234,6 +235,10 @@ def collect_ambush_alerts(all_results):
                 "direction": r.get("direction", ""),
                 "nearest": ambush["nearest"],
                 "quality": r.get("ambush_quality", ""),
+                "sl": staged.get("sl"),
+                "tp1": staged.get("tp1"),
+                "tp2": staged.get("tp2"),
+                "tp3": staged.get("tp3"),
             })
         else:
             # ★4未満でもPOI接近は「待ち伏せ候補」として拾う
