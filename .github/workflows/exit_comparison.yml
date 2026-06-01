@@ -1,0 +1,29 @@
+name: Exit Strategy Comparison
+
+on:
+  workflow_dispatch:
+    inputs:
+      lookback_days:
+        description: '検証対象日数'
+        required: false
+        default: '200'
+
+permissions:
+  contents: read
+
+jobs:
+  compare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install pyyaml
+      - name: Run exit strategy comparison
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          BACKTEST_DAYS: ${{ github.event.inputs.lookback_days || '200' }}
+        run: python run_exit_comparison.py
