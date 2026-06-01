@@ -356,7 +356,27 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results,
         else:
             color = 0xFBBF24
     else:
-        return False
+        # シグナル変化はないが、待ち伏せ・トレード・ドローダウンのいずれかで呼ばれたケース
+        has_ambush_now = bool(ambush_alerts and ambush_alerts.get("high_confidence"))
+        has_trade_now = bool(trade_update and (trade_update.get("newly_opened") or trade_update.get("newly_closed")))
+        has_dd_now = bool(drawdown and drawdown.get("alert"))
+
+        if has_ambush_now:
+            title = f"{risk_emoji} 🎯 待ち伏せシグナル発火"
+            n_amb = len(ambush_alerts.get("high_confidence", []))
+            desc = f"高確度ゾーン到達: **{n_amb}件** / 市場モード: **{risk_mode.upper()}**"
+            color = 0x4ADE80
+        elif has_trade_now:
+            title = f"{risk_emoji} 💼 トレード更新"
+            desc = f"市場モード: **{risk_mode.upper()}**"
+            color = 0xD4A574
+        elif has_dd_now:
+            title = f"🛑 ドローダウン警告"
+            desc = drawdown.get("message", "連敗を検知しました")
+            color = 0xF87171
+        else:
+            # 本当に何もない場合のみ送信しない
+            return False
 
     embeds = [{
         "title": title, "description": desc, "color": color,
