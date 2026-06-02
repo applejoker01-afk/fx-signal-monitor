@@ -144,11 +144,11 @@ a{color:var(--gold);}
   </div>
   <div class="input-card">
     <div class="input-hint">
-      証券会社の約定履歴を貼り付けてください。以下の形式に対応します（複数取引まとめてOK）:<br>
-      ・6行形式: 日時 / 通貨ペア / 新規or決済 / 売or買 / 約定価格 / 数量（改行区切り）<br>
-      ・CSV: 日時,通貨ペア,新規or決済,売or買,約定価格,数量<br>
-      ・タブ区切り: 同上をタブ区切り<br>
-      例) 2026/06/03 03:01:16　ユーロ-ポンド　新規　売　0.86335　100
+      証券会社の<strong>約定履歴</strong>または<strong>建玉サマリー</strong>を貼り付けてください（自動判別）。<br>
+      ▼ 約定履歴（取引の記録として蓄積）<br>
+      ・6行形式 / CSV / タブ区切り: 日時・通貨ペア・新規or決済・売or買・約定価格・数量<br>
+      ▼ 建玉サマリー（現在の保有を更新・証券会社の現在値を使用）<br>
+      ・「平均建単価・数量・現在値」を含む保有一覧をそのまま貼り付けOK
     </div>
     <textarea id="pasteArea" class="paste" placeholder="ここに約定履歴を貼り付け…"></textarea>
     <div class="btn-row">
@@ -243,7 +243,8 @@ function yahooSymbol(pair){ return pair + "=X"; }
 // ============================================================
 let fills = [];   // 約定の生データ [{dt, pair, kind:'open'|'close', side:'buy'|'sell', price, qty}]
 let trades = [];  // ペアリング済みトレード
-let slModes = {}; // tradeId -> 'OCO' | 'TRAIL'
+let holdings = []; // 建玉サマリー由来の現在保有 [{pair,direction,avg_price,qty,cur_price,updated}]
+let slModes = {}; // tradeId/holdingId -> 'OCO' | 'TRAIL'
 let priceCache = {}; // pair -> 現在価格
 let signalCache = {}; // pair -> last_signals.jsonの該当ペアデータ
 let signalTimestamp = null;
@@ -255,7 +256,7 @@ const STORE_KEY = "currents_position_manager_v1";
 
 async function saveData(){
   try{
-    await window.storage.set(STORE_KEY, JSON.stringify({ fills, slModes }), false);
+    await window.storage.set(STORE_KEY, JSON.stringify({ fills, slModes, holdings }), false);
   }catch(e){ console.error("save failed", e); }
 }
 async function loadData(){
@@ -265,6 +266,7 @@ async function loadData(){
       const d = JSON.parse(r.value);
       fills = d.fills || [];
       slModes = d.slModes || {};
+      holdings = d.holdings || [];
     }
   }catch(e){ /* 初回は無し */ }
 }
@@ -317,6 +319,66 @@ function buildFill(dtRaw, pairRaw, kindRaw, sideRaw, priceRaw, qtyRaw){
       dt: dtRaw.trim(), pair, kind, side, price, qty,
     };
   }catch(e){ return null; }
+}
+
+// ============================================================
+// 建玉サマリーのパース（証券会社の保有ポジション一覧）
+// 各ポジション: 通貨ペア → 買/売 → 平均建単価 → 数量 → (注文中) → 現在値 → ...
+// ============================================================
+function isNumberToken(s){
+  return /^[+\-]?[\d,]+\.?\d*$/.test(s.trim());
+}
+function parseHoldings(text){
+  const lines = text.split("\n")
+    .map(l => l.trim().replace(/^\*+/, "").trim())
+    .filter(l => l.length > 0);
+  const parsed = [];
+  let i = 0;
+  while(i < lines.length){
+    const pair = normalizePair(lines[i]);
+    // 既知ペアに正規化できた行を起点にする
+    const knownPair = Object.values(PAIR_ALIASES).includes(pair);
+    if(knownPair){
+      // 建区分（買/売）を直後数行から探す
+      let side = null, j = i + 1;
+      while(j < lines.length && j < i + 4){
+        if(lines[j] === "買" || lines[j] === "売"){
+          side = lines[j] === "売" ? "sell" : "buy";
+          break;
+        }
+        j++;
+      }
+      if(side === null){ i++; continue; }
+      // 建区分の次から数値を3つ集める（建単価・数量・現在値）。(注文中)は除外
+      const nums = [];
+      let k = j + 1;
+      while(k < lines.length && nums.length < 3){
+        const t = lines[k];
+        if(t.startsWith("(") && t.endsWith(")")){ k++; continue; }
+        if(isNumberToken(t)){ nums.push(parseFloat(t.replace(/,/g,""))); }
+        else if(Object.values(PAIR_ALIASES).includes(normalizePair(t))){ break; } // 次のペアに到達
+        k++;
+      }
+      if(nums.length >= 3){
+        parsed.push({
+          id: `H_${pair}_${side}`,
+          pair, side,
+          direction: side === "buy" ? "LONG" : "SHORT",
+          avg_price: nums[0], qty: nums[1], cur_price: nums[2],
+          updated: new Date().toISOString(),
+        });
+        i = k;
+      } else { i++; }
+    } else {
+      i++;
+    }
+  }
+  return parsed;
+}
+
+// 建玉サマリーが貼られたか判定（「建区分」「平均建単価」「決済売」などの特徴語）
+function looksLikeHoldings(text){
+  return /平均建単価|建区分|評価損益|決済売|決済買/.test(text);
 }
 
 // ============================================================
@@ -503,13 +565,25 @@ async function refreshPrices(){
 // ============================================================
 function render(){
   const built = buildTrades();
-  renderSummary(built);
-  renderOpen(built.open);
+  // 建玉サマリーがあればそれを保有として優先（証券会社の現在値付き）
+  // なければ約定履歴から計算した保有を使う
+  let openPositions;
+  if(holdings.length > 0){
+    openPositions = holdings.map(h => ({
+      id: h.id, pair: h.pair, direction: h.direction,
+      entryDt: "建玉サマリー", entryPrice: h.avg_price, qty: h.qty,
+      brokerCurPrice: h.cur_price, fromHoldings: true,
+    }));
+  } else {
+    openPositions = built.open;
+  }
+  renderSummary(built, openPositions);
+  renderOpen(openPositions);
   renderClosed(built.closed);
   renderAnalysis(built.closed);
 }
 
-function renderSummary(built){
+function renderSummary(built, openPositions){
   const closed = built.closed;
   const total = closed.length;
   const wins = closed.filter(t => t.result === "WIN").length;
@@ -520,13 +594,25 @@ function renderSummary(built){
   const grossLoss = Math.abs(closed.filter(t=>t.pips<0).reduce((s,t)=>s+t.pips,0));
   const pf = grossLoss > 0 ? (grossWin/grossLoss).toFixed(2) : "—";
 
+  // 保有中の含み損益合計（建玉の現在値ベース）
+  let openPips = 0;
+  (openPositions||[]).forEach(p => {
+    const cur = p.brokerCurPrice != null ? p.brokerCurPrice : priceCache[p.pair];
+    if(cur != null){
+      const pf2 = pairPipFactor(p.pair);
+      const diff = p.direction==="LONG" ? (cur - p.entryPrice) : (p.entryPrice - cur);
+      openPips += diff * pf2;
+    }
+  });
+
   const chips = [
     { k:"決済トレード", v:total, cls:"" },
     { k:"勝率", v:winRate+"%", cls: parseFloat(winRate)>=50?"pos":"neg" },
     { k:"勝/負", v:`${wins}/${losses}`, cls:"" },
-    { k:"累計pips", v:(totalPips>=0?"+":"")+totalPips.toFixed(1), cls: totalPips>=0?"pos":"neg" },
+    { k:"確定pips", v:(totalPips>=0?"+":"")+totalPips.toFixed(1), cls: totalPips>=0?"pos":"neg" },
     { k:"PF", v:pf, cls:"gold" },
-    { k:"保有中", v:built.open.length, cls:"" },
+    { k:"保有中", v:(openPositions||[]).length, cls:"" },
+    { k:"含み(pips)", v:(openPips>=0?"+":"")+openPips.toFixed(1), cls: openPips>=0?"pos":"neg" },
   ];
   document.getElementById("summaryGrid").innerHTML = chips.map(c =>
     `<div class="sum-chip"><span class="k">${c.k}</span><span class="v ${c.cls}">${c.v}</span></div>`
@@ -538,7 +624,8 @@ function renderOpen(open){
   if(!open.length){ grid.innerHTML = `<div class="empty">保有中のポジションはありません</div>`; return; }
   grid.innerHTML = open.map(pos => {
     const d = pairDecimals(pos.pair);
-    const cur = priceCache[pos.pair];
+    // 建玉サマリー由来なら証券会社の現在値を優先、なければYahoo価格
+    const cur = pos.brokerCurPrice != null ? pos.brokerCurPrice : priceCache[pos.pair];
     const tpsl = autoTPSL(pos);
     const mode = slModes[pos.id] || "OCO";
     let plHtml = `<div class="pl-detail">現在価格を更新すると含み損益を表示</div>`;
@@ -550,8 +637,9 @@ function renderOpen(open){
       const rawDiff = pos.direction === "LONG" ? (cur - pos.entryPrice) : (pos.entryPrice - cur);
       const pips = rawDiff * pf;
       plClass = pips >= 0 ? "pos" : "neg";
+      const srcTag = pos.brokerCurPrice != null ? "証券会社" : "Yahoo";
       plHtml = `<div class="pos-pl ${plClass}">${pips>=0?"+":""}${pips.toFixed(1)} pips</div>
-        <div class="pl-detail">現在 ${cur.toFixed(d)} / 建値 ${pos.entryPrice.toFixed(d)}</div>`;
+        <div class="pl-detail">現在 ${cur.toFixed(d)} (${srcTag}) / 建値 ${pos.entryPrice.toFixed(d)}</div>`;
 
       // TP/SLまでの距離
       const targets = [
@@ -720,20 +808,39 @@ function toast(msg){
 // ============================================================
 document.getElementById("parseBtn").onclick = async () => {
   const text = document.getElementById("pasteArea").value;
-  if(!text.trim()){ toast("約定履歴を貼り付けてください"); return; }
+  if(!text.trim()){ toast("データを貼り付けてください"); return; }
+
+  // 建玉サマリーか約定履歴かを自動判別
+  if(looksLikeHoldings(text)){
+    const parsedH = parseHoldings(text);
+    if(!parsedH.length){
+      document.getElementById("parseResult").textContent =
+        "建玉サマリーを認識しましたが解析できませんでした。形式を確認してください。";
+      return;
+    }
+    // 現在の保有を上書き（最新の建玉だけ保持）
+    holdings = parsedH;
+    await saveData();
+    document.getElementById("parseResult").textContent =
+      `📋 建玉サマリー取込: ${parsedH.length}件の保有ポジションを更新しました`;
+    document.getElementById("pasteArea").value = "";
+    render();
+    return;
+  }
+
+  // 約定履歴として処理
   const { parsed, errors } = parseFills(text);
   if(!parsed.length){
     document.getElementById("parseResult").textContent = "解析できませんでした。形式を確認してください。";
     return;
   }
-  // 重複を除いて追加
   let added = 0;
   for(const f of parsed){
     if(!fills.some(x => x.id === f.id)){ fills.push(f); added++; }
   }
   await saveData();
   document.getElementById("parseResult").textContent =
-    `${parsed.length}件解析 / ${added}件を新規追加${errors?` / ${errors}件スキップ`:""}`;
+    `📜 約定履歴: ${parsed.length}件解析 / ${added}件を新規追加${errors?` / ${errors}件スキップ`:""}`;
   document.getElementById("pasteArea").value = "";
   render();
   refreshPrices();
@@ -743,7 +850,7 @@ document.getElementById("clearPasteBtn").onclick = () => {
 };
 document.getElementById("refreshBtn").onclick = refreshPrices;
 document.getElementById("exportBtn").onclick = () => {
-  const blob = new Blob([JSON.stringify({ fills, slModes }, null, 2)], { type:"application/json" });
+  const blob = new Blob([JSON.stringify({ fills, slModes, holdings }, null, 2)], { type:"application/json" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
   a.download = `currents_positions_${new Date().toISOString().slice(0,10)}.json`;
@@ -760,6 +867,7 @@ document.getElementById("importFile").onchange = (e) => {
       const d = JSON.parse(reader.result);
       fills = d.fills || [];
       slModes = d.slModes || {};
+      holdings = d.holdings || [];
       await saveData();
       render(); refreshPrices();
       toast("JSONを読み込みました");
@@ -769,7 +877,7 @@ document.getElementById("importFile").onchange = (e) => {
 };
 document.getElementById("resetBtn").onclick = async () => {
   if(!confirm("全ての約定記録を削除します。よろしいですか？")) return;
-  fills = []; slModes = {}; priceCache = {};
+  fills = []; slModes = {}; priceCache = {}; holdings = [];
   await saveData();
   render();
   toast("全データを削除しました");
