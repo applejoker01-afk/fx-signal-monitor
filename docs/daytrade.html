@@ -30,6 +30,13 @@ body{background:var(--bg-deep);color:var(--text-primary);font-family:var(--jp);
 .brand-mark{font-family:var(--display);font-size:2rem;font-weight:600;font-style:italic;color:var(--gold);}
 .brand-sub{font-family:var(--jp-serif);font-size:0.78rem;color:var(--text-secondary);letter-spacing:0.12em;}
 .header-meta{font-family:var(--mono);font-size:0.75rem;color:var(--text-secondary);}
+.top-nav{display:flex;gap:0.4rem;flex-wrap:wrap;align-items:center;}
+.top-nav a{font-family:var(--mono);font-size:0.74rem;color:var(--text-secondary);text-decoration:none;
+  padding:0.35rem 0.8rem;border:1px solid var(--border);border-radius:4px;transition:all 0.15s;white-space:nowrap;}
+.top-nav a:hover{border-color:var(--gold);color:var(--gold);}
+.top-nav a.active{background:var(--gold);color:var(--bg-deep);border-color:var(--gold);font-weight:700;}
+.header-meta-row{font-family:var(--mono);font-size:0.74rem;color:var(--text-secondary);
+  margin-bottom:1.5rem;padding-bottom:0.8rem;border-bottom:1px solid var(--border-soft);}
 .live{display:inline-block;padding:0.2rem 0.6rem;border-radius:3px;font-size:0.7rem;font-weight:700;
   letter-spacing:0.08em;margin-right:0.5rem;}
 .live.on{background:var(--buy-bg);color:var(--buy);border:1px solid rgba(74,222,128,0.3);}
@@ -107,11 +114,17 @@ a{color:var(--gold);}
       <span class="brand-mark">Currents</span>
       <span class="brand-sub">15分足 デイトレ反発モニター · M15 AMBUSH</span>
     </div>
-    <div class="header-meta">
-      <span id="liveStatus" class="live off">● 停止中</span>
-      <span id="lastUpdate">未取得</span>
-    </div>
+    <nav class="top-nav">
+      <a href="https://applejoker01-afk.github.io/fx-signal-monitor/">📊 ダッシュボード</a>
+      <a href="https://applejoker01-afk.github.io/fx-signal-monitor/terminal.html">🖥 分析ターミナル</a>
+      <a href="https://applejoker01-afk.github.io/fx-signal-monitor/daytrade.html" class="active">⚡ デイトレ</a>
+      <a href="https://applejoker01-afk.github.io/fx-signal-monitor/position_manager.html">📋 ポジション管理</a>
+    </nav>
   </header>
+  <div class="header-meta-row">
+    <span id="liveStatus" class="live off">● 停止中</span>
+    <span id="lastUpdate">未取得</span>
+  </div>
 
   <!-- 設定パネル -->
   <div class="control-panel">

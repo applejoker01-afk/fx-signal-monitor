@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Currents FX · ポジション・マネージャー</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,500;1,600&family=JetBrains+Mono:wght@400;500;700&family=Shippori+Mincho:wght@500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-deep:#0a0e1a;--bg-surface:#111726;--bg-card:#141b2d;--bg-elev:#1a2235;
+  --border:#2a3450;--border-soft:#1f273d;
+  --text-primary:#e8edf7;--text-secondary:#9aa5b8;--text-muted:#5a6378;
+  --gold:#d4a574;--buy:#4ade80;--buy-bg:rgba(74,222,128,0.08);
+  --sell:#f87171;--sell-bg:rgba(248,113,113,0.08);
+  --caution:#fbbf24;--neutral:#94a3b8;
+  --display:'Cormorant Garamond','Shippori Mincho',serif;
+  --jp:'Zen Kaku Gothic New',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+  --jp-serif:'Shippori Mincho',serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg-deep);color:var(--text-primary);font-family:var(--jp);
+  line-height:1.6;min-height:100vh;
+  background-image:radial-gradient(circle at 15% 10%,rgba(212,165,116,0.04) 0%,transparent 40%),
+    radial-gradient(circle at 85% 80%,rgba(74,222,128,0.03) 0%,transparent 40%);}
+.container{max-width:1280px;margin:0 auto;padding:2rem;}
+.app-header{display:flex;justify-content:space-between;align-items:baseline;
+  padding-bottom:1rem;border-bottom:1px solid var(--border);margin-bottom:1.5rem;flex-wrap:wrap;gap:1rem;}
+.brand{display:flex;align-items:baseline;gap:1rem;}
+.brand-mark{font-family:var(--display);font-size:2rem;font-weight:600;font-style:italic;color:var(--gold);}
+.brand-sub{font-family:var(--jp-serif);font-size:0.78rem;color:var(--text-secondary);letter-spacing:0.12em;}
+.header-meta{font-family:var(--mono);font-size:0.75rem;color:var(--text-secondary);}
+.top-nav{display:flex;gap:0.4rem;flex-wrap:wrap;align-items:center;}
+.top-nav a{font-family:var(--mono);font-size:0.74rem;color:var(--text-secondary);text-decoration:none;
+  padding:0.35rem 0.8rem;border:1px solid var(--border);border-radius:4px;transition:all 0.15s;white-space:nowrap;}
+.top-nav a:hover{border-color:var(--gold);color:var(--gold);}
+.top-nav a.active{background:var(--gold);color:var(--bg-deep);border-color:var(--gold);font-weight:700;}
+.header-meta-row{font-family:var(--mono);font-size:0.74rem;color:var(--text-secondary);
+  margin-bottom:1.5rem;padding-bottom:0.8rem;border-bottom:1px solid var(--border-soft);}
+
+.section-head{display:flex;align-items:baseline;gap:1rem;margin:1.8rem 0 1rem;
+  padding-bottom:0.6rem;border-bottom:1px solid var(--border-soft);}
+.section-num{font-family:var(--display);font-style:italic;font-size:1.6rem;color:var(--gold);line-height:1;}
+.section-title{font-family:var(--jp-serif);font-size:1.1rem;font-weight:600;}
+
+/* Input area */
+.input-card{background:var(--bg-card);border:1px solid var(--border);border-radius:6px;padding:1.3rem 1.5rem;}
+.input-hint{font-family:var(--mono);font-size:0.74rem;color:var(--text-muted);margin-bottom:0.7rem;line-height:1.7;}
+textarea.paste{width:100%;min-height:140px;background:var(--bg-elev);border:1px solid var(--border);
+  border-radius:4px;color:var(--text-primary);font-family:var(--mono);font-size:0.82rem;padding:0.8rem;resize:vertical;}
+textarea.paste:focus{outline:none;border-color:var(--gold);}
+.btn{font-family:var(--jp);font-size:0.85rem;font-weight:600;padding:0.55rem 1.4rem;border-radius:4px;
+  border:1px solid var(--border);cursor:pointer;transition:all 0.15s;background:var(--bg-elev);color:var(--text-primary);}
+.btn:hover{border-color:var(--gold);color:var(--gold);}
+.btn.primary{background:var(--buy-bg);color:var(--buy);border-color:rgba(74,222,128,0.4);}
+.btn.danger{background:var(--sell-bg);color:var(--sell);border-color:rgba(248,113,113,0.4);}
+.btn.small{padding:0.3rem 0.8rem;font-size:0.75rem;}
+.btn-row{display:flex;gap:0.7rem;margin-top:0.9rem;flex-wrap:wrap;align-items:center;}
+
+/* Summary chips */
+.summary-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:1rem;margin-bottom:0.5rem;}
+.sum-chip{background:var(--bg-card);border:1px solid var(--border);border-radius:5px;padding:0.8rem 1rem;}
+.sum-chip .k{font-family:var(--mono);font-size:0.66rem;color:var(--text-muted);text-transform:uppercase;
+  letter-spacing:0.06em;display:block;margin-bottom:0.3rem;}
+.sum-chip .v{font-family:var(--mono);font-size:1.4rem;font-weight:700;}
+.v.pos{color:var(--buy);}.v.neg{color:var(--sell);}.v.gold{color:var(--gold);}
+
+/* Position cards */
+.pos-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:1rem;}
+.pos-card{background:var(--bg-card);border:1px solid var(--border);border-radius:6px;padding:1.1rem 1.3rem;}
+.pos-card.long{border-left:3px solid var(--buy);}
+.pos-card.short{border-left:3px solid var(--sell);}
+.pos-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:0.5rem;}
+.pos-pair{font-family:var(--display);font-style:italic;font-size:1.3rem;font-weight:600;}
+.pos-dir{font-family:var(--mono);font-size:0.7rem;font-weight:700;padding:0.15rem 0.5rem;border-radius:3px;letter-spacing:0.05em;}
+.dir-long{background:var(--buy-bg);color:var(--buy);}
+.dir-short{background:var(--sell-bg);color:var(--sell);}
+.pos-meta{font-family:var(--mono);font-size:0.74rem;color:var(--text-secondary);line-height:1.8;}
+.pos-pl{font-family:var(--mono);font-size:1.5rem;font-weight:700;margin:0.5rem 0;}
+.pl-detail{font-family:var(--mono);font-size:0.72rem;color:var(--text-muted);}
+
+/* SL mode switch */
+.sl-switch{display:flex;gap:0;margin:0.7rem 0;border:1px solid var(--border);border-radius:4px;overflow:hidden;width:fit-content;}
+.sl-opt{font-family:var(--mono);font-size:0.72rem;padding:0.3rem 0.9rem;cursor:pointer;background:var(--bg-elev);
+  color:var(--text-muted);transition:all 0.15s;border:none;}
+.sl-opt.active{background:var(--gold);color:var(--bg-deep);font-weight:700;}
+
+.tpsl-bar{margin-top:0.6rem;font-family:var(--mono);font-size:0.7rem;}
+.tpsl-row{display:flex;justify-content:space-between;padding:0.2rem 0;color:var(--text-secondary);}
+.tpsl-row .hit{color:var(--buy);font-weight:700;}
+.dist-bar{height:5px;background:var(--bg-elev);border-radius:3px;margin-top:0.3rem;overflow:hidden;position:relative;}
+.dist-fill{height:100%;background:var(--gold);border-radius:3px;transition:width 0.3s;}
+
+/* Table */
+.tbl{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:0.76rem;}
+.tbl th{text-align:left;padding:0.5rem 0.7rem;color:var(--text-muted);font-size:0.66rem;
+  text-transform:uppercase;letter-spacing:0.05em;border-bottom:1px solid var(--border);}
+.tbl td{padding:0.5rem 0.7rem;border-bottom:1px solid var(--border-soft);color:var(--text-secondary);}
+.tbl tr:hover td{background:var(--bg-elev);}
+.win{color:var(--buy);}.loss{color:var(--sell);}
+
+.empty{text-align:center;padding:2rem;color:var(--text-muted);font-family:var(--mono);font-size:0.8rem;}
+.footer{margin-top:2rem;padding-top:1rem;border-top:1px solid var(--border);
+  font-family:var(--mono);font-size:0.72rem;color:var(--text-muted);text-align:center;}
+.disclaimer{margin-top:0.5rem;font-size:0.7rem;}
+a{color:var(--gold);}
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:var(--bg-elev);
+  border:1px solid var(--gold);border-radius:6px;padding:0.8rem 1.5rem;font-family:var(--mono);font-size:0.8rem;
+  color:var(--gold);opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:100;}
+.toast.show{opacity:1;}
+.analysis-card{background:var(--bg-card);border:1px solid var(--border);border-radius:6px;padding:1.2rem 1.5rem;margin-bottom:1rem;}
+.bd-table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:0.78rem;margin-top:0.5rem;}
+.bd-table th,.bd-table td{padding:0.4rem 0.7rem;text-align:left;border-bottom:1px solid var(--border-soft);}
+.bd-table th{color:var(--text-muted);font-size:0.66rem;text-transform:uppercase;}
+.sig-box{margin:0.6rem 0;padding:0.6rem 0.8rem;background:var(--bg-elev);border-radius:5px;border:1px solid var(--border-soft);}
+.sig-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.3rem;}
+.sig-stars{font-size:0.85rem;color:var(--gold);letter-spacing:0.05em;}
+.sig-advice{font-family:var(--jp);font-size:0.74rem;color:var(--text-secondary);line-height:1.6;margin-top:0.3rem;}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header class="app-header">
+    <div class="brand">
+      <span class="brand-mark">Currents</span>
+      <span class="brand-sub">ポジション・マネージャー · 実約定記録と分析</span>
+    </div>
+    <nav class="top-nav">
+      <a href="https://applejoker01-afk.github.io/fx-signal-monitor/">📊 ダッシュボード</a>
+      <a href="https://applejoker01-afk.github.io/fx-signal-monitor/terminal.html">🖥 分析ターミナル</a>
+      <a href="https://applejoker01-afk.github.io/fx-signal-monitor/daytrade.html">⚡ デイトレ</a>
+      <a href="https://applejoker01-afk.github.io/fx-signal-monitor/position_manager.html" class="active">📋 ポジション管理</a>
+    </nav>
+  </header>
+  <div class="header-meta-row">
+    <span id="priceStatus">現在価格: 未取得</span>
+  </div>
+
+  <!-- I. 約定履歴の貼り付け -->
+  <div class="section-head">
+    <div class="section-num">I.</div>
+    <h2 class="section-title">約定履歴を貼り付け</h2>
+  </div>
+  <div class="input-card">
+    <div class="input-hint">
+      証券会社の約定履歴を貼り付けてください。以下の形式に対応します（複数取引まとめてOK）:<br>
+      ・6行形式: 日時 / 通貨ペア / 新規or決済 / 売or買 / 約定価格 / 数量（改行区切り）<br>
+      ・CSV: 日時,通貨ペア,新規or決済,売or買,約定価格,数量<br>
+      ・タブ区切り: 同上をタブ区切り<br>
+      例) 2026/06/03 03:01:16　ユーロ-ポンド　新規　売　0.86335　100
+    </div>
+    <textarea id="pasteArea" class="paste" placeholder="ここに約定履歴を貼り付け…"></textarea>
+    <div class="btn-row">
+      <button id="parseBtn" class="btn primary">解析して取り込み</button>
+      <button id="clearPasteBtn" class="btn small">入力クリア</button>
+      <span id="parseResult" style="font-family:var(--mono);font-size:0.76rem;color:var(--text-secondary);"></span>
+    </div>
+  </div>
+
+  <!-- II. サマリー -->
+  <div class="section-head">
+    <div class="section-num">II.</div>
+    <h2 class="section-title">パフォーマンス・サマリー</h2>
+    <button id="refreshBtn" class="btn small" style="margin-left:auto;">現在価格を更新</button>
+  </div>
+  <div class="summary-grid" id="summaryGrid"></div>
+
+  <!-- III. 保有中ポジション -->
+  <div class="section-head">
+    <div class="section-num">III.</div>
+    <h2 class="section-title">保有中ポジション</h2>
+  </div>
+  <div class="pos-grid" id="openGrid"></div>
+
+  <!-- IV. 決済済みトレード -->
+  <div class="section-head">
+    <div class="section-num">IV.</div>
+    <h2 class="section-title">決済済みトレード</h2>
+  </div>
+  <div id="closedWrap"></div>
+
+  <!-- V. ペア別・月別分析 -->
+  <div class="section-head">
+    <div class="section-num">V.</div>
+    <h2 class="section-title">ペア別・月別 分析</h2>
+  </div>
+  <div id="analysisWrap"></div>
+
+  <div class="btn-row" style="margin-top:2rem;">
+    <button id="exportBtn" class="btn small">📥 全データをJSON書き出し</button>
+    <button id="importBtn" class="btn small">📤 JSON読み込み</button>
+    <button id="resetBtn" class="btn small danger">⚠ 全データ削除</button>
+    <input type="file" id="importFile" accept=".json" style="display:none;">
+  </div>
+
+  <footer class="footer">
+    <em style="font-family:var(--display);font-style:italic;color:var(--gold);">Currents</em>
+    · Position Manager · 実約定ベースのパフォーマンス分析
+    <div class="disclaimer">
+      本ツールはご自身の取引記録を管理・分析する個人用ツールです。投資助言ではありません。<br>
+      表示される損益・距離はあくまで参考情報であり、売買判断はご自身の責任で行ってください。
+    </div>
+  </footer>
+
+</div>
+<div id="toast" class="toast"></div>
+
+<script>
+// ============================================================
+// 通貨ペア正規化（日本語名・記号ゆれを吸収）
+// ============================================================
+const PAIR_ALIASES = {
+  "ドル円":"USDJPY","米ドル円":"USDJPY","ドル-円":"USDJPY","USD/JPY":"USDJPY","USDJPY":"USDJPY",
+  "ユーロ円":"EURJPY","ユーロ-円":"EURJPY","EUR/JPY":"EURJPY","EURJPY":"EURJPY",
+  "ポンド円":"GBPJPY","ポンド-円":"GBPJPY","GBP/JPY":"GBPJPY","GBPJPY":"GBPJPY",
+  "豪ドル円":"AUDJPY","豪ドル-円":"AUDJPY","AUD/JPY":"AUDJPY","AUDJPY":"AUDJPY",
+  "NZドル円":"NZDJPY","NZドル-円":"NZDJPY","NZD/JPY":"NZDJPY","NZDJPY":"NZDJPY",
+  "ユーロドル":"EURUSD","ユーロ-ドル":"EURUSD","EUR/USD":"EURUSD","EURUSD":"EURUSD",
+  "ポンドドル":"GBPUSD","ポンド-ドル":"GBPUSD","GBP/USD":"GBPUSD","GBPUSD":"GBPUSD",
+  "豪ドル米ドル":"AUDUSD","豪ドル-米ドル":"AUDUSD","AUD/USD":"AUDUSD","AUDUSD":"AUDUSD",
+  "ユーロポンド":"EURGBP","ユーロ-ポンド":"EURGBP","EUR/GBP":"EURGBP","EURGBP":"EURGBP",
+  "ユーロ豪ドル":"EURAUD","ユーロ-豪ドル":"EURAUD","EUR/AUD":"EURAUD","EURAUD":"EURAUD",
+  "ドルスイス":"USDCHF","米ドルスイス":"USDCHF","USD/CHF":"USDCHF","USDCHF":"USDCHF",
+  "ドルカナダ":"USDCAD","米ドルカナダ":"USDCAD","USD/CAD":"USDCAD","USDCAD":"USDCAD",
+  "ランド円":"ZARJPY","南アランド円":"ZARJPY","ZAR/JPY":"ZARJPY","ZARJPY":"ZARJPY",
+  "メキシコペソ円":"MXNJPY","ペソ円":"MXNJPY","MXN/JPY":"MXNJPY","MXNJPY":"MXNJPY",
+  "トルコリラ円":"TRYJPY","リラ円":"TRYJPY","TRY/JPY":"TRYJPY","TRYJPY":"TRYJPY",
+};
+function normalizePair(raw){
+  const s = raw.trim().replace(/\s/g,"");
+  if (PAIR_ALIASES[s]) return PAIR_ALIASES[s];
+  const upper = s.toUpperCase().replace(/[\/\-]/g,"");
+  if (PAIR_ALIASES[upper]) return PAIR_ALIASES[upper];
+  return upper; // 未知はそのまま大文字で
+}
+function pairDecimals(pair){ return pair.endsWith("JPY") ? 3 : 5; }
+function pairPipFactor(pair){ return pair.endsWith("JPY") ? 100 : 10000; } // 1pip
+function yahooSymbol(pair){ return pair + "=X"; }
+
+// ============================================================
+// データモデル（window.storageで永続化）
+// ============================================================
+let fills = [];   // 約定の生データ [{dt, pair, kind:'open'|'close', side:'buy'|'sell', price, qty}]
+let trades = [];  // ペアリング済みトレード
+let slModes = {}; // tradeId -> 'OCO' | 'TRAIL'
+let priceCache = {}; // pair -> 現在価格
+let signalCache = {}; // pair -> last_signals.jsonの該当ペアデータ
+let signalTimestamp = null;
+
+// last_signals.json のURL（GitHub Pages）
+const SIGNAL_URL = "https://applejoker01-afk.github.io/fx-signal-monitor/last_signals.json";
+
+const STORE_KEY = "currents_position_manager_v1";
+
+async function saveData(){
+  try{
+    await window.storage.set(STORE_KEY, JSON.stringify({ fills, slModes }), false);
+  }catch(e){ console.error("save failed", e); }
+}
+async function loadData(){
+  try{
+    const r = await window.storage.get(STORE_KEY, false);
+    if(r && r.value){
+      const d = JSON.parse(r.value);
+      fills = d.fills || [];
+      slModes = d.slModes || {};
+    }
+  }catch(e){ /* 初回は無し */ }
+}
+
+// ============================================================
+// 約定履歴のパース（6行 / CSV / タブ の3形式対応）
+// ============================================================
+function parseFills(text){
+  const lines = text.split("\n").map(l => l.trim()).filter(l => l.length > 0);
+  const parsed = [];
+  let errors = 0;
+
+  // まず「1行に区切り文字で全項目が入っている形式（CSV/タブ）」を試す
+  const delimRows = [];
+  let allDelimited = lines.length > 0;
+  for(const line of lines){
+    const parts = line.split(/[,\t]/).map(p => p.trim()).filter(p => p);
+    if(parts.length >= 6){ delimRows.push(parts); }
+    else { allDelimited = false; break; }
+  }
+
+  if(allDelimited && delimRows.length > 0){
+    for(const parts of delimRows){
+      const f = buildFill(parts[0], parts[1], parts[2], parts[3], parts[4], parts[5]);
+      if(f) parsed.push(f); else errors++;
+    }
+    return { parsed, errors };
+  }
+
+  // 6行形式（1取引=6行）として処理
+  for(let i = 0; i + 5 < lines.length + 1 && i + 5 <= lines.length - 1 + 1; i += 6){
+    const chunk = lines.slice(i, i + 6);
+    if(chunk.length < 6) break;
+    const f = buildFill(chunk[0], chunk[1], chunk[2], chunk[3], chunk[4], chunk[5]);
+    if(f) parsed.push(f); else errors++;
+  }
+  return { parsed, errors };
+}
+
+function buildFill(dtRaw, pairRaw, kindRaw, sideRaw, priceRaw, qtyRaw){
+  try{
+    const pair = normalizePair(pairRaw);
+    const kind = /決済|close|決|手仕舞/i.test(kindRaw) ? "close" : "open";
+    const side = /売|sell|ask/i.test(sideRaw) ? "sell" : "buy";
+    const price = parseFloat(String(priceRaw).replace(/[^\d.]/g, ""));
+    const qty = parseFloat(String(qtyRaw).replace(/[^\d.]/g, "")) || 0;
+    if(!pair || isNaN(price)) return null;
+    return {
+      id: `${dtRaw}_${pair}_${kind}_${side}_${price}_${qty}`.replace(/\s/g,"_"),
+      dt: dtRaw.trim(), pair, kind, side, price, qty,
+    };
+  }catch(e){ return null; }
+}
+
+// ============================================================
+// 新規→決済のペアリング（FIFO）
+// ============================================================
+function buildTrades(){
+  // ペアごと・方向ごとにFIFOでマッチング
+  const byPair = {};
+  // 時系列にソート
+  const sorted = [...fills].sort((a,b) => a.dt.localeCompare(b.dt));
+
+  for(const f of sorted){
+    if(!byPair[f.pair]) byPair[f.pair] = { openQueue: [] };
+  }
+
+  const result = [];
+  const openStacks = {}; // pair -> [openFill,...]
+
+  for(const f of sorted){
+    if(!openStacks[f.pair]) openStacks[f.pair] = [];
+    if(f.kind === "open"){
+      openStacks[f.pair].push({ ...f, remaining: f.qty });
+    } else {
+      // close: 同ペアの逆方向openと相殺
+      let closeQty = f.qty;
+      const stack = openStacks[f.pair];
+      while(closeQty > 0 && stack.length > 0){
+        const op = stack[0];
+        const matchQty = Math.min(op.remaining, closeQty);
+        const direction = op.side === "buy" ? "LONG" : "SHORT";
+        // pips計算（方向考慮）
+        const pf = pairPipFactor(f.pair);
+        const rawDiff = (op.side === "buy") ? (f.price - op.price) : (op.price - f.price);
+        const pips = rawDiff * pf;
+        result.push({
+          id: op.id + "__" + f.id,
+          pair: f.pair, direction,
+          entryDt: op.dt, exitDt: f.dt,
+          entryPrice: op.price, exitPrice: f.price,
+          qty: matchQty, pips: pips,
+          result: pips > 0 ? "WIN" : (pips < 0 ? "LOSS" : "EVEN"),
+        });
+        op.remaining -= matchQty;
+        closeQty -= matchQty;
+        if(op.remaining <= 0) stack.shift();
+      }
+    }
+  }
+
+  // 残ったopen = 保有中
+  const openPositions = [];
+  for(const pair in openStacks){
+    for(const op of openStacks[pair]){
+      if(op.remaining > 0){
+        openPositions.push({
+          id: op.id, pair, direction: op.side === "buy" ? "LONG" : "SHORT",
+          entryDt: op.dt, entryPrice: op.price, qty: op.remaining,
+        });
+      }
+    }
+  }
+
+  return { closed: result, open: openPositions };
+}
+
+// ============================================================
+// TP/SL算出。シグナルのstaged_tp（ボラ調整済み）があれば優先、なければ簡易計算
+// ============================================================
+function autoTPSL(pos){
+  // シグナルにstaged_tpがあればそれを使う（ボラ調整済みの最適値）
+  const sig = signalCache[pos.pair];
+  if(sig && sig.staged_tp && sig.direction === pos.direction){
+    const s = sig.staged_tp;
+    return { sl: s.sl, tp1: s.tp1, tp2: s.tp2, tp3: s.tp3, fromSignal: true,
+             rr_tp1: s.rr_tp1, rr_tp2: s.rr_tp2, rr_tp3: s.rr_tp3 };
+  }
+  // フォールバック: 建値の0.4%基準
+  const unit = pos.entryPrice * 0.004;
+  const e = pos.entryPrice;
+  if(pos.direction === "LONG"){
+    return { sl: e - unit*1.5, tp1: e + unit*1.5, tp2: e + unit*3, tp3: e + unit*5, fromSignal: false };
+  } else {
+    return { sl: e + unit*1.5, tp1: e - unit*1.5, tp2: e - unit*3, tp3: e - unit*5, fromSignal: false };
+  }
+}
+
+// ============================================================
+// 相場局面に応じた決済戦略の判定（最大利益のための自動切替）
+//   トレンド相場 → TP3まで伸ばす・トレール推奨
+//   弱トレンド   → TP2まで・TP1で半分利確
+//   レンジ相場   → TP1で確実利確・OCO推奨
+// ============================================================
+function decideExitStrategy(pos){
+  const sig = signalCache[pos.pair];
+  if(!sig || !sig.market_regime){
+    return { regime:"unknown", label:"局面不明", target:"TP2",
+             mode:"OCO", advice:"シグナル情報がありません。手動で判断してください。" };
+  }
+  const mr = sig.market_regime;
+  const adx = mr.adx || 0;
+  const dirMatch = sig.direction === pos.direction;
+
+  if(!dirMatch){
+    return { regime: mr.regime, label: mr.regime_label, target:"要注意",
+             mode:"OCO",
+             advice:`⚠ システムの現在方向(${sig.direction})が保有方向(${pos.direction})と逆。決済・縮小を検討。` };
+  }
+
+  if(mr.regime === "trending"){
+    return { regime:"trending", label:"トレンド相場", target:"TP3",
+             mode:"TRAIL",
+             advice:`トレンド相場(ADX${adx})。利益を伸ばす局面。TP1で利確せずトレールでTP2-3を狙う。` };
+  } else if(mr.regime === "weak_trend"){
+    return { regime:"weak_trend", label:"弱トレンド相場", target:"TP2",
+             mode:"TRAIL",
+             advice:`弱トレンド(ADX${adx})。TP1で半分利確 → 残りトレールでTP2狙い。` };
+  } else {
+    return { regime:"ranging", label:"レンジ相場", target:"TP1",
+             mode:"OCO",
+             advice:`レンジ相場(ADX${adx})。伸びにくいのでTP1で確実利確（OCO）。深追いしない。` };
+  }
+}
+
+// ============================================================
+// 現在価格取得（Yahoo・CORSプロキシ）
+// ============================================================
+const FETCH_STRATEGIES = [
+  (url) => url,
+  (url) => "https://corsproxy.io/?url=" + encodeURIComponent(url),
+  (url) => "https://api.allorigins.win/raw?url=" + encodeURIComponent(url),
+];
+
+// シグナルデータ取得
+async function fetchSignals(){
+  for(const strat of FETCH_STRATEGIES){
+    try{
+      const res = await fetch(strat(SIGNAL_URL), { cache: "no-store" });
+      if(!res.ok) continue;
+      const data = await res.json();
+      signalTimestamp = data.timestamp;
+      signalCache = {};
+      (data.results || []).forEach(r => { signalCache[r.pair] = r; });
+      return true;
+    }catch(e){}
+  }
+  return false;
+}
+
+async function fetchPrice(pair){
+  const base = `https://query1.finance.yahoo.com/v8/finance/chart/${yahooSymbol(pair)}?interval=15m&range=1d`;
+  for(const strat of FETCH_STRATEGIES){
+    try{
+      const res = await fetch(strat(base), { cache: "no-store" });
+      if(!res.ok) continue;
+      const data = await res.json();
+      const r = data.chart.result[0];
+      const closes = r.indicators.quote[0].close.filter(c => c != null);
+      if(closes.length) return closes[closes.length - 1];
+    }catch(e){}
+  }
+  return null;
+}
+async function refreshPrices(){
+  const built = buildTrades();
+  const pairs = [...new Set(built.open.map(p => p.pair))];
+  document.getElementById("priceStatus").textContent = "シグナル・現在価格: 取得中…";
+  // まずシグナルを取得
+  await fetchSignals();
+  for(const pair of pairs){
+    const p = await fetchPrice(pair);
+    if(p != null) priceCache[pair] = p;
+    await new Promise(r => setTimeout(r, 250));
+  }
+  const sigInfo = signalTimestamp
+    ? " / シグナル: " + new Date(signalTimestamp).toLocaleString("ja-JP")
+    : " / シグナル未取得";
+  document.getElementById("priceStatus").textContent =
+    "更新: " + new Date().toLocaleTimeString("ja-JP") + sigInfo;
+  render();
+}
+
+// ============================================================
+// 描画
+// ============================================================
+function render(){
+  const built = buildTrades();
+  renderSummary(built);
+  renderOpen(built.open);
+  renderClosed(built.closed);
+  renderAnalysis(built.closed);
+}
+
+function renderSummary(built){
+  const closed = built.closed;
+  const total = closed.length;
+  const wins = closed.filter(t => t.result === "WIN").length;
+  const losses = closed.filter(t => t.result === "LOSS").length;
+  const winRate = total ? (wins/total*100).toFixed(1) : "0.0";
+  const totalPips = closed.reduce((s,t) => s + t.pips, 0);
+  const grossWin = closed.filter(t=>t.pips>0).reduce((s,t)=>s+t.pips,0);
+  const grossLoss = Math.abs(closed.filter(t=>t.pips<0).reduce((s,t)=>s+t.pips,0));
+  const pf = grossLoss > 0 ? (grossWin/grossLoss).toFixed(2) : "—";
+
+  const chips = [
+    { k:"決済トレード", v:total, cls:"" },
+    { k:"勝率", v:winRate+"%", cls: parseFloat(winRate)>=50?"pos":"neg" },
+    { k:"勝/負", v:`${wins}/${losses}`, cls:"" },
+    { k:"累計pips", v:(totalPips>=0?"+":"")+totalPips.toFixed(1), cls: totalPips>=0?"pos":"neg" },
+    { k:"PF", v:pf, cls:"gold" },
+    { k:"保有中", v:built.open.length, cls:"" },
+  ];
+  document.getElementById("summaryGrid").innerHTML = chips.map(c =>
+    `<div class="sum-chip"><span class="k">${c.k}</span><span class="v ${c.cls}">${c.v}</span></div>`
+  ).join("");
+}
+
+function renderOpen(open){
+  const grid = document.getElementById("openGrid");
+  if(!open.length){ grid.innerHTML = `<div class="empty">保有中のポジションはありません</div>`; return; }
+  grid.innerHTML = open.map(pos => {
+    const d = pairDecimals(pos.pair);
+    const cur = priceCache[pos.pair];
+    const tpsl = autoTPSL(pos);
+    const mode = slModes[pos.id] || "OCO";
+    let plHtml = `<div class="pl-detail">現在価格を更新すると含み損益を表示</div>`;
+    let plClass = "";
+    let tpslHtml = "";
+
+    if(cur != null){
+      const pf = pairPipFactor(pos.pair);
+      const rawDiff = pos.direction === "LONG" ? (cur - pos.entryPrice) : (pos.entryPrice - cur);
+      const pips = rawDiff * pf;
+      plClass = pips >= 0 ? "pos" : "neg";
+      plHtml = `<div class="pos-pl ${plClass}">${pips>=0?"+":""}${pips.toFixed(1)} pips</div>
+        <div class="pl-detail">現在 ${cur.toFixed(d)} / 建値 ${pos.entryPrice.toFixed(d)}</div>`;
+
+      // TP/SLまでの距離
+      const targets = [
+        {name:"SL", price:tpsl.sl, isStop:true},
+        {name:"TP1", price:tpsl.tp1},
+        {name:"TP2", price:tpsl.tp2},
+        {name:"TP3", price:tpsl.tp3},
+      ];
+      tpslHtml = `<div class="tpsl-bar">
+        <div style="font-size:0.66rem;color:var(--text-muted);margin-bottom:0.2rem;">
+          ${tpsl.fromSignal?'📡 システム推奨TP/SL（ボラ調整済み）':'簡易TP/SL（シグナル未取得）'}</div>` + targets.map(t => {
+        const distPips = Math.abs(cur - t.price) * pf;
+        let reached = false;
+        if(t.isStop){
+          reached = pos.direction==="LONG" ? cur <= t.price : cur >= t.price;
+        } else {
+          reached = pos.direction==="LONG" ? cur >= t.price : cur <= t.price;
+        }
+        return `<div class="tpsl-row"><span>${t.name}: ${t.price.toFixed(d)}</span>
+          <span class="${reached?'hit':''}">${reached?'到達':'あと'+distPips.toFixed(1)+'pips'}</span></div>`;
+      }).join("") + `</div>`;
+    }
+
+    // シグナル照合と戦略アドバイス
+    const sig = signalCache[pos.pair];
+    const strat = decideExitStrategy(pos);
+    let sigHtml = "";
+    if(sig){
+      const stars = "★".repeat(sig.stars || 0) + "☆".repeat(5 - (sig.stars || 0));
+      const regimeColor = strat.regime === "trending" ? "var(--buy)"
+        : (strat.regime === "ranging" ? "var(--caution)" : "var(--gold)");
+      const dirWarn = sig.direction !== pos.direction
+        ? `<div style="color:var(--sell);font-size:0.72rem;margin-top:0.3rem;">⚠ システム現在方向: ${sig.direction}（保有と逆）</div>` : "";
+      // 介入リスク・ambush警告
+      let warns = "";
+      if(sig.ambush && sig.ambush.has_alert && sig.ambush_quality && sig.ambush_quality.includes("注意")){
+        warns += `<div style="color:var(--caution);font-size:0.72rem;">⚠ ${sig.ambush.message||"反発注意"}</div>`;
+      }
+      if(sig.intervention_risk && (sig.intervention_risk.risk_level==="HIGH"||sig.intervention_risk.risk_level==="VERY_HIGH")){
+        warns += `<div style="color:var(--sell);font-size:0.72rem;">⚠ 介入リスク${sig.intervention_risk.risk_label}</div>`;
+      }
+      sigHtml = `
+      <div class="sig-box">
+        <div class="sig-row"><span class="sig-stars">${stars}</span>
+          <span style="color:var(--text-secondary);font-size:0.72rem;">TA${sig.ta_score}/FA${sig.fa_score}</span></div>
+        <div class="sig-row" style="color:${regimeColor};font-weight:700;font-size:0.78rem;">
+          ${strat.label}（${strat.target}狙い）</div>
+        <div class="sig-advice">${strat.advice}</div>
+        ${dirWarn}${warns}
+      </div>`;
+    } else {
+      sigHtml = `<div class="sig-box"><div class="sig-advice" style="color:var(--text-muted);">
+        このペアの現在シグナルは取得できていません（★4未満か対象外）</div></div>`;
+    }
+
+    // 推奨モードと現在のモードが違えばヒント
+    const recMode = strat.mode;
+    const modeHint = (mode !== recMode && sig)
+      ? `<div style="font-size:0.7rem;color:var(--gold);margin-top:0.2rem;">💡 局面的には【${recMode==='TRAIL'?'トレール':'OCO固定'}】推奨</div>` : "";
+
+    return `<div class="pos-card ${pos.direction.toLowerCase()}">
+      <div class="pos-top">
+        <span class="pos-pair">${pos.pair}</span>
+        <span class="pos-dir dir-${pos.direction.toLowerCase()}">${pos.direction}</span>
+      </div>
+      <div class="pos-meta">建値: ${pos.entryPrice.toFixed(d)}　数量: ${pos.qty}<br>${pos.entryDt}</div>
+      ${plHtml}
+      ${sigHtml}
+      <div class="sl-switch" data-id="${pos.id}">
+        <button class="sl-opt ${mode==='OCO'?'active':''}" data-mode="OCO">OCO固定</button>
+        <button class="sl-opt ${mode==='TRAIL'?'active':''}" data-mode="TRAIL">トレール</button>
+      </div>
+      <div class="pl-detail">${mode==='OCO'?'SL/TPを固定して監視':'価格追従でSLを引き上げる方針'}</div>
+      ${modeHint}
+      ${tpslHtml}
+    </div>`;
+  }).join("");
+
+  // SLスイッチのイベント
+  grid.querySelectorAll(".sl-switch").forEach(sw => {
+    sw.querySelectorAll(".sl-opt").forEach(btn => {
+      btn.onclick = async () => {
+        slModes[sw.dataset.id] = btn.dataset.mode;
+        await saveData();
+        render();
+      };
+    });
+  });
+}
+
+function renderClosed(closed){
+  const wrap = document.getElementById("closedWrap");
+  if(!closed.length){ wrap.innerHTML = `<div class="empty">決済済みトレードはありません</div>`; return; }
+  const sorted = [...closed].sort((a,b) => b.exitDt.localeCompare(a.exitDt));
+  wrap.innerHTML = `<table class="tbl"><thead><tr>
+    <th>ペア</th><th>方向</th><th>建値</th><th>決済</th><th>pips</th><th>結果</th><th>決済日時</th>
+    </tr></thead><tbody>` + sorted.map(t => {
+    const d = pairDecimals(t.pair);
+    const cls = t.result === "WIN" ? "win" : (t.result === "LOSS" ? "loss" : "");
+    return `<tr>
+      <td>${t.pair}</td><td>${t.direction}</td>
+      <td>${t.entryPrice.toFixed(d)}</td><td>${t.exitPrice.toFixed(d)}</td>
+      <td class="${cls}">${t.pips>=0?"+":""}${t.pips.toFixed(1)}</td>
+      <td class="${cls}">${t.result}</td><td>${t.exitDt}</td>
+    </tr>`;
+  }).join("") + `</tbody></table>`;
+}
+
+function renderAnalysis(closed){
+  const wrap = document.getElementById("analysisWrap");
+  if(!closed.length){ wrap.innerHTML = `<div class="empty">分析できるトレードがまだありません</div>`; return; }
+
+  // ペア別
+  const byPair = {};
+  closed.forEach(t => {
+    if(!byPair[t.pair]) byPair[t.pair] = { wins:0, total:0, pips:0 };
+    byPair[t.pair].total++;
+    byPair[t.pair].pips += t.pips;
+    if(t.result === "WIN") byPair[t.pair].wins++;
+  });
+  // 月別
+  const byMonth = {};
+  closed.forEach(t => {
+    const m = (t.exitDt.match(/(\d{4})[\/\-](\d{2})/) || [])[0] || "不明";
+    if(!byMonth[m]) byMonth[m] = { wins:0, total:0, pips:0 };
+    byMonth[m].total++;
+    byMonth[m].pips += t.pips;
+    if(t.result === "WIN") byMonth[m].wins++;
+  });
+
+  const pairRows = Object.entries(byPair).sort((a,b)=>b[1].pips-a[1].pips).map(([p,s]) =>
+    `<tr><td>${p}</td><td>${(s.wins/s.total*100).toFixed(0)}%</td>
+     <td>${s.wins}/${s.total}</td>
+     <td class="${s.pips>=0?'win':'loss'}">${s.pips>=0?'+':''}${s.pips.toFixed(1)}</td></tr>`
+  ).join("");
+  const monthRows = Object.entries(byMonth).sort((a,b)=>b[0].localeCompare(a[0])).map(([m,s]) =>
+    `<tr><td>${m}</td><td>${(s.wins/s.total*100).toFixed(0)}%</td>
+     <td>${s.wins}/${s.total}</td>
+     <td class="${s.pips>=0?'win':'loss'}">${s.pips>=0?'+':''}${s.pips.toFixed(1)}</td></tr>`
+  ).join("");
+
+  wrap.innerHTML = `
+    <div class="analysis-card">
+      <div style="font-family:var(--jp-serif);font-size:0.95rem;margin-bottom:0.5rem;">ペア別成績</div>
+      <table class="bd-table"><thead><tr><th>ペア</th><th>勝率</th><th>勝/計</th><th>累計pips</th></tr></thead>
+      <tbody>${pairRows}</tbody></table>
+    </div>
+    <div class="analysis-card">
+      <div style="font-family:var(--jp-serif);font-size:0.95rem;margin-bottom:0.5rem;">月別成績</div>
+      <table class="bd-table"><thead><tr><th>月</th><th>勝率</th><th>勝/計</th><th>累計pips</th></tr></thead>
+      <tbody>${monthRows}</tbody></table>
+    </div>`;
+}
+
+// ============================================================
+// トースト
+// ============================================================
+function toast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2500);
+}
+
+// ============================================================
+// イベント
+// ============================================================
+document.getElementById("parseBtn").onclick = async () => {
+  const text = document.getElementById("pasteArea").value;
+  if(!text.trim()){ toast("約定履歴を貼り付けてください"); return; }
+  const { parsed, errors } = parseFills(text);
+  if(!parsed.length){
+    document.getElementById("parseResult").textContent = "解析できませんでした。形式を確認してください。";
+    return;
+  }
+  // 重複を除いて追加
+  let added = 0;
+  for(const f of parsed){
+    if(!fills.some(x => x.id === f.id)){ fills.push(f); added++; }
+  }
+  await saveData();
+  document.getElementById("parseResult").textContent =
+    `${parsed.length}件解析 / ${added}件を新規追加${errors?` / ${errors}件スキップ`:""}`;
+  document.getElementById("pasteArea").value = "";
+  render();
+  refreshPrices();
+};
+document.getElementById("clearPasteBtn").onclick = () => {
+  document.getElementById("pasteArea").value = "";
+};
+document.getElementById("refreshBtn").onclick = refreshPrices;
+document.getElementById("exportBtn").onclick = () => {
+  const blob = new Blob([JSON.stringify({ fills, slModes }, null, 2)], { type:"application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `currents_positions_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  toast("JSONを書き出しました");
+};
+document.getElementById("importBtn").onclick = () => document.getElementById("importFile").click();
+document.getElementById("importFile").onchange = (e) => {
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = async () => {
+    try{
+      const d = JSON.parse(reader.result);
+      fills = d.fills || [];
+      slModes = d.slModes || {};
+      await saveData();
+      render(); refreshPrices();
+      toast("JSONを読み込みました");
+    }catch(err){ toast("読み込み失敗: 不正なJSON"); }
+  };
+  reader.readAsText(file);
+};
+document.getElementById("resetBtn").onclick = async () => {
+  if(!confirm("全ての約定記録を削除します。よろしいですか？")) return;
+  fills = []; slModes = {}; priceCache = {};
+  await saveData();
+  render();
+  toast("全データを削除しました");
+};
+
+// ============================================================
+// 初期化
+// ============================================================
+(async function init(){
+  await loadData();
+  render();
+  // 保有が無くてもシグナルは取得（照合表示のため）
+  await fetchSignals();
+  render();
+  if(fills.length) refreshPrices();
+})();
+</script>
+</body>
+</html>
