@@ -644,8 +644,10 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results,
         "name": "🔗 ダッシュボード",
         "value": (
             f"**[📊 L3 ダッシュボードを開く]({PAGES_URL})**\n"
-            f"[🖥 分析ターミナル]({PAGES_URL}terminal.html) "
-            f"・ [{{}} Raw JSON]({PAGES_URL}last_signals.json)"
+            f"[🖥 分析ターミナル]({PAGES_URL}terminal.html) ・ "
+            f"[⚡ デイトレ]({PAGES_URL}daytrade.html) ・ "
+            f"[📋 ポジション管理]({PAGES_URL}position_manager.html)\n"
+            f"[{{}} Raw JSON]({PAGES_URL}last_signals.json)"
         ),
         "inline": False
     })
@@ -1033,6 +1035,8 @@ body{{background:var(--bg-deep);color:var(--text-primary);font-family:var(--jp);
     <div class="top-nav-links">
       <a href="./" class="nav-link active"><span>📊</span><span>L3 ダッシュボード</span></a>
       <a href="./terminal.html" class="nav-link"><span>🖥</span><span>分析ターミナル</span></a>
+      <a href="./daytrade.html" class="nav-link"><span>⚡</span><span>デイトレ</span></a>
+      <a href="./position_manager.html" class="nav-link"><span>📋</span><span>ポジション管理</span></a>
       <a href="./last_signals.json" class="nav-link" target="_blank"><span>{{}}</span><span>Raw JSON</span></a>
     </div>
   </nav>
