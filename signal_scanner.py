@@ -356,18 +356,13 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results,
         else:
             color = 0xFBBF24
     else:
-        # シグナル変化はないが、待ち伏せ・トレード・ドローダウンのいずれかで呼ばれたケース
-        has_ambush_now = bool(ambush_alerts and ambush_alerts.get("high_confidence"))
-        has_trade_now = bool(trade_update and (trade_update.get("newly_opened") or trade_update.get("newly_closed")))
+        # シグナル変化はないが、決済・ドローダウンで呼ばれたケース
+        # （待ち伏せ・反発監視はデイトレ画面に集約したため中長期通知では扱わない）
+        has_trade_now = bool(trade_update and trade_update.get("newly_closed"))
         has_dd_now = bool(drawdown and drawdown.get("alert"))
 
-        if has_ambush_now:
-            title = f"{risk_emoji} 🎯 待ち伏せシグナル発火"
-            n_amb = len(ambush_alerts.get("high_confidence", []))
-            desc = f"高確度ゾーン到達: **{n_amb}件** / 市場モード: **{risk_mode.upper()}**"
-            color = 0x4ADE80
-        elif has_trade_now:
-            title = f"{risk_emoji} 💼 トレード更新"
+        if has_trade_now:
+            title = f"{risk_emoji} 💼 シグナル決着"
             desc = f"市場モード: **{risk_mode.upper()}**"
             color = 0xD4A574
         elif has_dd_now:
@@ -393,57 +388,6 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results,
             "value": ai_commentary[:1024],
             "inline": False
         })
-
-    # 🎯 待ち伏せアラート（高確度ゾーン・最重要）
-    if ambush_alerts and ambush_alerts.get("high_confidence"):
-        held_pairs = set((open_trades or {}).keys())
-        lines = []
-        for a in ambush_alerts["high_confidence"][:5]:
-            n = a["nearest"]
-            # 保有中か新規かを明示
-            if a["pair"] in held_pairs:
-                hold_tag = "📦保有中（追加せず継続推奨）"
-            else:
-                hold_tag = "🆕新規候補"
-            block = (
-                f"{'★'*a['stars']} {a['label']} {a['direction']} [{hold_tag}]\n"
-                f"  {n['role']}({n['price']}) あと{n['distance_pct']:.2f}% — {a['quality']}"
-            )
-            # TP/SL目安を追加
-            if a.get("sl") is not None:
-                block += (
-                    f"\n  SL:{a.get('sl')} / TP1:{a.get('tp1')} / "
-                    f"TP2:{a.get('tp2')} / TP3:{a.get('tp3')}"
-                )
-            lines.append(block)
-        embeds[0]["fields"].append({
-            "name": "🎯 高確度ゾーン到達（待ち伏せ）",
-            "value": "\n\n".join(lines)[:1024],
-            "inline": False
-        })
-
-    # 🎯 POI接近中（シグナル未成立だが重要価格に近い）
-    if ambush_alerts and ambush_alerts.get("approaching"):
-        held_pairs = set((open_trades or {}).keys())
-        lines = []
-        for a in ambush_alerts["approaching"][:6]:
-            n = a["nearest"]
-            plan = a.get("plan")
-            hold = " 📦保有中" if a["pair"] in held_pairs else ""
-            block = f"・{a['label']}{hold} | {n['role']}({n['price']}) あと{n['distance_pct']:.2f}%"
-            if plan:
-                block += (
-                    f"\n  → {plan['direction']} "
-                    f"SL:{plan['sl']} / TP1:{plan['tp1']} / TP2:{plan['tp2']} / TP3:{plan['tp3']} "
-                    f"(RR 1:{plan['rr1']}/1:{plan['rr2']}/1:{plan['rr3']})"
-                )
-            lines.append(block)
-        if lines:
-            embeds[0]["fields"].append({
-                "name": "👀 重要価格に接近中（反発狙いの監視）",
-                "value": "\n\n".join(lines)[:1024],
-                "inline": False
-            })
 
     # ⑪ ドローダウン警告（重要なので上部に）
     if drawdown and drawdown.get("alert"):
@@ -493,24 +437,8 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results,
             "inline": False
         })
 
-    # ⑦ トレード情報（新規エントリー・決済・保有中）
+    # ⑦ トレード情報（決済のみ・中長期シグナルの結果として）
     if trade_update:
-        # 新規エントリー
-        newly_opened = trade_update.get("newly_opened", [])
-        if newly_opened:
-            lines = []
-            for t in newly_opened[:5]:
-                lines.append(
-                    f"+ {t['pair']} {t['direction']} @ {t['entry_price']}\n"
-                    f"   SL:{t.get('sl','?')} / TP1:{t.get('tp1','?')} / "
-                    f"TP2:{t.get('tp2','?')} / TP3:{t.get('tp3','?')}"
-                )
-            embeds[0]["fields"].append({
-                "name": f"📌 新規エントリー（{len(newly_opened)}件）",
-                "value": "```diff\n" + "\n".join(lines) + "\n```",
-                "inline": False
-            })
-
         # 決済
         newly_closed = trade_update.get("newly_closed", [])
         if newly_closed:
@@ -532,32 +460,8 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results,
                     f"({t.get('pips',0):+.4f}) 保有{t.get('hold_hours',0)}h"
                 )
             embeds[0]["fields"].append({
-                "name": f"💼 決済完了（{len(newly_closed)}件）",
+                "name": f"💼 シグナル決着（{len(newly_closed)}件）",
                 "value": "```diff\n" + "\n".join(lines) + "\n```",
-                "inline": False
-            })
-
-    # 現在保有中（オープントレード一覧）
-    if open_trades:
-        from datetime import datetime as _dt
-        now_utc = _dt.now(timezone.utc)
-        lines = []
-        for pair, t in list(open_trades.items())[:8]:
-            try:
-                entry_dt = _dt.fromisoformat(t["entry_time"])
-                if entry_dt.tzinfo is None:
-                    entry_dt = entry_dt.replace(tzinfo=timezone.utc)
-                hours_held = (now_utc - entry_dt).total_seconds() / 3600
-                hold_str = f"{hours_held:.0f}h"
-            except Exception:
-                hold_str = "?"
-            lines.append(
-                f"・{pair} {t['direction']} @ {t['entry_price']} (経過{hold_str})"
-            )
-        if lines:
-            embeds[0]["fields"].append({
-                "name": f"📦 現在保有中（{len(open_trades)}件）",
-                "value": "\n".join(lines),
                 "inline": False
             })
 
@@ -1286,10 +1190,10 @@ def main():
         if ai_commentary:
             print(f"[AI] 市況コメンタリー生成完了")
 
-    # 7. 通知（トレード情報も同梱・決済が出たら必ず送信）
-    has_trade_change = bool(trade_update.get("newly_opened") or trade_update.get("newly_closed"))
-    has_ambush = bool(ambush_alerts.get("high_confidence"))
-    if newly or upgraded or (is_first and newly) or has_trade_change or drawdown.get("alert") or has_ambush:
+    # 7. 通知（中長期シグナル変化・決済・ドローダウンで送信）
+    #    待ち伏せ・反発監視（短期）はデイトレ画面に集約したため中長期通知では送らない
+    has_close = bool(trade_update.get("newly_closed"))
+    if newly or upgraded or (is_first and newly) or has_close or drawdown.get("alert"):
         _wh = os.environ.get("DISCORD_WEBHOOK_URL", "")
         _wh = _wh.replace("discordapp.com", "discord.com")
         send_discord(
@@ -1300,7 +1204,7 @@ def main():
             open_trades=open_trades,
             drawdown=drawdown,
             ai_commentary=ai_commentary,
-            ambush_alerts=ambush_alerts,
+            ambush_alerts=None,
         )
         send_email(
             os.environ.get("SMTP_HOST", "smtp.gmail.com"),
