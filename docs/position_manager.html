@@ -637,10 +637,60 @@ function renderSummary(built, openPositions){
 function renderOpen(open){
   const grid = document.getElementById("openGrid");
   if(!open.length){ grid.innerHTML = `<div class="empty">保有中のポジションはありません</div>`; return; }
-  grid.innerHTML = open.map(pos => {
-   try {
+
+  // 各カードを完全に隔離して生成（1件のエラーが他に波及しないように）
+  const cards = [];
+  for(let idx = 0; idx < open.length; idx++){
+    const pos = open[idx];
+    let cardHtml = "";
+    try {
+      cardHtml = buildPositionCard(pos);
+    } catch(err) {
+      console.error("renderOpen card error (primary)", pos, err);
+      // 二次フォールバック: 計算を一切せず生データだけ表示
+      try {
+        cardHtml = `<div class="pos-card">
+          <div class="pos-top"><span class="pos-pair">${String(pos && pos.pair || "?")}</span>
+          <span class="pos-dir">${String(pos && pos.direction || "")}</span></div>
+          <div class="pos-meta">建値: ${String(pos && pos.entryPrice)}　数量: ${String(pos && pos.qty)}</div>
+          <div class="pl-detail" style="color:var(--caution);">⚠ このカードの詳細表示でエラーが発生しました（データは保持されています）</div>
+        </div>`;
+      } catch(err2) {
+        cardHtml = `<div class="pos-card"><div class="pos-meta">表示エラー</div></div>`;
+      }
+    }
+    cards.push(cardHtml);
+  }
+  // 先頭に件数バッジ（パース結果の確認用）
+  const badge = `<div style="grid-column:1/-1;font-family:var(--mono);font-size:0.72rem;color:var(--text-muted);margin-bottom:0.3rem;">保有 ${open.length} 件を表示中: ${open.map(p=>p.pair).join(" / ")}</div>`;
+  grid.innerHTML = badge + cards.join("");
+
+  // SLスイッチのイベント
+  grid.querySelectorAll(".sl-switch").forEach(sw => {
+    sw.querySelectorAll(".sl-opt").forEach(btn => {
+      btn.onclick = async () => {
+        slModes[sw.dataset.id] = btn.dataset.mode;
+        await saveData();
+        render();
+      };
+    });
+  });
+
+  // AI決済アドバイスのイベント
+  grid.querySelectorAll(".ai-advice-btn").forEach(btn => {
+    btn.onclick = async () => {
+      const id = btn.dataset.id;
+      const pos = open.find(p => p.id === id);
+      if(pos) await getAIAdvice(pos, btn);
+    };
+  });
+}
+
+// ============================================================
+// 1ポジションのカードHTMLを生成（renderOpenから呼ばれる）
+// ============================================================
+function buildPositionCard(pos){
     const d = pairDecimals(pos.pair);
-    // 建玉サマリー由来なら証券会社の現在値を優先、なければYahoo価格
     const cur = pos.brokerCurPrice != null ? pos.brokerCurPrice : priceCache[pos.pair];
     const tpsl = autoTPSL(pos);
     const mode = slModes[pos.id] || "OCO";
@@ -657,7 +707,6 @@ function renderOpen(open){
       plHtml = `<div class="pos-pl ${plClass}">${pips>=0?"+":""}${pips.toFixed(1)} pips</div>
         <div class="pl-detail">現在 ${cur.toFixed(d)} (${srcTag}) / 建値 ${pos.entryPrice.toFixed(d)}</div>`;
 
-      // TP/SLまでの距離
       const targets = [
         {name:"SL", price:tpsl.sl, isStop:true},
         {name:"TP1", price:tpsl.tp1},
@@ -667,6 +716,7 @@ function renderOpen(open){
       tpslHtml = `<div class="tpsl-bar">
         <div style="font-size:0.66rem;color:var(--text-muted);margin-bottom:0.2rem;">
           ${tpsl.fromSignal?'📡 システム推奨TP/SL（ボラ調整済み）':'簡易TP/SL（シグナル未取得）'}</div>` + targets.map(t => {
+        if(t.price == null) return "";
         const distPips = Math.abs(cur - t.price) * pf;
         let reached = false;
         if(t.isStop){
@@ -690,13 +740,12 @@ function renderOpen(open){
         : (strat.regime === "ranging" ? "var(--caution)" : "var(--gold)");
       const dirWarn = sig.direction !== pos.direction
         ? `<div style="color:var(--sell);font-size:0.72rem;margin-top:0.3rem;">⚠ システム現在方向: ${sig.direction}（保有と逆）</div>` : "";
-      // 介入リスク・ambush警告
       let warns = "";
       if(sig.ambush && sig.ambush.has_alert && sig.ambush_quality && sig.ambush_quality.includes("注意")){
         warns += `<div style="color:var(--caution);font-size:0.72rem;">⚠ ${sig.ambush.message||"反発注意"}</div>`;
       }
       if(sig.intervention_risk && (sig.intervention_risk.risk_level==="HIGH"||sig.intervention_risk.risk_level==="VERY_HIGH")){
-        warns += `<div style="color:var(--sell);font-size:0.72rem;">⚠ 介入リスク${sig.intervention_risk.risk_label}</div>`;
+        warns += `<div style="color:var(--sell);font-size:0.72rem;">⚠ 介入リスク${sig.intervention_risk.risk_label||""}</div>`;
       }
       sigHtml = `
       <div class="sig-box">
@@ -712,26 +761,20 @@ function renderOpen(open){
         このペアの現在シグナルは取得できていません（★4未満か対象外）</div></div>`;
     }
 
-    // 推奨モードと現在のモードが違えばヒント
     const recMode = strat.mode;
     const modeHint = (mode !== recMode && sig)
       ? `<div style="font-size:0.7rem;color:var(--gold);margin-top:0.2rem;">💡 局面的には【${recMode==='TRAIL'?'トレール':'OCO固定'}】推奨</div>` : "";
 
-    // トレール選択時の推奨値（逆指値とトレール幅）
+    // トレール選択時の推奨値
     let trailHtml = "";
     if(mode === "TRAIL"){
       const pf = pairPipFactor(pos.pair);
-      // ATRをTP/SLから逆算（SL幅 = ATR×1.5 → ATR = SL幅/1.5）
       let atr = null;
-      if(tpsl.sl != null){
-        atr = Math.abs(pos.entryPrice - tpsl.sl) / 1.5;
-      }
+      if(tpsl.sl != null){ atr = Math.abs(pos.entryPrice - tpsl.sl) / 1.5; }
       if(atr != null && cur != null){
-        const trailWidth = atr * 2.0; // 理論推奨: ATR×2
+        const trailWidth = atr * 2.0;
         const trailWidthPips = trailWidth * pf;
-        // 初期トレール逆指値（現在値からトレール幅分離れた位置）
         const trailStop = pos.direction === "LONG" ? (cur - trailWidth) : (cur + trailWidth);
-        // 建値を超えているか（BEより有利ならリスクゼロ圏）
         const beReached = pos.direction === "LONG" ? (trailStop >= pos.entryPrice) : (trailStop <= pos.entryPrice);
         trailHtml = `
           <div class="trail-box">
@@ -743,7 +786,7 @@ function renderOpen(open){
           </div>`;
       } else {
         trailHtml = `<div class="trail-box"><div class="trail-note">
-          現在価格が取得できればトレール推奨値を表示します（建玉サマリーを貼り直すか「現在価格を更新」）。</div></div>`;
+          現在価格が取得できればトレール推奨値を表示します（「現在価格を更新」）。</div></div>`;
       }
     }
 
@@ -768,49 +811,6 @@ function renderOpen(open){
       </button>
       <div class="ai-advice-box" id="ai-${pos.id}"></div>
     </div>`;
-   } catch(err) {
-    // 1件の描画でエラーが出ても他のカードは表示する
-    console.error("renderOpen card error", pos, err);
-    const d2 = pairDecimals(pos.pair);
-    const cur2 = pos.brokerCurPrice != null ? pos.brokerCurPrice : priceCache[pos.pair];
-    let pl2 = "";
-    if(cur2 != null){
-      const pf2 = pairPipFactor(pos.pair);
-      const diff2 = pos.direction==="LONG" ? (cur2-pos.entryPrice) : (pos.entryPrice-cur2);
-      const pips2 = diff2 * pf2;
-      pl2 = `<div class="pos-pl ${pips2>=0?'pos':'neg'}">${pips2>=0?'+':''}${pips2.toFixed(1)} pips</div>
-        <div class="pl-detail">現在 ${cur2.toFixed(d2)} / 建値 ${pos.entryPrice.toFixed(d2)}</div>`;
-    }
-    return `<div class="pos-card ${pos.direction.toLowerCase()}">
-      <div class="pos-top">
-        <span class="pos-pair">${pos.pair}</span>
-        <span class="pos-dir dir-${pos.direction.toLowerCase()}">${pos.direction}</span>
-      </div>
-      <div class="pos-meta">建値: ${pos.entryPrice.toFixed(d2)}　数量: ${pos.qty}</div>
-      ${pl2}
-    </div>`;
-   }
-  }).join("");
-
-  // SLスイッチのイベント
-  grid.querySelectorAll(".sl-switch").forEach(sw => {
-    sw.querySelectorAll(".sl-opt").forEach(btn => {
-      btn.onclick = async () => {
-        slModes[sw.dataset.id] = btn.dataset.mode;
-        await saveData();
-        render();
-      };
-    });
-  });
-
-  // AI決済アドバイスのイベント
-  grid.querySelectorAll(".ai-advice-btn").forEach(btn => {
-    btn.onclick = async () => {
-      const id = btn.dataset.id;
-      const pos = open.find(p => p.id === id);
-      if(pos) await getAIAdvice(pos, btn);
-    };
-  });
 }
 
 // ============================================================
