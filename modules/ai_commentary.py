@@ -215,3 +215,65 @@ def generate_weekly_summary(stats: dict, backtest_overall: dict = None) -> str:
 
     return _call_claude(prompt, max_tokens=600,
                         system="あなたはトレードシステムの運用を支援する冷静なアナリストです。")
+
+
+# ============================================================
+# 決済アドバイス（ポジション管理用・★4以上の保有候補ペアに対して）
+# 利益追求型・スワップ/金利差を根拠に長期保有も検討
+# ============================================================
+
+def generate_exit_advice(result: dict) -> str:
+    """
+    1つの★4以上シグナルに対し、保有していた場合の決済アドバイスを生成。
+    勝率より期待値重視。OCO/トレール/部分利確/長期保有を選択肢として提示。
+    情報提供に徹し投資助言はしない。
+
+    position_manager.html がこの結果を last_signals.json から読んで表示する。
+    """
+    if not os.environ.get("ANTHROPIC_API_KEY"):
+        return None
+
+    pair = result.get("pair", "?")
+    direction = result.get("direction", "?")
+    stars = result.get("stars", 0)
+    ta = result.get("ta_score", "?")
+    fa = result.get("fa_score", "?")
+    rate_diff = result.get("fa_rate_diff")
+    rate_diff_str = f"{rate_diff:+.2f}%" if rate_diff is not None else "不明"
+    mr = result.get("market_regime", {})
+    regime = mr.get("regime_label", "不明")
+    adx = mr.get("adx", "不明")
+    carry = result.get("carry", {})
+    carry_label = carry.get("label") or result.get("carry_comment") or "不明"
+    carry_score = carry.get("score", "不明")
+    sl_recovery = carry.get("sl_recovery_days", "不明")
+    staged = result.get("staged_tp", {})
+    cb_detail = result.get("fa_detail") or result.get("cb_detail") or "不明"
+
+    prompt = f"""あなたはFXトレーダーの保有ポジションについて状況を整理し選択肢を提示するアシスタントです。このトレーダーは「勝率よりトータルの期待値（利益）」を重視し、利を伸ばす戦略を好みます。断定的な売買指示はせず、根拠とともに選択肢を提示してください。
+
+【ポジション】{pair} {direction}（★{stars} TA{ta}/FA{fa}）
+
+【テクニカル】
+相場局面: {regime}（ADX{adx}）
+推奨TP/SL: SL{staged.get('sl','?')} / TP1{staged.get('tp1','?')} / TP2{staged.get('tp2','?')} / TP3{staged.get('tp3','?')}
+
+【ファンダ・スワップ】
+金利差: {rate_diff_str}
+キャリー: {carry_label}（スコア{carry_score} / SL回収{sl_recovery}日）
+中銀スタンス: {cb_detail}
+
+以下を日本語で出力:
+1. 現状整理（1-2文）
+2. 利益を伸ばす選択肢（A/B/Cで2-3個。OCO固定⇄トレール切替、部分利確、長期保有(スワップ)を局面に応じ検討。各々狙いとリスク併記）
+3. 留意点（1文・金利差縮小/介入/トレンド転換など）
+
+ルール:
+- トレンド相場では早すぎる利確が機会損失になる点を踏まえる
+- 長期保有を挙げる場合は金利差・キャリー・SL回収日数を根拠に
+- 「〜すべき」と断定せず「〜という選択肢があります」と提示
+- 最終判断は本人が行う前提
+- 全体300字程度"""
+
+    return _call_claude(prompt, max_tokens=900,
+                        system="あなたは利益最大化を重視するトレーダーの判断を支援する冷静なアシスタントです。投資助言ではなく情報整理と選択肢提示に徹します。")

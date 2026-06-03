@@ -36,7 +36,7 @@ from modules.performance_intelligence import (
     build_pair_performance_map, apply_performance_weighting,
     check_drawdown_alert, detect_market_regime,
 )
-from modules.ai_commentary import generate_market_commentary
+from modules.ai_commentary import generate_market_commentary, generate_exit_advice
 from modules.ambush_alert import evaluate_ambush, collect_ambush_alerts
 
 PAGES_URL = "https://applejoker01-afk.github.io/fx-signal-monitor/"
@@ -1189,6 +1189,19 @@ def main():
         )
         if ai_commentary:
             print(f"[AI] 市況コメンタリー生成完了")
+
+    # 🤖 AI決済アドバイス（★4以上のペアに生成し、resultsに埋め込む）
+    #    position_manager.html が last_signals.json からこれを読んで表示する
+    if os.environ.get("ANTHROPIC_API_KEY"):
+        advice_count = 0
+        for r in results:
+            if r.get("stars", 0) >= 4:
+                advice = generate_exit_advice(r)
+                if advice:
+                    r["ai_exit_advice"] = advice
+                    advice_count += 1
+        if advice_count:
+            print(f"[AI] 決済アドバイス生成: {advice_count}件")
 
     # 7. 通知（中長期シグナル変化・決済・ドローダウンで送信）
     #    待ち伏せ・反発監視（短期）はデイトレ画面に集約したため中長期通知では送らない

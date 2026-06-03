@@ -724,7 +724,7 @@ function renderOpen(open){
       ${modeHint}
       ${tpslHtml}
       <button class="btn small ai-advice-btn" data-id="${pos.id}" style="margin-top:0.7rem;width:100%;">
-        🤖 AI決済アドバイスを取得
+        🤖 AI決済アドバイスを表示
       </button>
       <div class="ai-advice-box" id="ai-${pos.id}"></div>
     </div>`;
@@ -757,107 +757,26 @@ function renderOpen(open){
 // ============================================================
 async function getAIAdvice(pos, btn){
   const box = document.getElementById("ai-" + pos.id);
-  btn.disabled = true;
-  btn.textContent = "🤖 AI分析中…";
-  box.innerHTML = `<div class="ai-loading">Claudeが状況を整理しています…</div>`;
-
-  const d = pairDecimals(pos.pair);
-  const cur = pos.brokerCurPrice != null ? pos.brokerCurPrice : priceCache[pos.pair];
-  const tpsl = autoTPSL(pos);
-  const strat = decideExitStrategy(pos);
   const sig = signalCache[pos.pair];
-  const pf = pairPipFactor(pos.pair);
-  const pips = cur != null
-    ? (pos.direction==="LONG" ? (cur-pos.entryPrice) : (pos.entryPrice-cur)) * pf
-    : null;
 
-  // Claudeに渡す状況サマリー（分析ターミナルの実データを根拠として渡す）
-  const mr = sig && sig.market_regime ? sig.market_regime : {};
-  const carry = sig && sig.carry ? sig.carry : {};
-  const ctx = {
-    pair: pos.pair, direction: pos.direction,
-    entry: pos.entryPrice.toFixed(d),
-    current: cur != null ? cur.toFixed(d) : "不明",
-    unrealizedPips: pips != null ? pips.toFixed(1) : "不明",
-    sl: tpsl.sl?.toFixed(d), tp1: tpsl.tp1?.toFixed(d),
-    tp2: tpsl.tp2?.toFixed(d), tp3: tpsl.tp3?.toFixed(d),
-    regime: strat.label, regimeTarget: strat.target,
-    adx: mr.adx != null ? mr.adx : "不明",
-    stars: sig ? sig.stars : "不明",
-    ta: sig ? sig.ta_score : "不明",
-    fa: sig ? sig.fa_score : "不明",
-    sigDirection: sig ? sig.direction : "不明",
-    rateDiff: sig && sig.fa_rate_diff != null ? sig.fa_rate_diff.toFixed(2) + "%" : "不明",
-    carryScore: carry.score != null ? carry.score : "不明",
-    carryLabel: carry.label || (sig && sig.carry_comment) || "不明",
-    slRecoveryDays: carry.sl_recovery_days != null ? carry.sl_recovery_days : "不明",
-    cbDetail: sig && sig.fa_detail ? sig.fa_detail : (sig && sig.cb_detail ? sig.cb_detail : "不明"),
-    currentMode: slModes[pos.id] || "OCO",
-    interventionRisk: sig && sig.intervention_risk ? (sig.intervention_risk.risk_label || sig.intervention_risk.risk_level) : "なし",
-  };
-
-  const prompt = `あなたはFXトレーダーの保有ポジションについて、状況を整理し選択肢を提示するアシスタントです。このトレーダーは「勝率よりもトータルの期待値（利益）」を重視し、利を伸ばす戦略を好みます。断定的な売買指示はせず、根拠とともに複数の選択肢を提示してください。
-
-【保有ポジション】
-通貨ペア: ${ctx.pair} / 方向: ${ctx.direction}
-建値: ${ctx.entry} → 現在値: ${ctx.current}
-含み損益: ${ctx.unrealizedPips} pips
-現在の決済方式設定: ${ctx.currentMode}
-
-【テクニカル（分析ターミナルの実データ）】
-相場局面: ${ctx.regime}（ADX${ctx.adx}・推奨ターゲット${ctx.regimeTarget}）
-シグナル: ★${ctx.stars} TA${ctx.ta}/FA${ctx.fa} システム方向${ctx.sigDirection}
-推奨TP/SL: SL${ctx.sl} / TP1${ctx.tp1} / TP2${ctx.tp2} / TP3${ctx.tp3}
-
-【ファンダ・スワップ（長期保有の判断材料）】
-金利差: ${ctx.rateDiff}
-キャリー: ${ctx.carryLabel}（スコア${ctx.carryScore} / SL回収${ctx.slRecoveryDays}日）
-中銀スタンス: ${ctx.cbDetail}
-介入リスク: ${ctx.interventionRisk}
-
-以下を日本語で出力してください:
-
-1. 現状の整理（2-3文。含み損益と局面を踏まえて）
-
-2. 利益を伸ばすための選択肢（A/B/Cで2-3個）。以下を状況に応じて具体的に検討:
-   - OCO固定 ⇄ トレール切替（今の局面でどちらが利益最大化に資するか）
-   - 部分利確（半分利確して残りを伸ばす）
-   - 長期保有への切替（金利差・キャリー・SL回収日数・トレンド継続を根拠に。スワップ受取の妙味があるか）
-   各選択肢に「狙い」と「リスク」を併記。
-
-3. 留意点（金利差縮小・介入・トレンド転換などのリスクを1-2文）
-
-ルール:
-- トレンド相場では早すぎる利確が機会損失になる点を踏まえる
-- 長期保有を挙げる場合は必ず金利差・キャリー・SL回収日数を根拠に示す
-- 「〜すべき」と断定せず「〜という選択肢があります」と提示
-- 最終判断は本人が行う前提
-- 全体で350字程度`;
-
-  try{
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 1500,
-        messages: [{ role: "user", content: prompt }],
-      }),
-    });
-    const data = await res.json();
-    const text = (data.content || [])
-      .filter(b => b.type === "text").map(b => b.text).join("\n").trim();
-    if(text){
-      box.innerHTML = `<div class="ai-result">${text.replace(/\n/g,"<br>")}</div>
-        <div class="ai-disclaimer">※ AIによる情報整理です。投資助言ではありません。最終判断はご自身で。</div>`;
-    } else {
-      box.innerHTML = `<div class="ai-error">AIから応答が得られませんでした。</div>`;
-    }
-  }catch(e){
-    box.innerHTML = `<div class="ai-error">AI呼び出しに失敗しました: ${e.message}</div>`;
+  // GitHub Actionsが生成済みのアドバイスを last_signals.json から取得
+  if(sig && sig.ai_exit_advice){
+    box.innerHTML = `<div class="ai-result">${sig.ai_exit_advice.replace(/\n/g,"<br>")}</div>
+      <div class="ai-disclaimer">※ システムが生成したAI情報整理です（${signalTimestamp ? new Date(signalTimestamp).toLocaleString("ja-JP") : ""}時点）。投資助言ではありません。最終判断はご自身で。</div>`;
+    btn.textContent = "🤖 AI決済アドバイス（最新を再取得）";
+    btn.onclick = async () => { await fetchSignals(); render(); };
+    return;
   }
-  btn.disabled = false;
-  btn.textContent = "🤖 AI決済アドバイスを再取得";
+
+  // まだ生成されていない場合
+  if(sig){
+    box.innerHTML = `<div class="ai-loading">このペアのAIアドバイスはまだ生成されていません。<br>
+      次回のシステムスキャン（毎時05分）で★4以上が維持されれば生成されます。<br>
+      「現在価格を更新」を押すと最新のシグナルを取得します。</div>`;
+  } else {
+    box.innerHTML = `<div class="ai-loading">このペアは現在★4未満のため、AIアドバイスの生成対象外です。<br>
+      （AIアドバイスは★4以上の中長期シグナルが出ているペアに生成されます）</div>`;
+  }
 }
 
 function renderClosed(closed){
