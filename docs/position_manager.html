@@ -122,6 +122,13 @@ a{color:var(--gold);}
   padding:0.7rem 0.9rem;font-family:var(--jp);font-size:0.76rem;line-height:1.7;color:var(--text-primary);}
 .ai-disclaimer{font-family:var(--mono);font-size:0.64rem;color:var(--text-muted);margin-top:0.3rem;}
 .ai-error{font-family:var(--mono);font-size:0.72rem;color:var(--sell);padding:0.5rem;}
+.trail-box{margin-top:0.5rem;padding:0.6rem 0.8rem;background:rgba(212,165,116,0.07);
+  border:1px solid rgba(212,165,116,0.35);border-radius:5px;}
+.trail-title{font-family:var(--jp-serif);font-size:0.78rem;color:var(--gold);font-weight:600;margin-bottom:0.4rem;}
+.trail-row{display:flex;justify-content:space-between;font-family:var(--mono);font-size:0.74rem;
+  color:var(--text-secondary);padding:0.15rem 0;}
+.trail-val{color:var(--text-primary);font-weight:700;}
+.trail-note{font-family:var(--jp);font-size:0.7rem;color:var(--text-muted);line-height:1.6;margin-top:0.35rem;}
 </style>
 </head>
 <body>
@@ -710,6 +717,36 @@ function renderOpen(open){
     const modeHint = (mode !== recMode && sig)
       ? `<div style="font-size:0.7rem;color:var(--gold);margin-top:0.2rem;">💡 局面的には【${recMode==='TRAIL'?'トレール':'OCO固定'}】推奨</div>` : "";
 
+    // トレール選択時の推奨値（逆指値とトレール幅）
+    let trailHtml = "";
+    if(mode === "TRAIL"){
+      const pf = pairPipFactor(pos.pair);
+      // ATRをTP/SLから逆算（SL幅 = ATR×1.5 → ATR = SL幅/1.5）
+      let atr = null;
+      if(tpsl.sl != null){
+        atr = Math.abs(pos.entryPrice - tpsl.sl) / 1.5;
+      }
+      if(atr != null && cur != null){
+        const trailWidth = atr * 2.0; // 理論推奨: ATR×2
+        const trailWidthPips = trailWidth * pf;
+        // 初期トレール逆指値（現在値からトレール幅分離れた位置）
+        const trailStop = pos.direction === "LONG" ? (cur - trailWidth) : (cur + trailWidth);
+        // 建値を超えているか（BEより有利ならリスクゼロ圏）
+        const beReached = pos.direction === "LONG" ? (trailStop >= pos.entryPrice) : (trailStop <= pos.entryPrice);
+        trailHtml = `
+          <div class="trail-box">
+            <div class="trail-title">📐 トレール推奨設定</div>
+            <div class="trail-row"><span>トレール幅</span><span class="trail-val">ATR×2 ＝ 約${trailWidthPips.toFixed(0)}pips（${trailWidth.toFixed(d)}）</span></div>
+            <div class="trail-row"><span>初期逆指値</span><span class="trail-val">${trailStop.toFixed(d)}</span></div>
+            <div class="trail-note">価格が${pos.direction==="LONG"?"上昇":"下落"}したら逆指値を${pos.direction==="LONG"?"切り上げ":"切り下げ"}、${trailWidthPips.toFixed(0)}pips逆行で決済。
+            ${beReached?'✅ 現在の逆指値は建値より有利（実質ノーリスク圏）':'⚠ まだ建値に届かず。逆指値ヒットなら損失。'}</div>
+          </div>`;
+      } else {
+        trailHtml = `<div class="trail-box"><div class="trail-note">
+          現在価格が取得できればトレール推奨値を表示します（建玉サマリーを貼り直すか「現在価格を更新」）。</div></div>`;
+      }
+    }
+
     return `<div class="pos-card ${pos.direction.toLowerCase()}">
       <div class="pos-top">
         <span class="pos-pair">${pos.pair}</span>
@@ -724,6 +761,7 @@ function renderOpen(open){
       </div>
       <div class="pl-detail">${mode==='OCO'?'SL/TPを固定して監視':'価格追従でSLを引き上げる方針'}</div>
       ${modeHint}
+      ${trailHtml}
       ${tpslHtml}
       <button class="btn small ai-advice-btn" data-id="${pos.id}" style="margin-top:0.7rem;width:100%;">
         🤖 AI決済アドバイスを表示
