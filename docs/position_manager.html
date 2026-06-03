@@ -238,12 +238,21 @@ const PAIR_ALIASES = {
   "香港ドル-円":"HKDJPY","香港ドル円":"HKDJPY","HKD/JPY":"HKDJPY","HKDJPY":"HKDJPY",
   "ドルスイス":"USDCHF","米ドルスイス":"USDCHF","USD/CHF":"USDCHF","USDCHF":"USDCHF",
   "ドルカナダ":"USDCAD","米ドルカナダ":"USDCAD","USD/CAD":"USDCAD","USDCAD":"USDCAD",
+  "カナダドル-円":"CADJPY","カナダ-円":"CADJPY","カナダドル円":"CADJPY","CAD/JPY":"CADJPY","CADJPY":"CADJPY",
+  "スイス-円":"CHFJPY","スイスフラン-円":"CHFJPY","スイスフラン円":"CHFJPY","CHF/JPY":"CHFJPY","CHFJPY":"CHFJPY",
+  "ポンド-スイス":"GBPCHF","GBP/CHF":"GBPCHF","GBPCHF":"GBPCHF",
+  "ポンド-豪ドル":"GBPAUD","GBP/AUD":"GBPAUD","GBPAUD":"GBPAUD",
+  "NZドル-米ドル":"NZDUSD","ＮＺドル-米ドル":"NZDUSD","NZD/USD":"NZDUSD","NZDUSD":"NZDUSD",
+  "豪ドル-NZドル":"AUDNZD","AUD/NZD":"AUDNZD","AUDNZD":"AUDNZD",
   "ランド円":"ZARJPY","南アランド円":"ZARJPY","ZAR/JPY":"ZARJPY","ZARJPY":"ZARJPY",
   "メキシコペソ円":"MXNJPY","ペソ円":"MXNJPY","MXN/JPY":"MXNJPY","MXNJPY":"MXNJPY",
   "トルコリラ円":"TRYJPY","リラ円":"TRYJPY","TRY/JPY":"TRYJPY","TRYJPY":"TRYJPY",
 };
 function normalizePair(raw){
-  const s = raw.trim().replace(/\s/g,"");
+  if(!raw) return "";
+  // 全角ハイフン・各種ダッシュを半角ハイフンに統一してから判定
+  let s = raw.trim().replace(/\s/g,"")
+    .replace(/[‐‑‒–—―ー－]/g, "-"); // 各種ハイフン/全角を半角-に
   if (PAIR_ALIASES[s]) return PAIR_ALIASES[s];
   const upper = s.toUpperCase().replace(/[\/\-]/g,"");
   if (PAIR_ALIASES[upper]) return PAIR_ALIASES[upper];
@@ -269,19 +278,47 @@ const SIGNAL_URL = "https://applejoker01-afk.github.io/fx-signal-monitor/last_si
 
 const STORE_KEY = "currents_position_manager_v1";
 
-async function saveData(){
-  try{
-    await window.storage.set(STORE_KEY, JSON.stringify({ fills, slModes, holdings }), false);
-  }catch(e){ console.error("save failed", e); }
+// localStorageが使えるか判定（GitHub Pages・通常ブラウザ）
+function hasLocalStorage(){
+  try{ return typeof localStorage !== "undefined" && localStorage !== null; }
+  catch(e){ return false; }
 }
-async function loadData(){
+
+async function saveData(){
+  const payload = JSON.stringify({ fills, slModes, holdings });
+  // 1) localStorage（GitHub Pages・通常ブラウザで動く）
+  if(hasLocalStorage()){
+    try{ localStorage.setItem(STORE_KEY, payload); return; }
+    catch(e){ console.error("localStorage save failed", e); }
+  }
+  // 2) window.storage（claude.aiアーティファクト環境）
   try{
-    const r = await window.storage.get(STORE_KEY, false);
-    if(r && r.value){
-      const d = JSON.parse(r.value);
-      fills = d.fills || [];
-      slModes = d.slModes || {};
-      holdings = d.holdings || [];
+    if(typeof window !== "undefined" && window.storage && window.storage.set){
+      await window.storage.set(STORE_KEY, payload, false);
+    }
+  }catch(e){ console.error("window.storage save failed", e); }
+}
+
+async function loadData(){
+  // 1) localStorage を試す
+  if(hasLocalStorage()){
+    try{
+      const raw = localStorage.getItem(STORE_KEY);
+      if(raw){
+        const d = JSON.parse(raw);
+        fills = d.fills || []; slModes = d.slModes || {}; holdings = d.holdings || [];
+        return;
+      }
+    }catch(e){ /* 続けてwindow.storageを試す */ }
+  }
+  // 2) window.storage を試す（claude.aiアーティファクト環境）
+  try{
+    if(typeof window !== "undefined" && window.storage && window.storage.get){
+      const r = await window.storage.get(STORE_KEY, false);
+      if(r && r.value){
+        const d = JSON.parse(r.value);
+        fills = d.fills || []; slModes = d.slModes || {}; holdings = d.holdings || [];
+      }
     }
   }catch(e){ /* 初回は無し */ }
 }
