@@ -631,6 +631,7 @@ function renderOpen(open){
   const grid = document.getElementById("openGrid");
   if(!open.length){ grid.innerHTML = `<div class="empty">保有中のポジションはありません</div>`; return; }
   grid.innerHTML = open.map(pos => {
+   try {
     const d = pairDecimals(pos.pair);
     // 建玉サマリー由来なら証券会社の現在値を優先、なければYahoo価格
     const cur = pos.brokerCurPrice != null ? pos.brokerCurPrice : priceCache[pos.pair];
@@ -676,7 +677,8 @@ function renderOpen(open){
     const strat = decideExitStrategy(pos);
     let sigHtml = "";
     if(sig){
-      const stars = "★".repeat(sig.stars || 0) + "☆".repeat(5 - (sig.stars || 0));
+      const st = Math.max(0, Math.min(5, sig.stars || 0));
+      const stars = "★".repeat(st) + "☆".repeat(5 - st);
       const regimeColor = strat.regime === "trending" ? "var(--buy)"
         : (strat.regime === "ranging" ? "var(--caution)" : "var(--gold)");
       const dirWarn = sig.direction !== pos.direction
@@ -728,6 +730,28 @@ function renderOpen(open){
       </button>
       <div class="ai-advice-box" id="ai-${pos.id}"></div>
     </div>`;
+   } catch(err) {
+    // 1件の描画でエラーが出ても他のカードは表示する
+    console.error("renderOpen card error", pos, err);
+    const d2 = pairDecimals(pos.pair);
+    const cur2 = pos.brokerCurPrice != null ? pos.brokerCurPrice : priceCache[pos.pair];
+    let pl2 = "";
+    if(cur2 != null){
+      const pf2 = pairPipFactor(pos.pair);
+      const diff2 = pos.direction==="LONG" ? (cur2-pos.entryPrice) : (pos.entryPrice-cur2);
+      const pips2 = diff2 * pf2;
+      pl2 = `<div class="pos-pl ${pips2>=0?'pos':'neg'}">${pips2>=0?'+':''}${pips2.toFixed(1)} pips</div>
+        <div class="pl-detail">現在 ${cur2.toFixed(d2)} / 建値 ${pos.entryPrice.toFixed(d2)}</div>`;
+    }
+    return `<div class="pos-card ${pos.direction.toLowerCase()}">
+      <div class="pos-top">
+        <span class="pos-pair">${pos.pair}</span>
+        <span class="pos-dir dir-${pos.direction.toLowerCase()}">${pos.direction}</span>
+      </div>
+      <div class="pos-meta">建値: ${pos.entryPrice.toFixed(d2)}　数量: ${pos.qty}</div>
+      ${pl2}
+    </div>`;
+   }
   }).join("");
 
   // SLスイッチのイベント
