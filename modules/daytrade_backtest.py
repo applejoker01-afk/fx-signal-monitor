@@ -413,6 +413,264 @@ def detect_resonance_entries(bars, pair, rr=2.0):
     return entries
 
 
+def calc_adx(highs, lows, closes, period=14):
+    """簡易ADX（トレンドの強さ。高い=トレンド、低い=レンジ）"""
+    if len(closes) < period * 2:
+        return None
+    plus_dm, minus_dm, trs = [], [], []
+    for i in range(1, len(closes)):
+        up = highs[i] - highs[i - 1]
+        down = lows[i - 1] - lows[i]
+        plus_dm.append(up if (up > down and up > 0) else 0)
+        minus_dm.append(down if (down > up and down > 0) else 0)
+        tr = max(highs[i] - lows[i], abs(highs[i] - closes[i - 1]),
+                 abs(lows[i] - closes[i - 1]))
+        trs.append(tr)
+    if len(trs) < period:
+        return None
+    atr = statistics.mean(trs[-period:])
+    if atr == 0:
+        return None
+    pdi = 100 * statistics.mean(plus_dm[-period:]) / atr
+    mdi = 100 * statistics.mean(minus_dm[-period:]) / atr
+    if pdi + mdi == 0:
+        return None
+    dx = 100 * abs(pdi - mdi) / (pdi + mdi)
+    return dx
+
+
+def detect_breakout_entries(bars, pair, rr=2.0, lookback=20):
+    """
+    ①ブレイクアウト: 直近lookback本のレンジ高安を抜けた方向に乗る。
+    フィルター: ATR拡大中（動き出している）時のみ。
+    """
+    entries = []
+    closes = [b["close"] for b in bars]
+    highs = [b["high"] for b in bars]
+    lows = [b["low"] for b in bars]
+
+    i = 60
+    while i < len(bars) - 30:
+        atr = calc_atr(highs[:i + 1], lows[:i + 1], closes[:i + 1])
+        atr_prev = calc_atr(highs[:i - 5], lows[:i - 5], closes[:i - 5]) if i > 30 else None
+        if not atr or not atr_prev:
+            i += 1
+            continue
+        # レンジ（直近lookback本、当該足除く）
+        window_h = highs[i - lookback:i]
+        window_l = lows[i - lookback:i]
+        range_high = max(window_h)
+        range_low = min(window_l)
+        bar = bars[i]
+        atr_expanding = atr > atr_prev  # ボラ拡大中
+
+        direction = None
+        if bar["close"] > range_high and atr_expanding:
+            direction = "LONG"
+        elif bar["close"] < range_low and atr_expanding:
+            direction = "SHORT"
+
+        if direction:
+            entry = bar["close"]
+            if direction == "LONG":
+                sl = range_high - atr * 0.5  # 抜けたレンジ上限の少し下
+                risk = entry - sl
+                tp = entry + risk * rr
+            else:
+                sl = range_low + atr * 0.5
+                risk = sl - entry
+                tp = entry - risk * rr
+            if risk > 0:
+                entries.append({"index": i, "direction": direction,
+                                "entry": entry, "sl": sl, "tp": tp,
+                                "role": "ブレイク", "atr": atr})
+                i += 8
+                continue
+        i += 1
+    return entries
+
+
+def detect_vol_breakout_entries(bars, pair, rr=2.0, period=20):
+    """
+    ③ボラティリティ・ブレイク: ボリンジャーバンドのスクイーズ（収縮）後、
+    バンド拡大が始まった方向にエントリー。
+    """
+    entries = []
+    closes = [b["close"] for b in bars]
+    highs = [b["high"] for b in bars]
+    lows = [b["low"] for b in bars]
+
+    def bandwidth(idx):
+        seg = closes[idx - period:idx]
+        if len(seg) < period:
+            return None
+        m = statistics.mean(seg)
+        sd = statistics.pstdev(seg)
+        if m == 0:
+            return None
+        return (4 * sd) / m  # バンド幅（2σ×2）/中心
+
+    i = period + 30
+    while i < len(bars) - 30:
+        atr = calc_atr(highs[:i + 1], lows[:i + 1], closes[:i + 1])
+        bw_now = bandwidth(i)
+        bw_prev = bandwidth(i - 5)
+        if not atr or bw_now is None or bw_prev is None:
+            i += 1
+            continue
+        # 直近20本のバンド幅の中で、5本前が最小付近（スクイーズ）→ 今拡大
+        recent_bws = [bandwidth(j) for j in range(i - 20, i) if bandwidth(j) is not None]
+        if not recent_bws:
+            i += 1
+            continue
+        was_squeezed = bw_prev <= min(recent_bws) * 1.15  # 5本前が収縮状態
+        expanding = bw_now > bw_prev * 1.1  # 今拡大中
+
+        bar = bars[i]
+        m = statistics.mean(closes[i - period:i])
+        direction = None
+        if was_squeezed and expanding:
+            # 拡大方向 = 中心線に対する価格の位置
+            if bar["close"] > m:
+                direction = "LONG"
+            elif bar["close"] < m:
+                direction = "SHORT"
+
+        if direction:
+            entry = bar["close"]
+            if direction == "LONG":
+                sl = entry - atr * 1.5
+                risk = entry - sl
+                tp = entry + risk * rr
+            else:
+                sl = entry + atr * 1.5
+                risk = sl - entry
+                tp = entry - risk * rr
+            if risk > 0:
+                entries.append({"index": i, "direction": direction,
+                                "entry": entry, "sl": sl, "tp": tp,
+                                "role": "ボラブレイク", "atr": atr})
+                i += 8
+                continue
+        i += 1
+    return entries
+
+
+def detect_mean_reversion_entries(bars, pair, rr=2.0, period=20):
+    """
+    ④平均回帰: 明確なレンジ（低ADX）でのみ、バンド端で逆張り。
+    トレンド時は何もしない。
+    """
+    entries = []
+    closes = [b["close"] for b in bars]
+    highs = [b["high"] for b in bars]
+    lows = [b["low"] for b in bars]
+
+    i = period + 30
+    while i < len(bars) - 30:
+        atr = calc_atr(highs[:i + 1], lows[:i + 1], closes[:i + 1])
+        adx = calc_adx(highs[:i + 1], lows[:i + 1], closes[:i + 1])
+        if not atr or adx is None:
+            i += 1
+            continue
+        # レンジ相場（ADX < 20）でのみ
+        if adx >= 20:
+            i += 1
+            continue
+        seg = closes[i - period:i]
+        m = statistics.mean(seg)
+        sd = statistics.pstdev(seg)
+        upper = m + 2 * sd
+        lower = m - 2 * sd
+        bar = bars[i]
+        direction = None
+        # 下バンド割れ→ロング（回帰）、上バンド超え→ショート
+        if bar["low"] <= lower and bar["close"] > lower:
+            direction = "LONG"
+        elif bar["high"] >= upper and bar["close"] < upper:
+            direction = "SHORT"
+
+        if direction:
+            entry = bar["close"]
+            if direction == "LONG":
+                sl = entry - atr * 1.5
+                risk = entry - sl
+                tp = entry + risk * rr  # 平均回帰なのでTPは中心線方向
+            else:
+                sl = entry + atr * 1.5
+                risk = sl - entry
+                tp = entry - risk * rr
+            if risk > 0:
+                entries.append({"index": i, "direction": direction,
+                                "entry": entry, "sl": sl, "tp": tp,
+                                "role": "平均回帰", "atr": atr})
+                i += 8
+                continue
+        i += 1
+    return entries
+
+
+def detect_session_entries(bars, pair, rr=2.0):
+    """
+    ②時間帯特化: 東京時間(00-07 UTC)=レンジ逆張り、
+    ロンドン/NY(07-21 UTC)=順張りブレイク。
+    barsに'hour'（UTC時）が必要。無ければ全時間帯で動作。
+    """
+    entries = []
+    closes = [b["close"] for b in bars]
+    highs = [b["high"] for b in bars]
+    lows = [b["low"] for b in bars]
+
+    i = 60
+    while i < len(bars) - 30:
+        atr = calc_atr(highs[:i + 1], lows[:i + 1], closes[:i + 1])
+        if not atr:
+            i += 1
+            continue
+        bar = bars[i]
+        hour = bar.get("hour")
+        # 東京時間（レンジ逆張り）
+        is_tokyo = hour is not None and 0 <= hour < 7
+        direction = None
+        role = ""
+
+        if is_tokyo:
+            # レンジ逆張り: 直近20本の高安で逆張り
+            rh = max(highs[i - 20:i])
+            rl = min(lows[i - 20:i])
+            if bar["low"] <= rl and bar["close"] > rl:
+                direction, role = "LONG", "東京逆張り"
+            elif bar["high"] >= rh and bar["close"] < rh:
+                direction, role = "SHORT", "東京逆張り"
+        else:
+            # 欧米時間: ブレイク順張り
+            rh = max(highs[i - 20:i])
+            rl = min(lows[i - 20:i])
+            if bar["close"] > rh:
+                direction, role = "LONG", "欧米ブレイク"
+            elif bar["close"] < rl:
+                direction, role = "SHORT", "欧米ブレイク"
+
+        if direction:
+            entry = bar["close"]
+            if direction == "LONG":
+                sl = entry - atr * 1.5
+                risk = entry - sl
+                tp = entry + risk * rr
+            else:
+                sl = entry + atr * 1.5
+                risk = sl - entry
+                tp = entry - risk * rr
+            if risk > 0:
+                entries.append({"index": i, "direction": direction,
+                                "entry": entry, "sl": sl, "tp": tp,
+                                "role": role, "atr": atr})
+                i += 8
+                continue
+        i += 1
+    return entries
+
+
 def run_comparison(price_data, pair):
     """
     1ペアについて4方式を比較。
@@ -470,36 +728,39 @@ def run_rr_comparison(price_data, pair, base_method="improveB",
 
 def run_strategy_comparison(price_data, pair, rr=2.0):
     """
-    反発（逆張り）vs 三次元共鳴（順張り）を同じRRで比較。
+    6戦略を同じRRで比較:
+    反発 / 反発の逆 / 三次元共鳴 / ブレイクアウト / ボラブレイク / 平均回帰 / 時間帯特化
     """
     highs = price_data["highs"]
     lows = price_data["lows"]
     closes = price_data["closes"]
     opens = price_data.get("opens", closes)
-    bars = [
-        {"high": highs[i], "low": lows[i], "close": closes[i],
-         "open": opens[i] if i < len(opens) else closes[i]}
-        for i in range(len(closes))
-    ]
+    timestamps = price_data.get("timestamps")  # UNIX秒のリスト（任意）
+    bars = []
+    for i in range(len(closes)):
+        hour = None
+        if timestamps and i < len(timestamps) and timestamps[i]:
+            from datetime import datetime, timezone as _tz
+            hour = datetime.fromtimestamp(timestamps[i], _tz.utc).hour
+        bars.append({"high": highs[i], "low": lows[i], "close": closes[i],
+                     "open": opens[i] if i < len(opens) else closes[i],
+                     "hour": hour})
     if len(bars) < 250:
         return None
 
     max_hold = int(20 * max(1.0, rr))
     summaries = {}
 
-    # 反発（トレンドフィルター付き improveB）
-    rebound = detect_entries(bars, "improveB", pair, rr=rr)
-    rebound_results = evaluate_entries(bars, rebound, max_hold=max_hold)
-    summaries["反発(improveB)"] = summarize(rebound_results, "反発(improveB)")
+    def run(name, entries):
+        res = evaluate_entries(bars, entries, max_hold=max_hold)
+        summaries[name] = summarize(res, name)
 
-    # 反発の逆（同じエントリー地点で方向反転）
-    reverse = detect_entries(bars, "improveB", pair, rr=rr, reverse=True)
-    reverse_results = evaluate_entries(bars, reverse, max_hold=max_hold)
-    summaries["反発の逆(reverse)"] = summarize(reverse_results, "反発の逆(reverse)")
-
-    # 三次元共鳴（順張り）
-    resonance = detect_resonance_entries(bars, pair, rr=rr)
-    resonance_results = evaluate_entries(bars, resonance, max_hold=max_hold)
-    summaries["三次元共鳴(順張り)"] = summarize(resonance_results, "三次元共鳴(順張り)")
+    run("反発(improveB)", detect_entries(bars, "improveB", pair, rr=rr))
+    run("反発の逆(reverse)", detect_entries(bars, "improveB", pair, rr=rr, reverse=True))
+    run("三次元共鳴(順張り)", detect_resonance_entries(bars, pair, rr=rr))
+    run("①ブレイクアウト", detect_breakout_entries(bars, pair, rr=rr))
+    run("②時間帯特化", detect_session_entries(bars, pair, rr=rr))
+    run("③ボラブレイク", detect_vol_breakout_entries(bars, pair, rr=rr))
+    run("④平均回帰", detect_mean_reversion_entries(bars, pair, rr=rr))
 
     return summaries
