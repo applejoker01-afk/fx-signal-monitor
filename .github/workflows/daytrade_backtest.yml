@@ -1,0 +1,26 @@
+name: Daytrade Backtest
+
+on:
+  workflow_dispatch:  # 手動実行
+
+jobs:
+  backtest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run daytrade backtest
+        run: python run_daytrade_backtest.py
+
+      - name: Commit results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/daytrade_backtest.json
+          git commit -m "Update daytrade backtest results" || echo "No changes"
+          git push
