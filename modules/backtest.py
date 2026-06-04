@@ -196,6 +196,7 @@ def run_full_backtest(
     cb_rates: dict,
     pair_api: dict,
     lookback_days: int = 180,
+    atr_multipliers: tuple = (2.5, 2.5, 5.0, 8.5),
 ) -> dict:
     """
     全通貨ペアのバックテストを実行して総合結果を返す。
@@ -216,7 +217,8 @@ def run_full_backtest(
         if prices and len(prices) >= 60:
             result = run_backtest(
                 pair, prices, compute_ta_score_fn, compute_fa_score_fn,
-                cb_rates, pair_api, lookback_days=lookback_days
+                cb_rates, pair_api, lookback_days=lookback_days,
+                atr_multipliers=atr_multipliers
             )
             if result.get("total", 0) > 0:
                 by_pair[pair] = result

@@ -1,0 +1,27 @@
+name: TPSL Optimization
+
+on:
+  workflow_dispatch:
+    inputs:
+      backtest_days:
+        description: "検証日数"
+        required: false
+        default: "180"
+
+jobs:
+  optimize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run TP/SL optimization
+        env:
+          BACKTEST_DAYS: ${{ github.event.inputs.backtest_days }}
+          FRED: ${{ secrets.FRED }}
+          FINNHUB: ${{ secrets.FINNHUB }}
+        run: python run_tpsl_optimization.py
