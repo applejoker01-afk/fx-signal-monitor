@@ -10,7 +10,7 @@ import time
 import urllib.request
 from datetime import datetime, timezone
 
-from modules.daytrade_backtest import run_comparison
+from modules.daytrade_backtest import run_strategy_comparison
 
 # 検証対象（デイトレ監視ペア）
 PAIRS = ["USDJPY", "EURUSD", "GBPJPY", "AUDJPY", "EURJPY", "AUDUSD"]
@@ -45,14 +45,13 @@ def fetch_15m(pair, days=60):
 
 def main():
     print("=" * 64)
-    print("デイトレ反発ロジック検証（現状 vs 改善A/B/C）")
+    print("デイトレ戦略比較: 反発(逆張り) vs 三次元共鳴(順張り) RR1:2")
     print("=" * 64)
 
     all_results = {}
-    # 全ペア合算用
-    aggregate = {m: {"trades": 0, "wins": 0, "losses": 0, "total_pips": 0.0,
-                     "gross_win": 0.0, "gross_loss": 0.0}
-                 for m in ["current", "improveA", "improveB", "improveC"]}
+    strategies = ["反発(improveB)", "三次元共鳴(順張り)"]
+    aggregate = {s: {"trades": 0, "wins": 0, "losses": 0, "total_pips": 0.0}
+                 for s in strategies}
 
     for pair in PAIRS:
         print(f"\n--- {pair} ---")
@@ -62,58 +61,60 @@ def main():
             continue
         print(f"  {len(data['closes'])}本の15分足を取得")
 
-        summaries = run_comparison(data, pair)
+        summaries = run_strategy_comparison(data, pair, rr=2.0)
         if not summaries:
             continue
         all_results[pair] = summaries
 
-        for m, s in summaries.items():
-            if s.get("trades", 0) == 0:
-                print(f"  {m:9}: トレードなし")
+        for s, v in summaries.items():
+            if v.get("trades", 0) == 0:
+                print(f"  {s:18}: トレードなし")
                 continue
-            print(f"  {m:9}: {s['trades']}件 勝率{s['win_rate']}% "
-                  f"PF{s['pf']} 期待値{s['expectancy']}pips/件 "
-                  f"累計{s['total_pips']}pips DD{s['max_dd']}")
-            # 合算
-            aggregate[m]["trades"] += s["trades"]
-            aggregate[m]["wins"] += s["wins"]
-            aggregate[m]["losses"] += s["losses"]
-            aggregate[m]["total_pips"] += s["total_pips"]
+            print(f"  {s:18}: {v['trades']}件 勝率{v['win_rate']}% "
+                  f"PF{v['pf']} 期待値{v['expectancy']}pips/件 "
+                  f"累計{v['total_pips']}pips DD{v['max_dd']}")
+            if s in aggregate:
+                aggregate[s]["trades"] += v["trades"]
+                aggregate[s]["wins"] += v["wins"]
+                aggregate[s]["losses"] += v["losses"]
+                aggregate[s]["total_pips"] += v["total_pips"]
 
-        time.sleep(1)  # レート制限対策
+        time.sleep(1)
 
-    # 全ペア合算サマリー
     print("\n" + "=" * 64)
-    print("【全ペア合算】")
+    print("【全ペア合算】戦略比較（RR1:2）")
     print("=" * 64)
     agg_summary = {}
-    for m, a in aggregate.items():
+    for s, a in aggregate.items():
         if a["trades"] == 0:
             continue
         win_rate = a["wins"] / a["trades"] * 100
         avg_pips = a["total_pips"] / a["trades"]
-        agg_summary[m] = {
+        agg_summary[s] = {
             "trades": a["trades"], "win_rate": round(win_rate, 1),
-            "wins": a["wins"], "losses": a["losses"],
             "total_pips": round(a["total_pips"], 1),
             "avg_pips_per_trade": round(avg_pips, 2),
         }
-        print(f"  {m:9}: {a['trades']}件 勝率{win_rate:.1f}% "
+        print(f"  {s:18}: {a['trades']}件 勝率{win_rate:.1f}% "
               f"1件平均{avg_pips:+.2f}pips 累計{a['total_pips']:+.1f}pips")
 
-    # 最良方式の判定（期待値=1件平均pips で）
     if agg_summary:
         best = max(agg_summary.items(), key=lambda kv: kv[1]["avg_pips_per_trade"])
-        print(f"\n  → 期待値が最も高い方式: 【{best[0]}】"
+        print(f"\n  → 期待値が高い戦略: 【{best[0]}】"
               f"（1件平均{best[1]['avg_pips_per_trade']:+.2f}pips）")
+        if best[1]["avg_pips_per_trade"] > 0:
+            print("  ✅ プラスの期待値が出る戦略が見つかりました")
+        else:
+            print("  ⚠ どちらも期待値マイナス。15分足デイトレ自体の見直しが必要")
 
-    # 保存
     output = {
         "generated_at": datetime.now(timezone.utc).isoformat(),
+        "test_type": "strategy_comparison",
+        "rr": 2.0,
         "pairs": all_results,
         "aggregate": agg_summary,
-        "best_method": max(agg_summary.items(),
-                           key=lambda kv: kv[1]["avg_pips_per_trade"])[0]
+        "best_strategy": max(agg_summary.items(),
+                             key=lambda kv: kv[1]["avg_pips_per_trade"])[0]
         if agg_summary else None,
     }
     with open("docs/daytrade_backtest.json", "w", encoding="utf-8") as f:

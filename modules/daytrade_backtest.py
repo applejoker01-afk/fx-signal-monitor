@@ -44,6 +44,53 @@ def calc_atr(highs, lows, closes, period=14):
     return statistics.mean(trs[-period:])
 
 
+def calc_ema_series(prices, period):
+    """EMAの時系列を返す"""
+    if len(prices) < period:
+        return None
+    k = 2 / (period + 1)
+    ema = prices[0]
+    series = [ema]
+    for p in prices[1:]:
+        ema = p * k + ema * (1 - k)
+        series.append(ema)
+    return series
+
+
+def calc_macd(closes, fast=12, slow=26, signal=9):
+    """MACD line, signal line を返す（最新値のみ）"""
+    if len(closes) < slow + signal:
+        return None, None
+    ema_fast = calc_ema_series(closes, fast)
+    ema_slow = calc_ema_series(closes, slow)
+    if not ema_fast or not ema_slow:
+        return None, None
+    # MACDライン = fast - slow（末尾を揃える）
+    macd_line = [ema_fast[i] - ema_slow[i] for i in range(len(closes))]
+    # シグナル = MACDのEMA
+    signal_series = calc_ema_series(macd_line, signal)
+    if not signal_series:
+        return None, None
+    return macd_line[-1], signal_series[-1]
+
+
+def calc_rsi(closes, period=14):
+    """RSI（最新値）"""
+    if len(closes) < period + 1:
+        return None
+    gains, losses = [], []
+    for i in range(1, len(closes)):
+        diff = closes[i] - closes[i - 1]
+        gains.append(max(diff, 0))
+        losses.append(max(-diff, 0))
+    avg_gain = statistics.mean(gains[-period:])
+    avg_loss = statistics.mean(losses[-period:])
+    if avg_loss == 0:
+        return 100.0
+    rs = avg_gain / avg_loss
+    return 100 - (100 / (1 + rs))
+
+
 def calc_pivot(prev_high, prev_low, prev_close):
     pp = (prev_high + prev_low + prev_close) / 3
     r1 = 2 * pp - prev_low
@@ -82,9 +129,10 @@ def find_poi_levels(bars, i, lookback_day=96):
     return levels
 
 
-def detect_entries(bars, method, pair):
+def detect_entries(bars, method, pair, rr=1.0):
     """
     指定方式で反発エントリーを検出。
+    rr: リスクリワード比（TP = SL幅 × rr）。1.0ならTP=SL。
     戻り値: [{index, direction, entry, sl, tp, role}, ...]
     """
     entries = []
@@ -155,10 +203,12 @@ def detect_entries(bars, method, pair):
             entry = bar["close"]
             if is_support:
                 sl = lv["price"] - atr * 1.5
-                tp = entry + atr * 1.5  # TP1（RR1:1相当）
+                risk = entry - sl  # SLまでの距離（リスク）
+                tp = entry + risk * rr  # TP = リスク × RR
             else:
                 sl = lv["price"] + atr * 1.5
-                tp = entry - atr * 1.5
+                risk = sl - entry
+                tp = entry - risk * rr
             entries.append({
                 "index": i, "direction": direction,
                 "entry": entry, "sl": sl, "tp": tp, "role": lv["role"], "atr": atr,
@@ -274,6 +324,90 @@ def summarize(results, method):
     }
 
 
+def detect_resonance_entries(bars, pair, rr=2.0):
+    """
+    三次元共鳴（順張り）エントリーを検出。
+    次元1: EMA20/60/120パーフェクトオーダー（トレンド）
+    次元2: MACD > signal + RSI > 50（モメンタム）
+    次元3: 押し目からの転換（プライスアクション）
+    SLは直近スイング、TPはRR倍。
+    """
+    entries = []
+    closes = [b["close"] for b in bars]
+    highs = [b["high"] for b in bars]
+    lows = [b["low"] for b in bars]
+
+    i = 130  # EMA120 + MACD が計算できる地点から
+    while i < len(bars) - 30:
+        window = closes[:i + 1]
+        atr = calc_atr(highs[:i + 1], lows[:i + 1], closes[:i + 1])
+        if not atr:
+            i += 1
+            continue
+
+        # 次元1: トレンド（EMA整列）
+        ema20 = calc_ema(window[-120:], 20)
+        ema60 = calc_ema(window[-120:], 60)
+        ema120 = calc_ema(window[-120:], 120)
+        if not (ema20 and ema60 and ema120):
+            i += 1
+            continue
+        long_trend = ema20 > ema60 > ema120
+        short_trend = ema20 < ema60 < ema120
+        if not (long_trend or short_trend):
+            i += 1
+            continue
+
+        # 次元2: モメンタム（MACD + RSI）
+        macd_line, signal_line = calc_macd(window)
+        rsi = calc_rsi(window)
+        if macd_line is None or rsi is None:
+            i += 1
+            continue
+        long_mom = macd_line > signal_line and rsi > 50
+        short_mom = macd_line < signal_line and rsi < 50
+
+        # 次元3: プライスアクション（押し目/戻りからの転換）
+        bar = bars[i]
+        prev = bars[i - 1]
+        is_bull = bar["close"] > bar["open"]
+        is_bear = bar["close"] < bar["open"]
+        # ロング: 直近で押した後の陽線転換（前足より安値切り上げ＋陽線）
+        long_pa = is_bull and bar["low"] >= prev["low"] - atr * 0.2
+        short_pa = is_bear and bar["high"] <= prev["high"] + atr * 0.2
+
+        direction = None
+        if long_trend and long_mom and long_pa:
+            direction = "LONG"
+        elif short_trend and short_mom and short_pa:
+            direction = "SHORT"
+
+        if direction:
+            entry = bar["close"]
+            # SLは直近5本のスイング安値/高値
+            recent_lows = [b["low"] for b in bars[max(0, i - 5):i + 1]]
+            recent_highs = [b["high"] for b in bars[max(0, i - 5):i + 1]]
+            if direction == "LONG":
+                sl = min(recent_lows) - atr * 0.3
+                risk = entry - sl
+                tp = entry + risk * rr
+            else:
+                sl = max(recent_highs) + atr * 0.3
+                risk = sl - entry
+                tp = entry - risk * rr
+            if risk > 0:
+                entries.append({
+                    "index": i, "direction": direction,
+                    "entry": entry, "sl": sl, "tp": tp,
+                    "role": "三次元共鳴", "atr": atr,
+                })
+                i += 8
+                continue
+        i += 1
+
+    return entries
+
+
 def run_comparison(price_data, pair):
     """
     1ペアについて4方式を比較。
@@ -297,4 +431,65 @@ def run_comparison(price_data, pair):
         entries = detect_entries(bars, m, pair)
         results = evaluate_entries(bars, entries)
         summaries[m] = summarize(results, m)
+    return summaries
+
+
+def run_rr_comparison(price_data, pair, base_method="improveB",
+                      rr_list=(1.0, 1.5, 2.0, 2.5, 3.0)):
+    """
+    最良方式（improveB）を固定し、RR（TP/SL比）を変えて比較。
+    TPを遠くするほど決着に時間がかかるのでmax_holdを長めに。
+    """
+    highs = price_data["highs"]
+    lows = price_data["lows"]
+    closes = price_data["closes"]
+    opens = price_data.get("opens", closes)
+    bars = [
+        {"high": highs[i], "low": lows[i], "close": closes[i],
+         "open": opens[i] if i < len(opens) else closes[i]}
+        for i in range(len(closes))
+    ]
+    if len(bars) < 250:
+        return None
+
+    summaries = {}
+    for rr in rr_list:
+        entries = detect_entries(bars, base_method, pair, rr=rr)
+        # TPが遠いほど時間がかかるのでmax_holdをRRに比例させる
+        max_hold = int(20 * max(1.0, rr))
+        results = evaluate_entries(bars, entries, max_hold=max_hold)
+        label = f"RR1:{rr}"
+        summaries[label] = summarize(results, label)
+    return summaries
+
+
+def run_strategy_comparison(price_data, pair, rr=2.0):
+    """
+    反発（逆張り）vs 三次元共鳴（順張り）を同じRRで比較。
+    """
+    highs = price_data["highs"]
+    lows = price_data["lows"]
+    closes = price_data["closes"]
+    opens = price_data.get("opens", closes)
+    bars = [
+        {"high": highs[i], "low": lows[i], "close": closes[i],
+         "open": opens[i] if i < len(opens) else closes[i]}
+        for i in range(len(closes))
+    ]
+    if len(bars) < 250:
+        return None
+
+    max_hold = int(20 * max(1.0, rr))
+    summaries = {}
+
+    # 反発（トレンドフィルター付き improveB）
+    rebound = detect_entries(bars, "improveB", pair, rr=rr)
+    rebound_results = evaluate_entries(bars, rebound, max_hold=max_hold)
+    summaries["反発(improveB)"] = summarize(rebound_results, "反発(improveB)")
+
+    # 三次元共鳴（順張り）
+    resonance = detect_resonance_entries(bars, pair, rr=rr)
+    resonance_results = evaluate_entries(bars, resonance, max_hold=max_hold)
+    summaries["三次元共鳴(順張り)"] = summarize(resonance_results, "三次元共鳴(順張り)")
+
     return summaries
