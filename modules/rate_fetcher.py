@@ -26,6 +26,39 @@ FRED_RATE_SERIES = {
 }
 
 
+def fetch_fred_series_history(series_id, api_key, days=300):
+    """
+    FRED APIから指定シリーズの過去時系列を取得。
+    返り値: {date_str: value, ...} の辞書（日付→値）。失敗時は空dict。
+    例: DGS10（米10年債利回り）
+    """
+    from datetime import date
+    start = (datetime.now(timezone.utc).date() -
+             timedelta(days=days)).isoformat()
+    url = (
+        "https://api.stlouisfed.org/fred/series/observations"
+        f"?series_id={series_id}&api_key={api_key}&file_type=json"
+        f"&observation_start={start}&sort_order=asc"
+    )
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": "fx-signal-monitor/1.0"})
+        with urllib.request.urlopen(req, timeout=20) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+        result = {}
+        for obs in data.get("observations", []):
+            v = obs.get("value")
+            d = obs.get("date")
+            if v not in (".", "", None) and d:
+                try:
+                    result[d] = float(v)
+                except ValueError:
+                    continue
+        return result
+    except Exception as e:
+        print(f"[WARN] FRED history {series_id} failed: {e}")
+        return {}
+
+
 def fetch_fred_rate(series_id, api_key):
     """FRED APIから指定シリーズの最新値を取得。失敗時None。"""
     url = (
@@ -260,9 +293,11 @@ def _fallback_yields():
 # 金利差ベースのFAスコア計算（添付資料に基づく）
 # ---------------------------------------------------------------------------
 
-def compute_fa_score(pair, pair_api, central_bank_rates):
+def compute_fa_score(pair, pair_api, central_bank_rates, bond_trend=None):
     """
     金利差と中銀スタンスから動的にFAスコアを算出。
+    bond_trend: 米10年債の直近トレンド（"up"/"down"/None）。
+                USD絡みペアのみFAスコアを±5点補正する。
     返り値: dict (score: 0-100, direction: buy/sell/neutral, detail: str, rate_diff: float)
     """
     from_ccy, to_ccy = pair_api[pair]
@@ -302,8 +337,21 @@ def compute_fa_score(pair, pair_api, central_bank_rates):
         elif stance_from == "tighten":
             stance_bonus = 10
 
+    # 債券補正（米10年債トレンド・USD絡みペアのみ）
+    bond_bonus = 0
+    bond_note = ""
+    if bond_trend in ("up", "down"):
+        if from_ccy == "USD":
+            # USDがFROM（USDロング方向）: 利回り上昇でUSD買い+
+            bond_bonus = 5 if bond_trend == "up" else -5
+            bond_note = f" / 米10年債{('↑' if bond_trend=='up' else '↓')}"
+        elif to_ccy == "USD":
+            # USDがTO（USDショート方向）: 利回り上昇はFROM売り方向-
+            bond_bonus = -5 if bond_trend == "up" else 5
+            bond_note = f" / 米10年債{('↑' if bond_trend=='up' else '↓')}"
+
     # 最終スコア（50を中立基準）
-    final_score = 50 + diff_score + stance_bonus
+    final_score = 50 + diff_score + stance_bonus + bond_bonus
     final_score = max(0, min(100, final_score))
 
     if final_score >= 60:
@@ -318,7 +366,7 @@ def compute_fa_score(pair, pair_api, central_bank_rates):
     detail = (
         f"{cb_from}({rate_from:.2f}% {stance_from}) vs "
         f"{cb_to}({rate_to:.2f}% {stance_to}) "
-        f"差{rate_diff:+.2f}%"
+        f"差{rate_diff:+.2f}%{bond_note}"
     )
 
     return {
