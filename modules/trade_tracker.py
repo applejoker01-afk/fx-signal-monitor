@@ -14,8 +14,8 @@ trade_tracker.py
   TP2_HIT  : TP2到達（勝ち）
   TP1_HIT  : TP1到達（小勝ち）
   SL_HIT   : ストップロス到達（負け）
-  SIGNAL_LOST : ★4を割った（シグナル消滅・引き分け〜小利）
-  REVERSED : 方向が反転した（LONG→SHORT等）
+  SIGNAL_LOST : ★2を割った（シグナルが明確に弱体化・中長期保持後の消滅）
+  REVERSED : 方向が反転した（LONG→SHORT等・明確なトレンド転換）
 """
 
 import json
@@ -159,14 +159,15 @@ def check_exit_condition(trade: dict, current_price: float,
 
     # ── シグナルベースの決済判定 ──
     if exit_reason is None:
-        # 方向が反転した
-        if current_direction.endswith(("LONG", "SHORT")):
+        # 方向が反転した（★2以上の確信を伴う明確な反転のみ。
+        # 中長期なので、弱い逆シグナルでは決済しない）
+        if current_direction.endswith(("LONG", "SHORT")) and current_stars >= 2:
             cur_is_long = current_direction.endswith("LONG")
             if cur_is_long != is_long:
                 exit_reason = "REVERSED"
                 exit_price = current_price
-        # ★4を割った（シグナル消滅）
-        if exit_reason is None and current_stars < 4:
+        # ★が2を割った（シグナルが明確に弱体化・中長期なので多少の低下では決済しない）
+        if exit_reason is None and current_stars < 2:
             exit_reason = "SIGNAL_LOST"
             exit_price = current_price
 
