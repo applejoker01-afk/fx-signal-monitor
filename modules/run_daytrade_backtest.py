@@ -28,7 +28,8 @@ def fetch_15m(pair, days=60):
             data = json.loads(resp.read().decode())
         result = data["chart"]["result"][0]
         q = result["indicators"]["quote"][0]
-        highs, lows, closes, opens = [], [], [], []
+        ts_all = result.get("timestamp", [])
+        highs, lows, closes, opens, timestamps = [], [], [], [], []
         for i in range(len(q["close"])):
             if (q["close"][i] is None or q["high"][i] is None
                     or q["low"][i] is None):
@@ -37,7 +38,9 @@ def fetch_15m(pair, days=60):
             lows.append(q["low"][i])
             closes.append(q["close"][i])
             opens.append(q["open"][i] if q["open"][i] is not None else q["close"][i])
-        return {"highs": highs, "lows": lows, "closes": closes, "opens": opens}
+            timestamps.append(ts_all[i] if i < len(ts_all) else None)
+        return {"highs": highs, "lows": lows, "closes": closes,
+                "opens": opens, "timestamps": timestamps}
     except Exception as e:
         print(f"[WARN] {pair} 取得失敗: {e}")
         return None
@@ -45,11 +48,12 @@ def fetch_15m(pair, days=60):
 
 def main():
     print("=" * 64)
-    print("デイトレ戦略比較: 反発(逆張り) vs 三次元共鳴(順張り) RR1:2")
+    print("デイトレ7戦略比較 RR1:2（反発/逆/順張り/ブレイク/時間帯/ボラ/平均回帰）")
     print("=" * 64)
 
     all_results = {}
-    strategies = ["反発(improveB)", "反発の逆(reverse)", "三次元共鳴(順張り)"]
+    strategies = ["反発(improveB)", "反発の逆(reverse)", "三次元共鳴(順張り)",
+                  "①ブレイクアウト", "②時間帯特化", "③ボラブレイク", "④平均回帰"]
     aggregate = {s: {"trades": 0, "wins": 0, "losses": 0, "total_pips": 0.0}
                  for s in strategies}
 
@@ -68,9 +72,9 @@ def main():
 
         for s, v in summaries.items():
             if v.get("trades", 0) == 0:
-                print(f"  {s:20}: トレードなし")
+                print(f"  {s:22}: トレードなし")
                 continue
-            print(f"  {s:20}: {v['trades']}件 勝率{v['win_rate']}% "
+            print(f"  {s:22}: {v['trades']}件 勝率{v['win_rate']}% "
                   f"PF{v['pf']} 期待値{v['expectancy']}pips/件 "
                   f"累計{v['total_pips']}pips DD{v['max_dd']}")
             if s in aggregate:
@@ -95,7 +99,7 @@ def main():
             "total_pips": round(a["total_pips"], 1),
             "avg_pips_per_trade": round(avg_pips, 2),
         }
-        print(f"  {s:20}: {a['trades']}件 勝率{win_rate:.1f}% "
+        print(f"  {s:22}: {a['trades']}件 勝率{win_rate:.1f}% "
               f"1件平均{avg_pips:+.2f}pips 累計{a['total_pips']:+.1f}pips")
 
     if agg_summary:
