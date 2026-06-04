@@ -14,15 +14,10 @@ CENTRAL_BANK_FILE = "data/central_bank_rates.json"
 
 # FRED シリーズID（主要国の政策金利）
 # 取得できた通貨はFREDの最新値で上書き、取れないものは手動JSON/固定値を使う
+# 【方針】信頼できる米国の日次データ(USD)のみ自動化。
+# 他国はOECD月次系列が遅延・誤値を返すため手動JSON/固定値を維持する。
 FRED_RATE_SERIES = {
-    "USD": "DFEDTARU",        # Fed Funds 目標上限
-    "EUR": "ECBDFR",          # ECB 預金ファシリティ金利
-    "JPY": "IRSTCB01JPM156N", # 日本 政策金利
-    "GBP": "BOERUKM",         # 英 Bank Rate
-    "CAD": "IRSTCB01CAM156N", # カナダ 翌日物
-    "AUD": "IRSTCI01AUM156N", # 豪 コールレート
-    "CHF": "IRSTCI01CHM156N", # スイス
-    "NZD": "IRSTCI01NZM156N", # NZ
+    "USD": "DFEDTARU",        # Fed Funds 目標上限（日次・信頼性高）
 }
 
 
@@ -33,6 +28,7 @@ def fetch_fred_series_history(series_id, api_key, days=300):
     例: DGS10（米10年債利回り）
     """
     from datetime import date
+    api_key = (api_key or "").strip()
     start = (datetime.now(timezone.utc).date() -
              timedelta(days=days)).isoformat()
     url = (
@@ -54,6 +50,13 @@ def fetch_fred_series_history(series_id, api_key, days=300):
                 except ValueError:
                     continue
         return result
+    except urllib.error.HTTPError as e:
+        try:
+            body = e.read().decode("utf-8")[:200]
+        except Exception:
+            body = ""
+        print(f"[WARN] FRED history {series_id} HTTP{e.code}: {body}")
+        return {}
     except Exception as e:
         print(f"[WARN] FRED history {series_id} failed: {e}")
         return {}
@@ -61,6 +64,8 @@ def fetch_fred_series_history(series_id, api_key, days=300):
 
 def fetch_fred_rate(series_id, api_key):
     """FRED APIから指定シリーズの最新値を取得。失敗時None。"""
+    # APIキーの前後の空白・改行を除去（Secret登録時の混入対策）
+    api_key = (api_key or "").strip()
     url = (
         "https://api.stlouisfed.org/fred/series/observations"
         f"?series_id={series_id}&api_key={api_key}&file_type=json"
@@ -73,6 +78,13 @@ def fetch_fred_rate(series_id, api_key):
         obs = data.get("observations", [])
         if obs and obs[0].get("value") not in (".", "", None):
             return float(obs[0]["value"])
+    except urllib.error.HTTPError as e:
+        # エラー本文を表示（原因特定のため）
+        try:
+            body = e.read().decode("utf-8")[:200]
+        except Exception:
+            body = ""
+        print(f"[WARN] FRED {series_id} HTTP{e.code}: {body}")
     except Exception as e:
         print(f"[WARN] FRED {series_id} fetch failed: {e}")
     return None
@@ -201,22 +213,26 @@ def load_central_bank_rates():
 
 
 def _fallback_rates():
-    """JSONが読めない場合のフォールバック（2026年5月時点）"""
+    """
+    FRED自動取得できない通貨の手動フォールバック（2026年6月時点）。
+    USDはFRED(DFEDTARU)で自動上書きされるため、ここの値は参考。
+    他通貨は手動メンテ。中銀の利上げ/利下げ時はこのstanceとrateを更新すること。
+    """
     return {
-        "USD": {"rate": 4.75, "stance": "tighten", "cb_name": "FRB"},
-        "EUR": {"rate": 2.65, "stance": "ease", "cb_name": "ECB"},
-        "JPY": {"rate": 0.75, "stance": "tighten", "cb_name": "日銀"},
-        "GBP": {"rate": 4.25, "stance": "neutral", "cb_name": "BOE"},
-        "AUD": {"rate": 4.10, "stance": "neutral", "cb_name": "RBA"},
-        "NZD": {"rate": 4.50, "stance": "ease", "cb_name": "RBNZ"},
-        "CAD": {"rate": 3.25, "stance": "neutral", "cb_name": "BOC"},
-        "CHF": {"rate": 0.50, "stance": "ease", "cb_name": "SNB"},
-        "SGD": {"rate": 3.00, "stance": "tighten", "cb_name": "MAS"},
-        "HKD": {"rate": 4.75, "stance": "tighten", "cb_name": "HKMA"},
-        "CNY": {"rate": 3.10, "stance": "ease", "cb_name": "PBOC"},
+        "USD": {"rate": 3.75, "stance": "neutral", "cb_name": "FRB"},
+        "EUR": {"rate": 2.15, "stance": "neutral", "cb_name": "ECB"},
+        "JPY": {"rate": 0.75, "stance": "tighten", "cb_name": "日銀"},  # 1%へ利上げ検討中
+        "GBP": {"rate": 3.75, "stance": "ease", "cb_name": "BOE"},      # 下落傾向
+        "AUD": {"rate": 4.10, "stance": "tighten", "cb_name": "RBA"},   # 2026上昇トレンド
+        "NZD": {"rate": 4.33, "stance": "neutral", "cb_name": "RBNZ"},
+        "CAD": {"rate": 2.75, "stance": "neutral", "cb_name": "BOC"},   # 2026据え置き見通し
+        "CHF": {"rate": 0.00, "stance": "neutral", "cb_name": "SNB"},   # 0%据え置き
+        "SGD": {"rate": 3.00, "stance": "neutral", "cb_name": "MAS"},
+        "HKD": {"rate": 4.75, "stance": "neutral", "cb_name": "HKMA"},
+        "CNY": {"rate": 3.00, "stance": "ease", "cb_name": "PBOC"},
         "MXN": {"rate": 7.00, "stance": "ease", "cb_name": "Banxico"},
         "TRY": {"rate": 38.00, "stance": "ease", "cb_name": "CBRT"},
-        "ZAR": {"rate": 7.50, "stance": "ease", "cb_name": "SARB"},
+        "ZAR": {"rate": 7.25, "stance": "ease", "cb_name": "SARB"},
         "INR": {"rate": 6.00, "stance": "neutral", "cb_name": "RBI"},
     }
 
