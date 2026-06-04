@@ -129,10 +129,11 @@ def find_poi_levels(bars, i, lookback_day=96):
     return levels
 
 
-def detect_entries(bars, method, pair, rr=1.0):
+def detect_entries(bars, method, pair, rr=1.0, reverse=False):
     """
     指定方式で反発エントリーを検出。
     rr: リスクリワード比（TP = SL幅 × rr）。1.0ならTP=SL。
+    reverse: Trueならエントリー方向を反転（逆張りの逆＝順張り的）。
     戻り値: [{index, direction, entry, sl, tp, role}, ...]
     """
     entries = []
@@ -201,16 +202,20 @@ def detect_entries(bars, method, pair, rr=1.0):
 
         if confirmed:
             entry = bar["close"]
-            if is_support:
-                sl = lv["price"] - atr * 1.5
-                risk = entry - sl  # SLまでの距離（リスク）
-                tp = entry + risk * rr  # TP = リスク × RR
+            # reverse: 反発の逆方向にエントリー
+            actual_long = is_support if not reverse else (not is_support)
+            actual_dir = "LONG" if actual_long else "SHORT"
+            if actual_long:
+                # ロング: SLはエントリー下、TPは上
+                sl = entry - atr * 1.5
+                risk = entry - sl
+                tp = entry + risk * rr
             else:
-                sl = lv["price"] + atr * 1.5
+                sl = entry + atr * 1.5
                 risk = sl - entry
                 tp = entry - risk * rr
             entries.append({
-                "index": i, "direction": direction,
+                "index": i, "direction": actual_dir,
                 "entry": entry, "sl": sl, "tp": tp, "role": lv["role"], "atr": atr,
             })
             i += 8  # エントリー後は少し飛ばす（連続エントリー防止）
@@ -486,6 +491,11 @@ def run_strategy_comparison(price_data, pair, rr=2.0):
     rebound = detect_entries(bars, "improveB", pair, rr=rr)
     rebound_results = evaluate_entries(bars, rebound, max_hold=max_hold)
     summaries["反発(improveB)"] = summarize(rebound_results, "反発(improveB)")
+
+    # 反発の逆（同じエントリー地点で方向反転）
+    reverse = detect_entries(bars, "improveB", pair, rr=rr, reverse=True)
+    reverse_results = evaluate_entries(bars, reverse, max_hold=max_hold)
+    summaries["反発の逆(reverse)"] = summarize(reverse_results, "反発の逆(reverse)")
 
     # 三次元共鳴（順張り）
     resonance = detect_resonance_entries(bars, pair, rr=rr)
