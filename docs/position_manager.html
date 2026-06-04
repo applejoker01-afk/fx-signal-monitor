@@ -250,9 +250,9 @@ const PAIR_ALIASES = {
 };
 function normalizePair(raw){
   if(!raw) return "";
-  // 全角ハイフン・各種ダッシュを半角ハイフンに統一してから判定
+  // 全角ハイフン・ダッシュ類を半角ハイフンに統一（長音記号ーは除外！通貨名に含まれるため）
   let s = raw.trim().replace(/\s/g,"")
-    .replace(/[‐‑‒–—―ー－]/g, "-"); // 各種ハイフン/全角を半角-に
+    .replace(/[‐‑‒–—―－]/g, "-"); // 各種ハイフン/全角ハイフンを半角-に（ーは含めない）
   if (PAIR_ALIASES[s]) return PAIR_ALIASES[s];
   const upper = s.toUpperCase().replace(/[\/\-]/g,"");
   if (PAIR_ALIASES[upper]) return PAIR_ALIASES[upper];
