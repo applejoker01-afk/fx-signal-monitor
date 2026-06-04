@@ -90,6 +90,12 @@ body{background:var(--bg-deep);color:var(--text-primary);font-family:var(--jp);
 .tag-watch{background:rgba(251,191,36,0.12);color:var(--caution);}
 .tag-idle{background:var(--bg-elev);color:var(--text-muted);}
 .plan-line{font-size:0.72rem;color:var(--text-secondary);margin-top:0.3rem;}
+.badges{display:flex;gap:0.4rem;flex-wrap:wrap;margin:0.3rem 0;}
+.strat-badge{font-size:0.66rem;font-weight:700;padding:0.15rem 0.5rem;border-radius:3px;
+  background:rgba(212,165,116,0.15);color:var(--gold);border:1px solid rgba(212,165,116,0.4);}
+.regime-badge{font-size:0.66rem;padding:0.15rem 0.5rem;border-radius:3px;
+  background:var(--bg-elev);color:var(--text-secondary);border:1px solid var(--border);}
+.pair-card.skipped{opacity:0.55;}
 
 /* Log */
 .log-box{background:var(--bg-card);border:1px solid var(--border);border-radius:6px;
@@ -112,7 +118,7 @@ a{color:var(--gold);}
   <header class="app-header">
     <div class="brand">
       <span class="brand-mark">Currents</span>
-      <span class="brand-sub">15分足 デイトレ反発モニター · M15 AMBUSH</span>
+      <span class="brand-sub">15分足 適応戦略モニター · 自動再検証+AI局面</span>
     </div>
     <nav class="top-nav">
       <a href="https://applejoker01-afk.github.io/fx-signal-monitor/">📊 ダッシュボード</a>
@@ -206,7 +212,25 @@ let countdownTimer = null;
 let secondsLeft = 0;
 let soundOn = false;
 let fireCount = 0;
-const pairState = {}; // key -> { phase: 'idle'|'watching'|'fired', lastSignalTime }
+const pairState = {}; // key -> { phase, lastSignalTime }
+let strategyMap = {}; // pair -> { strategy_key, regime, ... } 適応的戦略マップ
+let strategyMapTime = null;
+
+// 戦略マップを読む（毎週GitHub Actionsが更新）
+const STRATEGY_MAP_URL = "https://applejoker01-afk.github.io/fx-signal-monitor/strategy_map.json";
+async function loadStrategyMap() {
+  for (const strat of FETCH_STRATEGIES) {
+    try {
+      const res = await fetch(strat(STRATEGY_MAP_URL), { cache: "no-store" });
+      if (!res.ok) continue;
+      const data = await res.json();
+      strategyMap = data.strategy_map || {};
+      strategyMapTime = data.generated_at;
+      return true;
+    } catch (e) {}
+  }
+  return false;
+}
 
 // ============================================================
 // テクニカル計算
@@ -327,6 +351,193 @@ function makePlan(direction, poi, price, atrVal) {
 }
 
 // ============================================================
+// 7戦略のエントリー判定（各ペアは割当てられた1戦略だけ実行）
+// バックテスト(daytrade_backtest.py)と同じロジックをJS化
+// 戻り値: { direction, entry, sl, tp1, tp2, tp3, label } or null
+// ============================================================
+function sma(arr, period) {
+  if (arr.length < period) return null;
+  const seg = arr.slice(-period);
+  return seg.reduce((a, b) => a + b, 0) / seg.length;
+}
+function stddev(arr, period) {
+  if (arr.length < period) return null;
+  const seg = arr.slice(-period);
+  const m = seg.reduce((a, b) => a + b, 0) / seg.length;
+  const v = seg.reduce((a, b) => a + (b - m) ** 2, 0) / seg.length;
+  return Math.sqrt(v);
+}
+function macd(closes) {
+  if (closes.length < 35) return null;
+  const ef = emaSeries(closes, 12), es = emaSeries(closes, 26);
+  if (!ef || !es) return null;
+  const line = closes.map((_, i) => ef[i] - es[i]);
+  const sig = emaSeries(line, 9);
+  if (!sig) return null;
+  return { line: line[line.length - 1], signal: sig[sig.length - 1] };
+}
+function emaSeries(arr, period) {
+  if (arr.length < period) return null;
+  const k = 2 / (period + 1);
+  let e = arr[0]; const out = [e];
+  for (let i = 1; i < arr.length; i++) { e = arr[i] * k + e * (1 - k); out.push(e); }
+  return out;
+}
+function rsi(closes, period = 14) {
+  if (closes.length < period + 1) return null;
+  let g = 0, l = 0;
+  for (let i = closes.length - period; i < closes.length; i++) {
+    const d = closes[i] - closes[i - 1];
+    if (d > 0) g += d; else l -= d;
+  }
+  if (l === 0) return 100;
+  const rs = (g / period) / (l / period);
+  return 100 - 100 / (1 + rs);
+}
+function adx(highs, lows, closes, period = 14) {
+  if (closes.length < period * 2) return null;
+  let pdm = 0, mdm = 0, trs = 0;
+  for (let i = closes.length - period; i < closes.length; i++) {
+    const up = highs[i] - highs[i - 1], dn = lows[i - 1] - lows[i];
+    pdm += (up > dn && up > 0) ? up : 0;
+    mdm += (dn > up && dn > 0) ? dn : 0;
+    trs += Math.max(highs[i] - lows[i], Math.abs(highs[i] - closes[i - 1]), Math.abs(lows[i] - closes[i - 1]));
+  }
+  if (trs === 0) return null;
+  const pdi = 100 * pdm / trs, mdi = 100 * mdm / trs;
+  if (pdi + mdi === 0) return null;
+  return 100 * Math.abs(pdi - mdi) / (pdi + mdi);
+}
+
+// RR1:2のプラン生成（エントリー基準）
+function planRR(direction, entry, slDist, rr = 2.0) {
+  if (direction === "LONG") {
+    return { direction, entry, sl: entry - slDist, tp1: entry + slDist * rr,
+             tp2: entry + slDist * rr, tp3: entry + slDist * rr };
+  } else {
+    return { direction, entry, sl: entry + slDist, tp1: entry - slDist * rr,
+             tp2: entry - slDist * rr, tp3: entry - slDist * rr };
+  }
+}
+
+// 各戦略の判定。最新足でエントリー条件が成立したらプランを返す
+function evalStrategy(key, m, atrVal) {
+  const { closes, highs, lows } = m;
+  const n = closes.length;
+  const price = closes[n - 1];
+  const prevClose = closes[n - 2];
+  const lastHigh = highs[n - 1], lastLow = lows[n - 1];
+  if (!atrVal) return null;
+
+  if (key === "rebound") {
+    // 反発（トレンドフィルター付き）: サポ反発ロング/レジ反落ショート＋EMA200整合
+    const e200 = ema(closes, 200);
+    const r = detectReversal(closes, highs, lows, atrVal);
+    if (r && e200) {
+      const trendUp = price > e200;
+      if ((r.direction === "LONG" && trendUp) || (r.direction === "SHORT" && !trendUp)) {
+        const slDist = Math.abs(r.entry - r.sl);
+        return { ...planRR(r.direction, price, slDist), label: "反発" };
+      }
+    }
+    return null;
+  }
+
+  if (key === "reverse") {
+    // 反発の逆
+    const r = detectReversal(closes, highs, lows, atrVal);
+    if (r) {
+      const rev = r.direction === "LONG" ? "SHORT" : "LONG";
+      return { ...planRR(rev, price, atrVal * 1.5), label: "反発の逆" };
+    }
+    return null;
+  }
+
+  if (key === "resonance") {
+    // 三次元共鳴（順張り）
+    const e20 = ema(closes, 20), e60 = ema(closes, 60), e120 = ema(closes, 120);
+    const mac = macd(closes), rs = rsi(closes);
+    if (!e20 || !e60 || !e120 || !mac || rs == null) return null;
+    const bar = closes[n - 1], open = closes[n - 2];
+    const longT = e20 > e60 && e60 > e120, shortT = e20 < e60 && e60 < e120;
+    const longM = mac.line > mac.signal && rs > 50, shortM = mac.line < mac.signal && rs < 50;
+    const bull = price > prevClose, bear = price < prevClose;
+    if (longT && longM && bull) {
+      const sl = Math.min(...lows.slice(-6)) - atrVal * 0.3;
+      return { ...planRR("LONG", price, price - sl), label: "三次元共鳴" };
+    }
+    if (shortT && shortM && bear) {
+      const sl = Math.max(...highs.slice(-6)) + atrVal * 0.3;
+      return { ...planRR("SHORT", price, sl - price), label: "三次元共鳴" };
+    }
+    return null;
+  }
+
+  if (key === "breakout") {
+    // ブレイクアウト: 直近20本のレンジ抜け＋ATR拡大
+    if (n < 30) return null;
+    const rh = Math.max(...highs.slice(-21, -1)), rl = Math.min(...lows.slice(-21, -1));
+    const atrPrev = atr(highs.slice(0, -5), lows.slice(0, -5), closes.slice(0, -5));
+    const expanding = atrPrev && atrVal > atrPrev;
+    if (price > rh && expanding) return { ...planRR("LONG", price, price - (rh - atrVal * 0.5)), label: "ブレイク" };
+    if (price < rl && expanding) return { ...planRR("SHORT", price, (rl + atrVal * 0.5) - price), label: "ブレイク" };
+    return null;
+  }
+
+  if (key === "session") {
+    // 時間帯特化: 東京(0-7 UTC)=逆張り / 欧米=ブレイク
+    const hour = new Date().getUTCHours();
+    const rh = Math.max(...highs.slice(-21, -1)), rl = Math.min(...lows.slice(-21, -1));
+    if (hour >= 0 && hour < 7) {
+      if (lastLow <= rl && price > rl) return { ...planRR("LONG", price, atrVal * 1.5), label: "東京逆張り" };
+      if (lastHigh >= rh && price < rh) return { ...planRR("SHORT", price, atrVal * 1.5), label: "東京逆張り" };
+    } else {
+      if (price > rh) return { ...planRR("LONG", price, atrVal * 1.5), label: "欧米ブレイク" };
+      if (price < rl) return { ...planRR("SHORT", price, atrVal * 1.5), label: "欧米ブレイク" };
+    }
+    return null;
+  }
+
+  if (key === "vol_breakout") {
+    // ボラブレイク: バンド収縮→拡大
+    const bw = (idx) => {
+      const seg = closes.slice(idx - 20, idx);
+      if (seg.length < 20) return null;
+      const mm = seg.reduce((a, b) => a + b, 0) / seg.length;
+      const sd = Math.sqrt(seg.reduce((a, b) => a + (b - mm) ** 2, 0) / seg.length);
+      return mm ? (4 * sd) / mm : null;
+    };
+    const bwNow = bw(n), bwPrev = bw(n - 5);
+    if (bwNow == null || bwPrev == null) return null;
+    const recent = [];
+    for (let j = n - 20; j < n; j++) { const b = bw(j); if (b != null) recent.push(b); }
+    if (!recent.length) return null;
+    const squeezed = bwPrev <= Math.min(...recent) * 1.15;
+    const expanding = bwNow > bwPrev * 1.1;
+    const m20 = sma(closes, 20);
+    if (squeezed && expanding && m20) {
+      if (price > m20) return { ...planRR("LONG", price, atrVal * 1.5), label: "ボラブレイク" };
+      if (price < m20) return { ...planRR("SHORT", price, atrVal * 1.5), label: "ボラブレイク" };
+    }
+    return null;
+  }
+
+  if (key === "mean_reversion") {
+    // 平均回帰: 低ADX(レンジ)でバンド端逆張り
+    const ax = adx(highs, lows, closes);
+    if (ax == null || ax >= 20) return null;
+    const m20 = sma(closes, 20), sd = stddev(closes, 20);
+    if (m20 == null || sd == null) return null;
+    const upper = m20 + 2 * sd, lower = m20 - 2 * sd;
+    if (lastLow <= lower && price > lower) return { ...planRR("LONG", price, atrVal * 1.5), label: "平均回帰" };
+    if (lastHigh >= upper && price < upper) return { ...planRR("SHORT", price, atrVal * 1.5), label: "平均回帰" };
+    return null;
+  }
+
+  return null;
+}
+
+// ============================================================
 // データ取得（Yahoo 15分足・複数戦略でフォールバック）
 // ============================================================
 async function fetchM15(pair) {
@@ -365,6 +576,14 @@ async function fetchM15(pair) {
 // ============================================================
 async function scanAll() {
   log("スキャン開始...");
+  // 戦略マップを更新（毎回読む）
+  const mapOk = await loadStrategyMap();
+  if (mapOk) {
+    log(`戦略マップ取得: ${strategyMapTime ? new Date(strategyMapTime).toLocaleDateString("ja-JP") : ""}更新`);
+  } else {
+    log("戦略マップ取得失敗（反発をデフォルト適用）", "err");
+  }
+
   let watchCount = 0;
   for (const pair of PAIRS) {
     try {
@@ -376,35 +595,51 @@ async function scanAll() {
       const e50 = ema(m.closes, 50);
       const e200 = ema(m.closes, 200);
 
-      // 反発確定の判定
-      const reversal = detectReversal(m.closes, m.highs, m.lows, atrVal);
-      const approach = detectApproach(m.closes, m.highs, m.lows, atrVal);
+      // このペアに割り当てられた戦略を取得
+      const mapEntry = strategyMap[pair.key] || {};
+      const stratKey = mapEntry.strategy_key;
+      const stratName = mapEntry.strategy;
+      const regime = mapEntry.regime;
+      const regimeComment = mapEntry.regime_comment;
 
       const st = pairState[pair.key] || { phase: "idle", lastSignalTime: 0 };
 
-      if (reversal) {
-        // 同じシグナルの連続発火を防ぐ（1時間クールダウン）
+      // 戦略が割り当てられていない（見送り）ペアは判定しない
+      if (!stratKey) {
+        st.phase = "idle";
+        setPairCard(pair, { price, atrVal, e50, e200, skip: true,
+          stratName: stratName || "見送り", regime, regimeComment });
+        pairState[pair.key] = st;
+        await new Promise(r => setTimeout(r, 300));
+        continue;
+      }
+
+      // 割り当てられた戦略だけを判定
+      const plan = evalStrategy(stratKey, m, atrVal);
+
+      if (plan) {
         const now = Date.now();
         if (now - st.lastSignalTime > 3600 * 1000 || st.phase !== "fired") {
-          fireSignal(pair, reversal, price, atrVal, e50, e200);
+          fireSignal(pair, plan, price, atrVal, e50, e200, stratName, regime);
           st.phase = "fired";
           st.lastSignalTime = now;
         }
-        setPairCard(pair, { price, atrVal, e50, e200, reversal });
-      } else if (approach) {
-        st.phase = "watching";
-        watchCount++;
-        setPairCard(pair, { price, atrVal, e50, e200, approach });
+        setPairCard(pair, { price, atrVal, e50, e200, reversal: plan,
+          stratName, regime, regimeComment });
       } else {
-        st.phase = "idle";
-        setPairCard(pair, { price, atrVal, e50, e200 });
+        // 接近監視（参考表示）
+        const approach = detectApproach(m.closes, m.highs, m.lows, atrVal);
+        if (approach) { st.phase = "watching"; watchCount++; }
+        else st.phase = "idle";
+        setPairCard(pair, { price, atrVal, e50, e200, approach,
+          stratName, regime, regimeComment });
       }
       pairState[pair.key] = st;
 
     } catch (e) {
       log(`${pair.label} エラー: ${e.message}`, "err");
     }
-    await new Promise(r => setTimeout(r, 300)); // レート制限対策
+    await new Promise(r => setTimeout(r, 300));
   }
   document.getElementById("statWatch").textContent = watchCount;
   document.getElementById("lastUpdate").textContent =
@@ -415,29 +650,23 @@ async function scanAll() {
 // ============================================================
 // 発火処理（通知）
 // ============================================================
-function fireSignal(pair, plan, price, atrVal, e50, e200) {
+function fireSignal(pair, plan, price, atrVal, e50, e200, stratName, regime) {
   fireCount++;
   document.getElementById("statFires").textContent = fireCount;
   const d = pair.decimals;
-  const dirLabel = plan.direction === "LONG" ? "🟢 ロング（反発確定）" : "🔴 ショート（反落確定）";
-  const msg =
-    `${dirLabel}\n` +
-    `${pair.label} @ ${price.toFixed(d)}\n` +
-    `${plan.poi.type}(${plan.poi.price.toFixed(d)})で反発確定\n` +
-    `SL:${plan.sl.toFixed(d)} / TP1:${plan.tp1.toFixed(d)} / TP2:${plan.tp2.toFixed(d)} / TP3:${plan.tp3.toFixed(d)}`;
+  const label = plan.label || stratName || "シグナル";
+  const dirLabel = plan.direction === "LONG" ? "🟢 ロング" : "🔴 ショート";
+  const poiTxt = plan.poi ? `${plan.poi.type}(${plan.poi.price.toFixed(d)})` : label;
 
-  log(`🎯 発火 ${pair.label} ${plan.direction} @ ${price.toFixed(d)} (${plan.poi.type})`, "fire");
+  log(`🎯 発火 ${pair.label} ${plan.direction} @ ${price.toFixed(d)} [${label}]`, "fire");
 
-  // ブラウザ通知
   if (Notification.permission === "granted") {
-    new Notification(`🎯 ${pair.label} ${plan.direction} 反発確定`, {
-      body: `${plan.poi.type}で反発 @ ${price.toFixed(d)}\nSL:${plan.sl.toFixed(d)} TP1:${plan.tp1.toFixed(d)}`,
+    new Notification(`🎯 ${pair.label} ${plan.direction} [${label}]`, {
+      body: `@ ${price.toFixed(d)}\nSL:${plan.sl.toFixed(d)} TP:${plan.tp1.toFixed(d)}`,
     });
   }
-  // 音
   if (soundOn) playBeep();
-  // Discord
-  sendDiscord(pair, plan, price);
+  sendDiscord(pair, plan, price, stratName, regime);
 }
 
 function playBeep() {
@@ -452,21 +681,24 @@ function playBeep() {
   } catch (e) {}
 }
 
-async function sendDiscord(pair, plan, price) {
+async function sendDiscord(pair, plan, price, stratName, regime) {
   let url = document.getElementById("webhookUrl").value.trim();
   if (!url) return;
   url = url.replace("discordapp.com", "discord.com");
   const d = pair.decimals;
   const color = plan.direction === "LONG" ? 0x4ade80 : 0xf87171;
-  const dirJp = plan.direction === "LONG" ? "ロング（反発確定）" : "ショート（反落確定）";
+  const dirJp = plan.direction === "LONG" ? "ロング" : "ショート";
+  const label = plan.label || stratName || "シグナル";
+  const poiLine = plan.poi ? `**${plan.poi.type}**(${plan.poi.price.toFixed(d)})\n` : "";
+  const regimeLine = regime ? `AI局面: ${regime}\n` : "";
   const embed = {
-    title: `🎯 ${pair.label} ${dirJp}`,
+    title: `🎯 ${pair.label} ${dirJp}【${label}】`,
     color: color,
     description:
-      `**${plan.poi.type}**(${plan.poi.price.toFixed(d)})で反発確定\n` +
+      poiLine + regimeLine +
       `エントリー: **${price.toFixed(d)}**\n` +
       `SL: ${plan.sl.toFixed(d)} / TP1: ${plan.tp1.toFixed(d)} / TP2: ${plan.tp2.toFixed(d)} / TP3: ${plan.tp3.toFixed(d)}`,
-    footer: { text: `Currents M15 Ambush · ${new Date().toLocaleString("ja-JP")}` },
+    footer: { text: `Currents M15 適応戦略 · ${new Date().toLocaleString("ja-JP")}` },
   };
   try {
     await fetch(url, {
@@ -488,24 +720,35 @@ function setPairCard(pair, info) {
   const d = pair.decimals;
   let cls = "pair-card", stateHtml = "";
 
+  // 採用戦略・AI局面のバッジ
+  const stratBadge = info.stratName
+    ? `<span class="strat-badge">${info.stratName}</span>` : "";
+  const regimeBadge = info.regime
+    ? `<span class="regime-badge">AI局面: ${info.regime}${info.regimeComment ? "（" + info.regimeComment + "）" : ""}</span>` : "";
+
   if (info.error) {
     stateHtml = `<span class="state-tag tag-idle">取得失敗</span>`;
+  } else if (info.skip) {
+    cls += " skipped";
+    stateHtml = `<span class="state-tag tag-idle">⏸ 見送り</span>
+      <div class="plan-line">直近データで勝てる戦略がないため、このペアは監視対象外です</div>`;
   } else if (info.reversal) {
     const p = info.reversal;
     cls += p.direction === "LONG" ? " signal-long" : " signal-short";
     const tag = p.direction === "LONG" ? "tag-long" : "tag-short";
-    const dirJp = p.direction === "LONG" ? "🟢 反発ロング" : "🔴 反落ショート";
-    stateHtml = `<span class="state-tag ${tag}">${dirJp}</span>確定<br>
-      <div class="plan-line">${p.poi.type}(${p.poi.price.toFixed(d)})で反発<br>
+    const dirJp = p.direction === "LONG" ? "🟢 ロング" : "🔴 ショート";
+    const poiTxt = p.poi ? `${p.poi.type}(${p.poi.price.toFixed(d)})` : (p.label || "");
+    stateHtml = `<span class="state-tag ${tag}">${dirJp}</span>【${p.label || info.stratName || ""}】発火<br>
+      <div class="plan-line">${poiTxt}<br>
       SL:${p.sl.toFixed(d)} / TP1:${p.tp1.toFixed(d)} / TP2:${p.tp2.toFixed(d)} / TP3:${p.tp3.toFixed(d)}</div>`;
   } else if (info.approach) {
     cls += " watching";
     const a = info.approach;
     stateHtml = `<span class="state-tag tag-watch">👀 監視中</span>
       ${a.poi.type}(${a.poi.price.toFixed(d)}) あと${a.distPct.toFixed(2)}%<br>
-      <div class="plan-line">反発を待機中…確定で発火します</div>`;
+      <div class="plan-line">${info.stratName || ""}の条件成立を待機中…</div>`;
   } else {
-    stateHtml = `<span class="state-tag tag-idle">待機</span>重要価格から離れています`;
+    stateHtml = `<span class="state-tag tag-idle">待機</span>条件成立を待っています`;
   }
 
   const metaHtml = info.price ?
@@ -517,6 +760,7 @@ function setPairCard(pair, info) {
       <span class="pair-name">${pair.label}</span>
       <span class="pair-price">${info.price ? info.price.toFixed(d) : "—"}</span>
     </div>
+    <div class="badges">${stratBadge}${regimeBadge}</div>
     <div class="pair-meta">${metaHtml}</div>
     <div class="pair-state">${stateHtml}</div>`;
 
