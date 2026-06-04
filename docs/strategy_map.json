@@ -1,0 +1,70 @@
+{
+  "generated_at": "2026-06-04T12:05:39.983761+00:00",
+  "lookback_days": 60,
+  "rr": 2.0,
+  "min_trades": 30,
+  "min_expectancy": 0.1,
+  "strategy_map": {
+    "USDJPY": {
+      "strategy": "④平均回帰",
+      "strategy_key": "mean_reversion",
+      "expectancy": 1.7,
+      "trades": 131,
+      "win_rate": 40.5,
+      "pf": 1.25,
+      "regime": "ranging",
+      "regime_comment": "極小値動き。スキャルピング向き、方向性は控える"
+    },
+    "EURUSD": {
+      "strategy": "②時間帯特化",
+      "strategy_key": "session",
+      "expectancy": 0.47,
+      "trades": 293,
+      "win_rate": 36.9,
+      "pf": 1.1,
+      "regime": "ranging",
+      "regime_comment": "小幅上昇も値幅狭く、方向性不明確。様子見推奨"
+    },
+    "GBPJPY": {
+      "strategy": "反発(improveB)",
+      "strategy_key": "rebound",
+      "expectancy": 0.34,
+      "trades": 450,
+      "win_rate": 37.6,
+      "pf": 1.03,
+      "regime": "ranging",
+      "regime_comment": "変化率0.15%で値幅0.29%。トレンド弱く、レンジ相場。"
+    },
+    "AUDJPY": {
+      "strategy": "反発の逆(reverse)",
+      "strategy_key": "reverse",
+      "expectancy": 0.84,
+      "trades": 455,
+      "win_rate": 37.1,
+      "pf": 1.1,
+      "regime": "ranging",
+      "regime_comment": "変化率0.16%、値幅0.22%で方向感薄弱。レンジ相場で無理な仕掛けは避ける"
+    },
+    "EURJPY": {
+      "strategy": "②時間帯特化",
+      "strategy_key": "session",
+      "expectancy": 0.69,
+      "trades": 258,
+      "win_rate": 35.7,
+      "pf": 1.08,
+      "regime": "ranging",
+      "regime_comment": "ボラティリティ低く、方向性なし。待機推奨"
+    },
+    "AUDUSD": {
+      "strategy": "②時間帯特化",
+      "strategy_key": "session",
+      "expectancy": 1.25,
+      "trades": 308,
+      "win_rate": 39.3,
+      "pf": 1.32,
+      "regime": "ranging",
+      "regime_comment": "変化率0.24%に対し高値安値幅0.34%でレンジ相場。方向性が弱い"
+    }
+  },
+  "note": "毎週自動再検証され、市場変化に応じて各ペアの採用戦略が入れ替わります"
+}
