@@ -35,7 +35,7 @@ jobs:
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          FRED: ${{ secrets.FRED }}
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
           FINNHUB: ${{ secrets.FINNHUB }}
           BACKTEST_DAYS: ${{ github.event.inputs.lookback_days || '180' }}
         run: python run_backtest.py

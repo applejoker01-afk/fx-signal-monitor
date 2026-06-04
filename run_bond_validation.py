@@ -53,7 +53,7 @@ def main():
     print("米10年債 FA統合 効果検証（統合あり vs なし）")
     print("=" * 64)
 
-    api_key = os.environ.get("FRED")
+    api_key = os.environ.get("FRED_API_KEY") or os.environ.get("FRED")
     if not api_key:
         print("[ERROR] FRED APIキーが必要です（環境変数 FRED）")
         return

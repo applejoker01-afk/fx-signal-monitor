@@ -22,6 +22,6 @@ jobs:
       - name: Run TP/SL optimization
         env:
           BACKTEST_DAYS: ${{ github.event.inputs.backtest_days }}
-          FRED: ${{ secrets.FRED }}
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
           FINNHUB: ${{ secrets.FINNHUB }}
         run: python run_tpsl_optimization.py

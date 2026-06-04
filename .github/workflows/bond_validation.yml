@@ -20,6 +20,6 @@ jobs:
       - name: Run bond validation
         env:
           BACKTEST_DAYS: ${{ github.event.inputs.backtest_days }}
-          FRED: ${{ secrets.FRED }}
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
           FINNHUB: ${{ secrets.FINNHUB }}
         run: python run_bond_validation.py

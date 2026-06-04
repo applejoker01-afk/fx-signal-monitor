@@ -88,7 +88,7 @@ def fetch_live_central_bank_rates(base_rates=None):
         base_rates = load_central_bank_rates()
     rates = {k: dict(v) for k, v in base_rates.items()}  # メタ情報を保持
 
-    api_key = os.environ.get("FRED")
+    api_key = os.environ.get("FRED_API_KEY") or os.environ.get("FRED")
     if not api_key:
         print("[INFO] FRED APIキー未設定。手動の金利データを使用します")
         return rates
