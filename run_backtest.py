@@ -18,7 +18,7 @@ from signal_scanner import (
     compute_ta_score, fetch_history, PAIR_API,
     fetch_latest_rates,
 )
-from modules.rate_fetcher import load_central_bank_rates, compute_fa_score
+from modules.rate_fetcher import fetch_live_central_bank_rates, compute_fa_score
 from modules.backtest import run_full_backtest
 
 PAGES_URL = "https://applejoker01-afk.github.io/fx-signal-monitor/"
@@ -31,7 +31,7 @@ def main():
 
     lookback = int(os.environ.get("BACKTEST_DAYS", "180"))
 
-    cb_rates = load_central_bank_rates()
+    cb_rates = fetch_live_central_bank_rates()
 
     # 全ペアの履歴取得
     print(f"[INFO] Fetching {len(PAIR_API)} pairs history...")

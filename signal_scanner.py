@@ -15,7 +15,8 @@ from email.mime.multipart import MIMEMultipart
 from email.header import Header
 
 from modules.rate_fetcher import (
-    load_central_bank_rates, fetch_us_treasury_yields, compute_fa_score
+    load_central_bank_rates, fetch_live_central_bank_rates,
+    fetch_us_treasury_yields, compute_fa_score
 )
 from modules.event_filter import (
     check_event_proximity, upcoming_events_for
@@ -326,7 +327,8 @@ def stars_to_text(n):
 def send_discord(webhook_url, newly, upgraded, is_first, all_results,
                  sentiment, currency_strength=None, portfolio_risk=None,
                  trade_update=None, open_trades=None,
-                 drawdown=None, ai_commentary=None, ambush_alerts=None):
+                 drawdown=None, ai_commentary=None, ambush_alerts=None,
+                 rate_warnings=None):
     if not webhook_url:
         print("[INFO] Discord webhook not configured")
         return False
@@ -380,6 +382,16 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results,
         "footer": {"text": f"Currents FX Terminal L3 | {timestamp}"},
         "fields": []
     }]
+
+    # 🔴 金利スタンス矛盾警告（最優先・手動更新リマインダー）
+    if rate_warnings:
+        warn_text = "\n".join(f"・{w['message']}" for w in rate_warnings[:5])
+        embeds[0]["fields"].append({
+            "name": f"🔴 金利スタンス見直し要 ({len(rate_warnings)}件)",
+            "value": (warn_text[:900] +
+                      "\n→ central_bank_rates.json のstanceを更新してください"),
+            "inline": False
+        })
 
     # ⑮ AI市況コメンタリー（最上部に表示）
     if ai_commentary:
@@ -1009,9 +1021,19 @@ def main():
         print(f"[FATAL] Cannot fetch latest rates: {e}")
         sys.exit(1)
 
-    # 2. 中央銀行金利
-    cb_rates = load_central_bank_rates()
+    # 2. 中央銀行金利（FRED APIで最新値を自動取得・失敗時は手動値）
+    cb_rates = fetch_live_central_bank_rates()
     print(f"[OK] Central bank rates: {len(cb_rates)} currencies")
+
+    # 2b. stance矛盾検知（FRED金利の変化と手動stanceの整合性チェック）
+    from modules.rate_fetcher import (
+        check_stance_consistency, save_rates_snapshot, generate_rates_html
+    )
+    rate_consistency = check_stance_consistency(cb_rates)
+    generate_rates_html(cb_rates, rate_consistency)
+    save_rates_snapshot(cb_rates)
+    if rate_consistency.get("warnings"):
+        print(f"[WARN] stance矛盾 {len(rate_consistency['warnings'])}件検知")
 
     # 3. 米国債利回り
     us_yields = fetch_us_treasury_yields()
@@ -1206,7 +1228,9 @@ def main():
     # 7. 通知（中長期シグナル変化・決済・ドローダウンで送信）
     #    待ち伏せ・反発監視（短期）はデイトレ画面に集約したため中長期通知では送らない
     has_close = bool(trade_update.get("newly_closed"))
-    if newly or upgraded or (is_first and newly) or has_close or drawdown.get("alert"):
+    has_rate_warn = bool(rate_consistency.get("warnings"))
+    if (newly or upgraded or (is_first and newly) or has_close
+            or drawdown.get("alert") or has_rate_warn):
         _wh = os.environ.get("DISCORD_WEBHOOK_URL", "")
         _wh = _wh.replace("discordapp.com", "discord.com")
         send_discord(
@@ -1218,6 +1242,7 @@ def main():
             drawdown=drawdown,
             ai_commentary=ai_commentary,
             ambush_alerts=None,
+            rate_warnings=rate_consistency.get("warnings"),
         )
         send_email(
             os.environ.get("SMTP_HOST", "smtp.gmail.com"),

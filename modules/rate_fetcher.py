@@ -12,6 +12,146 @@ from datetime import datetime, timezone, timedelta
 
 CENTRAL_BANK_FILE = "data/central_bank_rates.json"
 
+# FRED シリーズID（主要国の政策金利）
+# 取得できた通貨はFREDの最新値で上書き、取れないものは手動JSON/固定値を使う
+FRED_RATE_SERIES = {
+    "USD": "DFEDTARU",        # Fed Funds 目標上限
+    "EUR": "ECBDFR",          # ECB 預金ファシリティ金利
+    "JPY": "IRSTCB01JPM156N", # 日本 政策金利
+    "GBP": "BOERUKM",         # 英 Bank Rate
+    "CAD": "IRSTCB01CAM156N", # カナダ 翌日物
+    "AUD": "IRSTCI01AUM156N", # 豪 コールレート
+    "CHF": "IRSTCI01CHM156N", # スイス
+    "NZD": "IRSTCI01NZM156N", # NZ
+}
+
+
+def fetch_fred_rate(series_id, api_key):
+    """FRED APIから指定シリーズの最新値を取得。失敗時None。"""
+    url = (
+        "https://api.stlouisfed.org/fred/series/observations"
+        f"?series_id={series_id}&api_key={api_key}&file_type=json"
+        "&sort_order=desc&limit=1"
+    )
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": "fx-signal-monitor/1.0"})
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+        obs = data.get("observations", [])
+        if obs and obs[0].get("value") not in (".", "", None):
+            return float(obs[0]["value"])
+    except Exception as e:
+        print(f"[WARN] FRED {series_id} fetch failed: {e}")
+    return None
+
+
+def fetch_live_central_bank_rates(base_rates=None):
+    """
+    FRED APIから主要国の政策金利を自動取得し、手動JSON/固定値を上書きする。
+    FRED APIキー（環境変数 FRED）が無い、または取得失敗した通貨は base_rates のまま。
+    stance（利上げ/利下げ姿勢）は手動JSONの値を維持（FREDからは判定できないため）。
+    """
+    if base_rates is None:
+        base_rates = load_central_bank_rates()
+    rates = {k: dict(v) for k, v in base_rates.items()}  # メタ情報を保持
+
+    api_key = os.environ.get("FRED")
+    if not api_key:
+        print("[INFO] FRED APIキー未設定。手動の金利データを使用します")
+        return rates
+
+    updated = []
+    for ccy, series_id in FRED_RATE_SERIES.items():
+        live = fetch_fred_rate(series_id, api_key)
+        if live is not None:
+            old = rates.get(ccy, {}).get("rate")
+            if ccy not in rates:
+                rates[ccy] = {"stance": "neutral", "cb_name": ccy}
+            rates[ccy]["rate"] = round(live, 2)
+            rates[ccy]["rate_source"] = "FRED"
+            if old is not None and abs(old - live) >= 0.01:
+                updated.append(f"{ccy}:{old}→{live}%")
+            else:
+                updated.append(f"{ccy}:{live}%")
+    if updated:
+        print(f"[INFO] FRED金利自動取得: {', '.join(updated)}")
+    return rates
+
+
+def check_stance_consistency(rates, snapshot_file="docs/rates_snapshot.json"):
+    """
+    FRED金利の変化と手動stanceの矛盾を検知する。
+    前回スナップショットと比較し、金利が動いたのにstanceが整合しない通貨を警告。
+
+    矛盾の例:
+      stance="tighten"（利上げ中）なのに金利が下がった
+      stance="ease"（利下げ中）なのに金利が上がった
+
+    返り値: {
+      "warnings": [{ccy, stance, old_rate, new_rate, message}],
+      "checked_at": iso,
+      "rates": {ccy: rate},
+    }
+    """
+    import json as _json
+    # 前回スナップショット読込
+    prev = {}
+    try:
+        if os.path.exists(snapshot_file):
+            with open(snapshot_file, "r", encoding="utf-8") as f:
+                prev = _json.load(f).get("rates", {})
+    except Exception:
+        prev = {}
+
+    warnings = []
+    current = {}
+    for ccy, info in rates.items():
+        rate = info.get("rate")
+        stance = info.get("stance", "neutral")
+        if rate is None:
+            continue
+        current[ccy] = rate
+        old = prev.get(ccy)
+        if old is None:
+            continue
+        delta = rate - old
+        # 金利が有意に動いた（±0.05%以上）場合のみ判定
+        if abs(delta) < 0.05:
+            continue
+        cb = info.get("cb_name", ccy)
+        if delta < 0 and stance == "tighten":
+            warnings.append({
+                "ccy": ccy, "stance": stance, "old_rate": old, "new_rate": rate,
+                "message": f"{cb}({ccy}): 金利が{old}%→{rate}%に低下したのに stance=tighten（利上げ中）。利下げ転換の可能性。stanceの見直しを。",
+            })
+        elif delta > 0 and stance == "ease":
+            warnings.append({
+                "ccy": ccy, "stance": stance, "old_rate": old, "new_rate": rate,
+                "message": f"{cb}({ccy}): 金利が{old}%→{rate}%に上昇したのに stance=ease（利下げ中）。利上げ転換の可能性。stanceの見直しを。",
+            })
+
+    return {
+        "warnings": warnings,
+        "checked_at": datetime.now(timezone.utc).isoformat(),
+        "rates": current,
+    }
+
+
+def save_rates_snapshot(rates, snapshot_file="docs/rates_snapshot.json"):
+    """現在の金利をスナップショットとして保存（次回の比較用）"""
+    import json as _json
+    snap = {
+        "saved_at": datetime.now(timezone.utc).isoformat(),
+        "rates": {ccy: info.get("rate") for ccy, info in rates.items()
+                  if info.get("rate") is not None},
+    }
+    try:
+        os.makedirs(os.path.dirname(snapshot_file), exist_ok=True)
+        with open(snapshot_file, "w", encoding="utf-8") as f:
+            _json.dump(snap, f, ensure_ascii=False, indent=2)
+    except Exception as e:
+        print(f"[WARN] スナップショット保存失敗: {e}")
+
 
 def load_central_bank_rates():
     """JSONファイルから中央銀行政策金利を読込"""
@@ -193,3 +333,111 @@ def compute_fa_score(pair, pair_api, central_bank_rates):
         "cb_from": cb_from,
         "cb_to": cb_to,
     }
+
+
+def generate_rates_html(rates, consistency, out_file="docs/rates.html"):
+    """
+    金利モニターHTMLを生成。各通貨の金利・stance・矛盾警告を一覧表示。
+    矛盾があれば赤字で目立たせる。
+    """
+    import json as _json
+    warnings = consistency.get("warnings", [])
+    warn_ccy = {w["ccy"]: w for w in warnings}
+    checked = consistency.get("checked_at", "")[:19].replace("T", " ")
+
+    # stance表示の日本語化
+    stance_jp = {"tighten": "利上げ", "ease": "利下げ", "neutral": "中立"}
+    stance_color = {"tighten": "#4ade80", "ease": "#f87171", "neutral": "#9ca3af"}
+
+    # 警告バナー
+    if warnings:
+        warn_items = "".join(
+            f'<div class="warn-item">⚠ {w["message"]}</div>' for w in warnings
+        )
+        warn_banner = f'''
+        <div class="warn-banner">
+          <div class="warn-title">🔴 stance（金利スタンス）の見直しが必要です（{len(warnings)}件）</div>
+          {warn_items}
+          <div class="warn-note">data/central_bank_rates.json の stance を更新してください。</div>
+        </div>'''
+    else:
+        warn_banner = '<div class="ok-banner">✅ 金利スタンスに矛盾は検知されていません</div>'
+
+    # 金利テーブル行
+    rows = ""
+    for ccy in sorted(rates.keys()):
+        info = rates[ccy]
+        rate = info.get("rate")
+        if rate is None:
+            continue
+        stance = info.get("stance", "neutral")
+        cb = info.get("cb_name", ccy)
+        src = info.get("rate_source", "手動")
+        has_warn = ccy in warn_ccy
+        row_cls = "warn-row" if has_warn else ""
+        rate_cls = "rate-warn" if has_warn else "rate-val"
+        warn_mark = "🔴" if has_warn else ""
+        rows += f'''
+        <tr class="{row_cls}">
+          <td class="ccy">{ccy} {warn_mark}</td>
+          <td>{cb}</td>
+          <td class="{rate_cls}">{rate:.2f}%</td>
+          <td style="color:{stance_color.get(stance,'#9ca3af')};">{stance_jp.get(stance, stance)}</td>
+          <td class="src">{src}</td>
+        </tr>'''
+
+    html = f'''<!DOCTYPE html>
+<html lang="ja"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>金利モニター · Currents FX</title>
+<style>
+:root{{--bg:#0a0e14;--panel:#131820;--border:#1f2937;--gold:#d4a574;--text:#e5e7eb;--muted:#9ca3af;--sell:#f87171;}}
+*{{box-sizing:border-box;margin:0;padding:0;}}
+body{{background:var(--bg);color:var(--text);font-family:'Zen Kaku Gothic New',sans-serif;padding:1.5rem;max-width:900px;margin:0 auto;}}
+h1{{font-family:'Cormorant Garamond',serif;font-size:1.8rem;color:var(--gold);margin-bottom:0.3rem;}}
+.sub{{color:var(--muted);font-size:0.8rem;margin-bottom:1.2rem;}}
+.top-nav{{display:flex;gap:0.4rem;flex-wrap:wrap;margin-bottom:1.2rem;}}
+.top-nav a{{font-family:monospace;font-size:0.74rem;color:var(--muted);text-decoration:none;padding:0.3rem 0.6rem;border:1px solid var(--border);border-radius:4px;}}
+.top-nav a:hover{{border-color:var(--gold);color:var(--gold);}}
+.top-nav a.active{{background:var(--gold);color:var(--bg);font-weight:700;}}
+.warn-banner{{background:rgba(248,113,113,0.1);border:2px solid var(--sell);border-radius:8px;padding:1rem;margin-bottom:1.2rem;}}
+.warn-title{{color:var(--sell);font-weight:700;font-size:1rem;margin-bottom:0.6rem;}}
+.warn-item{{color:var(--sell);font-size:0.85rem;margin:0.4rem 0;line-height:1.5;}}
+.warn-note{{color:var(--muted);font-size:0.75rem;margin-top:0.6rem;}}
+.ok-banner{{background:rgba(74,222,128,0.08);border:1px solid #4ade80;color:#4ade80;border-radius:8px;padding:0.8rem;margin-bottom:1.2rem;font-size:0.9rem;}}
+table{{width:100%;border-collapse:collapse;background:var(--panel);border-radius:8px;overflow:hidden;}}
+th,td{{padding:0.6rem 0.8rem;text-align:left;border-bottom:1px solid var(--border);font-size:0.85rem;}}
+th{{background:rgba(212,165,116,0.1);color:var(--gold);font-weight:600;}}
+.ccy{{font-family:monospace;font-weight:700;}}
+.rate-val{{font-family:monospace;font-weight:700;}}
+.rate-warn{{font-family:monospace;font-weight:700;color:var(--sell);font-size:1rem;}}
+.warn-row{{background:rgba(248,113,113,0.06);}}
+.src{{color:var(--muted);font-size:0.72rem;}}
+.foot{{color:var(--muted);font-size:0.72rem;margin-top:1rem;text-align:center;}}
+</style></head><body>
+<nav class="top-nav">
+  <a href="./">📊 ダッシュボード</a>
+  <a href="./terminal.html">🖥 分析ターミナル</a>
+  <a href="./daytrade.html">⚡ デイトレ</a>
+  <a href="./position_manager.html">📋 ポジション管理</a>
+  <a href="./rates.html" class="active">💴 金利モニター</a>
+</nav>
+<h1>💴 金利モニター</h1>
+<div class="sub">中央銀行政策金利（FRED自動取得）· stance矛盾検知 · {checked} 時点</div>
+{warn_banner}
+<table>
+  <thead><tr><th>通貨</th><th>中央銀行</th><th>政策金利</th><th>スタンス</th><th>取得元</th></tr></thead>
+  <tbody>{rows}</tbody>
+</table>
+<div class="foot">金利数値はFRED APIで自動更新。stance（利上げ/利下げ姿勢）は手動メンテ。<br>
+金利が動いたのにstanceが矛盾する場合は赤字で警告します。</div>
+</body></html>'''
+
+    try:
+        os.makedirs(os.path.dirname(out_file), exist_ok=True)
+        with open(out_file, "w", encoding="utf-8") as f:
+            f.write(html)
+        print(f"[OK] 金利モニターHTML生成: {out_file}")
+    except Exception as e:
+        print(f"[WARN] 金利HTML生成失敗: {e}")
+    return html

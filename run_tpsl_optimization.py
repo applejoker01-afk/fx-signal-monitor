@@ -18,7 +18,7 @@ from datetime import datetime, timezone
 from signal_scanner import (
     compute_ta_score, fetch_history, PAIR_API,
 )
-from modules.rate_fetcher import load_central_bank_rates, compute_fa_score
+from modules.rate_fetcher import fetch_live_central_bank_rates, compute_fa_score
 from modules.backtest import run_full_backtest
 
 # 検証するTP/SL設定（SL, TP1, TP2, TP3 のATR乗数）
@@ -38,7 +38,7 @@ def main():
     print("=" * 64)
 
     lookback = int(os.environ.get("BACKTEST_DAYS", "180"))
-    cb_rates = load_central_bank_rates()
+    cb_rates = fetch_live_central_bank_rates()
 
     print(f"[INFO] {len(PAIR_API)}ペアの履歴取得中...")
     all_histories = {}
