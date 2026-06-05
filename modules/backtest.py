@@ -23,6 +23,7 @@ def run_backtest(
     pair_api: dict,
     atr_multipliers: tuple = (2.5, 2.5, 5.0, 8.5),
     lookback_days: int = 180,
+    ta_thresholds: tuple = (60, 55),
 ) -> dict:
     """
     1通貨ペアのバックテストを実行。
@@ -121,11 +122,14 @@ def run_backtest(
             fa_sign = 1 if fa["direction"] == "buy" else (-1 if fa["direction"] == "sell" else 0)
             agree = ta_sign == fa_sign and ta_sign != 0
 
-            # ★4以上の条件
+            # エントリー条件（閾値は引数で調整可能）
+            ta_long, fa_long = ta_thresholds  # (TAロング下限, FAロング下限)
+            ta_short = 100 - ta_long  # 対称（ショート上限）
+            fa_short = 100 - fa_long
             entry_dir = None
-            if agree and ta["ta_score"] >= 60 and fa["score"] >= 55:
+            if agree and ta["ta_score"] >= ta_long and fa["score"] >= fa_long:
                 entry_dir = "LONG" if fa_sign > 0 else "SHORT"
-            elif agree and ta["ta_score"] <= 40 and fa["score"] <= 45:
+            elif agree and ta["ta_score"] <= ta_short and fa["score"] <= fa_short:
                 entry_dir = "SHORT"
 
             if entry_dir:
@@ -197,6 +201,7 @@ def run_full_backtest(
     pair_api: dict,
     lookback_days: int = 180,
     atr_multipliers: tuple = (2.5, 2.5, 5.0, 8.5),
+    ta_thresholds: tuple = (60, 55),
 ) -> dict:
     """
     全通貨ペアのバックテストを実行して総合結果を返す。
@@ -218,7 +223,8 @@ def run_full_backtest(
             result = run_backtest(
                 pair, prices, compute_ta_score_fn, compute_fa_score_fn,
                 cb_rates, pair_api, lookback_days=lookback_days,
-                atr_multipliers=atr_multipliers
+                atr_multipliers=atr_multipliers,
+                ta_thresholds=ta_thresholds
             )
             if result.get("total", 0) > 0:
                 by_pair[pair] = result
