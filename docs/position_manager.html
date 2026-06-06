@@ -129,6 +129,15 @@ a{color:var(--gold);}
   color:var(--text-secondary);padding:0.15rem 0;}
 .trail-val{color:var(--text-primary);font-weight:700;}
 .trail-note{font-family:var(--jp);font-size:0.7rem;color:var(--text-muted);line-height:1.6;margin-top:0.35rem;}
+.swap-box{margin-top:0.5rem;padding:0.6rem 0.8rem;background:rgba(96,165,250,0.06);
+  border:1px solid rgba(96,165,250,0.3);border-radius:5px;}
+.swap-title{font-family:var(--jp-serif);font-size:0.78rem;color:#60a5fa;font-weight:600;margin-bottom:0.4rem;}
+.swap-row{display:flex;justify-content:space-between;font-family:var(--mono);font-size:0.76rem;padding:0.15rem 0;}
+.swap-val{font-weight:700;color:var(--text-primary);}
+.swap-detail{font-family:var(--mono);font-size:0.68rem;color:var(--text-muted);margin-top:0.2rem;}
+.swap-advice{font-family:var(--jp);font-size:0.7rem;color:var(--text-secondary);line-height:1.6;
+  margin-top:0.4rem;padding:0.4rem 0.5rem;background:rgba(74,222,128,0.08);border-radius:4px;}
+.swap-advice.warn{background:rgba(248,113,113,0.08);color:#fca5a5;}
 </style>
 </head>
 <body>
@@ -260,6 +269,61 @@ function normalizePair(raw){
   return upper; // 未知はそのまま大文字で
 }
 function pairDecimals(pair){ return pair.endsWith("JPY") ? 3 : 5; }
+
+// ===== スワップ方向判定（2ロット超長期運用の補助）=====
+// 各通貨の政策金利（2026年6月時点・フォールバック）。
+// rates.json が読めれば最新値で上書き。
+let CCY_RATES = {
+  USD:3.75, EUR:2.15, JPY:0.75, GBP:3.75, AUD:4.10, NZD:4.33,
+  CAD:2.75, CHF:0.00, SGD:3.00, HKD:4.75, CNY:3.00,
+  MXN:7.00, TRY:38.00, ZAR:7.25, INR:6.00,
+};
+const PAIR_CCY = {
+  USDJPY:["USD","JPY"], EURJPY:["EUR","JPY"], GBPJPY:["GBP","JPY"],
+  AUDJPY:["AUD","JPY"], NZDJPY:["NZD","JPY"], CADJPY:["CAD","JPY"],
+  CHFJPY:["CHF","JPY"], SGDJPY:["SGD","JPY"], HKDJPY:["HKD","JPY"],
+  MXNJPY:["MXN","JPY"], ZARJPY:["ZAR","JPY"], TRYJPY:["TRY","JPY"],
+  EURUSD:["EUR","USD"], GBPUSD:["GBP","USD"], AUDUSD:["AUD","USD"],
+  NZDUSD:["NZD","USD"], USDCAD:["USD","CAD"], USDCHF:["USD","CHF"],
+  EURGBP:["EUR","GBP"], EURAUD:["EUR","AUD"], GBPCHF:["GBP","CHF"],
+  GBPAUD:["GBP","AUD"], AUDNZD:["AUD","NZD"], CHFJPY:["CHF","JPY"],
+};
+// 主要国（超長期保有を推奨するのは主要国のみ。新興国は急落リスクで非推奨）
+const MAJOR_CCY = new Set(["USD","EUR","JPY","GBP","AUD","NZD","CAD","CHF"]);
+
+// rates.jsonから最新金利を読む（あれば）
+async function loadRates(){
+  const urls = ["./rates_snapshot.json","rates_snapshot.json"];
+  for(const u of urls){
+    try{
+      const r = await fetch(u + "?t=" + Date.now(), {cache:"no-store"});
+      if(!r.ok) continue;
+      const d = await r.json();
+      if(d.rates){ Object.assign(CCY_RATES, d.rates); return true; }
+    }catch(e){}
+  }
+  return false;
+}
+
+// スワップ方向と年間金利差を返す
+// direction: "LONG"(買い) or "SHORT"(売り)
+// 返り値: {swapPositive, annualPct, isMajor, note}
+function swapInfo(pair, direction){
+  const ccy = PAIR_CCY[pair];
+  if(!ccy) return {swapPositive:null, annualPct:0, isMajor:false, note:"金利データなし"};
+  const [from, to] = ccy;
+  const rf = CCY_RATES[from], rt = CCY_RATES[to];
+  if(rf==null || rt==null) return {swapPositive:null, annualPct:0, isMajor:false, note:"金利データなし"};
+  // LONG = FROM買いTO売り → 金利差(rf-rt)を受け取る
+  const diff = (direction==="LONG") ? (rf - rt) : (rt - rf);
+  const isMajor = MAJOR_CCY.has(from) && MAJOR_CCY.has(to);
+  return {
+    swapPositive: diff > 0,
+    annualPct: diff,
+    isMajor,
+    note: `${from}${rf.toFixed(2)}% - ${to}${rt.toFixed(2)}%`,
+  };
+}
 function pairPipFactor(pair){ return pair.endsWith("JPY") ? 100 : 10000; } // 1pip
 function yahooSymbol(pair){ return pair + "=X"; }
 
@@ -803,6 +867,38 @@ function buildPositionCard(pos){
     const modeHint = (mode !== recMode && sig)
       ? `<div style="font-size:0.7rem;color:var(--gold);margin-top:0.2rem;">💡 局面的には【${recMode==='TRAIL'?'トレール':'OCO固定'}】推奨</div>` : "";
 
+    // スワップ補助情報（2ロット超長期運用の判断材料）
+    let swapHtml = "";
+    const sw = swapInfo(pos.pair, pos.direction);
+    if(sw.swapPositive != null){
+      const swColor = sw.swapPositive ? "var(--long)" : "var(--short)";
+      const swLabel = sw.swapPositive ? "スワップ受取（＋）" : "スワップ支払（−）";
+      // 1ロット(1万通貨)あたりの日次スワップ概算（金利差ベース理論値）
+      let dailySwapYen = "";
+      if(cur != null){
+        // 年間金利差% × 想定元本(1万通貨×現在価格) / 365
+        const notional = (pos.pair.endsWith("JPY") ? cur : cur*150) * 10000; // JPY換算ざっくり
+        const yearly = notional * Math.abs(sw.annualPct) / 100;
+        dailySwapYen = `約${(yearly/365).toFixed(0)}円/日（1万通貨・理論値）`;
+      }
+      let holdAdvice = "";
+      if(sw.swapPositive && sw.isMajor){
+        holdAdvice = `<div class="swap-advice">💡 この方向はスワップ受取＋主要国。2ロット運用の候補：<b>1ロットはTP利確、もう1ロットはトレールで超長期保有</b>するとスワップを積み上げられます。</div>`;
+      } else if(sw.swapPositive && !sw.isMajor){
+        holdAdvice = `<div class="swap-advice warn">⚠ スワップ＋だが新興国通貨。急落リスクが大きいため超長期保有は非推奨。短中期での利確が無難です。</div>`;
+      } else if(!sw.swapPositive){
+        holdAdvice = `<div class="swap-advice warn">⚠ この方向はスワップ支払（マイナス）。超長期保有は持つほどコスト増。短中期での決済が無難です。</div>`;
+      }
+      swapHtml = `
+        <div class="swap-box">
+          <div class="swap-title">💴 スワップ方向</div>
+          <div class="swap-row"><span style="color:${swColor};font-weight:700;">${swLabel}</span>
+            <span class="swap-val">${sw.annualPct>=0?'+':''}${sw.annualPct.toFixed(2)}%/年</span></div>
+          <div class="swap-detail">${sw.note}${dailySwapYen?' ／ '+dailySwapYen:''}</div>
+          ${holdAdvice}
+        </div>`;
+    }
+
     // トレール選択時の推奨値
     let trailHtml = "";
     if(mode === "TRAIL"){
@@ -843,6 +939,7 @@ function buildPositionCard(pos){
       <div class="pl-detail">${mode==='OCO'?'SL/TPを固定して監視':'価格追従でSLを引き上げる方針'}</div>
       ${modeHint}
       ${trailHtml}
+      ${swapHtml}
       ${tpslHtml}
       <button class="btn small ai-advice-btn" data-id="${pos.id}" style="margin-top:0.7rem;width:100%;">
         🤖 AI決済アドバイスを表示
@@ -1037,6 +1134,7 @@ document.getElementById("resetBtn").onclick = async () => {
 // ============================================================
 (async function init(){
   await loadData();
+  await loadRates();  // 最新金利を読む（スワップ方向判定用）
   render();
   // 保有が無くてもシグナルは取得（照合表示のため）
   await fetchSignals();
