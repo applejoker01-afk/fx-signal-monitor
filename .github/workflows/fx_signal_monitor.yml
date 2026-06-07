@@ -59,11 +59,11 @@ jobs:
           OBSIDIAN_VAULT_PATH:  ${{ secrets.OBSIDIAN_VAULT_PATH }}
         run: python signal_scanner.py
 
-          - name: Push Geopolitical Risk Diary to separate repo
-            if: always()
-            env:
-              DIARY_TOKEN: ${{ secrets.DIARY_REPO_TOKEN }}
-            run: |
+      - name: Push Geopolitical Risk Diary to separate repo
+        if: always()
+        env:
+          DIARY_TOKEN: ${{ secrets.DIARY_REPO_TOKEN }}
+        run: |
               git config --global user.email "fx-monitor-bot@github-actions"
               git config --global user.name "FX Monitor Bot"
 
