@@ -59,6 +59,30 @@ jobs:
           OBSIDIAN_VAULT_PATH:  ${{ secrets.OBSIDIAN_VAULT_PATH }}
         run: python signal_scanner.py
 
+          - name: Push Geopolitical Risk Diary to separate repo
+            if: always()
+            env:
+              DIARY_TOKEN: ${{ secrets.DIARY_REPO_TOKEN }}
+            run: |
+              git config --global user.email "fx-monitor-bot@github-actions"
+              git config --global user.name "FX Monitor Bot"
+
+              # diary repoをclone
+              git clone https://x-access-token:${DIARY_TOKEN}@github.com/applejoker01-afk/fx-geopolitical-diary.git diary_repo
+
+              # 出力された日記をコピー
+              mkdir -p diary_repo/Geopolitical\ Risk\ Diary
+              cp -r docs/diary_output/* diary_repo/Geopolitical\ Risk\ Diary/ 2>/dev/null || true
+
+              cd diary_repo
+              git add .
+              if git diff --staged --quiet; then
+                echo "No diary changes to commit"
+              else
+                git commit -m "🤖 Auto-update Geopolitical Risk Diary $(date -u +'%Y-%m-%d %H:%M UTC')"
+                git push
+              fi
+              
       - name: Commit updated state (for diff detection)
         run: |
           git config --local user.email "fx-monitor-bot@github-actions"
