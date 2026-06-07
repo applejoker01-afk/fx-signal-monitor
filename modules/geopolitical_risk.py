@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-地政学・政治リスク評価モジュール（新興国通貨向け） v2.4
-- GitHub Actions対応（Vaultパスが存在しない場合は安全にスキップ）
+地政学・政治リスク評価モジュール（新興国通貨向け） v2.5
+- GitHub Actions対応（CI時は別出力ディレクトリに保存）
 """
 
 import urllib.request
@@ -29,7 +29,15 @@ RISK_CATEGORIES = {
 HIGH_RISK_KEYWORDS = [k for cat in RISK_CATEGORIES.values() for k in cat["keywords"]]
 
 DIARY_PATH = "docs/geopolitical_risk_diary.jsonl"
-OBSIDIAN_DIARY_DIR = "docs/geopolitical_risk"
+
+# GitHub Actions環境かどうかを判定
+IS_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
+
+# CI時は専用ディレクトリに出力（ワークフロー側で別リポジトリにpush）
+if IS_GITHUB_ACTIONS:
+    OBSIDIAN_DIARY_DIR = "docs/diary_output"
+else:
+    OBSIDIAN_DIARY_DIR = "docs/geopolitical_risk"
 
 
 def load_obsidian_vault_path():
@@ -50,10 +58,13 @@ def load_obsidian_vault_path():
 
 
 def get_obsidian_diary_path():
+    if IS_GITHUB_ACTIONS:
+        return OBSIDIAN_DIARY_DIR
+
     vault_path = load_obsidian_vault_path()
     if vault_path and os.path.exists(vault_path):
         return os.path.join(vault_path, "Geopolitical Risk Diary")
-    return None   # 存在しない場合はNoneを返す
+    return OBSIDIAN_DIARY_DIR
 
 
 def log_to_diary(entry):
@@ -67,7 +78,7 @@ def log_to_diary(entry):
 def write_obsidian_markdown_diary(entry):
     diary_dir = get_obsidian_diary_path()
     if not diary_dir:
-        return  # Vaultが存在しない場合は何もしない（GitHub Actions対策）
+        return
 
     os.makedirs(diary_dir, exist_ok=True)
     date_str = entry["timestamp"][:10]
@@ -104,7 +115,7 @@ def fetch_news_from_google(country, timeout=12):
     url = f"https://news.google.com/rss/search?q={encoded}&hl=en-US&gl=US&ceid=US:en"
 
     try:
-        req = urllib.request.Request(url, headers={"User-Agent": "fx-signal-monitor/2.4"})
+        req = urllib.request.Request(url, headers={"User-Agent": "fx-signal-monitor/2.5"})
         with urllib.request.urlopen(req, timeout=timeout) as resp:
             content = resp.read().decode("utf-8", errors="ignore")
             titles = re.findall(r"<title>(.*?)</title>", content)
