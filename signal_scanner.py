@@ -39,6 +39,7 @@ from modules.performance_intelligence import (
 )
 from modules.ai_commentary import generate_market_commentary, generate_exit_advice
 from modules.ambush_alert import evaluate_ambush, collect_ambush_alerts
+from modules.geopolitical_risk import apply_geopolitical_filter
 
 PAGES_URL = "https://applejoker01-afk.github.io/fx-signal-monitor/"
 
@@ -181,6 +182,7 @@ def compute_ta_score(price, prices):
     macd_v, macd_sig = macd_now(prices)
     atr_v = atr_calc(prices, 14)
 
+    # === 既存ロジック ===
     dma_score = 50
     if dma200:
         if price > dma200: dma_score = 70
@@ -205,9 +207,56 @@ def compute_ta_score(price, prices):
         elif rsi_v > 55: rsi_score = 65
         elif rsi_v < 45: rsi_score = 35
 
+    # === ダマシ低減のための新フィルタ（2026-06追加） ===
+    # 1. トレンド強度（DMA50とDMA200の乖離率）
+    trend_strength = 0
+    if dma200 and dma50:
+        separation = abs(dma50 - dma200) / dma200
+        if separation >= 0.018:          # 1.8%以上 → 強いトレンド
+            trend_strength = 18
+        elif separation >= 0.012:        # 1.2%以上 → 普通のトレンド
+            trend_strength = 10
+        elif separation < 0.005:         # 0.5%未満 → ほぼレンジ（大幅減点）
+            trend_strength = -20
+
+    # 2. ATRボラティリティ品質（低ボラ = ダマシ多発）
+    atr_quality = 0
+    if atr_v and len(prices) >= 40:
+        recent_atrs = []
+        for i in range(len(prices) - 35, len(prices) - 14):
+            a = atr_calc(prices[i:i+20], 14)
+            if a: recent_atrs.append(a)
+        if recent_atrs:
+            avg_atr = sum(recent_atrs) / len(recent_atrs)
+            ratio = atr_v / avg_atr if avg_atr > 0 else 1.0
+            if ratio < 0.65:             # 明らかに低ボラ
+                atr_quality = -25
+            elif ratio > 1.4:            # ボラ拡大中
+                atr_quality = 12
+
+    # 3. 直近ブレイクアウト確認（20期間高値/安値）
+    breakout_bonus = 0
+    if len(prices) >= 20:
+        recent_high = max(prices[-20:])
+        recent_low = min(prices[-20:])
+        if price >= recent_high * 0.997:     # 高値近辺 or 更新
+            breakout_bonus = 15
+        elif price <= recent_low * 1.003:    # 安値近辺 or 更新
+            breakout_bonus = 15
+
+    # 総合TAスコア（新フィルタを反映）
+    base_score = (dma_score + macd_score + rsi_score) / 3
+    adjusted_score = base_score + trend_strength + atr_quality + breakout_bonus
+    ta_score = max(5, min(98, round(adjusted_score, 1)))
+
     return {
-        "ta_score": round((dma_score + macd_score + rsi_score) / 3, 1),
-        "dma_score": dma_score, "macd_score": macd_score, "rsi_score": rsi_score,
+        "ta_score": ta_score,
+        "dma_score": dma_score,
+        "macd_score": macd_score,
+        "rsi_score": rsi_score,
+        "trend_strength": trend_strength,
+        "atr_quality": atr_quality,
+        "breakout_bonus": breakout_bonus,
         "dma200": round(dma200, 5) if dma200 else None,
         "dma50": round(dma50, 5) if dma50 else None,
         "rsi": round(rsi_v, 2) if rsi_v else None,
@@ -226,15 +275,16 @@ def evaluate_full(pair, price, prices, cb_rates, sentiment, now):
     agree = ta_sign == fa_sign and ta_sign != 0
     conflict = ta_sign != fa_sign and ta_sign != 0 and fa_sign != 0
 
-    if agree and ta["ta_score"] >= 75 and fa["score"] >= 65:
+    # ダマシ低減のため閾値を厳しめに設定（2026-06改訂）
+    if agree and ta["ta_score"] >= 78 and fa["score"] >= 68:
         stars = 5; verdict = "◎ 高信頼ロング" if fa_sign > 0 else "◎ 高信頼ショート"
         direction = "LONG" if fa_sign > 0 else "SHORT"
-    elif agree and ta["ta_score"] >= 60 and fa["score"] >= 55:
+    elif agree and ta["ta_score"] >= 65 and fa["score"] >= 58:
         stars = 4; verdict = "○ ロング条件成立" if fa_sign > 0 else "○ ショート条件成立"
         direction = "LONG" if fa_sign > 0 else "SHORT"
-    elif agree and ta["ta_score"] <= 25 and fa["score"] <= 35:
+    elif agree and ta["ta_score"] <= 22 and fa["score"] <= 32:
         stars = 5; verdict = "◎ 高信頼ショート"; direction = "SHORT"
-    elif agree and ta["ta_score"] <= 40 and fa["score"] <= 45:
+    elif agree and ta["ta_score"] <= 35 and fa["score"] <= 42:
         stars = 4; verdict = "○ ショート条件成立"; direction = "SHORT"
     elif conflict:
         stars = 1; verdict = "⚠ 見送り（FA/TA不一致）"; direction = "NO_TRADE"
@@ -266,6 +316,7 @@ def evaluate_full(pair, price, prices, cb_rates, sentiment, now):
         result["event_info"] = event_check["event"]
 
     result = apply_sentiment_filter(pair, result, sentiment)
+    result = apply_geopolitical_filter(pair, result)
     result["upcoming_events"] = upcoming_events_for(pair, hours_ahead=168)
     return result
 
