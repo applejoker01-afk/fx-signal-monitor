@@ -234,19 +234,19 @@ a{color:var(--gold);}
 // 通貨ペア正規化（日本語名・記号ゆれを吸収）
 // ============================================================
 const PAIR_ALIASES = {
-  "ドル円":"USDJPY","米ドル円":"USDJPY","ドル-円":"USDJPY","USD/JPY":"USDJPY","USDJPY":"USDJPY",
+  "ドル円":"USDJPY","米ドル円":"USDJPY","ドル-円":"USDJPY","米ドル-円":"USDJPY","USD/JPY":"USDJPY","USDJPY":"USDJPY",
   "ユーロ円":"EURJPY","ユーロ-円":"EURJPY","EUR/JPY":"EURJPY","EURJPY":"EURJPY",
   "ポンド円":"GBPJPY","ポンド-円":"GBPJPY","GBP/JPY":"GBPJPY","GBPJPY":"GBPJPY",
   "豪ドル円":"AUDJPY","豪ドル-円":"AUDJPY","AUD/JPY":"AUDJPY","AUDJPY":"AUDJPY",
   "NZドル円":"NZDJPY","NZドル-円":"NZDJPY","NZD/JPY":"NZDJPY","NZDJPY":"NZDJPY",
-  "ユーロドル":"EURUSD","ユーロ-ドル":"EURUSD","EUR/USD":"EURUSD","EURUSD":"EURUSD",
+  "ユーロドル":"EURUSD","ユーロ-ドル":"EURUSD","ユーロ-米ドル":"EURUSD","EUR/USD":"EURUSD","EURUSD":"EURUSD",
   "ポンドドル":"GBPUSD","ポンド-ドル":"GBPUSD","GBP/USD":"GBPUSD","GBPUSD":"GBPUSD",
   "豪ドル米ドル":"AUDUSD","豪ドル-米ドル":"AUDUSD","AUD/USD":"AUDUSD","AUDUSD":"AUDUSD",
   "ユーロポンド":"EURGBP","ユーロ-ポンド":"EURGBP","EUR/GBP":"EURGBP","EURGBP":"EURGBP",
   "ユーロ豪ドル":"EURAUD","ユーロ-豪ドル":"EURAUD","EUR/AUD":"EURAUD","EURAUD":"EURAUD",
-  "シンガポールドル-円":"SGDJPY","シンガポールドル円":"SGDJPY","SGD/JPY":"SGDJPY","SGDJPY":"SGDJPY",
+  "シンガポールドル-円":"SGDJPY","シンガポールドル円":"SGDJPY","SGPドル-円":"SGDJPY","SGD/JPY":"SGDJPY","SGDJPY":"SGDJPY",
   "香港ドル-円":"HKDJPY","香港ドル円":"HKDJPY","HKD/JPY":"HKDJPY","HKDJPY":"HKDJPY",
-  "ドルスイス":"USDCHF","米ドルスイス":"USDCHF","USD/CHF":"USDCHF","USDCHF":"USDCHF",
+  "ドルスイス":"USDCHF","米ドルスイス":"USDCHF","米ドル-スイスフラン":"USDCHF","USD/CHF":"USDCHF","USDCHF":"USDCHF",
   "ドルカナダ":"USDCAD","米ドルカナダ":"USDCAD","USD/CAD":"USDCAD","USDCAD":"USDCAD",
   "カナダドル-円":"CADJPY","カナダ-円":"CADJPY","カナダドル円":"CADJPY","CAD/JPY":"CADJPY","CADJPY":"CADJPY",
   "スイス-円":"CHFJPY","スイスフラン-円":"CHFJPY","スイスフラン円":"CHFJPY","CHF/JPY":"CHFJPY","CHFJPY":"CHFJPY",
@@ -260,9 +260,14 @@ const PAIR_ALIASES = {
 };
 function normalizePair(raw){
   if(!raw) return "";
-  // 全角ハイフン・ダッシュ類を半角ハイフンに統一（長音記号ーは除外！通貨名に含まれるため）
+  // ハイフン類を半角-に統一（長音記号ーは除外）
   let s = raw.trim().replace(/\s/g,"")
-    .replace(/[‐‑‒–—―－]/g, "-"); // 各種ハイフン/全角ハイフンを半角-に（ーは含めない）
+    .replace(/[‐‑‒–—―－]/g, "-");
+  // 全角英数字（Ａ-Ｚ ａ-ｚ ０-９）を半角に変換（例: ＮＺ→NZ, ＳＧＰ→SGP）
+  s = s.replace(/[Ａ-Ｚａ-ｚ０-９]/g, c => String.fromCharCode(c.charCodeAt(0) - 0xFEE0));
+  // 半角カタカナを全角に変換（例: ｽｲｽﾌﾗﾝ→スイスフラン）
+  const HK = {"ｦ":"ヲ","ｧ":"ァ","ｨ":"ィ","ｩ":"ゥ","ｪ":"ェ","ｫ":"ォ","ｬ":"ャ","ｭ":"ュ","ｮ":"ョ","ｯ":"ッ","ｱ":"ア","ｲ":"イ","ｳ":"ウ","ｴ":"エ","ｵ":"オ","ｶ":"カ","ｷ":"キ","ｸ":"ク","ｹ":"ケ","ｺ":"コ","ｻ":"サ","ｼ":"シ","ｽ":"ス","ｾ":"セ","ｿ":"ソ","ﾀ":"タ","ﾁ":"チ","ﾂ":"ツ","ﾃ":"テ","ﾄ":"ト","ﾅ":"ナ","ﾆ":"ニ","ﾇ":"ヌ","ﾈ":"ネ","ﾉ":"ノ","ﾊ":"ハ","ﾋ":"ヒ","ﾌ":"フ","ﾍ":"ヘ","ﾎ":"ホ","ﾏ":"マ","ﾐ":"ミ","ﾑ":"ム","ﾒ":"メ","ﾓ":"モ","ﾔ":"ヤ","ﾕ":"ユ","ﾖ":"ヨ","ﾗ":"ラ","ﾘ":"リ","ﾙ":"ル","ﾚ":"レ","ﾛ":"ロ","ﾜ":"ワ","ﾝ":"ン"};
+  s = s.replace(/[ｦ-ﾝ]/g, c => HK[c] || c);
   if (PAIR_ALIASES[s]) return PAIR_ALIASES[s];
   const upper = s.toUpperCase().replace(/[\/\-]/g,"");
   if (PAIR_ALIASES[upper]) return PAIR_ALIASES[upper];
