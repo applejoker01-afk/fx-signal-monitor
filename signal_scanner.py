@@ -546,6 +546,7 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results,
             f"```\n"
             f"価格: {r['price']}\n"
             f"方向: {r['direction']}
+"
 SL:{r.get("staged_tp",{}).get("sl","?")} TP1:{r.get("staged_tp",{}).get("tp1","?")} TP2:{r.get("staged_tp",{}).get("tp2","?")} TP3:{r.get("staged_tp",{}).get("tp3","?")}\n"
             f"TA: {r['ta_score']}/100  FA: {r['fa_score']}/100\n"
             f"金利差: {rate_diff_str}\n"
