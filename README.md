@@ -409,3 +409,9 @@ geopolitical:
 ```
 
 設定すると、`Geopolitical Risk Diary` フォルダがVault直下に作成され、日記が直接書き込まれるようになります。
+
+### 2026-06-09 central_bank_rates.json スタンス修正
+- FRB(USD): rate 3.63% → 3.75%, stance "ease" → "tighten" に更新
+- 利上げ転換検知に伴うスタンス見直し（rate_fetcher.py の警告解消）
+- スナップショットも同期更新
+- 目的：金利上昇時の stance 不整合警告の解消とデータ整合性維持
