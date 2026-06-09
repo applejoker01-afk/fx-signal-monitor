@@ -21,7 +21,7 @@ def run_backtest(
     compute_fa_score_fn,
     cb_rates: dict,
     pair_api: dict,
-    atr_multipliers: tuple = (2.5, 2.5, 5.0, 8.5),
+    atr_multipliers: tuple = (3.0, 3.0, 4.5, 6.0),  # 2026-06-09 E案 (PF 2.15)
     lookback_days: int = 180,
     ta_thresholds: tuple = (60, 55),
 ) -> dict:
@@ -200,7 +200,7 @@ def run_full_backtest(
     cb_rates: dict,
     pair_api: dict,
     lookback_days: int = 180,
-    atr_multipliers: tuple = (2.5, 2.5, 5.0, 8.5),
+    atr_multipliers: tuple = (3.0, 3.0, 4.5, 6.0),  # 2026-06-09 E案 (PF 2.15)
     ta_thresholds: tuple = (60, 55),
 ) -> dict:
     """

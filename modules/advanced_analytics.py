@@ -183,30 +183,35 @@ def detect_volatility_regime(prices: list, atr_current: float) -> dict:
 
     ratio = atr_current / atr_90d
 
+    # 2026-06-09 E案 TP/SL最適化反映（backtest検証済み）
+    # 旧: normal=2.5/2.5/5.0/8.5 → 新: 3.0/3.0/4.5/6.0
+    # 効果: PF 2.08→2.15 (+3.4%), pips +43.59→+48.38 (+11%), TP2到達 4→14件 (+250%)
+    # TP3=8.5×ATRが180日で到達0件と判明、6.0に短縮
+    # 詳細: docs/2026-06-09_tpsl_optimization_summary.md
     if ratio >= 1.5:
         regime = "high"
         regime_label = "高ボラ相場"
-        sl_mult = 4.0
-        tp1_mult = 4.0
-        tp2_mult = 8.0
-        tp3_mult = 14.0
-        note = f"ATRが90日平均の{ratio:.1f}倍 → SL幅を自動拡大"
+        sl_mult = 3.5
+        tp1_mult = 3.5
+        tp2_mult = 5.0
+        tp3_mult = 7.0
+        note = f"ATRが90日平均の{ratio:.1f}倍 → SL幅を自動拡大（E案連動）"
     elif ratio <= 0.7:
         regime = "low"
         regime_label = "低ボラ相場"
-        sl_mult = 2.0
-        tp1_mult = 2.0
+        sl_mult = 2.5
+        tp1_mult = 2.5
         tp2_mult = 4.0
-        tp3_mult = 7.0
-        note = f"ATRが90日平均の{ratio:.1f}倍 → SL幅を縮小"
+        tp3_mult = 5.0
+        note = f"ATRが90日平均の{ratio:.1f}倍 → SL幅を縮小（E案連動）"
     else:
         regime = "normal"
         regime_label = "通常ボラ相場"
-        sl_mult = 2.5
-        tp1_mult = 2.5
-        tp2_mult = 5.0
-        tp3_mult = 8.5
-        note = f"ATR比率{ratio:.1f} → 通常設定"
+        sl_mult = 3.0
+        tp1_mult = 3.0
+        tp2_mult = 4.5
+        tp3_mult = 6.0
+        note = f"ATR比率{ratio:.1f} → E案最適設定（PF 2.15/+48.4pips）"
 
     return {
         "regime": regime,
@@ -222,16 +227,17 @@ def detect_volatility_regime(prices: list, atr_current: float) -> dict:
 
 
 def _default_regime() -> dict:
+    # 2026-06-09 E案 TP/SL最適化反映
     return {
         "regime": "normal",
         "regime_label": "通常ボラ相場",
         "atr_ratio": 1.0,
         "atr_90d": None,
-        "sl_multiplier": 2.5,
-        "tp1_multiplier": 2.5,
-        "tp2_multiplier": 5.0,
-        "tp3_multiplier": 8.5,
-        "note": "データ不足 → デフォルト設定",
+        "sl_multiplier": 3.0,
+        "tp1_multiplier": 3.0,
+        "tp2_multiplier": 4.5,
+        "tp3_multiplier": 6.0,
+        "note": "データ不足 → E案デフォルト設定",
     }
 
 
@@ -266,10 +272,11 @@ def calc_staged_tp(price: float, direction: str, atr: float, regime: dict) -> di
     if not atr or atr == 0:
         return {}
 
-    sl_mult = regime.get("sl_multiplier", 2.5)
-    tp1_mult = regime.get("tp1_multiplier", 2.5)
-    tp2_mult = regime.get("tp2_multiplier", 5.0)
-    tp3_mult = regime.get("tp3_multiplier", 8.5)
+    # 2026-06-09 E案 TP/SL最適化のデフォルト値反映
+    sl_mult = regime.get("sl_multiplier", 3.0)
+    tp1_mult = regime.get("tp1_multiplier", 3.0)
+    tp2_mult = regime.get("tp2_multiplier", 4.5)
+    tp3_mult = regime.get("tp3_multiplier", 6.0)
 
     sl_width = atr * sl_mult
     tp1_width = atr * tp1_mult
