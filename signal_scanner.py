@@ -545,9 +545,7 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results,
         value = (
             f"```\n"
             f"価格: {r['price']}\n"
-            f"方向: {r['direction']}
-"
-SL:{r.get("staged_tp",{}).get("sl","?")} TP1:{r.get("staged_tp",{}).get("tp1","?")} TP2:{r.get("staged_tp",{}).get("tp2","?")} TP3:{r.get("staged_tp",{}).get("tp3","?")}\n"
+            f"方向: {r['direction']}\n"
             f"TA: {r['ta_score']}/100  FA: {r['fa_score']}/100\n"
             f"金利差: {rate_diff_str}\n"
         )
@@ -602,10 +600,18 @@ SL:{r.get("staged_tp",{}).get("sl","?")} TP1:{r.get("staged_tp",{}).get("tp1","?
         })
 
     for r in upgraded:
+        staged = r.get("staged_tp", {})
+        tp_sl = ""
+        if staged:
+            tp_sl = (
+                f"\nSL: {staged.get('sl','?')} | "
+                f"TP1: {staged.get('tp1','?')} | "
+                f"TP2: {staged.get('tp2','?')} | "
+                f"TP3: {staged.get('tp3','?')}"
+            )
         embeds[0]["fields"].append({
             "name": f"⬆ 昇格: {r['label']} ★4→★5",
-            "value": f"```\n価格: {r['price']}  方向: {r['direction']}
-SL:{r.get("staged_tp",{}).get("sl","?")} TP1:{r.get("staged_tp",{}).get("tp1","?")} TP2:{r.get("staged_tp",{}).get("tp2","?")} TP3:{r.get("staged_tp",{}).get("tp3","?")}\n```",
+            "value": f"```\n価格: {r['price']}  方向: {r['direction']}{tp_sl}\n```",
             "inline": False
         })
 
