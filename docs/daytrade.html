@@ -96,6 +96,8 @@ body{background:var(--bg-deep);color:var(--text-primary);font-family:var(--jp);
 .regime-badge{font-size:0.66rem;padding:0.15rem 0.5rem;border-radius:3px;
   background:var(--bg-elev);color:var(--text-secondary);border:1px solid var(--border);}
 .pair-card.skipped{opacity:0.55;}
+.pair-card.time-blocked{border-color:rgba(251,191,36,0.4);opacity:0.75;}
+.tag-blocked{background:rgba(251,191,36,0.15);color:var(--caution);}
 
 /* Log */
 .log-box{background:var(--bg-card);border:1px solid var(--border);border-radius:6px;
@@ -594,8 +596,23 @@ async function fetchM15(pair) {
 // ============================================================
 // メイン監視ループ
 // ============================================================
+// ===== 時間帯フィルター（改善1: 実取引データに基づく）=====
+// 2026/5/26〜6/10の実取引34件の分析結果:
+//   欧州時間(JST15-21時)エントリー: 9件 勝率22% -697円（全時間帯で最悪）
+//   早朝(JST3-9時): 勝率50% +396円（唯一のプラス）
+// → 欧州時間はシグナル発火を停止する（監視・表示は継続）
+const BLOCKED_JST_START = 15; // JST 15時から
+const BLOCKED_JST_END = 21;   // JST 21時まで（21時台からOK）
+function isEuropeBlocked() {
+  const jstHour = (new Date().getUTCHours() + 9) % 24;
+  return jstHour >= BLOCKED_JST_START && jstHour < BLOCKED_JST_END;
+}
+
 async function scanAll() {
   log("スキャン開始...");
+  if (isEuropeBlocked()) {
+    log("🕐 欧州時間(JST15-21)のため発火停止中（監視は継続・実績: 勝率22%）", "err");
+  }
   // 戦略マップを更新（毎回読む）
   const mapOk = await loadStrategyMap();
   if (mapOk) {
@@ -638,14 +655,22 @@ async function scanAll() {
       const plan = evalStrategy(stratKey, m, atrVal);
 
       if (plan) {
-        const now = Date.now();
-        if (now - st.lastSignalTime > 3600 * 1000 || st.phase !== "fired") {
-          fireSignal(pair, plan, price, atrVal, e50, e200, stratName, regime);
-          st.phase = "fired";
-          st.lastSignalTime = now;
+        if (isEuropeBlocked()) {
+          // 改善1: 欧州時間(JST15-21)は発火停止（実績: 勝率22% -697円）
+          st.phase = "blocked";
+          log(`⏸ ${pair.label} ${plan.direction} 条件成立だが欧州時間のため発火停止`, "err");
+          setPairCard(pair, { price, atrVal, e50, e200, blocked: plan,
+            stratName, regime, regimeComment });
+        } else {
+          const now = Date.now();
+          if (now - st.lastSignalTime > 3600 * 1000 || st.phase !== "fired") {
+            fireSignal(pair, plan, price, atrVal, e50, e200, stratName, regime);
+            st.phase = "fired";
+            st.lastSignalTime = now;
+          }
+          setPairCard(pair, { price, atrVal, e50, e200, reversal: plan,
+            stratName, regime, regimeComment });
         }
-        setPairCard(pair, { price, atrVal, e50, e200, reversal: plan,
-          stratName, regime, regimeComment });
       } else {
         // 接近監視（参考表示）
         const approach = detectApproach(m.closes, m.highs, m.lows, atrVal);
@@ -748,6 +773,13 @@ function setPairCard(pair, info) {
 
   if (info.error) {
     stateHtml = `<span class="state-tag tag-idle">取得失敗</span>`;
+  } else if (info.blocked) {
+    const p = info.blocked;
+    cls += " time-blocked";
+    const dirJp = p.direction === "LONG" ? "🟢 ロング" : "🔴 ショート";
+    stateHtml = `<span class="state-tag tag-blocked">🕐 時間帯フィルター</span>${dirJp}条件成立も発火停止<br>
+      <div class="plan-line">欧州時間(JST15-21時)は実績不振のため発火を止めています<br>
+      （参考値 SL:${p.sl.toFixed(d)} / TP1:${p.tp1.toFixed(d)}）</div>`;
   } else if (info.skip) {
     cls += " skipped";
     stateHtml = `<span class="state-tag tag-idle">⏸ 見送り</span>
