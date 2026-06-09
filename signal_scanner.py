@@ -1095,14 +1095,26 @@ def main():
     if rate_consistency.get("warnings"):
         print(f"[WARN] stance矛盾 {len(rate_consistency['warnings'])}件検知")
 
-    # 3. 米国債利回り
+    # 3. 米国債利回り（カーブ形状の参考。10年は後で市場値に一本化）
     us_yields = fetch_us_treasury_yields()
-    print(f"[OK] US yields: 10y={us_yields.get('10y')}%")
 
     # 4. 市場センチメント
     print("[INFO] Fetching market sentiment...")
     sentiment = evaluate_market_sentiment()
     print(f"[OK] Sentiment: VIX={sentiment.get('vix')} mode={sentiment.get('risk_mode')}")
+
+    # 4b. 10年金利を市場値(^TNX)に一本化
+    #     fetch_us_treasury_yields() の "10y" は発行済み国債の平均クーポン利率
+    #     (Treasury avg_interest_rates) で市場利回りではないため、表示・stateは
+    #     センチメント側の市場値(^TNX)に統一し、二重表示・不整合を解消する。
+    market_10y = sentiment.get("us10y")
+    if market_10y is not None:
+        us_yields["avg_note_coupon"] = us_yields.get("10y")  # 旧値（参考保持）
+        us_yields["10y"] = market_10y
+        us_yields["10y_source"] = "market yield (^TNX via Yahoo Finance)"
+        if us_yields.get("2y") is not None:
+            us_yields["spread_10y2y"] = round(market_10y - us_yields["2y"], 3)
+    print(f"[OK] US 10Y (market): {us_yields.get('10y')}%")
 
     # 4.5 Obsidian Wiki
     print("\n[INFO] Fetching Obsidian Vault notes...")

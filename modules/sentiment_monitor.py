@@ -141,6 +141,25 @@ def fetch_yahoo(symbol):
     return None
 
 
+def fetch_yahoo_history(symbol, days=30):
+    """Yahoo Financeから過去N日の終値時系列を取得（Stooq履歴のフォールバック）"""
+    rng = "3mo" if days <= 60 else "6mo"
+    url = (
+        f"https://query1.finance.yahoo.com/v8/finance/chart/{symbol}"
+        f"?interval=1d&range={rng}"
+    )
+    try:
+        text = http_get(url, timeout=15)
+        data = json.loads(text)
+        closes = (data["chart"]["result"][0]
+                  ["indicators"]["quote"][0]["close"])
+        closes = [float(v) for v in closes if v is not None]
+        return closes[-days:] if len(closes) >= days else closes
+    except Exception as e:
+        print(f"[WARN] Yahoo history fetch failed for {symbol}: {e}")
+        return []
+
+
 def fetch_vix():
     """VIX恐怖指数 - Yahoo Finance優先、Stooqフォールバック"""
     # Yahoo Finance（最優先）
@@ -158,13 +177,17 @@ def fetch_vix():
 
 
 def fetch_dxy():
-    """ドルインデックス"""
-    val = fetch_stooq("dx.f")
-    if val is None:
-        val = fetch_stooq("usdx")
-    if val is None:
-        val = fetch_yahoo("DX-Y.NYB")
-    return val
+    """ドルインデックス - Yahoo Finance優先、Stooqフォールバック"""
+    val = fetch_yahoo("DX-Y.NYB")
+    if val is not None:
+        print(f"[OK] DXY from Yahoo Finance: {val}")
+        return val
+    for symbol in ("dx.f", "usdx"):
+        val = fetch_stooq(symbol)
+        if val is not None:
+            return val
+    print("[WARN] DXY: 全データソース取得失敗")
+    return None
 
 
 def fetch_us10y():
@@ -189,11 +212,18 @@ def fetch_us10y():
 
 
 def fetch_gold():
-    """金価格 (XAU/USD)"""
-    val = fetch_stooq("xauusd")
-    if val is None:
-        val = fetch_stooq("gc.f")  # Gold futures
-    return val
+    """金価格 (XAU/USD) - Yahoo Finance優先、Stooqフォールバック"""
+    for ysym in ("GC=F", "XAUUSD=X"):
+        val = fetch_yahoo(urllib.parse.quote(ysym, safe=""))
+        if val is not None:
+            print(f"[OK] Gold from Yahoo Finance ({ysym}): {val}")
+            return val
+    for symbol in ("xauusd", "gc.f"):
+        val = fetch_stooq(symbol)
+        if val is not None:
+            return val
+    print("[WARN] Gold: 全データソース取得失敗")
+    return None
 
 
 # ---------------------------------------------------------------------------
@@ -218,10 +248,14 @@ def evaluate_market_sentiment():
     dxy_history = fetch_stooq_history("dx.f", days=30)
     if not dxy_history:
         dxy_history = fetch_stooq_history("usdx", days=30)
+    if not dxy_history:
+        dxy_history = fetch_yahoo_history("DX-Y.NYB", days=30)
     dxy_30d_avg = sum(dxy_history) / len(dxy_history) if dxy_history else None
 
     # 金のトレンド判定
     gold_history = fetch_stooq_history("xauusd", days=20)
+    if not gold_history:
+        gold_history = fetch_yahoo_history(urllib.parse.quote("GC=F", safe=""), days=20)
     gold_20d_avg = sum(gold_history) / len(gold_history) if gold_history else None
 
     # キャッシュ更新
