@@ -217,23 +217,44 @@ def _fallback_rates():
     FRED自動取得できない通貨の手動フォールバック（2026年6月時点）。
     USDはFRED(DFEDTARU)で自動上書きされるため、ここの値は参考。
     他通貨は手動メンテ。中銀の利上げ/利下げ時はこのstanceとrateを更新すること。
+    rate_momentum: accelerating/decelerating/peak/trough/stable
+      accelerating = 利上げ/利下げが加速中（stance方向が強まる）
+      decelerating  = 利上げ/利下げが鈍化中（ピーク/底近し）
+      peak          = 利上げサイクルの天井（次は利下げ）
+      trough        = 利下げサイクルの底（次は利上げ）
+      stable        = 方向感なし・中立
     """
     return {
-        "USD": {"rate": 3.75, "stance": "neutral", "cb_name": "FRB"},
-        "EUR": {"rate": 2.15, "stance": "neutral", "cb_name": "ECB"},
-        "JPY": {"rate": 0.75, "stance": "tighten", "cb_name": "日銀"},  # 1%へ利上げ検討中
-        "GBP": {"rate": 3.75, "stance": "ease", "cb_name": "BOE"},      # 下落傾向
-        "AUD": {"rate": 4.10, "stance": "tighten", "cb_name": "RBA"},   # 2026上昇トレンド
-        "NZD": {"rate": 4.33, "stance": "neutral", "cb_name": "RBNZ"},
-        "CAD": {"rate": 2.75, "stance": "neutral", "cb_name": "BOC"},   # 2026据え置き見通し
-        "CHF": {"rate": 0.00, "stance": "neutral", "cb_name": "SNB"},   # 0%据え置き
-        "SGD": {"rate": 3.00, "stance": "neutral", "cb_name": "MAS"},
-        "HKD": {"rate": 4.75, "stance": "neutral", "cb_name": "HKMA"},
-        "CNY": {"rate": 3.00, "stance": "ease", "cb_name": "PBOC"},
-        "MXN": {"rate": 7.00, "stance": "ease", "cb_name": "Banxico"},
-        "TRY": {"rate": 38.00, "stance": "ease", "cb_name": "CBRT"},
-        "ZAR": {"rate": 7.25, "stance": "ease", "cb_name": "SARB"},
-        "INR": {"rate": 6.00, "stance": "neutral", "cb_name": "RBI"},
+        "USD": {"rate": 3.75, "stance": "neutral", "rate_momentum": "stable",
+                "cb_name": "FRB"},    # higher-for-longer pause
+        "EUR": {"rate": 2.15, "stance": "ease", "rate_momentum": "decelerating",
+                "cb_name": "ECB"},    # 利下げサイクル後半・ペース鈍化
+        "JPY": {"rate": 0.75, "stance": "tighten", "rate_momentum": "accelerating",
+                "cb_name": "日銀"},   # 6/16-17会合で0.75→1.0% 確率80-96%
+        "GBP": {"rate": 3.75, "stance": "neutral", "rate_momentum": "stable",
+                "cb_name": "BOE"},    # データ依存・中立
+        "AUD": {"rate": 4.10, "stance": "ease", "rate_momentum": "stable",
+                "cb_name": "RBA"},    # 2026-06-03 4.35→4.10に引き下げ
+        "NZD": {"rate": 3.25, "stance": "ease", "rate_momentum": "decelerating",
+                "cb_name": "RBNZ"},   # 利下げサイクル後半
+        "CAD": {"rate": 2.75, "stance": "neutral", "rate_momentum": "stable",
+                "cb_name": "BOC"},    # 据え置き
+        "CHF": {"rate": 0.25, "stance": "ease", "rate_momentum": "trough",
+                "cb_name": "SNB"},    # ゼロ金利接近・底打ち近し
+        "SGD": {"rate": 2.50, "stance": "neutral", "rate_momentum": "stable",
+                "cb_name": "MAS"},
+        "HKD": {"rate": 3.75, "stance": "neutral", "rate_momentum": "stable",
+                "cb_name": "HKMA"},   # USDペッグ
+        "CNY": {"rate": 3.00, "stance": "ease", "rate_momentum": "stable",
+                "cb_name": "PBOC"},
+        "MXN": {"rate": 9.00, "stance": "ease", "rate_momentum": "decelerating",
+                "cb_name": "Banxico"},
+        "TRY": {"rate": 46.00, "stance": "ease", "rate_momentum": "decelerating",
+                "cb_name": "CBRT"},
+        "ZAR": {"rate": 7.25, "stance": "neutral", "rate_momentum": "stable",
+                "cb_name": "SARB"},
+        "INR": {"rate": 5.50, "stance": "ease", "rate_momentum": "stable",
+                "cb_name": "RBI"},
     }
 
 
@@ -309,11 +330,37 @@ def _fallback_yields():
 # 金利差ベースのFAスコア計算（添付資料に基づく）
 # ---------------------------------------------------------------------------
 
+def _rate_momentum_bonus(stance: str, momentum: str) -> float:
+    """
+    金利サイクルのモメンタムによる追加ボーナス（-8〜+8）。
+    プラス = その通貨が強くなる方向（buy FROM / sell TO で加算）。
+
+    accelerating + tighten = 利上げ加速 → その通貨が強くなる確実性高 → +8
+    decelerating + tighten = 利上げ鈍化 → ピーク近し → -4（やや弱まる）
+    peak                   = 利上げ頂点 → 次は利下げ → -6
+    trough                 = 利下げ底  → 次は利上げ → +6
+    accelerating + ease    = 利下げ加速 → その通貨が弱くなる確実性高 → -8
+    decelerating + ease    = 利下げ鈍化 → 底打ち近し → +4
+    stable / その他        = 0
+    """
+    if momentum == "accelerating":
+        return 8.0 if stance == "tighten" else (-8.0 if stance == "ease" else 0.0)
+    elif momentum == "decelerating":
+        return -4.0 if stance == "tighten" else (4.0 if stance == "ease" else 0.0)
+    elif momentum == "peak":
+        return -6.0
+    elif momentum == "trough":
+        return 6.0
+    return 0.0
+
+
 def compute_fa_score(pair, pair_api, central_bank_rates, bond_trend=None):
     """
-    金利差と中銀スタンスから動的にFAスコアを算出。
+    金利差・中銀スタンス・金利サイクルモメンタムから動的にFAスコアを算出。
     bond_trend: 米10年債の直近トレンド（"up"/"down"/None）。
                 USD絡みペアのみFAスコアを±5点補正する。
+    rate_momentum: accelerating/decelerating/peak/trough/stable。
+                  金利サイクルの「勢い」を±8点で反映。
     返り値: dict (score: 0-100, direction: buy/sell/neutral, detail: str, rate_diff: float)
     """
     from_ccy, to_ccy = pair_api[pair]
@@ -321,6 +368,9 @@ def compute_fa_score(pair, pair_api, central_bank_rates, bond_trend=None):
     rate_to = central_bank_rates.get(to_ccy, {}).get("rate")
     stance_from = central_bank_rates.get(from_ccy, {}).get("stance", "neutral")
     stance_to = central_bank_rates.get(to_ccy, {}).get("stance", "neutral")
+    # 2026-06-11: 金利サイクルモメンタム（研究D反映）
+    momentum_from = central_bank_rates.get(from_ccy, {}).get("rate_momentum", "stable")
+    momentum_to = central_bank_rates.get(to_ccy, {}).get("rate_momentum", "stable")
 
     if rate_from is None or rate_to is None:
         return {
@@ -366,8 +416,21 @@ def compute_fa_score(pair, pair_api, central_bank_rates, bond_trend=None):
             bond_bonus = -5 if bond_trend == "up" else 5
             bond_note = f" / 米10年債{('↑' if bond_trend=='up' else '↓')}"
 
+    # 金利サイクルモメンタム補正（2026-06-11 研究D反映）
+    # FROM通貨のモメンタム（プラス = FROM強い = 買い方向）
+    # TO通貨のモメンタム（プラス = TO強い = 売り方向 = スコア減算）
+    mb_from = _rate_momentum_bonus(stance_from, momentum_from)
+    mb_to = _rate_momentum_bonus(stance_to, momentum_to)
+    momentum_bonus = mb_from - mb_to  # net: FROM有利 - TO有利
+    momentum_note = ""
+    if abs(momentum_bonus) >= 4:
+        if momentum_bonus > 0:
+            momentum_note = f" / {from_ccy}サイクル強化({momentum_from})"
+        else:
+            momentum_note = f" / {to_ccy}サイクル強化({momentum_to})"
+
     # 最終スコア（50を中立基準）
-    final_score = 50 + diff_score + stance_bonus + bond_bonus
+    final_score = 50 + diff_score + stance_bonus + bond_bonus + momentum_bonus
     final_score = max(0, min(100, final_score))
 
     if final_score >= 60:
@@ -380,9 +443,9 @@ def compute_fa_score(pair, pair_api, central_bank_rates, bond_trend=None):
     cb_from = central_bank_rates.get(from_ccy, {}).get("cb_name", from_ccy)
     cb_to = central_bank_rates.get(to_ccy, {}).get("cb_name", to_ccy)
     detail = (
-        f"{cb_from}({rate_from:.2f}% {stance_from}) vs "
-        f"{cb_to}({rate_to:.2f}% {stance_to}) "
-        f"差{rate_diff:+.2f}%{bond_note}"
+        f"{cb_from}({rate_from:.2f}% {stance_from}/{momentum_from}) vs "
+        f"{cb_to}({rate_to:.2f}% {stance_to}/{momentum_to}) "
+        f"差{rate_diff:+.2f}%{bond_note}{momentum_note}"
     )
 
     return {
@@ -394,6 +457,9 @@ def compute_fa_score(pair, pair_api, central_bank_rates, bond_trend=None):
         "rate_to": rate_to,
         "stance_from": stance_from,
         "stance_to": stance_to,
+        "momentum_from": momentum_from,
+        "momentum_to": momentum_to,
+        "momentum_bonus": round(momentum_bonus, 1),
         "cb_from": cb_from,
         "cb_to": cb_to,
     }

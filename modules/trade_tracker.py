@@ -9,13 +9,18 @@ trade_tracker.py
   ★4以上を維持 = 保有中（重複カウントしない）
   決済条件 = TP/SL到達 or ★4を割る or 方向反転 → closed_trades.jsonlに記録
 
-決済理由:
-  TP3_HIT  : TP3到達（中長期目標達成・大勝ち）
-  TP2_HIT  : TP2到達（勝ち）
-  TP1_HIT  : TP1到達（小勝ち）
-  SL_HIT   : ストップロス到達（負け）
+決済理由（2026-06-10刷新：単一TP + トレーリング戦略）:
+  TP_HIT      : TP到達（旧TP1相当・ほぼ確実に到達する利確水準）
+                到達後はトレーリング有効化、SLをBE+0.5Rへ移動
+  TRAIL_HIT   : トレーリングストップ到達（トレンド継続後の利益確定）
+  BE_HIT      : TP到達後の戻りでBE+0.5Rに到達（小利確保）
+  SL_HIT      : 初期SLに到達（負け）
   SIGNAL_LOST : ★2を割った（シグナルが明確に弱体化・中長期保持後の消滅）
-  REVERSED : 方向が反転した（LONG→SHORT等・明確なトレンド転換）
+  REVERSED    : 方向が反転した（LONG→SHORT等・明確なトレンド転換）
+
+  ── 後方互換 ──
+  TP1_HIT, TP2_HIT, TP3_HIT は既存のクローズドトレード履歴に残る可能性あり
+  新規トレードは TP_HIT / TRAIL_HIT / BE_HIT を使用
 """
 
 import json
@@ -118,61 +123,135 @@ def _hours_between(iso_start: str, dt_end: datetime) -> float:
 def check_exit_condition(trade: dict, current_price: float,
                          current_stars: int, current_direction: str) -> dict:
     """
-    保有中トレードが決済条件を満たすか判定。
+    保有中トレードが決済条件を満たすか判定（2026-06-10: 単一TP+トレーリング対応）。
+
+    新戦略:
+    - Phase 1（TP未到達）: 初期SL or 単一TP の判定
+    - Phase 2（TP到達後）: トレーリングストップ or BE+0.5R の判定
+
+    後方互換:
+    - 既存open_tradesに tp2/tp3 がある場合は従来通り（移行期）
 
     Returns:
-        None（継続）または決済情報dict
+        - None: 保有継続
+        - dict (with "_state_update"): SL移動・トレーリング更新（保有継続だが状態変化）
+        - dict (with "exit_reason"): 決済確定
     """
     direction = trade["direction"]
     entry_price = trade["entry_price"]
     sl = trade.get("sl")
-    tp1 = trade.get("tp1")
-    tp2 = trade.get("tp2")
-    tp3 = trade.get("tp3")
+    tp = trade.get("tp") or trade.get("tp1")  # 新旧両対応
+
+    # トレーリング関連の状態
+    tp_hit_flag = trade.get("tp_hit", False)
+    trail_active = trade.get("trail_active", False)
+    trail_distance = trade.get("trail_distance", 0)
+    extreme_price = trade.get("extreme_price")  # トレーリング用の最高値/最低値
 
     exit_reason = None
     exit_price = current_price
+    state_update = None  # 保有継続だが状態が更新される場合
 
     is_long = direction.endswith("LONG")
 
-    # ── 価格ベースの決済判定（TP/SL）──
-    if is_long:
-        # ロング: 上昇でTP、下落でSL
-        if sl is not None and current_price <= sl:
-            exit_reason = "SL_HIT"; exit_price = sl
-        elif tp3 is not None and current_price >= tp3:
-            exit_reason = "TP3_HIT"; exit_price = tp3
-        elif tp2 is not None and current_price >= tp2:
-            exit_reason = "TP2_HIT"; exit_price = tp2
-        elif tp1 is not None and current_price >= tp1:
-            exit_reason = "TP1_HIT"; exit_price = tp1
-    else:
-        # ショート: 下落でTP、上昇でSL
-        if sl is not None and current_price >= sl:
-            exit_reason = "SL_HIT"; exit_price = sl
-        elif tp3 is not None and current_price <= tp3:
-            exit_reason = "TP3_HIT"; exit_price = tp3
-        elif tp2 is not None and current_price <= tp2:
-            exit_reason = "TP2_HIT"; exit_price = tp2
-        elif tp1 is not None and current_price <= tp1:
-            exit_reason = "TP1_HIT"; exit_price = tp1
+    # ── Phase 1: TP未到達のフェーズ ──
+    if not tp_hit_flag:
+        if is_long:
+            # ロング
+            if sl is not None and current_price <= sl:
+                exit_reason = "SL_HIT"; exit_price = sl
+            elif tp is not None and current_price >= tp:
+                # TP到達 → Phase 2へ移行（決済しない）
+                tp_hit_flag = True
+                trail_active = True
+                extreme_price = current_price
+                # SLを BE+0.5R へ移動
+                new_sl = trade.get("be_target_after_tp", entry_price)
+                state_update = {
+                    "tp_hit": True,
+                    "tp_hit_time": None,  # 後で設定
+                    "trail_active": True,
+                    "trail_distance": trade.get("trail_distance", 0),
+                    "extreme_price": extreme_price,
+                    "sl": new_sl,  # SL移動
+                    "initial_sl": trade.get("initial_sl", sl),  # 元のSLを保持
+                }
+        else:
+            # ショート
+            if sl is not None and current_price >= sl:
+                exit_reason = "SL_HIT"; exit_price = sl
+            elif tp is not None and current_price <= tp:
+                tp_hit_flag = True
+                trail_active = True
+                extreme_price = current_price
+                new_sl = trade.get("be_target_after_tp", entry_price)
+                state_update = {
+                    "tp_hit": True,
+                    "trail_active": True,
+                    "trail_distance": trade.get("trail_distance", 0),
+                    "extreme_price": extreme_price,
+                    "sl": new_sl,
+                    "initial_sl": trade.get("initial_sl", sl),
+                }
 
-    # ── シグナルベースの決済判定 ──
+    # ── Phase 2: TP到達後（トレーリング中）──
+    elif trail_active and trail_distance > 0:
+        # 最高値/最低値の更新
+        if is_long:
+            if extreme_price is None or current_price > extreme_price:
+                extreme_price = current_price
+                state_update = {"extreme_price": extreme_price}
+            # トレーリングストップ価格 = 最高値 - trail_distance
+            trail_stop = extreme_price - trail_distance
+            # BE+0.5R よりトレーリングストップが上なら、SLをトレールへ
+            be_target = trade.get("be_target_after_tp", entry_price)
+            effective_sl = max(trail_stop, be_target)
+            if current_price <= effective_sl:
+                # トレーリングストップ or BE到達
+                if trail_stop > be_target:
+                    exit_reason = "TRAIL_HIT"
+                else:
+                    exit_reason = "BE_HIT"
+                exit_price = effective_sl
+            else:
+                if state_update is None:
+                    state_update = {}
+                state_update["sl"] = effective_sl
+        else:
+            # ショート
+            if extreme_price is None or current_price < extreme_price:
+                extreme_price = current_price
+                state_update = {"extreme_price": extreme_price}
+            trail_stop = extreme_price + trail_distance
+            be_target = trade.get("be_target_after_tp", entry_price)
+            effective_sl = min(trail_stop, be_target)
+            if current_price >= effective_sl:
+                if trail_stop < be_target:
+                    exit_reason = "TRAIL_HIT"
+                else:
+                    exit_reason = "BE_HIT"
+                exit_price = effective_sl
+            else:
+                if state_update is None:
+                    state_update = {}
+                state_update["sl"] = effective_sl
+
+    # ── シグナルベースの決済判定（Phase問わず） ──
     if exit_reason is None:
-        # 方向が反転した（★2以上の確信を伴う明確な反転のみ。
-        # 中長期なので、弱い逆シグナルでは決済しない）
         if current_direction.endswith(("LONG", "SHORT")) and current_stars >= 2:
             cur_is_long = current_direction.endswith("LONG")
             if cur_is_long != is_long:
                 exit_reason = "REVERSED"
                 exit_price = current_price
-        # ★が2を割った（シグナルが明確に弱体化・中長期なので多少の低下では決済しない）
         if exit_reason is None and current_stars < 2:
             exit_reason = "SIGNAL_LOST"
             exit_price = current_price
 
     if exit_reason is None:
-        return None  # 継続保有
+        # 状態更新のみ（継続保有）
+        if state_update:
+            return {"_state_update": state_update}
+        return None
 
     # ── 損益計算 ──
     if is_long:
@@ -181,12 +260,14 @@ def check_exit_condition(trade: dict, current_price: float,
         pips = entry_price - exit_price
 
     # 勝敗判定
-    if exit_reason in ("TP1_HIT", "TP2_HIT", "TP3_HIT"):
+    if exit_reason in ("TP_HIT", "TRAIL_HIT", "TP1_HIT", "TP2_HIT", "TP3_HIT"):
         result = "WIN"
+    elif exit_reason == "BE_HIT":
+        # BE+0.5R到達は小利確保（微益）
+        result = "WIN" if pips > 0 else "EVEN"
     elif exit_reason == "SL_HIT":
         result = "LOSS"
     else:
-        # SIGNAL_LOST / REVERSED は損益で判定
         result = "WIN" if pips > 0 else ("LOSS" if pips < 0 else "EVEN")
 
     return {
@@ -215,6 +296,7 @@ def update_trades(results: list, now: datetime) -> dict:
     open_trades = load_open_trades()
     newly_opened = []
     newly_closed = []
+    state_changes = []  # トレーリング状態変化（保有継続だが状態が更新された）
 
     # 現在のシグナルをpair→result辞書に
     current_by_pair = {r["pair"]: r for r in results}
@@ -227,14 +309,37 @@ def update_trades(results: list, now: datetime) -> dict:
             # この通貨ペアが評価対象から消えた（データ欠損）→ そのまま保有継続
             continue
 
+        current_price = cur.get("price", trade["entry_price"])
         exit_info = check_exit_condition(
             trade,
-            cur.get("price", trade["entry_price"]),
+            current_price,
             cur.get("stars", 0),
             cur.get("direction", ""),
         )
 
-        if exit_info:
+        # 現在価格を保存（保有ポジション表示用）
+        trade["current_price"] = current_price
+        trade["current_stars"] = cur.get("stars", 0)
+
+        if exit_info is None:
+            continue
+
+        # ── 状態更新のみ（決済しない）──
+        if "_state_update" in exit_info:
+            state_update = exit_info["_state_update"]
+            # tp_hit_time を必要なら設定
+            if state_update.get("tp_hit") and "tp_hit_time" in state_update and state_update["tp_hit_time"] is None:
+                state_update["tp_hit_time"] = now.isoformat()
+            trade.update(state_update)
+            state_changes.append({
+                "pair": pair,
+                "trade": trade,
+                "update": state_update,
+            })
+            continue
+
+        # ── 決済 ──
+        if "exit_reason" in exit_info:
             closed = {
                 **trade,
                 "exit_time": now.isoformat(),
@@ -265,17 +370,33 @@ def update_trades(results: list, now: datetime) -> dict:
                 and pair not in closed_this_cycle):
 
             staged = r.get("staged_tp", {})
+            entry_price = r.get("price")
+            initial_sl = staged.get("sl")
             trade = {
                 "pair": pair,
                 "entry_time": now.isoformat(),
                 "entry_date": now.strftime("%Y-%m-%d"),
-                "entry_price": r.get("price"),
+                "entry_price": entry_price,
                 "direction": direction,
                 "initial_stars": stars,
-                "sl": staged.get("sl"),
-                "tp1": staged.get("tp1"),
+                "sl": initial_sl,
+                "initial_sl": initial_sl,  # トレーリング後も初期SLを保持
+                # ── 新方式: 単一TP + トレーリング ──
+                "tp": staged.get("tp") or staged.get("tp1"),  # 新旧両対応
+                "trail_distance": staged.get("trail_distance", 0),
+                "trail_atr_mult": staged.get("trail_atr_mult", 3.0),
+                "be_target_after_tp": staged.get("be_target_after_tp", entry_price),
+                "max_target": staged.get("max_target") or staged.get("tp3"),  # 参考
+                "tp_mode": staged.get("tp_mode", "single_with_trail"),
+                # ── 状態フラグ（初期値）──
+                "tp_hit": False,
+                "trail_active": False,
+                "extreme_price": entry_price,  # トレーリング基準
+                # ── 後方互換: 既存JSONとの整合性 ──
+                "tp1": staged.get("tp1") or staged.get("tp"),
                 "tp2": staged.get("tp2"),
                 "tp3": staged.get("tp3"),
+                # ── メタデータ ──
                 "ta_score": r.get("ta_score"),
                 "fa_score": r.get("fa_score"),
                 "fa_rate_diff": r.get("fa_rate_diff"),
@@ -291,6 +412,8 @@ def update_trades(results: list, now: datetime) -> dict:
     return {
         "newly_opened": newly_opened,
         "newly_closed": newly_closed,
+        "state_changes": state_changes,
+        "open_trades": open_trades,  # 保有ポジション一覧（Discord通知用）
         "still_open": len(open_trades),
     }
 

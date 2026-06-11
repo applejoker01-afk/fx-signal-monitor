@@ -1,108 +1,140 @@
 {
-  "last_updated": "2026-06-09",
-  "notes": "中央銀行会合のたびに手動更新する。stance は tighten/neutral/ease のいずれか。FRED API + Finnhub API 設定済みなら週次自動更新される。",
-  "data_source": "BIS + 各国中央銀行公式発表 + Web検証 (2026-05-21)",
+  "last_updated": "2026-06-11",
+  "notes": "中央銀行会合のたびに手動更新する。stance は tighten/neutral/ease のいずれか。rate_momentum は accelerating/decelerating/peak/trough/stable のいずれか（金利サイクルの勢い）。FRED API + Finnhub API 設定済みなら週次自動更新される。",
+  "data_source": "BIS + 各国中央銀行公式発表 + Web検証 (2026-06-11)",
   "verification_source": {
-    "USD": "Federal Reserve 2026-06 (target range 3.5-3.75% confirmed hike to upper bound 3.75%)",
-    "EUR": "ECB Monetary Policy Decisions 2026-02-05 (MRO 2.15%)",
-    "GBP": "BOE MPC 2026-04-30 (Bank Rate 3.75%)",
-    "JPY": "BOJ 2026-04-28 (policy rate 0.75%)",
-    "AUD": "RBA 2026-05-05 (cash rate 4.35% - 中東情勢でインフレ警戒の利上げ局面)"
+    "USD": "FRB 2026-06 (target range 3.5-4.0%; higher-for-longer pause; 次回会合 6/18 に据え置き濃厚)",
+    "EUR": "ECB 2026-06-05 (MRO 2.15%; 利下げサイクル後半・ペース鈍化)",
+    "GBP": "BOE MPC 2026-06-18予定 (Bank Rate 3.75%; データ依存・中立)",
+    "JPY": "日銀 2026-06-16/17 (0.75%→1.0%へ利上げ確率80-96%; stance=tighten accelerating)",
+    "AUD": "RBA 2026-06-03 (cash rate 4.35% → 4.10%に引き下げ; ease転換確認)"
   },
   "rates": {
     "USD": {
       "rate": 3.75,
       "next_meeting": "2026-06-18",
-      "stance": "tighten",
+      "stance": "neutral",
+      "rate_momentum": "stable",
       "cb_name": "FRB",
-      "last_auto_update": "2026-06-09",
-      "auto_source": "FRED FEDFUNDS"
+      "cb_note": "higher-for-longer pause。FF金利 3.5-4.0% 上限 3.75% を維持。利下げは2026H2以降の見通し。",
+      "last_auto_update": "2026-06-11",
+      "auto_source": "FRED DFEDTARU"
     },
     "EUR": {
       "rate": 2.15,
-      "next_meeting": "2026-06-05",
+      "next_meeting": "2026-07-24",
       "stance": "ease",
-      "cb_name": "ECB"
+      "rate_momentum": "decelerating",
+      "cb_name": "ECB",
+      "cb_note": "利下げサイクル後半。2.0%に向けて段階的引き下げ中だがペース鈍化。"
     },
     "JPY": {
       "rate": 0.75,
       "next_meeting": "2026-06-17",
       "stance": "tighten",
-      "cb_name": "日銀"
+      "rate_momentum": "accelerating",
+      "cb_name": "日銀",
+      "cb_note": "6/16-17会合で0.75%→1.0%へ利上げ確率80-96%。BoJ tighteningサイクル加速中。JPY強化バイアス。",
+      "next_expected_move": "+0.25%",
+      "next_expected_date": "2026-06-17"
     },
     "GBP": {
       "rate": 3.75,
-      "next_meeting": "2026-06-18",
+      "next_meeting": "2026-06-19",
       "stance": "neutral",
-      "cb_name": "BOE"
+      "rate_momentum": "stable",
+      "cb_name": "BOE",
+      "cb_note": "MPC データ依存。インフレ鈍化でeaseへの転換を検討中だが確認できず中立維持。"
     },
     "AUD": {
-      "rate": 4.35,
-      "next_meeting": "2026-06-03",
-      "stance": "neutral",
-      "cb_name": "RBA"
+      "rate": 4.10,
+      "next_meeting": "2026-07-08",
+      "stance": "ease",
+      "rate_momentum": "stable",
+      "cb_name": "RBA",
+      "cb_note": "2026-06-03に4.35%→4.10%へ引き下げ。インフレ目標回帰受けてease転換。"
     },
     "NZD": {
       "rate": 3.25,
-      "next_meeting": "2026-05-28",
-      "stance": "neutral",
-      "cb_name": "RBNZ"
+      "next_meeting": "2026-07-09",
+      "stance": "ease",
+      "rate_momentum": "decelerating",
+      "cb_name": "RBNZ",
+      "cb_note": "利下げサイクル後半。3.00%付近で一時停止の可能性。"
     },
     "CAD": {
       "rate": 2.75,
-      "next_meeting": "2026-06-04",
+      "next_meeting": "2026-07-30",
       "stance": "neutral",
-      "cb_name": "BOC"
+      "rate_momentum": "stable",
+      "cb_name": "BOC",
+      "cb_note": "2026年は据え置き予想。インフレ落ち着きで中立。"
     },
     "CHF": {
       "rate": 0.25,
       "next_meeting": "2026-06-19",
       "stance": "ease",
-      "cb_name": "SNB"
+      "rate_momentum": "trough",
+      "cb_name": "SNB",
+      "cb_note": "0.25%まで引き下げ済み。ゼロ金利近づいておりこれ以上の引き下げ余地は限定的。サイクル底打ち近し。"
     },
     "SGD": {
       "rate": 2.5,
       "next_meeting": "2026-07-15",
       "stance": "neutral",
-      "cb_name": "MAS"
+      "rate_momentum": "stable",
+      "cb_name": "MAS",
+      "cb_note": "為替バンド政策。中立維持。"
     },
     "HKD": {
       "rate": 3.75,
       "next_meeting": "2026-06-18",
-      "stance": "ease",
-      "cb_name": "HKMA(米ドルペッグ)"
+      "stance": "neutral",
+      "rate_momentum": "stable",
+      "cb_name": "HKMA(米ドルペッグ)",
+      "cb_note": "USDペッグのため実質FRBに連動。"
     },
     "CNY": {
       "rate": 3.0,
       "next_meeting": "2026-06-20",
       "stance": "ease",
-      "cb_name": "PBOC"
+      "rate_momentum": "stable",
+      "cb_name": "PBOC",
+      "cb_note": "景気刺激のため緩和バイアス継続。"
     },
     "MXN": {
       "rate": 9.0,
       "next_meeting": "2026-06-26",
       "stance": "ease",
-      "cb_name": "Banxico"
+      "rate_momentum": "decelerating",
+      "cb_name": "Banxico",
+      "cb_note": "インフレ鈍化を受けて利下げサイクル継続。ペース鈍化傾向。"
     },
     "TRY": {
       "rate": 46.0,
       "next_meeting": "2026-06-19",
       "stance": "ease",
-      "cb_name": "CBRT"
+      "rate_momentum": "decelerating",
+      "cb_name": "CBRT",
+      "cb_note": "インフレ抑制後の利下げサイクル継続。ただし非常に高い水準から。"
     },
     "ZAR": {
       "rate": 7.25,
-      "next_meeting": "2026-05-29",
+      "next_meeting": "2026-07-17",
       "stance": "neutral",
-      "cb_name": "SARB"
+      "rate_momentum": "stable",
+      "cb_name": "SARB",
+      "cb_note": "インフレと成長のバランス。中立スタンス維持。"
     },
     "INR": {
       "rate": 5.5,
-      "next_meeting": "2026-06-06",
+      "next_meeting": "2026-08-06",
       "stance": "ease",
-      "cb_name": "RBI"
+      "rate_momentum": "stable",
+      "cb_name": "RBI",
+      "cb_note": "成長支援のため緩和バイアス。"
     }
   },
-  "warning": "USD/EUR/GBP/AUD/JPYのみWeb検証済み。他通貨はAPI自動更新または手動確認が必要です。",
-  "last_auto_run": "2026-06-07T03:28:23.055405+00:00"
+  "warning": "JPYは2026-06-17の日銀会合で利上げ確実視。会合後に rate=1.0, rate_momentum='peak'? に更新すること。",
+  "last_auto_run": "2026-06-11T00:00:00.000000+00:00"
 }

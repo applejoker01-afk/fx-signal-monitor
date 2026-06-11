@@ -245,9 +245,22 @@ def _default_regime() -> dict:
 # ③ 段階的TP計算
 # ============================================================
 
-def calc_staged_tp(price: float, direction: str, atr: float, regime: dict) -> dict:
+def calc_staged_tp(price: float, direction: str, atr: float, regime: dict,
+                   prices: list = None) -> dict:
     """
-    ボラティリティ・レジームに基づいた段階的TP/SLを計算。
+    単一TP + トレーリングストップ戦略を計算（2026-06-10刷新）。
+
+    実情ベースの改善：
+    - TP1/TP2/TP3の3段階は判断難しく、TP1選ぶと機会損失、TP3選ぶと届かず損失
+    - 解決策: TP は単一（旧TP1相当）でほぼ確実に到達 → トレーリングで伸ばす
+
+    戦略:
+    1. TP到達まで: SL固定でホールド
+    2. TP到達時: 半量利確 OR 全保有 + SL を BE+0.5R へ移動 + トレーリング有効化
+    3. トレーリング: 最高値（LONG）/最低値（SHORT）から trail_atr_mult × ATR の追従ストップ
+    4. トレーリングストップ到達: 利益確定で終了
+
+    旧tp2/tp3は「理論最大利益」として参考表示のみ（注文には使わない）。
 
     Args:
         price: 現在価格
@@ -257,67 +270,133 @@ def calc_staged_tp(price: float, direction: str, atr: float, regime: dict) -> di
 
     Returns:
         {
-          "sl": 9.11,
-          "tp1": 10.21,  # ATR×2.5倍（半分利確推奨）
-          "tp2": 10.76,  # ATR×5.0倍
-          "tp3": 11.31,  # ATR×8.5倍（中長期目標）
-          "sl_pips": 55,
-          "tp1_pips": 55,
-          "rr_tp1": 1.0,
-          "rr_tp2": 2.0,
-          "rr_tp3": 3.4,
-          "strategy": "TP1で半分利確 → SLをBEに移動 → TP2で残り半分"
+          "sl": 9.11,                # 初期SL
+          "tp": 10.21,               # 単一TP（旧TP1相当、ATR×3.0）
+          "trail_atr_mult": 3.0,     # トレーリング幅（ATR乗数）
+          "trail_distance": 0.15,    # トレーリング距離（実値）
+          "be_plus_offset": 0.05,    # BE+0.5R = 0.5 × SL幅
+          "be_target_after_tp": 9.66, # TP到達後のSL移動先（BE+0.5R）
+          "max_target": 11.31,       # 理論最大利益（参考・旧TP3）
+          "rr_tp": 1.0,              # TP のリスクリワード
+          "tp1": ..., "tp2": ..., "tp3": ..., # 後方互換のため残す
+          "strategy": "TP(...)到達 → SLをBE+0.5R移動 + トレーリング(N×ATR)発動",
+          "tp_mode": "single_with_trail"
         }
     """
     if not atr or atr == 0:
         return {}
 
-    # 2026-06-09 E案 TP/SL最適化のデフォルト値反映
+    # 2026-06-10 単一TP戦略反映 (TP=旧TP1=3.0×ATR、ほぼ確実に到達)
     sl_mult = regime.get("sl_multiplier", 3.0)
-    tp1_mult = regime.get("tp1_multiplier", 3.0)
-    tp2_mult = regime.get("tp2_multiplier", 4.5)
-    tp3_mult = regime.get("tp3_multiplier", 6.0)
+    tp_mult = regime.get("tp1_multiplier", 3.0)  # 旧TP1 = 新TP（単一）
+    tp2_mult = regime.get("tp2_multiplier", 4.5)  # 後方互換（参考のみ）
+    tp3_mult = regime.get("tp3_multiplier", 6.0)  # 後方互換（参考のみ）
+    trail_mult = tp_mult  # トレーリング幅 = TP幅と同じ（3.0×ATR）
 
     sl_width = atr * sl_mult
-    tp1_width = atr * tp1_mult
+    tp_width = atr * tp_mult
     tp2_width = atr * tp2_mult
     tp3_width = atr * tp3_mult
+    trail_distance = atr * trail_mult
+    # BE+0.5R: SLをBEからリスクの0.5倍分プラス側に移動（小利確保）
+    be_offset = sl_width * 0.5
+
+    # ─── Chandelier Exit 動的SL（2026-06-11 研究C反映）───
+    # 真の Chandelier Exit: 過去N日の高値/安値 ± ATR*mult
+    # 条件: prices が22本以上ある場合に使用。エントリー価格より有利（保護的）な場合のみ採用。
+    # 参照: wiki/concepts/chandelier-exit-trailing-stop.md
+    CHANDELIER_PERIOD = 22
+    chandelier_sl_active = False
+    chandelier_note = ""
 
     if direction in ("LONG", "LIGHT_LONG"):
-        sl = price - sl_width
-        tp1 = price + tp1_width
+        sl_fixed = price - sl_width
+        tp = price + tp_width
         tp2 = price + tp2_width
         tp3 = price + tp3_width
+        be_target = price + be_offset
+
+        # Chandelier Exit SL: 過去22日高値 - ATR*sl_mult
+        if prices and len(prices) >= CHANDELIER_PERIOD:
+            recent_high = max(prices[-CHANDELIER_PERIOD:])
+            sl_ce = recent_high - sl_width
+            # CE SL はエントリー価格より下（安全）かつ固定SLより上（タイト）な時のみ採用
+            if sl_fixed < sl_ce < price:
+                sl = sl_ce
+                chandelier_sl_active = True
+                chandelier_note = (
+                    f"Chandelier Exit: 過去{CHANDELIER_PERIOD}日高値"
+                    f"({round(recent_high, 5)})-{sl_mult}xATR"
+                )
+            else:
+                sl = sl_fixed  # 固定SLの方が安全（広い）場合はそちらを使用
+        else:
+            sl = sl_fixed
+
     elif direction in ("SHORT", "LIGHT_SHORT"):
-        sl = price + sl_width
-        tp1 = price - tp1_width
+        sl_fixed = price + sl_width
+        tp = price - tp_width
         tp2 = price - tp2_width
         tp3 = price - tp3_width
+        be_target = price - be_offset
+
+        # Chandelier Exit SL: 過去22日安値 + ATR*sl_mult
+        if prices and len(prices) >= CHANDELIER_PERIOD:
+            recent_low = min(prices[-CHANDELIER_PERIOD:])
+            sl_ce = recent_low + sl_width
+            # CE SL はエントリー価格より上（安全）かつ固定SLより下（タイト）な時のみ採用
+            if price < sl_ce < sl_fixed:
+                sl = sl_ce
+                chandelier_sl_active = True
+                chandelier_note = (
+                    f"Chandelier Exit: 過去{CHANDELIER_PERIOD}日安値"
+                    f"({round(recent_low, 5)})+{sl_mult}xATR"
+                )
+            else:
+                sl = sl_fixed
+        else:
+            sl = sl_fixed
+
     else:
         return {}
 
     # pip精度（JPYペアは小数点2桁、その他は5桁）
     decimals = 2 if price > 10 else 5
 
-    rr_tp1 = round(tp1_mult / sl_mult, 1)
+    rr_tp = round(tp_mult / sl_mult, 1)
     rr_tp2 = round(tp2_mult / sl_mult, 1)
     rr_tp3 = round(tp3_mult / sl_mult, 1)
 
     return {
+        # ── 新方式（単一TP + トレーリング）──
         "sl": round(sl, decimals),
-        "tp1": round(tp1, decimals),
+        "tp": round(tp, decimals),
+        "trail_atr_mult": trail_mult,
+        "trail_distance": round(trail_distance, decimals),
+        "be_plus_offset": round(be_offset, decimals),
+        "be_target_after_tp": round(be_target, decimals),
+        "max_target": round(tp3, decimals),  # 参考: 理論最大利益（旧TP3）
+        "rr_tp": rr_tp,
+        "tp_mode": "single_with_trail",
+        # ── 後方互換（既存コード/JSON消費者向け）──
+        "tp1": round(tp, decimals),      # 新TPは旧TP1相当
         "tp2": round(tp2, decimals),
         "tp3": round(tp3, decimals),
         "sl_width": round(sl_width, decimals),
-        "tp1_width": round(tp1_width, decimals),
-        "rr_tp1": rr_tp1,
+        "tp1_width": round(tp_width, decimals),
+        "rr_tp1": rr_tp,
         "rr_tp2": rr_tp2,
         "rr_tp3": rr_tp3,
+        # ── 共通メタ ──
         "regime_label": regime.get("regime_label", ""),
         "strategy": (
-            f"TP1({round(tp1, decimals)})で半分利確 → SLをBE({round(price, decimals)})に移動 "
-            f"→ TP2({round(tp2, decimals)})で残り半分"
+            f"TP({round(tp, decimals)})到達 → SLを BE+0.5R({round(be_target, decimals)}) "
+            f"へ移動 → トレーリング({trail_mult}×ATR={round(trail_distance, decimals)})発動 "
+            f"→ 利を伸ばす（理論最大: {round(tp3, decimals)}）"
         ),
+        # Chandelier Exit 情報（2026-06-11 研究C反映）
+        "chandelier_sl_active": chandelier_sl_active,
+        "chandelier_note": chandelier_note,
     }
 
 
@@ -785,9 +864,9 @@ def run_advanced_analytics(
     regime = detect_volatility_regime(prices, atr)
     result["volatility_regime"] = regime
 
-    # ③ 段階的TP計算
+    # ③ 段階的TP計算（Chandelier Exit 動的SL付き: 2026-06-11 研究C反映）
     if direction.endswith(("LONG", "SHORT")) and atr:
-        staged_tp = calc_staged_tp(price, direction, atr, regime)
+        staged_tp = calc_staged_tp(price, direction, atr, regime, prices=prices)
         result["staged_tp"] = staged_tp
 
     # ⑤ キャリートレード魅力度スコア

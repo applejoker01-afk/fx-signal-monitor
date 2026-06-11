@@ -40,8 +40,22 @@ from modules.performance_intelligence import (
 from modules.ai_commentary import generate_market_commentary, generate_exit_advice
 from modules.ambush_alert import evaluate_ambush, collect_ambush_alerts
 from modules.geopolitical_risk import apply_geopolitical_filter
+from modules.drl_collector import collect_scan_results, get_drl_stats  # 2026-06-11 研究A
 
 PAGES_URL = "https://applejoker01-afk.github.io/fx-signal-monitor/"
+
+
+def _hours_between_iso(iso_start: str, dt_end: datetime) -> float:
+    """ISO形式の文字列と datetime の差分時間を返す（Discord通知用）"""
+    if not iso_start:
+        return 0.0
+    try:
+        start = datetime.fromisoformat(iso_start)
+        if start.tzinfo is None:
+            start = start.replace(tzinfo=timezone.utc)
+        return round((dt_end - start).total_seconds() / 3600, 1)
+    except Exception:
+        return 0.0
 
 PAIR_API = {
     "USDJPY": ("USD", "JPY"), "EURJPY": ("EUR", "JPY"),
@@ -500,15 +514,18 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results,
             "inline": False
         })
 
-    # ⑦ トレード情報（決済のみ・中長期シグナルの結果として）
+    # ⑦ トレード情報（決済 + 状態変化 + 保有ポジション一覧）
     if trade_update:
-        # 決済
+        # ──（1）決済 ──
         newly_closed = trade_update.get("newly_closed", [])
         if newly_closed:
             reason_label = {
-                "TP3_HIT": "🏆TP3到達",
-                "TP2_HIT": "✅TP2到達",
-                "TP1_HIT": "✅TP1到達",
+                "TP_HIT": "✅TP到達(+トレール開始)",
+                "TRAIL_HIT": "🏆トレーリング決済",
+                "BE_HIT": "⚖️BE+0.5R戻り",
+                "TP3_HIT": "🏆TP3到達",  # 旧データ互換
+                "TP2_HIT": "✅TP2到達",  # 旧データ互換
+                "TP1_HIT": "✅TP1到達",  # 旧データ互換
                 "SL_HIT": "❌SL到達",
                 "SIGNAL_LOST": "➖シグナル消滅",
                 "REVERSED": "🔄方向反転",
@@ -525,6 +542,80 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results,
             embeds[0]["fields"].append({
                 "name": f"💼 シグナル決着（{len(newly_closed)}件）",
                 "value": "```diff\n" + "\n".join(lines) + "\n```",
+                "inline": False
+            })
+
+        # ──（2）状態変化（TP到達でトレーリング有効化など）──
+        state_changes = trade_update.get("state_changes", [])
+        if state_changes:
+            lines = []
+            for sc in state_changes[:5]:
+                t = sc["trade"]
+                upd = sc["update"]
+                if upd.get("tp_hit"):
+                    lines.append(
+                        f"🎯 {t['pair']} {t['direction']} TP到達!\n"
+                        f"   SLを BE+0.5R({upd.get('sl','?')}) へ移動 → トレーリング発動"
+                    )
+                elif "sl" in upd and "extreme_price" in upd:
+                    lines.append(
+                        f"📈 {t['pair']} {t['direction']} トレール更新\n"
+                        f"   高値/安値: {upd.get('extreme_price','?')} | SL: {upd.get('sl','?')}"
+                    )
+            if lines:
+                embeds[0]["fields"].append({
+                    "name": f"🔄 ポジション状態変化（{len(state_changes)}件）",
+                    "value": "```\n" + "\n".join(lines) + "\n```",
+                    "inline": False
+                })
+
+        # ──（3）保有中ポジション一覧（新機能！）──
+        open_trades_dict = trade_update.get("open_trades", {}) or open_trades or {}
+        if open_trades_dict:
+            lines = []
+            for pair, t in list(open_trades_dict.items())[:10]:
+                cur_price = t.get("current_price") or t.get("entry_price")
+                entry = t.get("entry_price")
+                direction = t.get("direction", "")
+                is_long = direction.endswith("LONG")
+                # 含み損益（pips相当）
+                if is_long:
+                    unreal = cur_price - entry
+                else:
+                    unreal = entry - cur_price
+                # アイコン
+                if t.get("tp_hit"):
+                    icon = "🎯"  # TP到達済み（トレーリング中）
+                    phase = "トレール中"
+                else:
+                    icon = "💼"  # 保有中（TP未到達）
+                    phase = "保有中"
+                # 進捗（TP/SLまでの距離）
+                tp = t.get("tp") or t.get("tp1")
+                sl = t.get("sl")
+                if tp is not None and sl is not None and entry is not None:
+                    if is_long:
+                        tp_pct = ((cur_price - entry) / (tp - entry) * 100) if tp != entry else 0
+                    else:
+                        tp_pct = ((entry - cur_price) / (entry - tp) * 100) if entry != tp else 0
+                    progress = f"進捗{tp_pct:+.0f}%"
+                else:
+                    progress = ""
+                # 保有時間
+                try:
+                    hold_h = _hours_between_iso(t.get("entry_time", ""), datetime.now(timezone.utc))
+                    hold_str = f"{hold_h:.0f}h" if hold_h else ""
+                except Exception:
+                    hold_str = ""
+
+                sign = "+" if unreal >= 0 else ""
+                lines.append(
+                    f"{icon} {pair} {direction[:5]} {phase} | "
+                    f"@{entry}→{cur_price} ({sign}{unreal:+.4f}) {progress} {hold_str}"
+                )
+            embeds[0]["fields"].append({
+                "name": f"📋 保有中ポジション（{len(open_trades_dict)}件）",
+                "value": "```\n" + "\n".join(lines) + "\n```",
                 "inline": False
             })
 
@@ -550,17 +641,29 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results,
             f"金利差: {rate_diff_str}\n"
         )
 
-        # ② ボラレジーム + ③ 段階的TP
+        # ② ボラレジーム + ③ 単一TP + トレーリング戦略
         if regime:
             value += f"ボラ: {regime.get('regime_label','')} (ATR比{regime.get('atr_ratio',1):.1f}倍)\n"
         if staged:
-            value += (
-                f"SL: {staged.get('sl','?')} | "
-                f"TP1: {staged.get('tp1','?')} | "
-                f"TP2: {staged.get('tp2','?')} | "
-                f"TP3: {staged.get('tp3','?')}\n"
-                f"RR: 1:{staged.get('rr_tp1','?')} / 1:{staged.get('rr_tp2','?')} / 1:{staged.get('rr_tp3','?')}\n"
-            )
+            tp_main = staged.get("tp") or staged.get("tp1", "?")
+            tp_mode = staged.get("tp_mode", "")
+            if tp_mode == "single_with_trail":
+                # 新方式: 単一TP + トレーリング
+                value += (
+                    f"SL: {staged.get('sl','?')} | TP: {tp_main} (RR 1:{staged.get('rr_tp','?')})\n"
+                    f"📍TP到達後: SL→BE+0.5R({staged.get('be_target_after_tp','?')}) "
+                    f"+ トレール{staged.get('trail_atr_mult','3.0')}×ATR\n"
+                    f"🎯理論最大: {staged.get('max_target','?')} (参考のみ)\n"
+                )
+            else:
+                # 旧方式（後方互換）
+                value += (
+                    f"SL: {staged.get('sl','?')} | "
+                    f"TP1: {staged.get('tp1','?')} | "
+                    f"TP2: {staged.get('tp2','?')} | "
+                    f"TP3: {staged.get('tp3','?')}\n"
+                    f"RR: 1:{staged.get('rr_tp1','?')} / 1:{staged.get('rr_tp2','?')} / 1:{staged.get('rr_tp3','?')}\n"
+                )
         value += "```\n"
         value += f"📊 {r['fa_detail']}"
 
@@ -603,12 +706,19 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results,
         staged = r.get("staged_tp", {})
         tp_sl = ""
         if staged:
-            tp_sl = (
-                f"\nSL: {staged.get('sl','?')} | "
-                f"TP1: {staged.get('tp1','?')} | "
-                f"TP2: {staged.get('tp2','?')} | "
-                f"TP3: {staged.get('tp3','?')}"
-            )
+            tp_main = staged.get("tp") or staged.get("tp1", "?")
+            if staged.get("tp_mode") == "single_with_trail":
+                tp_sl = (
+                    f"\nSL: {staged.get('sl','?')} | TP: {tp_main} (RR 1:{staged.get('rr_tp','?')})"
+                    f"\nTP到達後→トレール {staged.get('trail_atr_mult','3.0')}×ATR"
+                )
+            else:
+                tp_sl = (
+                    f"\nSL: {staged.get('sl','?')} | "
+                    f"TP1: {staged.get('tp1','?')} | "
+                    f"TP2: {staged.get('tp2','?')} | "
+                    f"TP3: {staged.get('tp3','?')}"
+                )
         embeds[0]["fields"].append({
             "name": f"⬆ 昇格: {r['label']} ★4→★5",
             "value": f"```\n価格: {r['price']}  方向: {r['direction']}{tp_sl}\n```",
@@ -1218,6 +1328,18 @@ def main():
         for r in results:
             ctx = get_pair_strength_context(r["pair"], PAIR_API, currency_strength)
             r["strength_context"] = ctx
+
+    # 🤖 DRL 学習データ収集（2026-06-11 研究A反映）
+    try:
+        drl_saved = collect_scan_results(results, cb_rates=cb_rates)
+        if drl_saved > 0:
+            drl_stats = get_drl_stats()
+            print(f"[DRL] 状態ベクトル保存: {drl_saved}件 "
+                  f"(累計 {drl_stats.get('total_rows', 0):,}行 / "
+                  f"{drl_stats.get('days_collected', 0)}日分 / "
+                  f"{drl_stats.get('file_size_kb', 0)} KB)")
+    except Exception as e:
+        print(f"[WARN] DRL collect failed: {e}")
 
     # ④ ポートフォリオ相関リスク
     print("\n[INFO] Calculating correlation risk...")
