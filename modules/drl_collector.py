@@ -100,14 +100,21 @@ def build_state_vector(result: dict, cb_rates: dict = None) -> dict:
     carry_norm = carry_score / 100.0
 
     # サポレジ近接度（近いほど 1.0）
-    sr_resistance = sr.get("nearest_resistance")
-    sr_support = sr.get("nearest_support")
-    if sr_resistance and price > 0:
-        resistance_dist_norm = 1.0 - min(abs(sr_resistance - price) / price, 0.05) / 0.05
+    # nearest_resistance / nearest_support は {"price": float, "distance_pct": float} の dict
+    sr_resistance_raw = sr.get("nearest_resistance")
+    sr_support_raw = sr.get("nearest_support")
+    if isinstance(sr_resistance_raw, dict):
+        dist_pct_r = sr_resistance_raw.get("distance_pct", 99)
+        resistance_dist_norm = 1.0 - min(dist_pct_r / 5.0, 1.0)  # 5%以内で線形スケール
+    elif isinstance(sr_resistance_raw, (int, float)) and price > 0:
+        resistance_dist_norm = 1.0 - min(abs(sr_resistance_raw - price) / price / 0.05, 1.0)
     else:
         resistance_dist_norm = 0.0
-    if sr_support and price > 0:
-        support_dist_norm = 1.0 - min(abs(sr_support - price) / price, 0.05) / 0.05
+    if isinstance(sr_support_raw, dict):
+        dist_pct_s = sr_support_raw.get("distance_pct", 99)
+        support_dist_norm = 1.0 - min(dist_pct_s / 5.0, 1.0)
+    elif isinstance(sr_support_raw, (int, float)) and price > 0:
+        support_dist_norm = 1.0 - min(abs(sr_support_raw - price) / price / 0.05, 1.0)
     else:
         support_dist_norm = 0.0
 

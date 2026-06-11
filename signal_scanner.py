@@ -6,6 +6,13 @@ FX売買シグナル監視スキャナー（レベル3 Advanced）
 
 import os
 import sys
+
+# Windows の cp932 コンソールでも絵文字・日本語を安全に出力する
+# （encode 不可な文字は ? に置換。Discord/ファイル出力には影響しない）
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
 import json
 import smtplib
 import urllib.request
