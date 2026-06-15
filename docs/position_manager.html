@@ -235,11 +235,11 @@ a{color:var(--gold);}
 // ============================================================
 const PAIR_ALIASES = {
   "ドル円":"USDJPY","米ドル円":"USDJPY","ドル-円":"USDJPY","米ドル-円":"USDJPY","USD/JPY":"USDJPY","USDJPY":"USDJPY",
-  "ユーロ円":"EURJPY","ユーロ-円":"EURJPY","EUR/JPY":"EURJPY","EURJPY":"EURJPY",
+  "ユーロ円":"EURJPY","ユーロ-円":"EURJPY","ユロ円":"EURJPY","ユロ-円":"EURJPY","EUR/JPY":"EURJPY","EURJPY":"EURJPY",
   "ポンド円":"GBPJPY","ポンド-円":"GBPJPY","GBP/JPY":"GBPJPY","GBPJPY":"GBPJPY",
   "豪ドル円":"AUDJPY","豪ドル-円":"AUDJPY","AUD/JPY":"AUDJPY","AUDJPY":"AUDJPY",
   "NZドル円":"NZDJPY","NZドル-円":"NZDJPY","NZD/JPY":"NZDJPY","NZDJPY":"NZDJPY",
-  "ユーロドル":"EURUSD","ユーロ-ドル":"EURUSD","ユーロ-米ドル":"EURUSD","EUR/USD":"EURUSD","EURUSD":"EURUSD",
+  "ユーロドル":"EURUSD","ユーロ-ドル":"EURUSD","ユーロ-米ドル":"EURUSD","ユロドル":"EURUSD","ユロ米ドル":"EURUSD","ユロ-米ドル":"EURUSD","EUR/USD":"EURUSD","EURUSD":"EURUSD",
   "ポンドドル":"GBPUSD","ポンド-ドル":"GBPUSD","GBP/USD":"GBPUSD","GBPUSD":"GBPUSD",
   "豪ドル米ドル":"AUDUSD","豪ドル-米ドル":"AUDUSD","AUD/USD":"AUDUSD","AUDUSD":"AUDUSD",
   "ユーロポンド":"EURGBP","ユーロ-ポンド":"EURGBP","EUR/GBP":"EURGBP","EURGBP":"EURGBP",
@@ -247,7 +247,7 @@ const PAIR_ALIASES = {
   "シンガポールドル-円":"SGDJPY","シンガポールドル円":"SGDJPY","SGPドル-円":"SGDJPY","SGD/JPY":"SGDJPY","SGDJPY":"SGDJPY",
   "香港ドル-円":"HKDJPY","香港ドル円":"HKDJPY","HKD/JPY":"HKDJPY","HKDJPY":"HKDJPY",
   "ドルスイス":"USDCHF","米ドルスイス":"USDCHF","米ドル-スイスフラン":"USDCHF","USD/CHF":"USDCHF","USDCHF":"USDCHF",
-  "ドルカナダ":"USDCAD","米ドルカナダ":"USDCAD","USD/CAD":"USDCAD","USDCAD":"USDCAD",
+  "ドルカナダ":"USDCAD","米ドルカナダ":"USDCAD","米ドル-カナダドル":"USDCAD","米ドルカナダドル":"USDCAD","ドルカナダドル":"USDCAD","USD/CAD":"USDCAD","USDCAD":"USDCAD",
   "カナダドル-円":"CADJPY","カナダ-円":"CADJPY","カナダドル円":"CADJPY","CAD/JPY":"CADJPY","CADJPY":"CADJPY",
   "スイス-円":"CHFJPY","スイスフラン-円":"CHFJPY","スイスフラン円":"CHFJPY","CHF/JPY":"CHFJPY","CHFJPY":"CHFJPY",
   "ポンド-スイス":"GBPCHF","GBP/CHF":"GBPCHF","GBPCHF":"GBPCHF",
@@ -388,6 +388,7 @@ async function loadData(){
       if(raw){
         const d = JSON.parse(raw);
         fills = d.fills || []; slModes = d.slModes || {}; holdings = d.holdings || [];
+        renormalizeStoredPairs();
         return;
       }
     }catch(e){ /* 続けてwindow.storageを試す */ }
@@ -399,9 +400,39 @@ async function loadData(){
       if(r && r.value){
         const d = JSON.parse(r.value);
         fills = d.fills || []; slModes = d.slModes || {}; holdings = d.holdings || [];
+        renormalizeStoredPairs();
       }
     }
   }catch(e){ /* 初回は無し */ }
+}
+
+// 既存保存データのペア名を最新の正規化ルールで再変換する
+// （古いバージョンで「ユロ円」「ＮＺドル円」のまま保存されたデータを救済）
+function renormalizeStoredPairs(){
+  const knownPairs = new Set(Object.values(PAIR_ALIASES));
+  let fixed = 0;
+  for(const f of fills){
+    if(!f.pair) continue;
+    if(knownPairs.has(f.pair)) continue;  // 既に正規化済み
+    const renorm = normalizePair(f.pair);
+    if(renorm && knownPairs.has(renorm) && renorm !== f.pair){
+      f.pair = renorm;
+      fixed++;
+    }
+  }
+  for(const h of holdings){
+    if(!h.pair) continue;
+    if(knownPairs.has(h.pair)) continue;
+    const renorm = normalizePair(h.pair);
+    if(renorm && knownPairs.has(renorm) && renorm !== h.pair){
+      h.pair = renorm;
+      fixed++;
+    }
+  }
+  if(fixed > 0){
+    console.log(`[正規化] 既存データのペア名 ${fixed}件を最新ルールで変換しました`);
+    saveData();  // 修正結果を保存
+  }
 }
 
 // ============================================================
