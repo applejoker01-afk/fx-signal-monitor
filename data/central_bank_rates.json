@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-06-11",
+  "last_updated": "2026-06-14",
   "notes": "中央銀行会合のたびに手動更新する。stance は tighten/neutral/ease のいずれか。rate_momentum は accelerating/decelerating/peak/trough/stable のいずれか（金利サイクルの勢い）。FRED API + Finnhub API 設定済みなら週次自動更新される。",
   "data_source": "BIS + 各国中央銀行公式発表 + Web検証 (2026-06-11)",
   "verification_source": {
@@ -11,14 +11,14 @@
   },
   "rates": {
     "USD": {
-      "rate": 3.75,
+      "rate": 3.63,
       "next_meeting": "2026-06-18",
       "stance": "neutral",
       "rate_momentum": "stable",
       "cb_name": "FRB",
       "cb_note": "higher-for-longer pause。FF金利 3.5-4.0% 上限 3.75% を維持。利下げは2026H2以降の見通し。",
-      "last_auto_update": "2026-06-11",
-      "auto_source": "FRED DFEDTARU"
+      "last_auto_update": "2026-05-01",
+      "auto_source": "FRED FEDFUNDS"
     },
     "EUR": {
       "rate": 2.15,
@@ -47,7 +47,7 @@
       "cb_note": "MPC データ依存。インフレ鈍化でeaseへの転換を検討中だが確認できず中立維持。"
     },
     "AUD": {
-      "rate": 4.10,
+      "rate": 4.1,
       "next_meeting": "2026-07-08",
       "stance": "ease",
       "rate_momentum": "stable",
@@ -136,5 +136,5 @@
     }
   },
   "warning": "JPYは2026-06-17の日銀会合で利上げ確実視。会合後に rate=1.0, rate_momentum='peak'? に更新すること。",
-  "last_auto_run": "2026-06-11T00:00:00.000000+00:00"
+  "last_auto_run": "2026-06-14T03:34:49.481502+00:00"
 }
