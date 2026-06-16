@@ -20,7 +20,9 @@ from datetime import datetime, timezone
 
 from modules.daytrade_backtest import run_strategy_comparison
 
-PAIRS = ["USDJPY", "EURUSD", "GBPJPY", "AUDJPY", "EURJPY", "AUDUSD"]
+PAIRS = ["USDJPY", "EURUSD", "GBPJPY", "AUDJPY", "EURJPY", "AUDUSD",
+         # Step1追加: 主要国の流動性高いクロス
+         "GBPUSD", "USDCAD", "USDCHF", "NZDJPY"]
 
 # 戦略の表示名 → daytrade.htmlが使う内部キー
 STRATEGY_KEYS = {
