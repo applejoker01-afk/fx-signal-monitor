@@ -139,6 +139,9 @@ a{color:var(--gold);}
       <span class="control-label">Discord Webhook</span>
       <input id="webhookUrl" class="input-field" type="text"
              placeholder="https://discord.com/api/webhooks/...（反発確定をスマホへ通知）">
+      <button id="saveWebhookBtn" class="btn" style="flex:0 0 auto;" title="このブラウザに記憶">💾 保存</button>
+      <button id="clearWebhookBtn" class="btn" style="flex:0 0 auto;" title="記憶を削除">🗑</button>
+      <span id="webhookStatus" style="font-size:0.7rem;color:var(--text-muted);margin-left:0.4rem;"></span>
     </div>
     <div class="control-row">
       <span class="control-label">更新間隔</span>
@@ -858,6 +861,75 @@ document.getElementById("testBtn").onclick = function() {
 // 初期カード描画
 PAIRS.forEach(p => setPairCard(p, {}));
 document.getElementById("statPairs").textContent = PAIRS.length;
+
+// ===== Discord Webhook の保存・復元（このブラウザに記憶）=====
+const WEBHOOK_KEY = "currents_daytrade_webhook_v1";
+const webhookInput = document.getElementById("webhookUrl");
+const webhookStatus = document.getElementById("webhookStatus");
+
+// 起動時に保存済みWebhookを復元
+try {
+  const saved = localStorage.getItem(WEBHOOK_KEY);
+  if (saved) {
+    webhookInput.value = saved;
+    webhookStatus.textContent = "✓ 記憶済み";
+    webhookStatus.style.color = "var(--long, #4ade80)";
+  }
+} catch (e) { /* localStorage使えない環境 */ }
+
+// 保存ボタン
+document.getElementById("saveWebhookBtn").onclick = function() {
+  const url = webhookInput.value.trim();
+  if (!url) {
+    webhookStatus.textContent = "⚠ URL未入力";
+    webhookStatus.style.color = "var(--caution, #fbbf24)";
+    return;
+  }
+  if (!url.includes("discord.com/api/webhooks/") &&
+      !url.includes("discordapp.com/api/webhooks/")) {
+    webhookStatus.textContent = "⚠ Discord Webhook URLでない可能性";
+    webhookStatus.style.color = "var(--caution, #fbbf24)";
+    return;
+  }
+  try {
+    localStorage.setItem(WEBHOOK_KEY, url);
+    webhookStatus.textContent = "✓ 保存しました";
+    webhookStatus.style.color = "var(--long, #4ade80)";
+    log("Discord Webhookをこのブラウザに保存しました");
+  } catch (e) {
+    webhookStatus.textContent = "✗ 保存失敗: " + e.message;
+    webhookStatus.style.color = "var(--short, #f87171)";
+  }
+};
+
+// 削除ボタン
+document.getElementById("clearWebhookBtn").onclick = function() {
+  if (!confirm("保存されたDiscord Webhookを削除しますか？")) return;
+  try {
+    localStorage.removeItem(WEBHOOK_KEY);
+    webhookInput.value = "";
+    webhookStatus.textContent = "削除しました";
+    webhookStatus.style.color = "var(--text-muted, #9ca3af)";
+    log("Discord Webhookの記憶を削除しました");
+  } catch (e) {}
+};
+
+// 入力変更を検知（保存済み表示の更新）
+webhookInput.addEventListener("input", function() {
+  try {
+    const saved = localStorage.getItem(WEBHOOK_KEY);
+    if (saved && this.value.trim() === saved) {
+      webhookStatus.textContent = "✓ 記憶済み";
+      webhookStatus.style.color = "var(--long, #4ade80)";
+    } else if (this.value.trim()) {
+      webhookStatus.textContent = "未保存（💾で保存）";
+      webhookStatus.style.color = "var(--text-muted, #9ca3af)";
+    } else {
+      webhookStatus.textContent = "";
+    }
+  } catch (e) {}
+});
+
 log("準備完了。Discord Webhookを入力して「監視開始」を押してください。");
 </script>
 </body>
