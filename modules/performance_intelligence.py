@@ -11,6 +11,51 @@ from datetime import datetime, timedelta, timezone
 
 
 # ============================================================
+# バックテスト実証済み ペア静的ベースライン（2026-06-09 180日実績）
+# ============================================================
+
+# 完全除外ペア: 流動性・政治リスクで構造的に勝率低（22%/33%）
+PAIR_EXCLUDE = frozenset(["INRJPY", "TRYJPY"])
+
+# 静的★調整: バックテスト勝率が明確に良/悪で、closed_tradesが少ない段階でも反映
+# 値は adjustment (整数 or 0.5刻み)。build_pair_performance_mapの実績値とマージ
+PAIR_STATIC_BASELINE = {
+    # 🏆 主力ペア昇格（76.9%勝率）
+    "SGDJPY": {"adjustment": +1,  "note": "主力ペア(実証76.9%)"},
+    "EURAUD": {"adjustment": +1,  "note": "主力ペア(実証76.9%)"},
+    # ✅ 好成績維持（69-72%）
+    "AUDJPY": {"adjustment": +1,  "note": "好成績(実証72.2%)"},
+    "GBPJPY": {"adjustment": +1,  "note": "好成績(実証69.2%)"},
+    # ❌ 慢性不振ペア（40%以下）
+    "EURUSD": {"adjustment": -1,  "note": "不振ペア(実証40.0%)"},
+    "USDCHF": {"adjustment": -1,  "note": "不振ペア(実証37.5%)"},
+}
+
+
+def apply_static_baseline(perf_map: dict) -> dict:
+    """
+    closed_tradesの実績マップに静的ベースラインをマージする。
+    実績データがある場合は adjustment を合算（ただし -2〜+2 でクランプ）。
+    実績データがないペアには静的値をそのまま追加。
+    """
+    for pair, static in PAIR_STATIC_BASELINE.items():
+        if pair in perf_map:
+            # 実績あり: adjustmentを加算（累積しすぎないようクランプ）
+            combined = perf_map[pair]["adjustment"] + static["adjustment"]
+            perf_map[pair]["adjustment"] = max(-2, min(2, combined))
+            perf_map[pair]["note"] = perf_map[pair]["note"] + " / " + static["note"]
+        else:
+            # 実績なし: 静的値をそのまま登録
+            perf_map[pair] = {
+                "win_rate": None,
+                "total": 0,
+                "adjustment": static["adjustment"],
+                "note": static["note"] + " (静的ベースライン)",
+            }
+    return perf_map
+
+
+# ============================================================
 # ⑩ 自己学習型シグナル重み付け
 # ============================================================
 

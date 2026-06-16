@@ -43,6 +43,7 @@ from modules.trade_tracker import update_trades
 from modules.performance_intelligence import (
     build_pair_performance_map, apply_performance_weighting,
     check_drawdown_alert, detect_market_regime,
+    PAIR_EXCLUDE, apply_static_baseline,  # 2026-06-16 軌道修正
 )
 from modules.ai_commentary import generate_market_commentary, generate_exit_advice
 from modules.ambush_alert import evaluate_ambush, collect_ambush_alerts
@@ -50,6 +51,86 @@ from modules.geopolitical_risk import apply_geopolitical_filter
 from modules.drl_collector import collect_scan_results, get_drl_stats  # 2026-06-11 研究A
 
 PAGES_URL = "https://applejoker01-afk.github.io/fx-signal-monitor/"
+
+
+# ============================================================
+# CB会合ブラックアウト（2026-06-16追加）
+# 中央銀行会合の前後 BLACKOUT_HOURS 時間はJPYシグナルを警告付きに降格
+# ============================================================
+
+CB_MEETING_BLACKOUT_HOURS = 36   # 会合後36時間は要注意
+CB_MEETING_WARN_HOURS     = 48   # 会合48時間前から警告
+
+
+def check_cb_meeting_blackout(pair: str, cb_rates: dict, now: datetime) -> dict:
+    """
+    指定ペアの通貨が中央銀行会合のブラックアウト期間内かチェック。
+    next_meeting（次回予定）と last_meeting（直近実施済み）の両方を確認。
+
+    Returns:
+        {"active": bool, "reason": str, "severity": "warn"|"blackout"|"none"}
+    """
+    if pair not in PAIR_API:
+        return {"active": False, "severity": "none", "reason": ""}
+
+    currencies = list(PAIR_API[pair])
+    rates_data = cb_rates.get("rates", cb_rates)
+
+    def _parse_dt(s):
+        if not s:
+            return None
+        try:
+            return datetime.fromisoformat(s).replace(tzinfo=timezone.utc)
+        except ValueError:
+            try:
+                return datetime.strptime(s, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+            except ValueError:
+                return None
+
+    # 全通貨を評価してから、最も重篤なステータスを返す
+    # （blackout > warn > none の優先順位）
+    best_blackout = None
+    best_warn = None
+
+    for ccy in currencies:
+        info = rates_data.get(ccy, {})
+
+        # ① last_meeting: 会合後ブラックアウト（優先度最高）
+        last_dt = _parse_dt(info.get("last_meeting"))
+        if last_dt:
+            hours_since = (now - last_dt).total_seconds() / 3600
+            if 0 <= hours_since <= CB_MEETING_BLACKOUT_HOURS:
+                best_blackout = {
+                    "active": True,
+                    "severity": "blackout",
+                    "reason": f"{ccy} 中銀会合後 {hours_since:.0f}h（ブラックアウト {CB_MEETING_BLACKOUT_HOURS}h）",
+                    "currency": ccy,
+                }
+
+        # ② next_meeting: 会合前警告 & 会合直後（last_meetingがない場合）
+        next_dt = _parse_dt(info.get("next_meeting"))
+        if next_dt:
+            hours_diff = (now - next_dt).total_seconds() / 3600
+            if 0 <= hours_diff <= CB_MEETING_BLACKOUT_HOURS and not best_blackout:
+                best_blackout = {
+                    "active": True,
+                    "severity": "blackout",
+                    "reason": f"{ccy} 中銀会合後 {hours_diff:.0f}h（ブラックアウト {CB_MEETING_BLACKOUT_HOURS}h）",
+                    "currency": ccy,
+                }
+            elif -CB_MEETING_WARN_HOURS <= hours_diff < 0 and not best_warn:
+                best_warn = {
+                    "active": True,
+                    "severity": "warn",
+                    "reason": f"{ccy} 中銀会合まで {abs(hours_diff):.0f}h（要注意期間）",
+                    "currency": ccy,
+                }
+
+    if best_blackout:
+        return best_blackout
+    if best_warn:
+        return best_warn
+    return {"active": False, "severity": "none", "reason": ""}
 
 
 def _hours_between_iso(iso_start: str, dt_end: datetime) -> float:
@@ -1247,22 +1328,29 @@ def main():
         obsidian_data = None
 
     # 5. 全ペア評価（価格履歴も保存して通貨強弱計算に使う）
-    print("\n[INFO] Evaluating 22 pairs...")
+    print(f"\n[INFO] Evaluating {len(PAIR_API)} pairs (除外: {sorted(PAIR_EXCLUDE)})...")
 
     # ⑩ 自己学習: 過去の決済実績からペア別信頼度マップを構築
     from modules.trade_tracker import load_closed_trades
     closed_trades_all = load_closed_trades(days_back=90)
     perf_map = build_pair_performance_map(closed_trades_all, min_trades=5)
+    # 2026-06-16: 静的ベースライン（バックテスト実証値）をマージ
+    perf_map = apply_static_baseline(perf_map)
     if perf_map:
         adjusted = [p for p, v in perf_map.items() if v.get("adjustment", 0) != 0]
         if adjusted:
-            print(f"[OK] 自己学習: {len(adjusted)}ペアに実績調整を適用")
+            print(f"[OK] ペア信頼度調整: {len(adjusted)}ペア → {adjusted}")
 
     results = []
     all_pair_prices = {}   # ① 通貨強弱メーター用
     all_histories = {}     # ⑨ バックテスト用（フル履歴）
 
     for pair in PAIR_API:
+        # 2026-06-16: 構造的不振ペアを除外
+        if pair in PAIR_EXCLUDE:
+            print(f"[SKIP] {pair}: 除外リスト（INRJPY/TRYJPY 流動性・政治リスク）")
+            continue
+
         price = latest["pairs"].get(pair)
         if not price:
             print(f"[SKIP] {pair}: no price")
@@ -1299,6 +1387,18 @@ def main():
             # 🎯 待ち伏せ型アラート（重要価格への接近を判定）
             r = evaluate_ambush(r, prices, atr_threshold=0.5)
 
+            # 🏦 CB会合ブラックアウト（2026-06-16追加）
+            cb_blackout = check_cb_meeting_blackout(pair, cb_rates, now)
+            r["cb_meeting_blackout"] = cb_blackout
+            if cb_blackout["active"]:
+                if cb_blackout["severity"] == "blackout":
+                    # ★を最大2段階降格（新規エントリー抑制）
+                    r["stars"] = max(1, r.get("stars", 1) - 2)
+                    r["blackout_degraded"] = True
+                elif cb_blackout["severity"] == "warn":
+                    # ★を1段階降格
+                    r["stars"] = max(1, r.get("stars", 1) - 1)
+
             results.append(r)
 
             regime = r.get("volatility_regime", {})
@@ -1307,6 +1407,8 @@ def main():
             if r.get("event_warning"): warn += " EVT"
             if r.get("sentiment_notes"): warn += " SENT"
             if regime.get("regime") == "high": warn += f" ⚡HighVol"
+            if r.get("blackout_degraded"): warn += " 🏦BLACKOUT"
+            elif r.get("cb_meeting_blackout", {}).get("severity") == "warn": warn += " 🏦会合前"
             if r.get("intervention_risk", {}).get("risk_level") in ("HIGH","CRITICAL"):
                 warn += f" 🚨介入"
             print(

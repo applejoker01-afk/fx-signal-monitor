@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-06-14",
+  "last_updated": "2026-06-16",
   "notes": "中央銀行会合のたびに手動更新する。stance は tighten/neutral/ease のいずれか。rate_momentum は accelerating/decelerating/peak/trough/stable のいずれか（金利サイクルの勢い）。FRED API + Finnhub API 設定済みなら週次自動更新される。",
   "data_source": "BIS + 各国中央銀行公式発表 + Web検証 (2026-06-11)",
   "verification_source": {
@@ -29,14 +29,15 @@
       "cb_note": "利下げサイクル後半。2.0%に向けて段階的引き下げ中だがペース鈍化。"
     },
     "JPY": {
-      "rate": 0.75,
-      "next_meeting": "2026-06-17",
-      "stance": "tighten",
-      "rate_momentum": "accelerating",
+      "rate": 1.0,
+      "next_meeting": "2026-07-30",
+      "stance": "pause",
+      "rate_momentum": "peak",
       "cb_name": "日銀",
-      "cb_note": "6/16-17会合で0.75%→1.0%へ利上げ確率80-96%。BoJ tighteningサイクル加速中。JPY強化バイアス。",
-      "next_expected_move": "+0.25%",
-      "next_expected_date": "2026-06-17"
+      "cb_note": "2026-06-17 利上げ決定(0.75%→1.0%)。次回は様子見。ピーク到達の可能性。JPYキャリー巻き戻しリスクに注意。",
+      "next_expected_move": "hold",
+      "next_expected_date": "2026-09-17",
+      "last_meeting": "2026-06-17"
     },
     "GBP": {
       "rate": 3.75,
