@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-14T22:11:01.206293+00:00",
+  "generated_at": "2026-06-17T13:21:57.962804+00:00",
   "lookback_days": 60,
   "rr": 2.0,
   "min_trades": 30,
@@ -8,62 +8,96 @@
     "USDJPY": {
       "strategy": "④平均回帰",
       "strategy_key": "mean_reversion",
-      "expectancy": 1.52,
-      "trades": 138,
-      "win_rate": 39.9,
-      "pf": 1.25,
+      "expectancy": 1.77,
+      "trades": 136,
+      "win_rate": 40.4,
+      "pf": 1.3,
       "regime": "ranging",
-      "regime_comment": "直近20本で-0.0%（横ばい）"
+      "regime_comment": "直近20本で+0.1%（横ばい）"
     },
     "EURUSD": {
       "strategy": "③ボラブレイク",
       "strategy_key": "vol_breakout",
-      "expectancy": 0.42,
-      "trades": 194,
-      "win_rate": 37.6,
-      "pf": 1.1,
+      "expectancy": 0.65,
+      "trades": 195,
+      "win_rate": 37.9,
+      "pf": 1.16,
       "regime": "ranging",
-      "regime_comment": "直近20本で-0.0%（横ばい）"
+      "regime_comment": "直近20本で+0.0%（横ばい）"
     },
     "GBPJPY": {
       "strategy": "三次元共鳴(順張り)",
       "strategy_key": "resonance",
-      "expectancy": 1.26,
-      "trades": 284,
-      "win_rate": 40.5,
-      "pf": 1.1,
+      "expectancy": 1.32,
+      "trades": 281,
+      "win_rate": 40.2,
+      "pf": 1.11,
       "regime": "ranging",
-      "regime_comment": "直近20本で-0.0%（横ばい）"
+      "regime_comment": "直近20本で+0.1%（横ばい）"
     },
     "AUDJPY": {
       "strategy": "反発(improveB)",
       "strategy_key": "rebound",
-      "expectancy": 0.22,
-      "trades": 460,
-      "win_rate": 36.5,
-      "pf": 1.03,
-      "regime": "ranging",
-      "regime_comment": "直近20本で-0.0%（横ばい）"
-    },
-    "EURJPY": {
-      "strategy": "②時間帯特化",
-      "strategy_key": "session",
-      "expectancy": 0.57,
-      "trades": 260,
-      "win_rate": 35.0,
+      "expectancy": 0.6,
+      "trades": 450,
+      "win_rate": 37.3,
       "pf": 1.07,
       "regime": "ranging",
-      "regime_comment": "直近20本で-0.0%（横ばい）"
+      "regime_comment": "直近20本で+0.1%（横ばい）"
+    },
+    "EURJPY": {
+      "strategy": "①ブレイクアウト",
+      "strategy_key": "breakout",
+      "expectancy": 0.44,
+      "trades": 163,
+      "win_rate": 30.7,
+      "pf": 1.07,
+      "regime": "ranging",
+      "regime_comment": "ボラティリティ低く、方向性不明瞭。スキャルピング向き。"
     },
     "AUDUSD": {
       "strategy": "②時間帯特化",
       "strategy_key": "session",
-      "expectancy": 0.87,
-      "trades": 311,
-      "win_rate": 37.6,
-      "pf": 1.23,
+      "expectancy": 1.08,
+      "trades": 309,
+      "win_rate": 37.9,
+      "pf": 1.3,
       "regime": "ranging",
-      "regime_comment": "直近20本で-0.0%（横ばい）"
+      "regime_comment": "ボラティリティ低く、方向性なし。スキャルピング向き"
+    },
+    "GBPUSD": {
+      "strategy": "④平均回帰",
+      "strategy_key": "mean_reversion",
+      "expectancy": 1.57,
+      "trades": 101,
+      "win_rate": 42.6,
+      "pf": 1.31,
+      "regime": "ranging",
+      "regime_comment": "ボラティリティ低い。レンジ相場。スキャルピング推奨。"
+    },
+    "USDCAD": {
+      "strategy": null,
+      "strategy_key": null,
+      "reason": "期待値が基準未満のため見送り",
+      "regime": "ranging",
+      "regime_comment": "変化率0.03%、幅0.15%で狭い値動き。レンジ相場。"
+    },
+    "USDCHF": {
+      "strategy": null,
+      "strategy_key": null,
+      "reason": "期待値が基準未満のため見送り",
+      "regime": "ranging",
+      "regime_comment": "ボラティリティ低い。レンジ内でのスキャルピング推奨"
+    },
+    "NZDJPY": {
+      "strategy": "②時間帯特化",
+      "strategy_key": "session",
+      "expectancy": 1.09,
+      "trades": 274,
+      "win_rate": 36.5,
+      "pf": 1.16,
+      "regime": "ranging",
+      "regime_comment": "狭いレンジ。方向性なし。様子見推奨"
     }
   },
   "note": "毎週自動再検証され、市場変化に応じて各ペアの採用戦略が入れ替わります"
