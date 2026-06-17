@@ -91,8 +91,8 @@ def select_best_strategy(summaries):
 
 def ai_judge_regime(pair, recent_closes):
     """
-    Claude APIで相場局面を判断（AI局面判断）。
-    APIキーが無ければ簡易判定にフォールバック。
+    AI APIで相場局面を判断（AI局面判断）。
+    優先順位: Gemini API → Claude API → 簡易判定（フォールバック）
     """
     # 簡易判定（フォールバック）: 直近の方向性
     def simple_regime():
@@ -105,19 +105,15 @@ def ai_judge_regime(pair, recent_closes):
                     f"直近20本で{change:+.1f}%")
         return "ranging", f"直近20本で{change:+.1f}%（横ばい）"
 
-    if not os.environ.get("ANTHROPIC_API_KEY"):
+    # 直近の値動きサマリー（共通プロンプト用）
+    if len(recent_closes) < 30:
         return simple_regime()
-
-    try:
-        import anthropic
-        client = anthropic.Anthropic()
-        # 直近の値動きサマリー
-        recent = recent_closes[-30:]
-        change = (recent[-1] - recent[0]) / recent[0] * 100
-        high = max(recent)
-        low = min(recent)
-        volatility = (high - low) / recent[0] * 100
-        prompt = f"""FXの{pair}の直近の15分足の値動きを分析してください。
+    recent = recent_closes[-30:]
+    change = (recent[-1] - recent[0]) / recent[0] * 100
+    high = max(recent)
+    low = min(recent)
+    volatility = (high - low) / recent[0] * 100
+    prompt = f"""FXの{pair}の直近の15分足の値動きを分析してください。
 直近30本（約7.5時間）の変化率: {change:+.2f}%
 高値〜安値の幅: {volatility:.2f}%
 現在値: {recent[-1]}
@@ -125,18 +121,59 @@ def ai_judge_regime(pair, recent_closes):
 この相場が「強いトレンド」「弱いトレンド」「レンジ」のどれかを判断し、
 デイトレードで取るべき基本姿勢を一言で。
 JSON形式のみで出力: {{"regime": "uptrend|downtrend|ranging", "comment": "20字以内"}}"""
-        msg = client.messages.create(
-            model="claude-haiku-4-5-20251001",
-            max_tokens=200,
-            messages=[{"role": "user", "content": prompt}],
-        )
-        text = "".join(b.text for b in msg.content if b.type == "text").strip()
-        text = text.replace("```json", "").replace("```", "").strip()
-        data = json.loads(text)
-        return data.get("regime", "unknown"), data.get("comment", "")
-    except Exception as e:
-        print(f"  [AI判定失敗 {pair}: {e}] 簡易判定にフォールバック")
-        return simple_regime()
+
+    # 1) Gemini APIを優先試行
+    gemini_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY")
+    if gemini_key:
+        try:
+            import urllib.request
+            model = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
+            url = (f"https://generativelanguage.googleapis.com/v1beta/models/"
+                   f"{model}:generateContent?key={gemini_key.strip()}")
+            body = json.dumps({
+                "contents": [{"parts": [{"text": prompt}]}],
+                "generationConfig": {
+                    "temperature": 0.3,
+                    "maxOutputTokens": 200,
+                    "responseMimeType": "application/json",
+                }
+            }).encode("utf-8")
+            req = urllib.request.Request(
+                url, data=body,
+                headers={"Content-Type": "application/json"},
+                method="POST"
+            )
+            with urllib.request.urlopen(req, timeout=20) as resp:
+                result = json.loads(resp.read().decode("utf-8"))
+            text = ""
+            for cand in result.get("candidates", []):
+                for part in cand.get("content", {}).get("parts", []):
+                    text += part.get("text", "")
+            text = text.replace("```json", "").replace("```", "").strip()
+            data = json.loads(text)
+            return data.get("regime", "unknown"), data.get("comment", "")
+        except Exception as e:
+            print(f"  [Gemini判定失敗 {pair}: {str(e)[:120]}] 次のAIへ")
+
+    # 2) Claude APIを試行（Geminiが無い・失敗時）
+    if os.environ.get("ANTHROPIC_API_KEY"):
+        try:
+            import anthropic
+            client = anthropic.Anthropic()
+            msg = client.messages.create(
+                model="claude-haiku-4-5-20251001",
+                max_tokens=200,
+                messages=[{"role": "user", "content": prompt}],
+            )
+            text = "".join(b.text for b in msg.content if b.type == "text").strip()
+            text = text.replace("```json", "").replace("```", "").strip()
+            data = json.loads(text)
+            return data.get("regime", "unknown"), data.get("comment", "")
+        except Exception as e:
+            print(f"  [Claude判定失敗 {pair}: {str(e)[:120]}] 簡易判定へ")
+
+    # 3) 最終フォールバック
+    return simple_regime()
 
 
 def main():
