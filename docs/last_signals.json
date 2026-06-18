@@ -1,7 +1,7 @@
 {
-  "timestamp": "2026-06-18T14:16:26.676211+00:00",
+  "timestamp": "2026-06-18T18:09:42.821589+00:00",
   "signals": {
-    "USDJPY": 3,
+    "USDJPY": 1,
     "EURJPY": 2,
     "GBPJPY": 4,
     "AUDJPY": 2,
@@ -42,107 +42,118 @@
       "fa_direction": "buy",
       "fa_rate_diff": 2.75,
       "fa_detail": "FRB(3.75% neutral/stable) vs 日銀(1.00% pause/peak) 差+2.75% / USDサイクル強化(stable)",
-      "stars": 3,
-      "verdict": "◎ 高信頼ロング",
-      "direction": "LONG",
+      "stars": 1,
+      "verdict": "⏸ イベント前自動見送り",
+      "direction": "WAIT_EVENT",
       "pair_type": "safe_haven",
+      "original_stars": 5,
+      "event_warning": "重要イベント直後 (FOMC（連邦公開市場委員会） から 0.2h経過)",
+      "event_info": {
+        "date": "2026-06-18T18:00:00Z",
+        "country": "US",
+        "currency": "USD",
+        "name": "FOMC（連邦公開市場委員会）",
+        "importance": "critical",
+        "affects_pairs": [
+          "USDJPY",
+          "EURUSD",
+          "GBPUSD",
+          "AUDUSD",
+          "NZDUSD",
+          "USDCAD",
+          "USDCHF"
+        ]
+      },
       "upcoming_events": [
-        {
-          "name": "FOMC（連邦公開市場委員会）",
-          "currency": "USD",
-          "importance": "critical",
-          "hours_until": 3.7,
-          "date": "2026-06-18T18:00:00Z"
-        },
         {
           "name": "Core Inflation Rate YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.2,
+          "hours_until": 5.3,
           "date": "2026-06-18T23:30:00Z"
         },
         {
           "name": "Inflation Rate Ex-Food and Energy YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.2,
+          "hours_until": 5.3,
           "date": "2026-06-18T23:30:00Z"
         },
         {
           "name": "Inflation Rate MoM",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.2,
+          "hours_until": 5.3,
           "date": "2026-06-18T23:30:00Z"
         },
         {
           "name": "Inflation Rate YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.2,
+          "hours_until": 5.3,
           "date": "2026-06-18T23:30:00Z"
         },
         {
           "name": "BoJ Monetary Policy Meeting Minutes",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.6,
+          "hours_until": 5.7,
           "date": "2026-06-18T23:50:00Z"
         },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 106.2,
+          "hours_until": 102.3,
           "date": "2026-06-23T00:30:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 106.2,
+          "hours_until": 102.3,
           "date": "2026-06-23T00:30:00Z"
         },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "USD",
           "importance": "high",
-          "hours_until": 119.5,
+          "hours_until": 115.6,
           "date": "2026-06-23T13:45:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "USD",
           "importance": "high",
-          "hours_until": 119.5,
+          "hours_until": 115.6,
           "date": "2026-06-23T13:45:00Z"
         },
         {
           "name": "BoJ Summary of Opinions",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 129.6,
+          "hours_until": 125.7,
           "date": "2026-06-23T23:50:00Z"
         },
         {
           "name": "GDP Growth Rate QoQ Final",
           "currency": "USD",
           "importance": "critical",
-          "hours_until": 166.2,
+          "hours_until": 162.3,
           "date": "2026-06-25T12:30:00Z"
         },
         {
           "name": "GDP Price Index QoQ Final",
           "currency": "USD",
           "importance": "critical",
-          "hours_until": 166.2,
+          "hours_until": 162.3,
           "date": "2026-06-25T12:30:00Z"
         },
         {
           "name": "GDP Sales QoQ Final",
           "currency": "USD",
           "importance": "critical",
-          "hours_until": 166.2,
+          "hours_until": 162.3,
           "date": "2026-06-25T12:30:00Z"
         }
       ],
@@ -156,29 +167,6 @@
         "tp2_multiplier": 4.0,
         "tp3_multiplier": 5.0,
         "note": "ATRが90日平均の0.5倍 → SL幅を縮小（E案連動）"
-      },
-      "staged_tp": {
-        "sl": 160.35,
-        "tp": 161.51,
-        "trail_atr_mult": 2.5,
-        "trail_distance": 0.58,
-        "be_plus_offset": 0.29,
-        "be_target_after_tp": 161.22,
-        "max_target": 162.1,
-        "rr_tp": 1.0,
-        "tp_mode": "single_with_trail",
-        "tp1": 161.51,
-        "tp2": 161.86,
-        "tp3": 162.1,
-        "sl_width": 0.58,
-        "tp1_width": 0.58,
-        "rr_tp1": 1.0,
-        "rr_tp2": 1.6,
-        "rr_tp3": 2.0,
-        "regime_label": "低ボラ相場",
-        "strategy": "TP(161.51)到達 → SLを BE+0.5R(161.22) へ移動 → トレーリング(2.5×ATR=0.58)発動 → 利を伸ばす（理論最大: 162.1）",
-        "chandelier_sl_active": true,
-        "chandelier_note": "Chandelier Exit: 過去22日高値(160.93)-2.5xATR"
       },
       "carry_score": {
         "carry_score": 18.91,
@@ -272,7 +260,7 @@
       "cb_meeting_blackout": {
         "active": true,
         "severity": "blackout",
-        "reason": "USD 中銀会合後 14h（ブラックアウト 36h）",
+        "reason": "USD 中銀会合後 18h（ブラックアウト 36h）",
         "currency": "USD"
       },
       "blackout_degraded": true,
@@ -320,161 +308,161 @@
           "name": "Core Inflation Rate YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.2,
+          "hours_until": 5.3,
           "date": "2026-06-18T23:30:00Z"
         },
         {
           "name": "Inflation Rate Ex-Food and Energy YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.2,
+          "hours_until": 5.3,
           "date": "2026-06-18T23:30:00Z"
         },
         {
           "name": "Inflation Rate MoM",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.2,
+          "hours_until": 5.3,
           "date": "2026-06-18T23:30:00Z"
         },
         {
           "name": "Inflation Rate YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.2,
+          "hours_until": 5.3,
           "date": "2026-06-18T23:30:00Z"
         },
         {
           "name": "BoJ Monetary Policy Meeting Minutes",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.6,
+          "hours_until": 5.7,
           "date": "2026-06-18T23:50:00Z"
         },
         {
           "name": "PPI MoM",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 15.7,
+          "hours_until": 11.8,
           "date": "2026-06-19T06:00:00Z"
         },
         {
           "name": "PPI YoY",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 15.7,
+          "hours_until": 11.8,
           "date": "2026-06-19T06:00:00Z"
         },
         {
           "name": "Consumer Confidence Flash",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 95.7,
+          "hours_until": 91.8,
           "date": "2026-06-22T14:00:00Z"
         },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 106.2,
+          "hours_until": 102.3,
           "date": "2026-06-23T00:30:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 106.2,
+          "hours_until": 102.3,
           "date": "2026-06-23T00:30:00Z"
         },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 113.0,
+          "hours_until": 109.1,
           "date": "2026-06-23T07:15:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 113.0,
+          "hours_until": 109.1,
           "date": "2026-06-23T07:15:00Z"
         },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 113.2,
+          "hours_until": 109.3,
           "date": "2026-06-23T07:30:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 113.2,
+          "hours_until": 109.3,
           "date": "2026-06-23T07:30:00Z"
         },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 113.7,
+          "hours_until": 109.8,
           "date": "2026-06-23T08:00:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 113.7,
+          "hours_until": 109.8,
           "date": "2026-06-23T08:00:00Z"
         },
         {
           "name": "BoJ Summary of Opinions",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 129.6,
+          "hours_until": 125.7,
           "date": "2026-06-23T23:50:00Z"
         },
         {
           "name": "GfK Consumer Confidence",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 159.7,
+          "hours_until": 155.8,
           "date": "2026-06-25T06:00:00Z"
         },
         {
           "name": "Consumer Confidence",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 160.5,
+          "hours_until": 156.6,
           "date": "2026-06-25T06:45:00Z"
         },
         {
           "name": "ECB General Council Meeting",
           "currency": "EUR",
           "importance": "critical",
-          "hours_until": 160.7,
+          "hours_until": 156.8,
           "date": "2026-06-25T07:00:00Z"
         },
         {
           "name": "GDP Growth Rate QoQ Final",
           "currency": "EUR",
           "importance": "critical",
-          "hours_until": 160.7,
+          "hours_until": 156.8,
           "date": "2026-06-25T07:00:00Z"
         },
         {
           "name": "GDP Growth Rate YoY Final",
           "currency": "EUR",
           "importance": "critical",
-          "hours_until": 160.7,
+          "hours_until": 156.8,
           "date": "2026-06-25T07:00:00Z"
         },
         {
           "name": "PPI YoY",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 160.7,
+          "hours_until": 156.8,
           "date": "2026-06-25T07:00:00Z"
         }
       ],
@@ -655,112 +643,112 @@
           "name": "Gfk Consumer Confidence",
           "currency": "GBP",
           "importance": "high",
-          "hours_until": 8.8,
+          "hours_until": 4.9,
           "date": "2026-06-18T23:01:00Z"
         },
         {
           "name": "Core Inflation Rate YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.2,
+          "hours_until": 5.3,
           "date": "2026-06-18T23:30:00Z"
         },
         {
           "name": "Inflation Rate Ex-Food and Energy YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.2,
+          "hours_until": 5.3,
           "date": "2026-06-18T23:30:00Z"
         },
         {
           "name": "Inflation Rate MoM",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.2,
+          "hours_until": 5.3,
           "date": "2026-06-18T23:30:00Z"
         },
         {
           "name": "Inflation Rate YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.2,
+          "hours_until": 5.3,
           "date": "2026-06-18T23:30:00Z"
         },
         {
           "name": "BoJ Monetary Policy Meeting Minutes",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.6,
+          "hours_until": 5.7,
           "date": "2026-06-18T23:50:00Z"
         },
         {
           "name": "Retail Sales ex Fuel MoM",
           "currency": "GBP",
           "importance": "high",
-          "hours_until": 15.7,
+          "hours_until": 11.8,
           "date": "2026-06-19T06:00:00Z"
         },
         {
           "name": "Retail Sales ex Fuel YoY",
           "currency": "GBP",
           "importance": "high",
-          "hours_until": 15.7,
+          "hours_until": 11.8,
           "date": "2026-06-19T06:00:00Z"
         },
         {
           "name": "Retail Sales MoM",
           "currency": "GBP",
           "importance": "high",
-          "hours_until": 15.7,
+          "hours_until": 11.8,
           "date": "2026-06-19T06:00:00Z"
         },
         {
           "name": "Retail Sales YoY",
           "currency": "GBP",
           "importance": "high",
-          "hours_until": 15.7,
+          "hours_until": 11.8,
           "date": "2026-06-19T06:00:00Z"
         },
         {
           "name": "BOE金融政策委員会",
           "currency": "GBP",
           "importance": "critical",
-          "hours_until": 20.7,
+          "hours_until": 16.8,
           "date": "2026-06-19T11:00:00Z"
         },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 106.2,
+          "hours_until": 102.3,
           "date": "2026-06-23T00:30:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 106.2,
+          "hours_until": 102.3,
           "date": "2026-06-23T00:30:00Z"
         },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "GBP",
           "importance": "high",
-          "hours_until": 114.2,
+          "hours_until": 110.3,
           "date": "2026-06-23T08:30:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "GBP",
           "importance": "high",
-          "hours_until": 114.2,
+          "hours_until": 110.3,
           "date": "2026-06-23T08:30:00Z"
         },
         {
           "name": "BoJ Summary of Opinions",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 129.6,
+          "hours_until": 125.7,
           "date": "2026-06-23T23:50:00Z"
         }
       ],
@@ -915,7 +903,7 @@
       "cb_meeting_blackout": {
         "active": true,
         "severity": "warn",
-        "reason": "GBP 中銀会合まで 10h（要注意期間）",
+        "reason": "GBP 中銀会合まで 6h（要注意期間）",
         "currency": "GBP"
       },
       "strength_context": {
@@ -931,7 +919,7 @@
         "context": "通貨強弱が拮抗（中立）",
         "bias": "neutral"
       },
-      "ai_exit_advice": "# GBPJPY LONG ポジション状況整理\n\n## 1. 現状整理\n弱トレンド相場（ADX28.8）でのロングポジション。テクニカル・ファンダが好適（スコア80超）で、金利差+2.75%のキャリー環境にあります。\n\n## 2. 利益を伸ばす選択肢\n\n**A) トレール切替戦略**\n- 狙い：現在のTP1(214.41)到達時にトレール（例：20-30pips）に切替え、弱トレンドの続伸を活かしながら損失リスクを固定\n- リスク：天井圏での逆行で利確幅が縮む可能性\n\n**B) 段階的部分利確**\n- 狙い：TP1で利益の30-50%確定、残部をTP2・TP3へ。期待値を積み上げつつ機会損失を抑制\n- リスク：トレンド加速時の利確不足感\n\n**C) 金利差活用の長期保有**\n- 狙い：SL(211.36)で損失確定できる前提で、キャリー+2.75%を回収。数日～数週間のホールド\n- リスク：SL回収日数が不明（スコア不明）のため、金利差以上の逆行時の損失リスク。中銀スタンス変化で急反転の可能性\n\n## 3. 留意点\nBOE・日銀の金融政策ニュースや、GBP上昇期待の有無で金利差が縮小する可能性を監視してください。"
+      "ai_exit_advice": "# ポジション状況整理と選択肢\n\n## 1. 現状整理\nGBPJPY LONGは中程度のテクニカル強度（TA84.7）と金利差+2.75%による下支えで保有根拠が明確です。弱トレンド相場（ADX28.8）のため、トレンド継続性は中程度ですが、利を伸ばす環境は整っています。\n\n## 2. 利益を伸ばす選択肢\n\n**A案：OCO維持＋トレール切替**\n- 狙い：TP設定で上値余力を確保しつつ、TP1到達後にトレール（20-30pips幅）へ自動切替。段階利確の利益確保と追撃トレンドへの対応を両立\n- リスク：トレンド転換時にトレール幅が狭すぎると損益分岐となる可能性\n\n**B案：部分利確＋残枠スワップ保有**\n- 狙い：TP1（214.41）で50%決済し利益確定。残50%はSL211.36維持で保有継続し、金利差+2.75%のキャリー享受（中期スワップ利益狙い）\n- リスク：金利差縮小局面では効率低下；SL回収日数未確認のため期間判断が困難\n\n**C案：現在値から部分損切＆利確分割**\n- 狙い：ポジション20-30%を利食い（212円台）、60%をTP2狙い、残枠をSL変更（213円）で調整。段階的な利益確保でドローダウン抑制\n- リスク：利確機会を逃した場合の後悔；トレンド終了時に残枠が圧迫される\n\n## 3. 留意点\nBOEのニュートラルスタンス維持と日銀の金利据え置きが続く限り金利差優位性は持続しますが、英国インフレ再加速や日銀ハト派転換による金利差圧縮リスクを随時監視が必須です。"
     },
     {
       "pair": "AUDJPY",
@@ -963,126 +951,126 @@
           "name": "Core Inflation Rate YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.2,
+          "hours_until": 5.3,
           "date": "2026-06-18T23:30:00Z"
         },
         {
           "name": "Inflation Rate Ex-Food and Energy YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.2,
+          "hours_until": 5.3,
           "date": "2026-06-18T23:30:00Z"
         },
         {
           "name": "Inflation Rate MoM",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.2,
+          "hours_until": 5.3,
           "date": "2026-06-18T23:30:00Z"
         },
         {
           "name": "Inflation Rate YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.2,
+          "hours_until": 5.3,
           "date": "2026-06-18T23:30:00Z"
         },
         {
           "name": "BoJ Monetary Policy Meeting Minutes",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.6,
+          "hours_until": 5.7,
           "date": "2026-06-18T23:50:00Z"
         },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "AUD",
           "importance": "high",
-          "hours_until": 104.7,
+          "hours_until": 100.8,
           "date": "2026-06-22T23:00:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "AUD",
           "importance": "high",
-          "hours_until": 104.7,
+          "hours_until": 100.8,
           "date": "2026-06-22T23:00:00Z"
         },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 106.2,
+          "hours_until": 102.3,
           "date": "2026-06-23T00:30:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 106.2,
+          "hours_until": 102.3,
           "date": "2026-06-23T00:30:00Z"
         },
         {
           "name": "BoJ Summary of Opinions",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 129.6,
+          "hours_until": 125.7,
           "date": "2026-06-23T23:50:00Z"
         },
         {
           "name": "CPI",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 131.2,
+          "hours_until": 127.3,
           "date": "2026-06-24T01:30:00Z"
         },
         {
           "name": "Inflation Rate MoM",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 131.2,
+          "hours_until": 127.3,
           "date": "2026-06-24T01:30:00Z"
         },
         {
           "name": "Inflation Rate YoY",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 131.2,
+          "hours_until": 127.3,
           "date": "2026-06-24T01:30:00Z"
         },
         {
           "name": "RBA Trimmed Mean CPI MoM",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 131.2,
+          "hours_until": 127.3,
           "date": "2026-06-24T01:30:00Z"
         },
         {
           "name": "RBA Trimmed Mean CPI YoY",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 131.2,
+          "hours_until": 127.3,
           "date": "2026-06-24T01:30:00Z"
         },
         {
           "name": "RBA Weighted Median CPI MoM",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 131.2,
+          "hours_until": 127.3,
           "date": "2026-06-24T01:30:00Z"
         },
         {
           "name": "RBA Weighted Median CPI YoY",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 131.2,
+          "hours_until": 127.3,
           "date": "2026-06-24T01:30:00Z"
         },
         {
           "name": "Unemployment Rate",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 155.2,
+          "hours_until": 151.3,
           "date": "2026-06-25T01:30:00Z"
         }
       ],
@@ -1263,56 +1251,56 @@
           "name": "Core Inflation Rate YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.2,
+          "hours_until": 5.3,
           "date": "2026-06-18T23:30:00Z"
         },
         {
           "name": "Inflation Rate Ex-Food and Energy YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.2,
+          "hours_until": 5.3,
           "date": "2026-06-18T23:30:00Z"
         },
         {
           "name": "Inflation Rate MoM",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.2,
+          "hours_until": 5.3,
           "date": "2026-06-18T23:30:00Z"
         },
         {
           "name": "Inflation Rate YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.2,
+          "hours_until": 5.3,
           "date": "2026-06-18T23:30:00Z"
         },
         {
           "name": "BoJ Monetary Policy Meeting Minutes",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.6,
+          "hours_until": 5.7,
           "date": "2026-06-18T23:50:00Z"
         },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 106.2,
+          "hours_until": 102.3,
           "date": "2026-06-23T00:30:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 106.2,
+          "hours_until": 102.3,
           "date": "2026-06-23T00:30:00Z"
         },
         {
           "name": "BoJ Summary of Opinions",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 129.6,
+          "hours_until": 125.7,
           "date": "2026-06-23T23:50:00Z"
         }
       ],
@@ -1462,7 +1450,7 @@
         "context": "弱い通貨 vs 強い通貨（ショート有利）",
         "bias": "short"
       },
-      "ai_exit_advice": "# NZDJPY LONG ポジション分析\n\n## 1. 現状整理\n強いトレンド相場（ADX54.5）で上昇トレンドが進行中。テクニカルスコア78.0で強気シグナルが継続し、+2.25%のキャリーも含み益をサポートしています。\n\n## 2. 利益を伸ばす選択肢\n\n**A案：トレール切替で利を伸ばす**\n- 狙い：トレンドが継続する限り利益を追求し、転換時に自動損切\n- リスク：レンジ化での振り落とし損失の可能性\n- 推奨：TP1到達後、SLをエントリー以上に上げてトレール運用\n\n**B案：部分利確＋長期保有ハイブリッド**\n- 狙い：TP1・TP2で段階的利確して確実利益を確保しつつ、残枠でスワップ利益も狙う\n- リスク：多段階管理の煩雑さ、TP3・TP4の利益を逃す可能性\n- 推奨：金利差+2.25%と中銀スタンスの強さを活かし、余裕資金では長期ホールド\n\n**C案：現OCO維持で強気貫徹**\n- 狙い：TP4（94.62）まで完全トレンド乗車を狙う\n- リスク：NZD利下げ加速や日銀転向による急落時の大損失\n\n## 3. 留意点\nNZD金利サイクル「decelerating」局面のため、金利差縮小リスクと日銀政策転換を定期的に監視が必須です。"
+      "ai_exit_advice": "# ポジション分析\n\n## 1. 現状整理\n強いトレンド相場（ADX54.5）でNZDJPY LONGは良好な環境。金利差+2.25%とスワップも有利で、TA78.0の強気シグナルが支持しています。\n\n## 2. 利益を伸ばす選択肢\n\n**A) トレール機能への切替え**\n- **狙い**: TP3（94.15）までの上昇を狙いながら、トレンド転換時の急落から保護。ADX54.5の強いトレンド相場では押し目買いの余地も活かせます\n- **リスク**: 高値引けで巻き込まれる可能性\n\n**B) 部分利確＋長期保有併用**\n- **狙い**: TP1（93.68）で50%程度利確し、残玉はスワップ（+2.25%）と金利差の継続収益を狙いながらTP3以上を目指す。SL回収日数が不明だからこそ、利益確定分で回収期間を短縮\n- **リスク**: 相場急変時に全損のリスクは残存\n\n**C) TP2（94.15）を目標に固定ポジション維持**\n- **狙い**: 現在のACO構成（SL91.79）を堅持し、リスク・リワード比が明確。トレンド継続への確信度が高ければ中道的選択肢\n- **リスク**: TP3以上への上昇を逃す機会損失\n\n## 3. 留意点\nRBNZのeaseサイクルが「decelerating」段階にあるため、金利差の段階的縮小リスクと、日銀の政策転換による急激なレート変動に要警戒です。"
     },
     {
       "pair": "CADJPY",
@@ -1494,133 +1482,133 @@
           "name": "Core Inflation Rate YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.2,
+          "hours_until": 5.3,
           "date": "2026-06-18T23:30:00Z"
         },
         {
           "name": "Inflation Rate Ex-Food and Energy YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.2,
+          "hours_until": 5.3,
           "date": "2026-06-18T23:30:00Z"
         },
         {
           "name": "Inflation Rate MoM",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.2,
+          "hours_until": 5.3,
           "date": "2026-06-18T23:30:00Z"
         },
         {
           "name": "Inflation Rate YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.2,
+          "hours_until": 5.3,
           "date": "2026-06-18T23:30:00Z"
         },
         {
           "name": "BoJ Monetary Policy Meeting Minutes",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.6,
+          "hours_until": 5.7,
           "date": "2026-06-18T23:50:00Z"
         },
         {
           "name": "Retail Sales Ex Autos MoM",
           "currency": "CAD",
           "importance": "high",
-          "hours_until": 22.2,
+          "hours_until": 18.3,
           "date": "2026-06-19T12:30:00Z"
         },
         {
           "name": "Retail Sales MoM Final",
           "currency": "CAD",
           "importance": "high",
-          "hours_until": 22.2,
+          "hours_until": 18.3,
           "date": "2026-06-19T12:30:00Z"
         },
         {
           "name": "Retail Sales MoM Prel",
           "currency": "CAD",
           "importance": "high",
-          "hours_until": 22.2,
+          "hours_until": 18.3,
           "date": "2026-06-19T12:30:00Z"
         },
         {
           "name": "Retail Sales YoY",
           "currency": "CAD",
           "importance": "high",
-          "hours_until": 22.2,
+          "hours_until": 18.3,
           "date": "2026-06-19T12:30:00Z"
         },
         {
           "name": "Core Inflation Rate MoM",
           "currency": "CAD",
           "importance": "critical",
-          "hours_until": 94.2,
+          "hours_until": 90.3,
           "date": "2026-06-22T12:30:00Z"
         },
         {
           "name": "Core Inflation Rate YoY",
           "currency": "CAD",
           "importance": "critical",
-          "hours_until": 94.2,
+          "hours_until": 90.3,
           "date": "2026-06-22T12:30:00Z"
         },
         {
           "name": "CPI Common YoY",
           "currency": "CAD",
           "importance": "critical",
-          "hours_until": 94.2,
+          "hours_until": 90.3,
           "date": "2026-06-22T12:30:00Z"
         },
         {
           "name": "CPI Median YoY",
           "currency": "CAD",
           "importance": "critical",
-          "hours_until": 94.2,
+          "hours_until": 90.3,
           "date": "2026-06-22T12:30:00Z"
         },
         {
           "name": "CPI Trimmed-Mean YoY",
           "currency": "CAD",
           "importance": "critical",
-          "hours_until": 94.2,
+          "hours_until": 90.3,
           "date": "2026-06-22T12:30:00Z"
         },
         {
           "name": "Inflation Rate MoM",
           "currency": "CAD",
           "importance": "critical",
-          "hours_until": 94.2,
+          "hours_until": 90.3,
           "date": "2026-06-22T12:30:00Z"
         },
         {
           "name": "Inflation Rate YoY",
           "currency": "CAD",
           "importance": "critical",
-          "hours_until": 94.2,
+          "hours_until": 90.3,
           "date": "2026-06-22T12:30:00Z"
         },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 106.2,
+          "hours_until": 102.3,
           "date": "2026-06-23T00:30:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 106.2,
+          "hours_until": 102.3,
           "date": "2026-06-23T00:30:00Z"
         },
         {
           "name": "BoJ Summary of Opinions",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 129.6,
+          "hours_until": 125.7,
           "date": "2026-06-23T23:50:00Z"
         }
       ],
@@ -1802,70 +1790,70 @@
           "name": "Core Inflation Rate YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.2,
+          "hours_until": 5.3,
           "date": "2026-06-18T23:30:00Z"
         },
         {
           "name": "Inflation Rate Ex-Food and Energy YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.2,
+          "hours_until": 5.3,
           "date": "2026-06-18T23:30:00Z"
         },
         {
           "name": "Inflation Rate MoM",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.2,
+          "hours_until": 5.3,
           "date": "2026-06-18T23:30:00Z"
         },
         {
           "name": "Inflation Rate YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.2,
+          "hours_until": 5.3,
           "date": "2026-06-18T23:30:00Z"
         },
         {
           "name": "BoJ Monetary Policy Meeting Minutes",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.6,
+          "hours_until": 5.7,
           "date": "2026-06-18T23:50:00Z"
         },
         {
           "name": "SNB政策金利発表",
           "currency": "CHF",
           "importance": "critical",
-          "hours_until": 17.2,
+          "hours_until": 13.3,
           "date": "2026-06-19T07:30:00Z"
         },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 106.2,
+          "hours_until": 102.3,
           "date": "2026-06-23T00:30:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 106.2,
+          "hours_until": 102.3,
           "date": "2026-06-23T00:30:00Z"
         },
         {
           "name": "BoJ Summary of Opinions",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 129.6,
+          "hours_until": 125.7,
           "date": "2026-06-23T23:50:00Z"
         },
         {
           "name": "SNB Quarterly Bulletin",
           "currency": "CHF",
           "importance": "critical",
-          "hours_until": 142.7,
+          "hours_until": 138.8,
           "date": "2026-06-24T13:00:00Z"
         }
       ],
@@ -2012,7 +2000,7 @@
       "cb_meeting_blackout": {
         "active": true,
         "severity": "warn",
-        "reason": "CHF 中銀会合まで 10h（要注意期間）",
+        "reason": "CHF 中銀会合まで 6h（要注意期間）",
         "currency": "CHF"
       },
       "strength_context": {
@@ -2059,77 +2047,77 @@
           "name": "Core Inflation Rate YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.2,
+          "hours_until": 5.3,
           "date": "2026-06-18T23:30:00Z"
         },
         {
           "name": "Inflation Rate Ex-Food and Energy YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.2,
+          "hours_until": 5.3,
           "date": "2026-06-18T23:30:00Z"
         },
         {
           "name": "Inflation Rate MoM",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.2,
+          "hours_until": 5.3,
           "date": "2026-06-18T23:30:00Z"
         },
         {
           "name": "Inflation Rate YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.2,
+          "hours_until": 5.3,
           "date": "2026-06-18T23:30:00Z"
         },
         {
           "name": "BoJ Monetary Policy Meeting Minutes",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.6,
+          "hours_until": 5.7,
           "date": "2026-06-18T23:50:00Z"
         },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 106.2,
+          "hours_until": 102.3,
           "date": "2026-06-23T00:30:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 106.2,
+          "hours_until": 102.3,
           "date": "2026-06-23T00:30:00Z"
         },
         {
           "name": "Core Inflation Rate YoY",
           "currency": "SGD",
           "importance": "critical",
-          "hours_until": 110.7,
+          "hours_until": 106.8,
           "date": "2026-06-23T05:00:00Z"
         },
         {
           "name": "Inflation Rate MoM",
           "currency": "SGD",
           "importance": "critical",
-          "hours_until": 110.7,
+          "hours_until": 106.8,
           "date": "2026-06-23T05:00:00Z"
         },
         {
           "name": "Inflation Rate YoY",
           "currency": "SGD",
           "importance": "critical",
-          "hours_until": 110.7,
+          "hours_until": 106.8,
           "date": "2026-06-23T05:00:00Z"
         },
         {
           "name": "BoJ Summary of Opinions",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 129.6,
+          "hours_until": 125.7,
           "date": "2026-06-23T23:50:00Z"
         }
       ],
@@ -2274,7 +2262,7 @@
         "context": "強い通貨 vs 弱い通貨（ロング有利）",
         "bias": "long"
       },
-      "ai_exit_advice": "# ポジション分析：SGDJPY LONG\n\n## 1. 現状整理\nレンジ相場（ADX7.2・トレンド弱い）で、金利差+1.50%のキャリー収益が見込める環境です。テクニカルスコア（TA74.7）は強気ですが、方向性の確実性は限定的です。\n\n## 2. 利益を伸ばす選択肢\n\n**A案：トレール切替（利を伸ばしつつ損失を限定）**\n- レンジ相場で方向が明確になるまで、SL124.26に対し損失を限定しながらTP1（125.07）到達後トレーリングストップに切替。トレンド転換に備えつつ上昇を生かせます。\n- リスク：レンジ内の値動きで頻繁に損切される可能性。\n\n**B案：部分利確×長期保有（リスク調整+キャリー獲得）**\n- TP1で3分の1決済し、残り3分の2をSL124.26のままで継続。金利差スワップ（年1.50%）を稼ぎながら、さらなる上昇を狙う。キャリー効率が優れた環境です。\n- リスク：SL到達まで含み損に耐える必要。キャリー回収日数が不明なため計算精度に欠ける。\n\n**C案：OCO固定維持（確実性重視）**\n- 現状のTP1/TP2/TP3とSL124.26の3分割OCOを維持し、機械的に利益確定。レンジ相場では計画性が重要です。\n- リスク：大きなトレンド発生時に利確機会を逃す可能性。\n\n## 3. 留意点\n日銀政策転換やMAS金利据え置き動向、また円介入リスクがSGD/JPY買いポジションに影響するため、マクロイベントカレンダー監視が必須です。"
+      "ai_exit_advice": "# SGDJPYロング ポジション分析\n\n## 1. 現状整理\n**レンジ相場（ADX7.2）で値動き鈍化している中、金利差+1.50%のキャリー・スワップが収益源となっています。** TA74.7の高スコアは存在していますが、FAと乖離し、トレンド強度が弱い状態です。\n\n## 2. 利益を伸ばす選択肢\n\n**A) トレール切替戦略**\n- **狙い**：レンジ上限（≒125.40付近）への値上がり益を狙いつつ、トレンド転換時も損失を限定\n- **リスク**：震源が浅いため小動きで狩られる可能性\n\n**B) 部分利確＋スワップ長期保有**\n- **狙い**：TP1（125.07）で50%利確して現金化、残50%を金利差+1.50%で保有し利を伸ばす\n- **リスク**：キャリーSL回収日数が不明なため、為替損失がスワップ利益を上回る可能性\n\n**C) OCO固定継続**\n- **狙い**：現在のTP設定（3段階）で機械的に利を取る安全性\n- **リスク**：レンジ相場での上値限定リスク、上抜け時の機会損失\n\n## 3. 留意点\n**MAS金利据え置き・日銀据え置き継続が前提ですが、想定外の介入や金利差縮小（特に日銀利上げ）でキャリー価値が急減する点に注意。**"
     },
     {
       "pair": "HKDJPY",
@@ -2306,70 +2294,70 @@
           "name": "Core Inflation Rate YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.2,
+          "hours_until": 5.3,
           "date": "2026-06-18T23:30:00Z"
         },
         {
           "name": "Inflation Rate Ex-Food and Energy YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.2,
+          "hours_until": 5.3,
           "date": "2026-06-18T23:30:00Z"
         },
         {
           "name": "Inflation Rate MoM",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.2,
+          "hours_until": 5.3,
           "date": "2026-06-18T23:30:00Z"
         },
         {
           "name": "Inflation Rate YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.2,
+          "hours_until": 5.3,
           "date": "2026-06-18T23:30:00Z"
         },
         {
           "name": "BoJ Monetary Policy Meeting Minutes",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.6,
+          "hours_until": 5.7,
           "date": "2026-06-18T23:50:00Z"
         },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 106.2,
+          "hours_until": 102.3,
           "date": "2026-06-23T00:30:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 106.2,
+          "hours_until": 102.3,
           "date": "2026-06-23T00:30:00Z"
         },
         {
           "name": "Inflation Rate MoM",
           "currency": "HKD",
           "importance": "critical",
-          "hours_until": 114.2,
+          "hours_until": 110.3,
           "date": "2026-06-23T08:30:00Z"
         },
         {
           "name": "Inflation Rate YoY",
           "currency": "HKD",
           "importance": "critical",
-          "hours_until": 114.2,
+          "hours_until": 110.3,
           "date": "2026-06-23T08:30:00Z"
         },
         {
           "name": "BoJ Summary of Opinions",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 129.6,
+          "hours_until": 125.7,
           "date": "2026-06-23T23:50:00Z"
         }
       ],
@@ -2474,7 +2462,7 @@
       "cb_meeting_blackout": {
         "active": true,
         "severity": "blackout",
-        "reason": "HKD 中銀会合後 14h（ブラックアウト 36h）",
+        "reason": "HKD 中銀会合後 18h（ブラックアウト 36h）",
         "currency": "HKD"
       },
       "blackout_degraded": true,
@@ -2524,8 +2512,8 @@
         "recent_news": [
           "\"China (election OR protest OR crisis OR sanction OR \"central bank\" OR geopolitics)\" - Google News",
           "Google News",
-          "China’s $300 Billion Pile of Bad Consumer Debt Threatens Economy - Bloomberg.com",
-          "EU and UK Sanction Chinese Firms, Shadow Fleet Boosters as Larger Russia Package Nears - Kharon"
+          "EU and UK Sanction Chinese Firms, Shadow Fleet Boosters as Larger Russia Package Nears - Kharon",
+          "China central bank's deepening control on short-term rates sparks debate over policy focus - Reuters"
         ],
         "categories": {
           "political_instability": {
@@ -2551,56 +2539,56 @@
           "name": "Core Inflation Rate YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.2,
+          "hours_until": 5.3,
           "date": "2026-06-18T23:30:00Z"
         },
         {
           "name": "Inflation Rate Ex-Food and Energy YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.2,
+          "hours_until": 5.3,
           "date": "2026-06-18T23:30:00Z"
         },
         {
           "name": "Inflation Rate MoM",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.2,
+          "hours_until": 5.3,
           "date": "2026-06-18T23:30:00Z"
         },
         {
           "name": "Inflation Rate YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.2,
+          "hours_until": 5.3,
           "date": "2026-06-18T23:30:00Z"
         },
         {
           "name": "BoJ Monetary Policy Meeting Minutes",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.6,
+          "hours_until": 5.7,
           "date": "2026-06-18T23:50:00Z"
         },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 106.2,
+          "hours_until": 102.3,
           "date": "2026-06-23T00:30:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 106.2,
+          "hours_until": 102.3,
           "date": "2026-06-23T00:30:00Z"
         },
         {
           "name": "BoJ Summary of Opinions",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 129.6,
+          "hours_until": 125.7,
           "date": "2026-06-23T23:50:00Z"
         }
       ],
@@ -2705,7 +2693,7 @@
       "cb_meeting_blackout": {
         "active": true,
         "severity": "warn",
-        "reason": "CNY 中銀会合まで 34h（要注意期間）",
+        "reason": "CNY 中銀会合まで 30h（要注意期間）",
         "currency": "CNY"
       },
       "strength_context": {
@@ -2754,8 +2742,8 @@
         "recent_news": [
           "\"Mexico (election OR protest OR crisis OR sanction OR \"central bank\" OR geopolitics)\" - Google News",
           "Google News",
-          "Banxico Publishes Rules to Boost Digital Payments, Bank Accounts - Bloomberg.com",
-          "Protesters to rally against World Cup sponsor Hyundai before Mexico game - The Guardian"
+          "New Mexico Secretary of State Maggie Toulouse Oliver suspends Dem Lt. Gov. campaign, citing health - Source New Mexico",
+          "Banxico Publishes Rules to Boost Digital Payments, Bank Accounts - Bloomberg.com"
         ],
         "categories": {
           "political_instability": {
@@ -2781,105 +2769,105 @@
           "name": "Core Inflation Rate YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.2,
+          "hours_until": 5.3,
           "date": "2026-06-18T23:30:00Z"
         },
         {
           "name": "Inflation Rate Ex-Food and Energy YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.2,
+          "hours_until": 5.3,
           "date": "2026-06-18T23:30:00Z"
         },
         {
           "name": "Inflation Rate MoM",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.2,
+          "hours_until": 5.3,
           "date": "2026-06-18T23:30:00Z"
         },
         {
           "name": "Inflation Rate YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.2,
+          "hours_until": 5.3,
           "date": "2026-06-18T23:30:00Z"
         },
         {
           "name": "BoJ Monetary Policy Meeting Minutes",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.6,
+          "hours_until": 5.7,
           "date": "2026-06-18T23:50:00Z"
         },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 106.2,
+          "hours_until": 102.3,
           "date": "2026-06-23T00:30:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 106.2,
+          "hours_until": 102.3,
           "date": "2026-06-23T00:30:00Z"
         },
         {
           "name": "Retail Sales MoM",
           "currency": "MXN",
           "importance": "high",
-          "hours_until": 117.7,
+          "hours_until": 113.8,
           "date": "2026-06-23T12:00:00Z"
         },
         {
           "name": "Retail Sales YoY",
           "currency": "MXN",
           "importance": "high",
-          "hours_until": 117.7,
+          "hours_until": 113.8,
           "date": "2026-06-23T12:00:00Z"
         },
         {
           "name": "BoJ Summary of Opinions",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 129.6,
+          "hours_until": 125.7,
           "date": "2026-06-23T23:50:00Z"
         },
         {
           "name": "Mid-month Core Inflation Rate MoM",
           "currency": "MXN",
           "importance": "critical",
-          "hours_until": 141.7,
+          "hours_until": 137.8,
           "date": "2026-06-24T12:00:00Z"
         },
         {
           "name": "Mid-month Core Inflation Rate YoY",
           "currency": "MXN",
           "importance": "critical",
-          "hours_until": 141.7,
+          "hours_until": 137.8,
           "date": "2026-06-24T12:00:00Z"
         },
         {
           "name": "Mid-month Inflation Rate MoM",
           "currency": "MXN",
           "importance": "critical",
-          "hours_until": 141.7,
+          "hours_until": 137.8,
           "date": "2026-06-24T12:00:00Z"
         },
         {
           "name": "Mid-month Inflation Rate YoY",
           "currency": "MXN",
           "importance": "critical",
-          "hours_until": 141.7,
+          "hours_until": 137.8,
           "date": "2026-06-24T12:00:00Z"
         },
         {
           "name": "Unemployment Rate",
           "currency": "MXN",
           "importance": "critical",
-          "hours_until": 165.7,
+          "hours_until": 161.8,
           "date": "2026-06-25T12:00:00Z"
         }
       ],
@@ -3032,8 +3020,8 @@
         "recent_news": [
           "\"South Africa (election OR protest OR crisis OR sanction OR \"central bank\" OR geopolitics)\" - Google News",
           "Google News",
-          "The Iran war meant an economic crisis for Africa - The Economist",
-          "South Africa migration crisis: Ramaphosa's plan faces doubt - dw.com"
+          "South Africa's migration crisis and repatriating Africans - DW",
+          "Why migrants have become targets in South Africa’s economic crisis - TRT World"
         ],
         "categories": {
           "political_instability": {
@@ -3060,77 +3048,77 @@
           "name": "Core Inflation Rate YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.2,
+          "hours_until": 5.3,
           "date": "2026-06-18T23:30:00Z"
         },
         {
           "name": "Inflation Rate Ex-Food and Energy YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.2,
+          "hours_until": 5.3,
           "date": "2026-06-18T23:30:00Z"
         },
         {
           "name": "Inflation Rate MoM",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.2,
+          "hours_until": 5.3,
           "date": "2026-06-18T23:30:00Z"
         },
         {
           "name": "Inflation Rate YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.2,
+          "hours_until": 5.3,
           "date": "2026-06-18T23:30:00Z"
         },
         {
           "name": "BoJ Monetary Policy Meeting Minutes",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.6,
+          "hours_until": 5.7,
           "date": "2026-06-18T23:50:00Z"
         },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 106.2,
+          "hours_until": 102.3,
           "date": "2026-06-23T00:30:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 106.2,
+          "hours_until": 102.3,
           "date": "2026-06-23T00:30:00Z"
         },
         {
           "name": "Consumer Confidence",
           "currency": "ZAR",
           "importance": "high",
-          "hours_until": 113.7,
+          "hours_until": 109.8,
           "date": "2026-06-23T08:00:00Z"
         },
         {
           "name": "BoJ Summary of Opinions",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 129.6,
+          "hours_until": 125.7,
           "date": "2026-06-23T23:50:00Z"
         },
         {
           "name": "PPI MoM",
           "currency": "ZAR",
           "importance": "high",
-          "hours_until": 163.2,
+          "hours_until": 159.3,
           "date": "2026-06-25T09:30:00Z"
         },
         {
           "name": "PPI YoY",
           "currency": "ZAR",
           "importance": "high",
-          "hours_until": 163.2,
+          "hours_until": 159.3,
           "date": "2026-06-25T09:30:00Z"
         }
       ],
@@ -3321,106 +3309,117 @@
       "fa_rate_diff": 0.0,
       "fa_detail": "BOE(3.75% neutral/stable) vs FRB(3.75% neutral/stable) 差+0.00%",
       "stars": 1,
-      "verdict": "△ 弱シグナル",
-      "direction": "LIGHT_SHORT",
+      "verdict": "⏸ イベント前自動見送り",
+      "direction": "WAIT_EVENT",
       "pair_type": "dollar",
+      "original_stars": 2,
+      "event_warning": "重要イベント直後 (FOMC（連邦公開市場委員会） から 0.2h経過)",
+      "event_info": {
+        "date": "2026-06-18T18:00:00Z",
+        "country": "US",
+        "currency": "USD",
+        "name": "FOMC（連邦公開市場委員会）",
+        "importance": "critical",
+        "affects_pairs": [
+          "USDJPY",
+          "EURUSD",
+          "GBPUSD",
+          "AUDUSD",
+          "NZDUSD",
+          "USDCAD",
+          "USDCHF"
+        ]
+      },
       "upcoming_events": [
-        {
-          "name": "FOMC（連邦公開市場委員会）",
-          "currency": "USD",
-          "importance": "critical",
-          "hours_until": 3.7,
-          "date": "2026-06-18T18:00:00Z"
-        },
         {
           "name": "Gfk Consumer Confidence",
           "currency": "GBP",
           "importance": "high",
-          "hours_until": 8.7,
+          "hours_until": 4.9,
           "date": "2026-06-18T23:01:00Z"
         },
         {
           "name": "Retail Sales ex Fuel MoM",
           "currency": "GBP",
           "importance": "high",
-          "hours_until": 15.7,
+          "hours_until": 11.8,
           "date": "2026-06-19T06:00:00Z"
         },
         {
           "name": "Retail Sales ex Fuel YoY",
           "currency": "GBP",
           "importance": "high",
-          "hours_until": 15.7,
+          "hours_until": 11.8,
           "date": "2026-06-19T06:00:00Z"
         },
         {
           "name": "Retail Sales MoM",
           "currency": "GBP",
           "importance": "high",
-          "hours_until": 15.7,
+          "hours_until": 11.8,
           "date": "2026-06-19T06:00:00Z"
         },
         {
           "name": "Retail Sales YoY",
           "currency": "GBP",
           "importance": "high",
-          "hours_until": 15.7,
+          "hours_until": 11.8,
           "date": "2026-06-19T06:00:00Z"
         },
         {
           "name": "BOE金融政策委員会",
           "currency": "GBP",
           "importance": "critical",
-          "hours_until": 20.7,
+          "hours_until": 16.8,
           "date": "2026-06-19T11:00:00Z"
         },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "GBP",
           "importance": "high",
-          "hours_until": 114.2,
+          "hours_until": 110.3,
           "date": "2026-06-23T08:30:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "GBP",
           "importance": "high",
-          "hours_until": 114.2,
+          "hours_until": 110.3,
           "date": "2026-06-23T08:30:00Z"
         },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "USD",
           "importance": "high",
-          "hours_until": 119.5,
+          "hours_until": 115.6,
           "date": "2026-06-23T13:45:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "USD",
           "importance": "high",
-          "hours_until": 119.5,
+          "hours_until": 115.6,
           "date": "2026-06-23T13:45:00Z"
         },
         {
           "name": "GDP Growth Rate QoQ Final",
           "currency": "USD",
           "importance": "critical",
-          "hours_until": 166.2,
+          "hours_until": 162.3,
           "date": "2026-06-25T12:30:00Z"
         },
         {
           "name": "GDP Price Index QoQ Final",
           "currency": "USD",
           "importance": "critical",
-          "hours_until": 166.2,
+          "hours_until": 162.3,
           "date": "2026-06-25T12:30:00Z"
         },
         {
           "name": "GDP Sales QoQ Final",
           "currency": "USD",
           "importance": "critical",
-          "hours_until": 166.2,
+          "hours_until": 162.3,
           "date": "2026-06-25T12:30:00Z"
         }
       ],
@@ -3434,29 +3433,6 @@
         "tp2_multiplier": 4.5,
         "tp3_multiplier": 6.0,
         "note": "ATR比率0.9 → E案最適設定（PF 2.15/+48.4pips）"
-      },
-      "staged_tp": {
-        "sl": 1.33396,
-        "tp": 1.31176,
-        "trail_atr_mult": 3.0,
-        "trail_distance": 0.0111,
-        "be_plus_offset": 0.00555,
-        "be_target_after_tp": 1.31731,
-        "max_target": 1.30066,
-        "rr_tp": 1.0,
-        "tp_mode": "single_with_trail",
-        "tp1": 1.31176,
-        "tp2": 1.30621,
-        "tp3": 1.30066,
-        "sl_width": 0.0111,
-        "tp1_width": 0.0111,
-        "rr_tp1": 1.0,
-        "rr_tp2": 1.5,
-        "rr_tp3": 2.0,
-        "regime_label": "通常ボラ相場",
-        "strategy": "TP(1.31176)到達 → SLを BE+0.5R(1.31731) へ移動 → トレーリング(3.0×ATR=0.0111)発動 → 利を伸ばす（理論最大: 1.30066）",
-        "chandelier_sl_active": false,
-        "chandelier_note": ""
       },
       "carry_score": {
         "carry_score": 0.0,
@@ -3543,7 +3519,7 @@
       "cb_meeting_blackout": {
         "active": true,
         "severity": "blackout",
-        "reason": "USD 中銀会合後 14h（ブラックアウト 36h）",
+        "reason": "USD 中銀会合後 18h（ブラックアウト 36h）",
         "currency": "USD"
       },
       "blackout_degraded": true,
@@ -3583,120 +3559,131 @@
       "fa_rate_diff": 0.35,
       "fa_detail": "RBA(4.10% ease/stable) vs FRB(3.75% neutral/stable) 差+0.35%",
       "stars": 1,
-      "verdict": "△ 弱シグナル",
-      "direction": "LIGHT_LONG",
+      "verdict": "⏸ イベント前自動見送り",
+      "direction": "WAIT_EVENT",
       "pair_type": "dollar",
+      "original_stars": 2,
+      "event_warning": "重要イベント直後 (FOMC（連邦公開市場委員会） から 0.2h経過)",
+      "event_info": {
+        "date": "2026-06-18T18:00:00Z",
+        "country": "US",
+        "currency": "USD",
+        "name": "FOMC（連邦公開市場委員会）",
+        "importance": "critical",
+        "affects_pairs": [
+          "USDJPY",
+          "EURUSD",
+          "GBPUSD",
+          "AUDUSD",
+          "NZDUSD",
+          "USDCAD",
+          "USDCHF"
+        ]
+      },
       "upcoming_events": [
-        {
-          "name": "FOMC（連邦公開市場委員会）",
-          "currency": "USD",
-          "importance": "critical",
-          "hours_until": 3.7,
-          "date": "2026-06-18T18:00:00Z"
-        },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "AUD",
           "importance": "high",
-          "hours_until": 104.7,
+          "hours_until": 100.8,
           "date": "2026-06-22T23:00:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "AUD",
           "importance": "high",
-          "hours_until": 104.7,
+          "hours_until": 100.8,
           "date": "2026-06-22T23:00:00Z"
         },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "USD",
           "importance": "high",
-          "hours_until": 119.5,
+          "hours_until": 115.6,
           "date": "2026-06-23T13:45:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "USD",
           "importance": "high",
-          "hours_until": 119.5,
+          "hours_until": 115.6,
           "date": "2026-06-23T13:45:00Z"
         },
         {
           "name": "CPI",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 131.2,
+          "hours_until": 127.3,
           "date": "2026-06-24T01:30:00Z"
         },
         {
           "name": "Inflation Rate MoM",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 131.2,
+          "hours_until": 127.3,
           "date": "2026-06-24T01:30:00Z"
         },
         {
           "name": "Inflation Rate YoY",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 131.2,
+          "hours_until": 127.3,
           "date": "2026-06-24T01:30:00Z"
         },
         {
           "name": "RBA Trimmed Mean CPI MoM",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 131.2,
+          "hours_until": 127.3,
           "date": "2026-06-24T01:30:00Z"
         },
         {
           "name": "RBA Trimmed Mean CPI YoY",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 131.2,
+          "hours_until": 127.3,
           "date": "2026-06-24T01:30:00Z"
         },
         {
           "name": "RBA Weighted Median CPI MoM",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 131.2,
+          "hours_until": 127.3,
           "date": "2026-06-24T01:30:00Z"
         },
         {
           "name": "RBA Weighted Median CPI YoY",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 131.2,
+          "hours_until": 127.3,
           "date": "2026-06-24T01:30:00Z"
         },
         {
           "name": "Unemployment Rate",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 155.2,
+          "hours_until": 151.3,
           "date": "2026-06-25T01:30:00Z"
         },
         {
           "name": "GDP Growth Rate QoQ Final",
           "currency": "USD",
           "importance": "critical",
-          "hours_until": 166.2,
+          "hours_until": 162.3,
           "date": "2026-06-25T12:30:00Z"
         },
         {
           "name": "GDP Price Index QoQ Final",
           "currency": "USD",
           "importance": "critical",
-          "hours_until": 166.2,
+          "hours_until": 162.3,
           "date": "2026-06-25T12:30:00Z"
         },
         {
           "name": "GDP Sales QoQ Final",
           "currency": "USD",
           "importance": "critical",
-          "hours_until": 166.2,
+          "hours_until": 162.3,
           "date": "2026-06-25T12:30:00Z"
         }
       ],
@@ -3710,29 +3697,6 @@
         "tp2_multiplier": 4.5,
         "tp3_multiplier": 6.0,
         "note": "ATR比率0.7 → E案最適設定（PF 2.15/+48.4pips）"
-      },
-      "staged_tp": {
-        "sl": 0.69326,
-        "tp": 0.70766,
-        "trail_atr_mult": 3.0,
-        "trail_distance": 0.0072,
-        "be_plus_offset": 0.0036,
-        "be_target_after_tp": 0.70406,
-        "max_target": 0.71486,
-        "rr_tp": 1.0,
-        "tp_mode": "single_with_trail",
-        "tp1": 0.70766,
-        "tp2": 0.71126,
-        "tp3": 0.71486,
-        "sl_width": 0.0072,
-        "tp1_width": 0.0072,
-        "rr_tp1": 1.0,
-        "rr_tp2": 1.5,
-        "rr_tp3": 2.0,
-        "regime_label": "通常ボラ相場",
-        "strategy": "TP(0.70766)到達 → SLを BE+0.5R(0.70406) へ移動 → トレーリング(3.0×ATR=0.0072)発動 → 利を伸ばす（理論最大: 0.71486）",
-        "chandelier_sl_active": false,
-        "chandelier_note": ""
       },
       "carry_score": {
         "carry_score": 1.02,
@@ -3831,7 +3795,7 @@
       "cb_meeting_blackout": {
         "active": true,
         "severity": "blackout",
-        "reason": "USD 中銀会合後 14h（ブラックアウト 36h）",
+        "reason": "USD 中銀会合後 18h（ブラックアウト 36h）",
         "currency": "USD"
       },
       "blackout_degraded": true,
@@ -3871,50 +3835,61 @@
       "fa_rate_diff": -0.5,
       "fa_detail": "RBNZ(3.25% ease/decelerating) vs FRB(3.75% neutral/stable) 差-0.50% / NZDサイクル強化(decelerating)",
       "stars": 1,
-      "verdict": "△ 弱シグナル",
-      "direction": "LIGHT_SHORT",
+      "verdict": "⏸ イベント前自動見送り",
+      "direction": "WAIT_EVENT",
       "pair_type": "dollar",
+      "original_stars": 2,
+      "event_warning": "重要イベント直後 (FOMC（連邦公開市場委員会） から 0.2h経過)",
+      "event_info": {
+        "date": "2026-06-18T18:00:00Z",
+        "country": "US",
+        "currency": "USD",
+        "name": "FOMC（連邦公開市場委員会）",
+        "importance": "critical",
+        "affects_pairs": [
+          "USDJPY",
+          "EURUSD",
+          "GBPUSD",
+          "AUDUSD",
+          "NZDUSD",
+          "USDCAD",
+          "USDCHF"
+        ]
+      },
       "upcoming_events": [
-        {
-          "name": "FOMC（連邦公開市場委員会）",
-          "currency": "USD",
-          "importance": "critical",
-          "hours_until": 3.7,
-          "date": "2026-06-18T18:00:00Z"
-        },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "USD",
           "importance": "high",
-          "hours_until": 119.5,
+          "hours_until": 115.6,
           "date": "2026-06-23T13:45:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "USD",
           "importance": "high",
-          "hours_until": 119.5,
+          "hours_until": 115.6,
           "date": "2026-06-23T13:45:00Z"
         },
         {
           "name": "GDP Growth Rate QoQ Final",
           "currency": "USD",
           "importance": "critical",
-          "hours_until": 166.2,
+          "hours_until": 162.3,
           "date": "2026-06-25T12:30:00Z"
         },
         {
           "name": "GDP Price Index QoQ Final",
           "currency": "USD",
           "importance": "critical",
-          "hours_until": 166.2,
+          "hours_until": 162.3,
           "date": "2026-06-25T12:30:00Z"
         },
         {
           "name": "GDP Sales QoQ Final",
           "currency": "USD",
           "importance": "critical",
-          "hours_until": 166.2,
+          "hours_until": 162.3,
           "date": "2026-06-25T12:30:00Z"
         }
       ],
@@ -3928,29 +3903,6 @@
         "tp2_multiplier": 4.5,
         "tp3_multiplier": 6.0,
         "note": "ATR比率0.9 → E案最適設定（PF 2.15/+48.4pips）"
-      },
-      "staged_tp": {
-        "sl": 0.58336,
-        "tp": 0.56914,
-        "trail_atr_mult": 3.0,
-        "trail_distance": 0.00711,
-        "be_plus_offset": 0.00356,
-        "be_target_after_tp": 0.5727,
-        "max_target": 0.56203,
-        "rr_tp": 1.0,
-        "tp_mode": "single_with_trail",
-        "tp1": 0.56914,
-        "tp2": 0.56559,
-        "tp3": 0.56203,
-        "sl_width": 0.00711,
-        "tp1_width": 0.00711,
-        "rr_tp1": 1.0,
-        "rr_tp2": 1.5,
-        "rr_tp3": 2.0,
-        "regime_label": "通常ボラ相場",
-        "strategy": "TP(0.56914)到達 → SLを BE+0.5R(0.5727) へ移動 → トレーリング(3.0×ATR=0.00711)発動 → 利を伸ばす（理論最大: 0.56203）",
-        "chandelier_sl_active": true,
-        "chandelier_note": "Chandelier Exit: 過去22日安値(0.57625)+3.0xATR"
       },
       "carry_score": {
         "carry_score": 1.22,
@@ -4043,7 +3995,7 @@
       "cb_meeting_blackout": {
         "active": true,
         "severity": "blackout",
-        "reason": "USD 中銀会合後 14h（ブラックアウト 36h）",
+        "reason": "USD 中銀会合後 18h（ブラックアウト 36h）",
         "currency": "USD"
       },
       "blackout_degraded": true,
@@ -4083,127 +4035,138 @@
       "fa_rate_diff": 1.0,
       "fa_detail": "FRB(3.75% neutral/stable) vs BOC(2.75% neutral/stable) 差+1.00%",
       "stars": 1,
-      "verdict": "△ 弱シグナル",
-      "direction": "LIGHT_LONG",
+      "verdict": "⏸ イベント前自動見送り",
+      "direction": "WAIT_EVENT",
       "pair_type": "dollar",
+      "original_stars": 2,
+      "event_warning": "重要イベント直後 (FOMC（連邦公開市場委員会） から 0.2h経過)",
+      "event_info": {
+        "date": "2026-06-18T18:00:00Z",
+        "country": "US",
+        "currency": "USD",
+        "name": "FOMC（連邦公開市場委員会）",
+        "importance": "critical",
+        "affects_pairs": [
+          "USDJPY",
+          "EURUSD",
+          "GBPUSD",
+          "AUDUSD",
+          "NZDUSD",
+          "USDCAD",
+          "USDCHF"
+        ]
+      },
       "upcoming_events": [
-        {
-          "name": "FOMC（連邦公開市場委員会）",
-          "currency": "USD",
-          "importance": "critical",
-          "hours_until": 3.7,
-          "date": "2026-06-18T18:00:00Z"
-        },
         {
           "name": "Retail Sales Ex Autos MoM",
           "currency": "CAD",
           "importance": "high",
-          "hours_until": 22.2,
+          "hours_until": 18.3,
           "date": "2026-06-19T12:30:00Z"
         },
         {
           "name": "Retail Sales MoM Final",
           "currency": "CAD",
           "importance": "high",
-          "hours_until": 22.2,
+          "hours_until": 18.3,
           "date": "2026-06-19T12:30:00Z"
         },
         {
           "name": "Retail Sales MoM Prel",
           "currency": "CAD",
           "importance": "high",
-          "hours_until": 22.2,
+          "hours_until": 18.3,
           "date": "2026-06-19T12:30:00Z"
         },
         {
           "name": "Retail Sales YoY",
           "currency": "CAD",
           "importance": "high",
-          "hours_until": 22.2,
+          "hours_until": 18.3,
           "date": "2026-06-19T12:30:00Z"
         },
         {
           "name": "Core Inflation Rate MoM",
           "currency": "CAD",
           "importance": "critical",
-          "hours_until": 94.2,
+          "hours_until": 90.3,
           "date": "2026-06-22T12:30:00Z"
         },
         {
           "name": "Core Inflation Rate YoY",
           "currency": "CAD",
           "importance": "critical",
-          "hours_until": 94.2,
+          "hours_until": 90.3,
           "date": "2026-06-22T12:30:00Z"
         },
         {
           "name": "CPI Common YoY",
           "currency": "CAD",
           "importance": "critical",
-          "hours_until": 94.2,
+          "hours_until": 90.3,
           "date": "2026-06-22T12:30:00Z"
         },
         {
           "name": "CPI Median YoY",
           "currency": "CAD",
           "importance": "critical",
-          "hours_until": 94.2,
+          "hours_until": 90.3,
           "date": "2026-06-22T12:30:00Z"
         },
         {
           "name": "CPI Trimmed-Mean YoY",
           "currency": "CAD",
           "importance": "critical",
-          "hours_until": 94.2,
+          "hours_until": 90.3,
           "date": "2026-06-22T12:30:00Z"
         },
         {
           "name": "Inflation Rate MoM",
           "currency": "CAD",
           "importance": "critical",
-          "hours_until": 94.2,
+          "hours_until": 90.3,
           "date": "2026-06-22T12:30:00Z"
         },
         {
           "name": "Inflation Rate YoY",
           "currency": "CAD",
           "importance": "critical",
-          "hours_until": 94.2,
+          "hours_until": 90.3,
           "date": "2026-06-22T12:30:00Z"
         },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "USD",
           "importance": "high",
-          "hours_until": 119.5,
+          "hours_until": 115.6,
           "date": "2026-06-23T13:45:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "USD",
           "importance": "high",
-          "hours_until": 119.5,
+          "hours_until": 115.6,
           "date": "2026-06-23T13:45:00Z"
         },
         {
           "name": "GDP Growth Rate QoQ Final",
           "currency": "USD",
           "importance": "critical",
-          "hours_until": 166.2,
+          "hours_until": 162.3,
           "date": "2026-06-25T12:30:00Z"
         },
         {
           "name": "GDP Price Index QoQ Final",
           "currency": "USD",
           "importance": "critical",
-          "hours_until": 166.2,
+          "hours_until": 162.3,
           "date": "2026-06-25T12:30:00Z"
         },
         {
           "name": "GDP Sales QoQ Final",
           "currency": "USD",
           "importance": "critical",
-          "hours_until": 166.2,
+          "hours_until": 162.3,
           "date": "2026-06-25T12:30:00Z"
         }
       ],
@@ -4217,29 +4180,6 @@
         "tp2_multiplier": 4.5,
         "tp3_multiplier": 6.0,
         "note": "ATR比率1.0 → E案最適設定（PF 2.15/+48.4pips）"
-      },
-      "staged_tp": {
-        "sl": 1.40455,
-        "tp": 1.42051,
-        "trail_atr_mult": 3.0,
-        "trail_distance": 0.00798,
-        "be_plus_offset": 0.00399,
-        "be_target_after_tp": 1.41652,
-        "max_target": 1.42849,
-        "rr_tp": 1.0,
-        "tp_mode": "single_with_trail",
-        "tp1": 1.42051,
-        "tp2": 1.4245,
-        "tp3": 1.42849,
-        "sl_width": 0.00798,
-        "tp1_width": 0.00798,
-        "rr_tp1": 1.0,
-        "rr_tp2": 1.5,
-        "rr_tp3": 2.0,
-        "regime_label": "通常ボラ相場",
-        "strategy": "TP(1.42051)到達 → SLを BE+0.5R(1.41652) へ移動 → トレーリング(3.0×ATR=0.00798)発動 → 利を伸ばす（理論最大: 1.42849）",
-        "chandelier_sl_active": false,
-        "chandelier_note": ""
       },
       "carry_score": {
         "carry_score": 5.31,
@@ -4338,7 +4278,7 @@
       "cb_meeting_blackout": {
         "active": true,
         "severity": "blackout",
-        "reason": "USD 中銀会合後 14h（ブラックアウト 36h）",
+        "reason": "USD 中銀会合後 18h（ブラックアウト 36h）",
         "currency": "USD"
       },
       "blackout_degraded": true,
@@ -4386,161 +4326,161 @@
           "name": "Gfk Consumer Confidence",
           "currency": "GBP",
           "importance": "high",
-          "hours_until": 8.7,
+          "hours_until": 4.9,
           "date": "2026-06-18T23:01:00Z"
         },
         {
           "name": "PPI MoM",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 15.7,
+          "hours_until": 11.8,
           "date": "2026-06-19T06:00:00Z"
         },
         {
           "name": "PPI YoY",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 15.7,
+          "hours_until": 11.8,
           "date": "2026-06-19T06:00:00Z"
         },
         {
           "name": "Retail Sales ex Fuel MoM",
           "currency": "GBP",
           "importance": "high",
-          "hours_until": 15.7,
+          "hours_until": 11.8,
           "date": "2026-06-19T06:00:00Z"
         },
         {
           "name": "Retail Sales ex Fuel YoY",
           "currency": "GBP",
           "importance": "high",
-          "hours_until": 15.7,
+          "hours_until": 11.8,
           "date": "2026-06-19T06:00:00Z"
         },
         {
           "name": "Retail Sales MoM",
           "currency": "GBP",
           "importance": "high",
-          "hours_until": 15.7,
+          "hours_until": 11.8,
           "date": "2026-06-19T06:00:00Z"
         },
         {
           "name": "Retail Sales YoY",
           "currency": "GBP",
           "importance": "high",
-          "hours_until": 15.7,
+          "hours_until": 11.8,
           "date": "2026-06-19T06:00:00Z"
         },
         {
           "name": "BOE金融政策委員会",
           "currency": "GBP",
           "importance": "critical",
-          "hours_until": 20.7,
+          "hours_until": 16.8,
           "date": "2026-06-19T11:00:00Z"
         },
         {
           "name": "Consumer Confidence Flash",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 95.7,
+          "hours_until": 91.8,
           "date": "2026-06-22T14:00:00Z"
         },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 113.0,
+          "hours_until": 109.1,
           "date": "2026-06-23T07:15:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 113.0,
+          "hours_until": 109.1,
           "date": "2026-06-23T07:15:00Z"
         },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 113.2,
+          "hours_until": 109.3,
           "date": "2026-06-23T07:30:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 113.2,
+          "hours_until": 109.3,
           "date": "2026-06-23T07:30:00Z"
         },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 113.7,
+          "hours_until": 109.8,
           "date": "2026-06-23T08:00:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 113.7,
+          "hours_until": 109.8,
           "date": "2026-06-23T08:00:00Z"
         },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "GBP",
           "importance": "high",
-          "hours_until": 114.2,
+          "hours_until": 110.3,
           "date": "2026-06-23T08:30:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "GBP",
           "importance": "high",
-          "hours_until": 114.2,
+          "hours_until": 110.3,
           "date": "2026-06-23T08:30:00Z"
         },
         {
           "name": "GfK Consumer Confidence",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 159.7,
+          "hours_until": 155.8,
           "date": "2026-06-25T06:00:00Z"
         },
         {
           "name": "Consumer Confidence",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 160.5,
+          "hours_until": 156.6,
           "date": "2026-06-25T06:45:00Z"
         },
         {
           "name": "ECB General Council Meeting",
           "currency": "EUR",
           "importance": "critical",
-          "hours_until": 160.7,
+          "hours_until": 156.8,
           "date": "2026-06-25T07:00:00Z"
         },
         {
           "name": "GDP Growth Rate QoQ Final",
           "currency": "EUR",
           "importance": "critical",
-          "hours_until": 160.7,
+          "hours_until": 156.8,
           "date": "2026-06-25T07:00:00Z"
         },
         {
           "name": "GDP Growth Rate YoY Final",
           "currency": "EUR",
           "importance": "critical",
-          "hours_until": 160.7,
+          "hours_until": 156.8,
           "date": "2026-06-25T07:00:00Z"
         },
         {
           "name": "PPI YoY",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 160.7,
+          "hours_until": 156.8,
           "date": "2026-06-25T07:00:00Z"
         }
       ],
@@ -4693,7 +4633,7 @@
       "cb_meeting_blackout": {
         "active": true,
         "severity": "warn",
-        "reason": "GBP 中銀会合まで 10h（要注意期間）",
+        "reason": "GBP 中銀会合まで 6h（要注意期間）",
         "currency": "GBP"
       },
       "strength_context": {
@@ -4740,175 +4680,175 @@
           "name": "PPI MoM",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 15.7,
+          "hours_until": 11.8,
           "date": "2026-06-19T06:00:00Z"
         },
         {
           "name": "PPI YoY",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 15.7,
+          "hours_until": 11.8,
           "date": "2026-06-19T06:00:00Z"
         },
         {
           "name": "Consumer Confidence Flash",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 95.7,
+          "hours_until": 91.8,
           "date": "2026-06-22T14:00:00Z"
         },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "AUD",
           "importance": "high",
-          "hours_until": 104.7,
+          "hours_until": 100.8,
           "date": "2026-06-22T23:00:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "AUD",
           "importance": "high",
-          "hours_until": 104.7,
+          "hours_until": 100.8,
           "date": "2026-06-22T23:00:00Z"
         },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 113.0,
+          "hours_until": 109.1,
           "date": "2026-06-23T07:15:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 113.0,
+          "hours_until": 109.1,
           "date": "2026-06-23T07:15:00Z"
         },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 113.2,
+          "hours_until": 109.3,
           "date": "2026-06-23T07:30:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 113.2,
+          "hours_until": 109.3,
           "date": "2026-06-23T07:30:00Z"
         },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 113.7,
+          "hours_until": 109.8,
           "date": "2026-06-23T08:00:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 113.7,
+          "hours_until": 109.8,
           "date": "2026-06-23T08:00:00Z"
         },
         {
           "name": "CPI",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 131.2,
+          "hours_until": 127.3,
           "date": "2026-06-24T01:30:00Z"
         },
         {
           "name": "Inflation Rate MoM",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 131.2,
+          "hours_until": 127.3,
           "date": "2026-06-24T01:30:00Z"
         },
         {
           "name": "Inflation Rate YoY",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 131.2,
+          "hours_until": 127.3,
           "date": "2026-06-24T01:30:00Z"
         },
         {
           "name": "RBA Trimmed Mean CPI MoM",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 131.2,
+          "hours_until": 127.3,
           "date": "2026-06-24T01:30:00Z"
         },
         {
           "name": "RBA Trimmed Mean CPI YoY",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 131.2,
+          "hours_until": 127.3,
           "date": "2026-06-24T01:30:00Z"
         },
         {
           "name": "RBA Weighted Median CPI MoM",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 131.2,
+          "hours_until": 127.3,
           "date": "2026-06-24T01:30:00Z"
         },
         {
           "name": "RBA Weighted Median CPI YoY",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 131.2,
+          "hours_until": 127.3,
           "date": "2026-06-24T01:30:00Z"
         },
         {
           "name": "Unemployment Rate",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 155.2,
+          "hours_until": 151.3,
           "date": "2026-06-25T01:30:00Z"
         },
         {
           "name": "GfK Consumer Confidence",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 159.7,
+          "hours_until": 155.8,
           "date": "2026-06-25T06:00:00Z"
         },
         {
           "name": "Consumer Confidence",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 160.5,
+          "hours_until": 156.6,
           "date": "2026-06-25T06:45:00Z"
         },
         {
           "name": "ECB General Council Meeting",
           "currency": "EUR",
           "importance": "critical",
-          "hours_until": 160.7,
+          "hours_until": 156.8,
           "date": "2026-06-25T07:00:00Z"
         },
         {
           "name": "GDP Growth Rate QoQ Final",
           "currency": "EUR",
           "importance": "critical",
-          "hours_until": 160.7,
+          "hours_until": 156.8,
           "date": "2026-06-25T07:00:00Z"
         },
         {
           "name": "GDP Growth Rate YoY Final",
           "currency": "EUR",
           "importance": "critical",
-          "hours_until": 160.7,
+          "hours_until": 156.8,
           "date": "2026-06-25T07:00:00Z"
         },
         {
           "name": "PPI YoY",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 160.7,
+          "hours_until": 156.8,
           "date": "2026-06-25T07:00:00Z"
         }
       ],
@@ -5032,25 +4972,25 @@
     }
   ],
   "sentiment": {
-    "vix": 17.21,
+    "vix": 16.67,
     "vix_level": "normal",
     "risk_off_strength": 0,
-    "dxy": 100.65,
+    "dxy": 100.8,
     "dxy_30d_avg": 99.27,
     "dxy_trend": "flat",
-    "us10y": 4.434,
+    "us10y": 4.438,
     "bond_pressure": "normal",
-    "gold": 4260.8,
-    "gold_20d_avg": 4378.52,
+    "gold": 4249.8,
+    "gold_20d_avg": 4377.97,
     "gold_trend": "flat",
     "risk_mode": "normal"
   },
   "us_yields": {
     "short": 4.85,
     "2y": 4.85,
-    "10y": 4.434,
+    "10y": 4.438,
     "30y": 4.55,
-    "spread_10y2y": -0.416,
+    "spread_10y2y": -0.412,
     "source": "fallback (estimated)",
     "avg_note_coupon": 4.35,
     "10y_source": "market yield (^TNX via Yahoo Finance)"
