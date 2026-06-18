@@ -14,8 +14,10 @@ from datetime import datetime, timedelta, timezone
 # バックテスト実証済み ペア静的ベースライン（2026-06-09 180日実績）
 # ============================================================
 
-# 完全除外ペア: 流動性・政治リスクで構造的に勝率低（22%/33%）
-PAIR_EXCLUDE = frozenset(["INRJPY", "TRYJPY"])
+# 完全除外ペア: 流動性・政治リスク or バックテスト実証済み慢性不振で構造的に取引不可
+# 2026-06-18: EURUSD(40%)/USDCHF(37.5%) を不振ペアのためハードブロックに昇格
+#              ソフトブロック(-1調整)では★4シグナルが届いてしまい実際に取引されていた
+PAIR_EXCLUDE = frozenset(["INRJPY", "TRYJPY", "EURUSD", "USDCHF"])
 
 # 静的★調整: バックテスト勝率が明確に良/悪で、closed_tradesが少ない段階でも反映
 # 値は adjustment (整数 or 0.5刻み)。build_pair_performance_mapの実績値とマージ
@@ -26,9 +28,9 @@ PAIR_STATIC_BASELINE = {
     # ✅ 好成績維持（69-72%）
     "AUDJPY": {"adjustment": +1,  "note": "好成績(実証72.2%)"},
     "GBPJPY": {"adjustment": +1,  "note": "好成績(実証69.2%)"},
-    # ❌ 慢性不振ペア（40%以下）
-    "EURUSD": {"adjustment": -1,  "note": "不振ペア(実証40.0%)"},
-    "USDCHF": {"adjustment": -1,  "note": "不振ペア(実証37.5%)"},
+    # ❌ 慢性不振ペア（40%以下）→ PAIR_EXCLUDEに移動（ハードブロック）
+    # "EURUSD": {"adjustment": -1,  "note": "不振ペア(実証40.0%)"},  # 除外済み
+    # "USDCHF": {"adjustment": -1,  "note": "不振ペア(実証37.5%)"},  # 除外済み
 }
 
 

@@ -1391,9 +1391,17 @@ def main():
             cb_blackout = check_cb_meeting_blackout(pair, cb_rates, now)
             r["cb_meeting_blackout"] = cb_blackout
             if cb_blackout["active"]:
+                currency = cb_blackout.get("currency", "")
                 if cb_blackout["severity"] == "blackout":
-                    # ★を最大2段階降格（新規エントリー抑制）
-                    r["stars"] = max(1, r.get("stars", 1) - 2)
+                    if currency == "JPY":
+                        # 日銀会合後ブラックアウト: JPYペアは完全ブロック（★1固定）
+                        # 2026-06-18: ★3以下に降格しても実際に取引されていたため強化
+                        r["stars"] = 1
+                        r["verdict"] = "🏦 日銀会合後ブラックアウト（新規禁止）"
+                        r["direction"] = "WAIT_BOJ"
+                    else:
+                        # 他中銀: ★を最大2段階降格
+                        r["stars"] = max(1, r.get("stars", 1) - 2)
                     r["blackout_degraded"] = True
                 elif cb_blackout["severity"] == "warn":
                     # ★を1段階降格
