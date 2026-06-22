@@ -229,8 +229,8 @@ def _fallback_rates():
                 "cb_name": "FRB"},    # higher-for-longer pause
         "EUR": {"rate": 2.15, "stance": "ease", "rate_momentum": "decelerating",
                 "cb_name": "ECB"},    # 利下げサイクル後半・ペース鈍化
-        "JPY": {"rate": 0.75, "stance": "tighten", "rate_momentum": "accelerating",
-                "cb_name": "日銀"},   # 6/16-17会合で0.75→1.0% 確率80-96%
+        "JPY": {"rate": 1.00, "stance": "pause", "rate_momentum": "peak",
+                "cb_name": "日銀"},   # 2026-06-17 利上げ決定(0.75→1.0%)。次は様子見・ピーク到達
         "GBP": {"rate": 3.75, "stance": "neutral", "rate_momentum": "stable",
                 "cb_name": "BOE"},    # データ依存・中立
         "AUD": {"rate": 4.10, "stance": "ease", "rate_momentum": "stable",

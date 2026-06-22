@@ -183,35 +183,35 @@ def detect_volatility_regime(prices: list, atr_current: float) -> dict:
 
     ratio = atr_current / atr_90d
 
-    # 2026-06-09 E案 TP/SL最適化反映（backtest検証済み）
-    # 旧: normal=2.5/2.5/5.0/8.5 → 新: 3.0/3.0/4.5/6.0
-    # 効果: PF 2.08→2.15 (+3.4%), pips +43.59→+48.38 (+11%), TP2到達 4→14件 (+250%)
-    # TP3=8.5×ATRが180日で到達0件と判明、6.0に短縮
-    # 詳細: docs/2026-06-09_tpsl_optimization_summary.md
+    # 2026-06-22 Phase1出口戦略改善（autoresearch: wiki/finance/fx-exit-strategy-fundamentals.md）
+    # TP = 3.0×ATR → 1.5×ATR（到達率 6.5% → 30-50% 目標）
+    # 根拠: 567,000バックテスト研究で TP=3×ATRはほぼ到達不能と判明（実取引62件で確認）
+    # SLは据え置き（3.0×ATR → リスク管理は変更なし）
+    # トレーリング幅は calc_staged_tp() 内で 2.0×ATR に別途設定（TP幅と分離）
     if ratio >= 1.5:
         regime = "high"
         regime_label = "高ボラ相場"
         sl_mult = 3.5
-        tp1_mult = 3.5
+        tp1_mult = 2.0   # 変更: 3.5 → 2.0（高ボラ時でも早期到達を優先）
         tp2_mult = 5.0
         tp3_mult = 7.0
-        note = f"ATRが90日平均の{ratio:.1f}倍 → SL幅を自動拡大（E案連動）"
+        note = f"ATRが90日平均の{ratio:.1f}倍 → SL拡大・TP縮小（Phase1出口改善）"
     elif ratio <= 0.7:
         regime = "low"
         regime_label = "低ボラ相場"
         sl_mult = 2.5
-        tp1_mult = 2.5
+        tp1_mult = 1.25  # 変更: 2.5 → 1.25（低ボラでも早期到達を優先）
         tp2_mult = 4.0
         tp3_mult = 5.0
-        note = f"ATRが90日平均の{ratio:.1f}倍 → SL幅を縮小（E案連動）"
+        note = f"ATRが90日平均の{ratio:.1f}倍 → SL縮小・TP縮小（Phase1出口改善）"
     else:
         regime = "normal"
         regime_label = "通常ボラ相場"
         sl_mult = 3.0
-        tp1_mult = 3.0
+        tp1_mult = 1.5   # 変更: 3.0 → 1.5（主要変更: 到達率向上）
         tp2_mult = 4.5
         tp3_mult = 6.0
-        note = f"ATR比率{ratio:.1f} → E案最適設定（PF 2.15/+48.4pips）"
+        note = f"ATR比率{ratio:.1f} → TP=1.5×ATR（Phase1出口改善・到達率向上）"
 
     return {
         "regime": regime,
@@ -227,17 +227,17 @@ def detect_volatility_regime(prices: list, atr_current: float) -> dict:
 
 
 def _default_regime() -> dict:
-    # 2026-06-09 E案 TP/SL最適化反映
+    # 2026-06-22 Phase1出口改善: tp1_multiplier 3.0 → 1.5
     return {
         "regime": "normal",
         "regime_label": "通常ボラ相場",
         "atr_ratio": 1.0,
         "atr_90d": None,
         "sl_multiplier": 3.0,
-        "tp1_multiplier": 3.0,
+        "tp1_multiplier": 1.5,   # 変更: 3.0 → 1.5（Phase1出口改善）
         "tp2_multiplier": 4.5,
         "tp3_multiplier": 6.0,
-        "note": "データ不足 → E案デフォルト設定",
+        "note": "データ不足 → Phase1デフォルト設定（TP=1.5×ATR）",
     }
 
 
@@ -286,12 +286,15 @@ def calc_staged_tp(price: float, direction: str, atr: float, regime: dict,
     if not atr or atr == 0:
         return {}
 
-    # 2026-06-10 単一TP戦略反映 (TP=旧TP1=3.0×ATR、ほぼ確実に到達)
+    # 2026-06-22 Phase1出口改善: TP=1.5×ATR（到達率向上）+ トレーリング幅を TP から分離
+    # 変更前: TP=3.0×ATR, trail=3.0×ATR（TP到達率6.5%、SIGNAL_LOST 85.5%）
+    # 変更後: TP=1.5×ATR, trail=2.0×ATR（TP到達率30-50%目標）
+    # SLは3.0×ATR維持（リスク管理は変更なし）
     sl_mult = regime.get("sl_multiplier", 3.0)
-    tp_mult = regime.get("tp1_multiplier", 3.0)  # 旧TP1 = 新TP（単一）
+    tp_mult = regime.get("tp1_multiplier", 1.5)   # 変更: 3.0 → 1.5（Phase1出口改善）
     tp2_mult = regime.get("tp2_multiplier", 4.5)  # 後方互換（参考のみ）
     tp3_mult = regime.get("tp3_multiplier", 6.0)  # 後方互換（参考のみ）
-    trail_mult = tp_mult  # トレーリング幅 = TP幅と同じ（3.0×ATR）
+    trail_mult = 2.0  # 変更: TP幅から分離 → 固定2.0×ATR（TP到達後の余裕幅）
 
     sl_width = atr * sl_mult
     tp_width = atr * tp_mult

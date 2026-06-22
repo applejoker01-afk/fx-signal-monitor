@@ -43,7 +43,9 @@ from modules.trade_tracker import update_trades
 from modules.performance_intelligence import (
     build_pair_performance_map, apply_performance_weighting,
     check_drawdown_alert, detect_market_regime,
-    PAIR_EXCLUDE, apply_static_baseline,  # 2026-06-16 軌道修正
+    PAIR_EXCLUDE, apply_static_baseline,       # 2026-06-16 軌道修正
+    apply_boj_cycle_directional_filter,        # 2026-06-19 BOJサイクル方向フィルタ
+    apply_vix_regime_filter,                   # 2026-06-22 VIXレジームフィルタ
 )
 from modules.ai_commentary import generate_market_commentary, generate_exit_advice
 from modules.ambush_alert import evaluate_ambush, collect_ambush_alerts
@@ -346,9 +348,41 @@ def compute_ta_score(price, prices):
         elif price <= recent_low * 1.003:    # 安値近辺 or 更新
             breakout_bonus = 15
 
-    # 総合TAスコア（新フィルタを反映）
+    # 4. RSIダイバージェンス検知（2026-06-22追加）
+    # 価格方向とRSI方向が乖離している場合 = トレンド転換の先行シグナル
+    # ノイズ除去: RSI変化が±5pt以上の場合のみ発火（誤発火防止）
+    divergence_adj = 0
+    if len(prices) >= 25 and rsi_v is not None:
+        rsi_prev = rsi(prices[:-10], 14)  # 10バー前のRSI
+        if rsi_prev is not None:
+            rsi_delta = rsi_v - rsi_prev              # RSI変化量
+            price_rose = prices[-1] > prices[-10]     # 直近10バーで価格上昇？
+            # 弱気ダイバージェンス: 価格↑ + RSI有意に低下(-5pt以上)
+            if price_rose and rsi_delta < -5 and rsi_v > 45:
+                divergence_adj = -18
+            # 強気ダイバージェンス: 価格↓ + RSI有意に上昇(+5pt以上)
+            elif not price_rose and rsi_delta > +5 and rsi_v < 55:
+                divergence_adj = +18
+
+    # 5. EMA20短期トレンド確認（2026-06-22追加）
+    # DMA50/200 の長期トレンドに加え、EMA20/50 の短期アライメントを確認
+    ema_short_bonus = 0
+    if len(prices) >= 50:
+        e20s = ema_series(prices, 20)
+        e50s = ema_series(prices, 50)
+        if e20s and e50s:
+            e20 = e20s[-1]; e50 = e50s[-1]
+            if price > e20 > e50:                           # 強い上昇トレンド
+                ema_short_bonus = +12
+            elif price < e20 < e50:                         # 強い下降トレンド
+                ema_short_bonus = -12
+            elif abs(e20 - e50) / e50 < 0.002:             # EMAが絡み合い = レンジ
+                ema_short_bonus = -8
+
+    # 総合TAスコア（全フィルタ反映）
     base_score = (dma_score + macd_score + rsi_score) / 3
-    adjusted_score = base_score + trend_strength + atr_quality + breakout_bonus
+    adjusted_score = (base_score + trend_strength + atr_quality
+                      + breakout_bonus + divergence_adj + ema_short_bonus)
     ta_score = max(5, min(98, round(adjusted_score, 1)))
 
     return {
@@ -359,6 +393,8 @@ def compute_ta_score(price, prices):
         "trend_strength": trend_strength,
         "atr_quality": atr_quality,
         "breakout_bonus": breakout_bonus,
+        "divergence_adj": divergence_adj,      # 2026-06-22: RSIダイバージェンス
+        "ema_short_bonus": ema_short_bonus,    # 2026-06-22: EMA20短期トレンド
         "dma200": round(dma200, 5) if dma200 else None,
         "dma50": round(dma50, 5) if dma50 else None,
         "rsi": round(rsi_v, 2) if rsi_v else None,
@@ -1346,9 +1382,12 @@ def main():
     all_histories = {}     # ⑨ バックテスト用（フル履歴）
 
     for pair in PAIR_API:
-        # 2026-06-16: 構造的不振ペアを除外
+        # 2026-06-16/19: 構造的不振ペアを除外
+        # INRJPY/TRYJPY: 流動性・政治リスク
+        # EURUSD/USDCHF: 慢性不振（実証40%/37.5%）
+        # NZDJPY/CADJPY: BOJ局面ダブル逆風（実証33%/0%）2026-06-19追加
         if pair in PAIR_EXCLUDE:
-            print(f"[SKIP] {pair}: 除外リスト（INRJPY/TRYJPY 流動性・政治リスク）")
+            print(f"[SKIP] {pair}: 除外リスト")
             continue
 
         price = latest["pairs"].get(pair)
@@ -1386,6 +1425,23 @@ def main():
 
             # 🎯 待ち伏せ型アラート（重要価格への接近を判定）
             r = evaluate_ambush(r, prices, atr_threshold=0.5)
+
+            # 📉 BOJサイクル方向性フィルタ（2026-06-19追加）
+            # JPYクロスのLONGシグナルを中銀スタンスで制限する
+            # ease通貨ロング = ダブル逆風（JPY強 + 対通貨弱）→ ブロックまたは降格
+            r = apply_boj_cycle_directional_filter(r, cb_rates)
+            if r.get("regime_filter_applied"):
+                print(f"         └─ {r.get('regime_filter_reason', '')}")
+
+            # 📊 VIXレジームフィルタ（2026-06-22追加）
+            # VIX>30(panic): JPYクロスLONG完全ブロック（キャリー崩壊リスク）
+            # VIX>25(risk_off): JPYクロスLONG ★1段降格
+            # VIX>20(caution): 警告のみ
+            r = apply_vix_regime_filter(r, sentiment)
+            if r.get("vix_filter_applied"):
+                print(f"         └─ {r.get('vix_filter_reason', '')}")
+            elif r.get("vix_caution"):
+                print(f"         └─ {r.get('vix_caution_reason', '')}")
 
             # 🏦 CB会合ブラックアウト（2026-06-16追加）
             cb_blackout = check_cb_meeting_blackout(pair, cb_rates, now)

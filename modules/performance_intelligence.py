@@ -17,7 +17,15 @@ from datetime import datetime, timedelta, timezone
 # 完全除外ペア: 流動性・政治リスク or バックテスト実証済み慢性不振で構造的に取引不可
 # 2026-06-18: EURUSD(40%)/USDCHF(37.5%) を不振ペアのためハードブロックに昇格
 #              ソフトブロック(-1調整)では★4シグナルが届いてしまい実際に取引されていた
-PAIR_EXCLUDE = frozenset(["INRJPY", "TRYJPY", "EURUSD", "USDCHF"])
+# 2026-06-19: NZDJPY(33%・3件)/CADJPY(0%・2件) を追加
+#              autoresearch実証: BOJ引き締め + RBNZ/BOC政策でダブル逆風。
+#              サンプルは少ないが、マクロ構造（RBNZ ease + JPY strong）で根拠十分。
+#              NZDJPY・AUDJPY は高相関のため、NZDJPY除外で AUDJPY を集中管理する。
+PAIR_EXCLUDE = frozenset([
+    "INRJPY", "TRYJPY",           # 流動性・政治リスク（当初から）
+    "EURUSD", "USDCHF",           # 慢性不振（実証40%/37.5%）2026-06-18追加
+    "NZDJPY", "CADJPY",           # BOJ局面でダブル逆風（実証33%/0%）2026-06-19追加
+])
 
 # 静的★調整: バックテスト勝率が明確に良/悪で、closed_tradesが少ない段階でも反映
 # 値は adjustment (整数 or 0.5刻み)。build_pair_performance_mapの実績値とマージ
@@ -31,6 +39,8 @@ PAIR_STATIC_BASELINE = {
     # ❌ 慢性不振ペア（40%以下）→ PAIR_EXCLUDEに移動（ハードブロック）
     # "EURUSD": {"adjustment": -1,  "note": "不振ペア(実証40.0%)"},  # 除外済み
     # "USDCHF": {"adjustment": -1,  "note": "不振ペア(実証37.5%)"},  # 除外済み
+    # "NZDJPY": {"adjustment": -1,  "note": "不振ペア(実証33%)"},     # 除外済み
+    # "CADJPY": {"adjustment": -1,  "note": "不振ペア(実証0%)"},      # 除外済み
 }
 
 
@@ -55,6 +65,185 @@ def apply_static_baseline(perf_map: dict) -> dict:
                 "note": static["note"] + " (静的ベースライン)",
             }
     return perf_map
+
+
+# ============================================================
+# BOJ引き締めサイクル 方向性レジームフィルタ（2026-06-19追加）
+# autoresearch: BOJ tightening + 対通貨ease = JPYクロスLONGは構造的逆風
+# ============================================================
+
+# JPYがピーク/引き締め継続中と判断するスタンスセット
+_JPY_STRONG_STANCES = frozenset(["tighten", "pause"])  # pause=一時停止だがまだ高金利
+
+# 対通貨が"ease"かつ積極的に利下げ中 → LONGは強くブロック
+_CCY_EASE_HARD = frozenset(["ease"])                  # stance=="ease"
+_CCY_EASE_HARD_MOMENTUM = frozenset(["stable", "accelerating"])  # ease方向が定着
+# ease+deceleratingは利下げ減速中（底打ち近し）→ 軽めのペナルティ
+_CCY_EASE_SOFT_MOMENTUM = frozenset(["decelerating"])
+# trough（底打ち）は次が利上げ → ブロック不要
+_CCY_EASE_NO_BLOCK_MOMENTUM = frozenset(["trough"])
+
+
+def apply_boj_cycle_directional_filter(result: dict, cb_rates: dict) -> dict:
+    """
+    BOJ引き締めサイクル局面フィルタ: JPYクロスペアの方向性を中銀スタンスで制限する。
+
+    対象: JPYを含む全クロスペア（XXX/JPY 形式）
+    条件: JPY スタンスが強い（tighten/pause） AND 対通貨が ease中
+    効果:
+      - ease + stable/accelerating → LONGを★2にハードブロック（期待値マイナス）
+      - ease + decelerating        → LONG★を1段降格（利下げ減速中で完全ブロックは過剰）
+    SHORTシグナルには影響しない（BOJ局面ではSHORT有利のため）。
+
+    実取引根拠（2026/5/26〜6/18, 66件）:
+      ロング 37%勝率 vs ショート 57%勝率
+      AUDJPY ロング -106.6pips（最大損失ペア）
+      NZDJPY ロング -90.7pips（最大単発損失）
+
+    Returns:
+        result dict with optional added fields:
+          regime_filter_applied: bool
+          regime_filter_reason: str
+    """
+    pair = result.get("pair", "")
+    direction = result.get("direction", "")
+
+    # JPYクロスかどうか判定（XXJPY or JPY含む）
+    if "JPY" not in pair:
+        return result
+
+    # LONG系シグナルのみが対象（SHORT/NO_TRADE/WAIT系はスルー）
+    if "LONG" not in direction:
+        return result
+
+    # cb_rates の形式を正規化（"rates" キーがある場合とフラットな場合の両方に対応）
+    rates_data = cb_rates.get("rates", cb_rates) if isinstance(cb_rates, dict) else {}
+
+    # JPYのスタンスを取得
+    jpy_info = rates_data.get("JPY", {})
+    jpy_stance = jpy_info.get("stance", "neutral")
+    if jpy_stance not in _JPY_STRONG_STANCES:
+        # JPYが中立 or easeなら円高圧力がないためフィルタ不要
+        return result
+
+    # 対通貨（非JPY側）を特定
+    # PAIR_API形式: AUDJPY → ("AUD", "JPY"), SGDJPY → ("SGD", "JPY")
+    # JPYが後ろにあるパターン（XXX/JPY）の場合、FROM通貨 = pair[:3]
+    # JPYが前にあるパターン（JPY/XXX）はPAIR_APIに存在しないため考慮不要
+    non_jpy_ccy = pair.replace("JPY", "")
+    if len(non_jpy_ccy) != 3:
+        return result
+
+    other_info = rates_data.get(non_jpy_ccy, {})
+    other_stance = other_info.get("stance", "neutral")
+    other_momentum = other_info.get("rate_momentum", "stable")
+
+    if other_stance not in _CCY_EASE_HARD:
+        # 対通貨が ease でない → フィルタ不要（neutral/tighten は問題なし）
+        return result
+
+    if other_momentum in _CCY_EASE_NO_BLOCK_MOMENTUM:
+        # trough（底打ち）= もうすぐ利上げ転換 → ブロック不要
+        return result
+
+    cb_other = other_info.get("cb_name", non_jpy_ccy)
+    cb_jpy = jpy_info.get("cb_name", "日銀")
+
+    if other_momentum in _CCY_EASE_HARD_MOMENTUM:
+        # ease + stable/accelerating = 積極利下げ中 → ハードブロック（★2固定）
+        original_stars = result.get("stars", 1)
+        result["stars"] = min(2, original_stars)  # ★2以下に抑制（元が★1ならそのまま）
+        reason = (
+            f"⚠️ BOJサイクルフィルタ: {non_jpy_ccy}({cb_other} ease/{other_momentum}) + "
+            f"JPY({cb_jpy} {jpy_stance}) = LONGはダブル逆風"
+        )
+        result["verdict"] = f"🔻 {reason.lstrip('⚠️ ')}"
+        result["direction"] = "NO_TRADE"  # 取引しない
+        result["regime_filter_applied"] = True
+        result["regime_filter_reason"] = reason
+    elif other_momentum in _CCY_EASE_SOFT_MOMENTUM:
+        # ease + decelerating = 利下げ減速中 → ★1段降格（見送り推奨だが禁止ではない）
+        original_stars = result.get("stars", 1)
+        new_stars = max(1, original_stars - 1)
+        reason = (
+            f"⚠️ BOJサイクル軽警告: {non_jpy_ccy}({cb_other} ease/{other_momentum}) + "
+            f"JPY({cb_jpy} {jpy_stance}) = LONG方向注意"
+        )
+        if new_stars != original_stars:
+            result["stars"] = new_stars
+            result["regime_filter_applied"] = True
+            result["regime_filter_reason"] = reason
+
+    return result
+
+
+# ============================================================
+# VIXレジームフィルタ（2026-06-22追加）
+# autoresearch: wiki/finance/vix-fx-signal-filter.md
+# VIX×JPY安全資産 — キャリー崩壊リスクをセンチメントモードで判定
+# 参考: 2024年8月5日 VIX日中~65・USD/JPY -14%・日経 -12.4%
+# ============================================================
+
+def apply_vix_regime_filter(result: dict, sentiment: dict) -> dict:
+    """
+    VIXレジームフィルタ: 高VIX局面でJPYクロスのLONGをブロック/降格する。
+
+    sentiment["risk_mode"] の値 (sentiment_monitor.py で定義):
+      panic     → VIX > 30 : JPYクロスLONG 完全ブロック（NO_TRADE, ★≤2）
+      risk_off  → VIX > 25 : JPYクロスLONG ★1段降格
+      caution   → VIX > 20 : 警告のみ（★変更なし）
+      normal / complacent : フィルタなし
+
+    SHORTシグナルは対象外（キャリー崩壊時のJPY急騰はSHORTに追い風）。
+    """
+    if not sentiment:
+        return result
+
+    risk_mode = sentiment.get("risk_mode", "normal")
+    vix_value = sentiment.get("vix")
+    pair = result.get("pair", "")
+    direction = result.get("direction", "")
+
+    # LONG系シグナルのみ対象
+    if "LONG" not in direction:
+        return result
+
+    # JPYペア以外はスルー（将来の拡張余地として残す）
+    if "JPY" not in pair:
+        return result
+
+    vix_str = f"VIX={vix_value:.1f}" if vix_value else "VIX高水準"
+
+    if risk_mode == "panic":
+        # VIX > 30 = 2024年8月型キャリー崩壊リスク → ハードブロック
+        result["stars"] = min(2, result.get("stars", 1))
+        result["direction"] = "NO_TRADE"
+        result["vix_filter_applied"] = True
+        result["vix_filter_reason"] = (
+            f"VIXパニックフィルタ: {vix_str} — "
+            f"キャリー崩壊リスク: JPYクロスLONG禁止"
+        )
+
+    elif risk_mode == "risk_off":
+        # VIX > 25 = キャリー不安定化 → ★1段降格
+        original_stars = result.get("stars", 1)
+        new_stars = max(1, original_stars - 1)
+        if new_stars != original_stars:
+            result["stars"] = new_stars
+            result["vix_filter_applied"] = True
+            result["vix_filter_reason"] = (
+                f"VIXリスクオフフィルタ: {vix_str} — "
+                f"JPYクロスLONG -{original_stars - new_stars}★降格"
+            )
+
+    elif risk_mode == "caution":
+        # VIX > 20 = 警告のみ（★変更なし、情報付与のみ）
+        result["vix_caution"] = True
+        result["vix_caution_reason"] = (
+            f"VIX警戒域: {vix_str} — JPYクロスLONGは要注意"
+        )
+
+    return result
 
 
 # ============================================================

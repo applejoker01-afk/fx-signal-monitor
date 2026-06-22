@@ -15,7 +15,7 @@ trade_tracker.py
   TRAIL_HIT   : トレーリングストップ到達（トレンド継続後の利益確定）
   BE_HIT      : TP到達後の戻りでBE+0.5Rに到達（小利確保）
   SL_HIT      : 初期SLに到達（負け）
-  SIGNAL_LOST : ★2を割った（シグナルが明確に弱体化・中長期保持後の消滅）
+  SIGNAL_LOST : 72h以上保有かつ含み損かつ★3未満（2026-06-22: 条件厳格化）
   REVERSED    : 方向が反転した（LONG→SHORT等・明確なトレンド転換）
 
   ── 後方互換 ──
@@ -243,9 +243,20 @@ def check_exit_condition(trade: dict, current_price: float,
             if cur_is_long != is_long:
                 exit_reason = "REVERSED"
                 exit_price = current_price
-        if exit_reason is None and current_stars < 2:
-            exit_reason = "SIGNAL_LOST"
-            exit_price = current_price
+        # ── SIGNAL_LOST（2026-06-22 Phase1出口改善: 条件を厳格化）──
+        # 変更前: current_stars < 2 で即時SIGNAL_LOST（85.5%の出口がここで発生）
+        # 変更後: 72h以上保有 かつ 含み損 かつ ★3未満 の場合のみ
+        # 根拠: 567,000バックテスト研究でMoving Average Exit（＝SIGNAL_LOST）は最下位
+        #       autoresearch: wiki/finance/fx-exit-strategy-fundamentals.md
+        if exit_reason is None:
+            hold_h = _hours_between(trade.get("entry_time", ""), datetime.now(timezone.utc))
+            current_pips = (
+                (current_price - entry_price) if is_long
+                else (entry_price - current_price)
+            )
+            if hold_h > 72 and current_pips < 0 and current_stars < 3:
+                exit_reason = "SIGNAL_LOST"
+                exit_price = current_price
 
     if exit_reason is None:
         # 状態更新のみ（継続保有）
