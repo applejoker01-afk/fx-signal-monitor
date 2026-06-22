@@ -1,18 +1,16 @@
 {
-  "timestamp": "2026-06-22T05:14:07.783655+00:00",
+  "timestamp": "2026-06-22T10:12:32.827141+00:00",
   "signals": {
     "USDJPY": 5,
-    "EURJPY": 4,
+    "EURJPY": 3,
     "GBPJPY": 5,
-    "AUDJPY": 3,
-    "NZDJPY": 2,
-    "CADJPY": 3,
+    "AUDJPY": 2,
     "CHFJPY": 2,
     "SGDJPY": 5,
     "HKDJPY": 5,
     "CNYJPY": 2,
-    "MXNJPY": 3,
-    "ZARJPY": 2,
+    "MXNJPY": 2,
+    "ZARJPY": 3,
     "GBPUSD": 2,
     "AUDUSD": 2,
     "NZDUSD": 2,
@@ -25,13 +23,15 @@
       "pair": "USDJPY",
       "label": "USD/JPY",
       "price": 161.22787,
-      "ta_score": 96.3,
+      "ta_score": 98,
       "dma_score": 85,
       "macd_score": 85,
       "rsi_score": 20,
       "trend_strength": 18,
       "atr_quality": 0,
       "breakout_bonus": 15,
+      "divergence_adj": 0,
+      "ema_short_bonus": 12,
       "dma200": 156.05276,
       "dma50": 159.12836,
       "rsi": 71.68,
@@ -51,105 +51,105 @@
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 19.3,
+          "hours_until": 14.3,
           "date": "2026-06-23T00:30:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 19.3,
+          "hours_until": 14.3,
           "date": "2026-06-23T00:30:00Z"
         },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "USD",
           "importance": "high",
-          "hours_until": 32.5,
+          "hours_until": 27.6,
           "date": "2026-06-23T13:45:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "USD",
           "importance": "high",
-          "hours_until": 32.5,
+          "hours_until": 27.6,
           "date": "2026-06-23T13:45:00Z"
         },
         {
           "name": "BoJ Summary of Opinions",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 42.6,
+          "hours_until": 37.6,
           "date": "2026-06-23T23:50:00Z"
         },
         {
           "name": "GDP Growth Rate QoQ Final",
           "currency": "USD",
           "importance": "critical",
-          "hours_until": 79.3,
+          "hours_until": 74.3,
           "date": "2026-06-25T12:30:00Z"
         },
         {
           "name": "GDP Price Index QoQ Final",
           "currency": "USD",
           "importance": "critical",
-          "hours_until": 79.3,
+          "hours_until": 74.3,
           "date": "2026-06-25T12:30:00Z"
         },
         {
           "name": "GDP Sales QoQ Final",
           "currency": "USD",
           "importance": "critical",
-          "hours_until": 79.3,
+          "hours_until": 74.3,
           "date": "2026-06-25T12:30:00Z"
         },
         {
           "name": "Tokyo Core CPI YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 90.3,
+          "hours_until": 85.3,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "Tokyo CPI Ex Food and Energy YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 90.3,
+          "hours_until": 85.3,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "Tokyo CPI YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 90.3,
+          "hours_until": 85.3,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "BoJ JGB Purchase",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 94.4,
+          "hours_until": 89.4,
           "date": "2026-06-26T03:35:00Z"
         },
         {
           "name": "Goods Trade Balance Adv",
           "currency": "USD",
           "importance": "high",
-          "hours_until": 103.3,
+          "hours_until": 98.3,
           "date": "2026-06-26T12:30:00Z"
         },
         {
           "name": "Retail Sales MoM",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 114.6,
+          "hours_until": 109.6,
           "date": "2026-06-26T23:50:00Z"
         },
         {
           "name": "Retail Sales YoY",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 114.6,
+          "hours_until": 109.6,
           "date": "2026-06-26T23:50:00Z"
         }
       ],
@@ -159,31 +159,31 @@
         "atr_ratio": 0.56,
         "atr_90d": 0.42158,
         "sl_multiplier": 2.5,
-        "tp1_multiplier": 2.5,
+        "tp1_multiplier": 1.25,
         "tp2_multiplier": 4.0,
         "tp3_multiplier": 5.0,
-        "note": "ATRが90日平均の0.6倍 → SL幅を縮小（E案連動）"
+        "note": "ATRが90日平均の0.6倍 → SL縮小・TP縮小（Phase1出口改善）"
       },
       "staged_tp": {
         "sl": 160.64,
-        "tp": 161.82,
-        "trail_atr_mult": 2.5,
-        "trail_distance": 0.59,
+        "tp": 161.52,
+        "trail_atr_mult": 2.0,
+        "trail_distance": 0.47,
         "be_plus_offset": 0.3,
         "be_target_after_tp": 161.52,
         "max_target": 162.41,
-        "rr_tp": 1.0,
+        "rr_tp": 0.5,
         "tp_mode": "single_with_trail",
-        "tp1": 161.82,
+        "tp1": 161.52,
         "tp2": 162.18,
         "tp3": 162.41,
         "sl_width": 0.59,
-        "tp1_width": 0.59,
-        "rr_tp1": 1.0,
+        "tp1_width": 0.3,
+        "rr_tp1": 0.5,
         "rr_tp2": 1.6,
         "rr_tp3": 2.0,
         "regime_label": "低ボラ相場",
-        "strategy": "TP(161.82)到達 → SLを BE+0.5R(161.52) へ移動 → トレーリング(2.5×ATR=0.59)発動 → 利を伸ばす（理論最大: 162.41）",
+        "strategy": "TP(161.52)到達 → SLを BE+0.5R(161.52) へ移動 → トレーリング(2.0×ATR=0.47)発動 → 利を伸ばす（理論最大: 162.41）",
         "chandelier_sl_active": true,
         "chandelier_note": "Chandelier Exit: 過去22日高値(161.23)-2.5xATR"
       },
@@ -284,29 +284,31 @@
       "strength_context": {
         "base_currency": "USD",
         "quote_currency": "JPY",
-        "base_score": 100.0,
+        "base_score": 82.2,
         "base_label": "強い",
         "base_rank": 1,
-        "quote_score": -26.4,
+        "quote_score": -32.1,
         "quote_label": "やや弱い",
-        "quote_rank": 9,
-        "spread": 126.4,
+        "quote_rank": 10,
+        "spread": 114.3,
         "context": "強い通貨 vs 弱い通貨（ロング有利）",
         "bias": "long"
       },
-      "ai_exit_advice": "# ポジション状況整理・選択肢提示\n\n## 1. 現状整理\n強いトレンド相場（ADX60.5）でロングが優位だが、TP1まで約85pipsと比較的近距離。金利差+2.75%のキャリー利益を活かすため、単純な早期利確より利伸ばしが有効な局面です。\n\n## 2. 利益を伸ばす選択肢\n\n**A案：トレイリングストップへ切替**\n- 狙い：トレンド継続時にTP3（+178pips）まで利益を伸ばしつつ、転換時の損失を限定\n- リスク：一時的な押し目で損切り確定の可能性\n- 根拠：ADX60.5の強トレンド環境で有効\n\n**B案：TP1到達後、残玉でキャリー長期保有**\n- 狙い：TP1で50-60%利確し現金化しながら、残玉は+2.75%のスワップを毎日獲得\n- リスク：SL回収日数が不明なため、金利差縮小リスク評価が不完全\n- 根拠：FRBサイクル強化で金利差が向こう中期安定見込み\n\n**C案：現レートで全量OCO維持**\n- 狙い：トレンド相場の判断を尊重、TP3到達時に最大利益を確保\n- リスク：途中利確がなく、トレンド反転で利益すべてが帳消し\n- 根拠：テクニカル環境が良好で時間価値がある\n\n## 3. 留意点\n日銀追加利上げ報道や米国インフレ統計は金利差を変動させ、キャリー評価・スワップ回収日数に影響するため定期確認が必須です。"
+      "ai_exit_advice": "# ポジション状況分析\n\n**1. 現状整理**\nUSDJPY LONGは強いトレンド相場（ADX60.5）で、ファンダメンタルズも金利差+2.75%で支持的です。TA/FA共に高スコアながら、トレンド強度が高いため早期利確は機会損失リスクがあります。\n\n**2. 利益を伸ばす選択肢**\n\n**A) トレール切替戦略**\n- 狙い：TP2（162.18）まで持ち込み、以降トレール（例：50-100pips）で上昇継続時の利幅拡大\n- リスク：トレンド転換時に利益削減される可能性\n\n**B) 部分利確＋長期保有**\n- TP1（161.52）で50%利確し確定益を確保、残り50%はスワップ狙いで長期保有（金利差+2.75%の継続享受）\n- リスク：SL160.64までの逆行で残玉が損失化；キャリー日数不明のため回収期間が不透明\n\n**C) OCO固定継続**\n- 狙い：TP3（162.41）まで到達を待つ；トレンド強度が現在最大、目標到達確度は比較的高い\n- リスク：短期的な急落時にSLに引っかかる可能性\n\n**3. 留意点**\n日銀政策転換や急激な金利差縮小、米雇用統計などで介入/トレンド転換リスクがあるため、定期的な情勢監視が必須です。"
     },
     {
       "pair": "EURJPY",
       "label": "EUR/JPY",
       "price": 184.88,
-      "ta_score": 83.0,
+      "ta_score": 75.0,
       "dma_score": 85,
       "macd_score": 15,
       "rsi_score": 50,
       "trend_strength": 18,
       "atr_quality": 0,
       "breakout_bonus": 15,
+      "divergence_adj": 0,
+      "ema_short_bonus": -8,
       "dma200": 182.10805,
       "dma50": 185.5154,
       "rsi": 46.28,
@@ -317,7 +319,7 @@
       "fa_direction": "buy",
       "fa_rate_diff": 1.4,
       "fa_detail": "ECB(2.40% ease/decelerating) vs 日銀(1.00% pause/peak) 差+1.40% / EURサイクル強化(decelerating)",
-      "stars": 4,
+      "stars": 3,
       "verdict": "○ ロング条件成立",
       "direction": "LONG",
       "pair_type": "major",
@@ -326,161 +328,161 @@
           "name": "Consumer Confidence Flash",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 8.8,
+          "hours_until": 3.8,
           "date": "2026-06-22T14:00:00Z"
         },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 19.3,
+          "hours_until": 14.3,
           "date": "2026-06-23T00:30:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 19.3,
+          "hours_until": 14.3,
           "date": "2026-06-23T00:30:00Z"
         },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 26.0,
+          "hours_until": 21.1,
           "date": "2026-06-23T07:15:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 26.0,
+          "hours_until": 21.1,
           "date": "2026-06-23T07:15:00Z"
         },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 26.3,
+          "hours_until": 21.3,
           "date": "2026-06-23T07:30:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 26.3,
+          "hours_until": 21.3,
           "date": "2026-06-23T07:30:00Z"
         },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 26.8,
+          "hours_until": 21.8,
           "date": "2026-06-23T08:00:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 26.8,
+          "hours_until": 21.8,
           "date": "2026-06-23T08:00:00Z"
         },
         {
           "name": "BoJ Summary of Opinions",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 42.6,
+          "hours_until": 37.6,
           "date": "2026-06-23T23:50:00Z"
         },
         {
           "name": "GfK Consumer Confidence",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 72.8,
+          "hours_until": 67.8,
           "date": "2026-06-25T06:00:00Z"
         },
         {
           "name": "Consumer Confidence",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 73.5,
+          "hours_until": 68.6,
           "date": "2026-06-25T06:45:00Z"
         },
         {
           "name": "ECB General Council Meeting",
           "currency": "EUR",
           "importance": "critical",
-          "hours_until": 73.8,
+          "hours_until": 68.8,
           "date": "2026-06-25T07:00:00Z"
         },
         {
           "name": "GDP Growth Rate QoQ Final",
           "currency": "EUR",
           "importance": "critical",
-          "hours_until": 73.8,
+          "hours_until": 68.8,
           "date": "2026-06-25T07:00:00Z"
         },
         {
           "name": "GDP Growth Rate YoY Final",
           "currency": "EUR",
           "importance": "critical",
-          "hours_until": 73.8,
+          "hours_until": 68.8,
           "date": "2026-06-25T07:00:00Z"
         },
         {
           "name": "PPI YoY",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 73.8,
+          "hours_until": 68.8,
           "date": "2026-06-25T07:00:00Z"
         },
         {
           "name": "Tokyo Core CPI YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 90.3,
+          "hours_until": 85.3,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "Tokyo CPI Ex Food and Energy YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 90.3,
+          "hours_until": 85.3,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "Tokyo CPI YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 90.3,
+          "hours_until": 85.3,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "BoJ JGB Purchase",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 94.4,
+          "hours_until": 89.4,
           "date": "2026-06-26T03:35:00Z"
         },
         {
           "name": "Consumer Confidence",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 99.8,
+          "hours_until": 94.8,
           "date": "2026-06-26T09:00:00Z"
         },
         {
           "name": "Retail Sales MoM",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 114.6,
+          "hours_until": 109.6,
           "date": "2026-06-26T23:50:00Z"
         },
         {
           "name": "Retail Sales YoY",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 114.6,
+          "hours_until": 109.6,
           "date": "2026-06-26T23:50:00Z"
         }
       ],
@@ -490,31 +492,31 @@
         "atr_ratio": 0.89,
         "atr_90d": 0.44344,
         "sl_multiplier": 3.0,
-        "tp1_multiplier": 3.0,
+        "tp1_multiplier": 1.5,
         "tp2_multiplier": 4.5,
         "tp3_multiplier": 6.0,
-        "note": "ATR比率0.9 → E案最適設定（PF 2.15/+48.4pips）"
+        "note": "ATR比率0.9 → TP=1.5×ATR（Phase1出口改善・到達率向上）"
       },
       "staged_tp": {
         "sl": 183.69,
-        "tp": 186.07,
-        "trail_atr_mult": 3.0,
-        "trail_distance": 1.19,
+        "tp": 185.47,
+        "trail_atr_mult": 2.0,
+        "trail_distance": 0.79,
         "be_plus_offset": 0.59,
         "be_target_after_tp": 185.47,
         "max_target": 187.25,
-        "rr_tp": 1.0,
+        "rr_tp": 0.5,
         "tp_mode": "single_with_trail",
-        "tp1": 186.07,
+        "tp1": 185.47,
         "tp2": 186.66,
         "tp3": 187.25,
         "sl_width": 1.19,
-        "tp1_width": 1.19,
-        "rr_tp1": 1.0,
+        "tp1_width": 0.59,
+        "rr_tp1": 0.5,
         "rr_tp2": 1.5,
         "rr_tp3": 2.0,
         "regime_label": "通常ボラ相場",
-        "strategy": "TP(186.07)到達 → SLを BE+0.5R(185.47) へ移動 → トレーリング(3.0×ATR=1.19)発動 → 利を伸ばす（理論最大: 187.25）",
+        "strategy": "TP(185.47)到達 → SLを BE+0.5R(185.47) へ移動 → トレーリング(2.0×ATR=0.79)発動 → 利を伸ばす（理論最大: 187.25）",
         "chandelier_sl_active": false,
         "chandelier_note": ""
       },
@@ -632,6 +634,8 @@
       },
       "high_confidence_zone": false,
       "ambush_quality": "注意（シグナルとPOIが逆方向）",
+      "regime_filter_applied": true,
+      "regime_filter_reason": "⚠️ BOJサイクル軽警告: EUR(ECB ease/decelerating) + JPY(日銀 pause) = LONG方向注意",
       "cb_meeting_blackout": {
         "active": false,
         "severity": "none",
@@ -640,29 +644,30 @@
       "strength_context": {
         "base_currency": "EUR",
         "quote_currency": "JPY",
-        "base_score": 4.3,
+        "base_score": 3.6,
         "base_label": "中立",
         "base_rank": 7,
-        "quote_score": -26.4,
+        "quote_score": -32.1,
         "quote_label": "やや弱い",
-        "quote_rank": 9,
-        "spread": 30.7,
+        "quote_rank": 10,
+        "spread": 35.7,
         "context": "やや強い通貨 vs 弱め（ロング寄り）",
         "bias": "slight_long"
-      },
-      "ai_exit_advice": "# ポジション状況整理と選択肢提示\n\n## 1. 現状整理\nEURJPY LONGは金利差+1.40%のキャリー優位と緩和サイクル強化が支援していますが、ADX20.4の弱トレンドで推進力が限定的です。現在値と推奨TPの乖離が明確で、利益確定タイミングが問われています。\n\n## 2. 利益を伸ばす選択肢\n\n**A案：トレール戦略で利を伸ばす（推奨SL183.69→184.50にシフト）**\n- 狙い：弱トレンドでも186円台への上値トライが可能なら、トレール切替で上昇分を全キャッチ\n- リスク：反転時に利益圧縮、SL幅拡大による含損増加\n\n**B案：部分利確で確度を高める（TP1の186.07で50%決済）**\n- 狙い：即座に利益確定し資金リスク低減、残り50%でTP2/3狙い\n- リスク：上昇加速時の機会損失、心理的な利確後の後悔\n\n**C案：スワップ長期保有視点（TP3手前187.25より上で保有継続）**\n- 狙い：金利差+1.40%で月20-30pips相当のキャリー獲得、EURサイクル強化傍観\n- リスク：金利差縮小やECB利下げ加速で根拠喪失、SL回収日数が経過リスク\n\n## 3. 留意点\nECB緩和ペースと日銀スタンス変化、円介入リスクが金利差と相場方向を揺さぶるため、週足ベースの中銀サインは注視必須です。"
+      }
     },
     {
       "pair": "GBPJPY",
       "label": "GBP/JPY",
       "price": 213.35672,
-      "ta_score": 78.0,
+      "ta_score": 70.0,
       "dma_score": 85,
       "macd_score": 15,
       "rsi_score": 35,
       "trend_strength": 18,
       "atr_quality": 0,
       "breakout_bonus": 15,
+      "divergence_adj": 0,
+      "ema_short_bonus": -8,
       "dma200": 209.27614,
       "dma50": 214.19813,
       "rsi": 44.12,
@@ -674,7 +679,7 @@
       "fa_rate_diff": 2.75,
       "fa_detail": "BOE(3.75% neutral/stable) vs 日銀(1.00% pause/peak) 差+2.75% / GBPサイクル強化(stable)",
       "stars": 5,
-      "verdict": "◎ 高信頼ロング",
+      "verdict": "○ ロング条件成立",
       "direction": "LONG",
       "pair_type": "major",
       "upcoming_events": [
@@ -682,77 +687,77 @@
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 19.3,
+          "hours_until": 14.3,
           "date": "2026-06-23T00:30:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 19.3,
+          "hours_until": 14.3,
           "date": "2026-06-23T00:30:00Z"
         },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "GBP",
           "importance": "high",
-          "hours_until": 27.3,
+          "hours_until": 22.3,
           "date": "2026-06-23T08:30:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "GBP",
           "importance": "high",
-          "hours_until": 27.3,
+          "hours_until": 22.3,
           "date": "2026-06-23T08:30:00Z"
         },
         {
           "name": "BoJ Summary of Opinions",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 42.6,
+          "hours_until": 37.6,
           "date": "2026-06-23T23:50:00Z"
         },
         {
           "name": "Tokyo Core CPI YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 90.3,
+          "hours_until": 85.3,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "Tokyo CPI Ex Food and Energy YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 90.3,
+          "hours_until": 85.3,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "Tokyo CPI YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 90.3,
+          "hours_until": 85.3,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "BoJ JGB Purchase",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 94.4,
+          "hours_until": 89.4,
           "date": "2026-06-26T03:35:00Z"
         },
         {
           "name": "Retail Sales MoM",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 114.6,
+          "hours_until": 109.6,
           "date": "2026-06-26T23:50:00Z"
         },
         {
           "name": "Retail Sales YoY",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 114.6,
+          "hours_until": 109.6,
           "date": "2026-06-26T23:50:00Z"
         }
       ],
@@ -762,31 +767,31 @@
         "atr_ratio": 0.8,
         "atr_90d": 0.62704,
         "sl_multiplier": 3.0,
-        "tp1_multiplier": 3.0,
+        "tp1_multiplier": 1.5,
         "tp2_multiplier": 4.5,
         "tp3_multiplier": 6.0,
-        "note": "ATR比率0.8 → E案最適設定（PF 2.15/+48.4pips）"
+        "note": "ATR比率0.8 → TP=1.5×ATR（Phase1出口改善・到達率向上）"
       },
       "staged_tp": {
         "sl": 211.85,
-        "tp": 214.87,
-        "trail_atr_mult": 3.0,
-        "trail_distance": 1.51,
+        "tp": 214.11,
+        "trail_atr_mult": 2.0,
+        "trail_distance": 1.01,
         "be_plus_offset": 0.75,
         "be_target_after_tp": 214.11,
         "max_target": 216.37,
-        "rr_tp": 1.0,
+        "rr_tp": 0.5,
         "tp_mode": "single_with_trail",
-        "tp1": 214.87,
+        "tp1": 214.11,
         "tp2": 215.62,
         "tp3": 216.37,
         "sl_width": 1.51,
-        "tp1_width": 1.51,
-        "rr_tp1": 1.0,
+        "tp1_width": 0.75,
+        "rr_tp1": 0.5,
         "rr_tp2": 1.5,
         "rr_tp3": 2.0,
         "regime_label": "通常ボラ相場",
-        "strategy": "TP(214.87)到達 → SLを BE+0.5R(214.11) へ移動 → トレーリング(3.0×ATR=1.51)発動 → 利を伸ばす（理論最大: 216.37）",
+        "strategy": "TP(214.11)到達 → SLを BE+0.5R(214.11) へ移動 → トレーリング(2.0×ATR=1.01)発動 → 利を伸ばす（理論最大: 216.37）",
         "chandelier_sl_active": false,
         "chandelier_note": ""
       },
@@ -874,6 +879,7 @@
         "trend_direction": "down",
         "note": "順張りやや有効"
       },
+      "performance_adjusted": true,
       "performance": {
         "win_rate": 57.1,
         "total_trades": 7,
@@ -892,17 +898,17 @@
       "strength_context": {
         "base_currency": "GBP",
         "quote_currency": "JPY",
-        "base_score": -22.0,
-        "base_label": "やや弱い",
+        "base_score": -18.1,
+        "base_label": "中立",
         "base_rank": 8,
-        "quote_score": -26.4,
+        "quote_score": -32.1,
         "quote_label": "やや弱い",
-        "quote_rank": 9,
-        "spread": 4.4,
+        "quote_rank": 10,
+        "spread": 14.0,
         "context": "通貨強弱が拮抗（中立）",
         "bias": "neutral"
       },
-      "ai_exit_advice": "## 現状整理\nGBPJPY LONG は弱トレンド環境にあり、テクニカル推奨値は明確ですが、金利差+2.75%のキャリー優位性が長期保有の根拠となります。現在TA78.0で推奨SLまで余裕がある状態です。\n\n## 利益を伸ばす選択肢\n\n**A案：トレール切替（推奨）**\n- 狙い：弱トレンドながら利益を伸ばす余地を確保。TP1（214.87）到達後、損切を建値付近に移動してTP2/3を目指す\n- リスク：小動きで引っ掛かる可能性\n\n**B案：部分利確＋トレール保有**\n- 狙い：TP1で30～50%利確して利益を確定。残り枠をトレール運用し、キャリーも継続回収\n- リスク：トレンド加速時の取りこぼし\n\n**C案：OCO固定維持（長期保有型）**\n- 狙い：金利差継続、SL回収日数が十分であれば、TP3まで我慢する\n- リスク：中銀スタンス変化や金利差縮小で機会損失化のおそれ\n\n## 留意点\nBOEサイクル強化は堅調ですが、日銀政策シフトや金利差収束リスクを定期監視が必須です。"
+      "ai_exit_advice": "# ポジション整理・選択肢提示\n\n## 1. 現状整理\nGBPJPYロングは金利差+2.75%のキャリー源泉と弱いが上向きテクニカル（TA70.0）で支えられています。ただしADX28.8は中程度トレンドで、本格上昇には確信が限定的です。\n\n## 2. 利益を伸ばす選択肢\n\n**A案：トレール戦略への切替**\n- 狙い：TP3(216.37)到達の可能性を活かしつつ、トレンド反転時の損失を最小限に\n- リスク：小戻りで早期決済される可能性\n- 推奨：現在値から+100pips超のトレールに設定\n\n**B案：部分利確＋コア保有**\n- 狙い：TP1(214.11)で利益を確定しつつ、コア（建値近傍SL211.85）で金利差スワップを年間+2.75%狙う\n- リスク：スワップ受取までSL回収日数が不明で、介入や金利政策リスク\n\n**C案：全力ホールド（OCO固定）**\n- 狙い：弱トレンド相場での早期利確機会損失を回避、TP3到達を目指す\n- リスク：トレンド反転時の一括損失、ADX低下で上値失敗の可能性\n\n## 3. 留意点\nBOE据置き・日銀据置きで金利差の拡大見込み薄く、「政策転換シグナル」と「GBP相場介入警戒」が値動きの天井になるリスクに注視してください。"
     },
     {
       "pair": "AUDJPY",
@@ -915,6 +921,8 @@
       "trend_strength": 18,
       "atr_quality": 0,
       "breakout_bonus": 0,
+      "divergence_adj": 0,
+      "ema_short_bonus": 0,
       "dma200": 106.97785,
       "dma50": 113.57061,
       "rsi": 47.45,
@@ -925,142 +933,142 @@
       "fa_direction": "buy",
       "fa_rate_diff": 3.1,
       "fa_detail": "RBA(4.10% ease/stable) vs 日銀(1.00% pause/peak) 差+3.10% / AUDサイクル強化(stable)",
-      "stars": 3,
-      "verdict": "○ ロング条件成立",
-      "direction": "LONG",
+      "stars": 2,
+      "verdict": "🔻 BOJサイクルフィルタ: AUD(RBA ease/stable) + JPY(日銀 pause) = LONGはダブル逆風",
+      "direction": "NO_TRADE",
       "pair_type": "major",
       "upcoming_events": [
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "AUD",
           "importance": "high",
-          "hours_until": 17.8,
+          "hours_until": 12.8,
           "date": "2026-06-22T23:00:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "AUD",
           "importance": "high",
-          "hours_until": 17.8,
+          "hours_until": 12.8,
           "date": "2026-06-22T23:00:00Z"
         },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 19.3,
+          "hours_until": 14.3,
           "date": "2026-06-23T00:30:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 19.3,
+          "hours_until": 14.3,
           "date": "2026-06-23T00:30:00Z"
         },
         {
           "name": "BoJ Summary of Opinions",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 42.6,
+          "hours_until": 37.6,
           "date": "2026-06-23T23:50:00Z"
         },
         {
           "name": "CPI",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 44.3,
+          "hours_until": 39.3,
           "date": "2026-06-24T01:30:00Z"
         },
         {
           "name": "Inflation Rate MoM",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 44.3,
+          "hours_until": 39.3,
           "date": "2026-06-24T01:30:00Z"
         },
         {
           "name": "Inflation Rate YoY",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 44.3,
+          "hours_until": 39.3,
           "date": "2026-06-24T01:30:00Z"
         },
         {
           "name": "RBA Trimmed Mean CPI MoM",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 44.3,
+          "hours_until": 39.3,
           "date": "2026-06-24T01:30:00Z"
         },
         {
           "name": "RBA Trimmed Mean CPI YoY",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 44.3,
+          "hours_until": 39.3,
           "date": "2026-06-24T01:30:00Z"
         },
         {
           "name": "RBA Weighted Median CPI MoM",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 44.3,
+          "hours_until": 39.3,
           "date": "2026-06-24T01:30:00Z"
         },
         {
           "name": "RBA Weighted Median CPI YoY",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 44.3,
+          "hours_until": 39.3,
           "date": "2026-06-24T01:30:00Z"
         },
         {
           "name": "Unemployment Rate",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 68.3,
+          "hours_until": 63.3,
           "date": "2026-06-25T01:30:00Z"
         },
         {
           "name": "Tokyo Core CPI YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 90.3,
+          "hours_until": 85.3,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "Tokyo CPI Ex Food and Energy YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 90.3,
+          "hours_until": 85.3,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "Tokyo CPI YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 90.3,
+          "hours_until": 85.3,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "BoJ JGB Purchase",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 94.4,
+          "hours_until": 89.4,
           "date": "2026-06-26T03:35:00Z"
         },
         {
           "name": "Retail Sales MoM",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 114.6,
+          "hours_until": 109.6,
           "date": "2026-06-26T23:50:00Z"
         },
         {
           "name": "Retail Sales YoY",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 114.6,
+          "hours_until": 109.6,
           "date": "2026-06-26T23:50:00Z"
         }
       ],
@@ -1070,31 +1078,31 @@
         "atr_ratio": 0.71,
         "atr_90d": 0.45245,
         "sl_multiplier": 3.0,
-        "tp1_multiplier": 3.0,
+        "tp1_multiplier": 1.5,
         "tp2_multiplier": 4.5,
         "tp3_multiplier": 6.0,
-        "note": "ATR比率0.7 → E案最適設定（PF 2.15/+48.4pips）"
+        "note": "ATR比率0.7 → TP=1.5×ATR（Phase1出口改善・到達率向上）"
       },
       "staged_tp": {
         "sl": 112.12,
-        "tp": 114.06,
-        "trail_atr_mult": 3.0,
-        "trail_distance": 0.97,
+        "tp": 113.57,
+        "trail_atr_mult": 2.0,
+        "trail_distance": 0.64,
         "be_plus_offset": 0.48,
         "be_target_after_tp": 113.57,
         "max_target": 115.02,
-        "rr_tp": 1.0,
+        "rr_tp": 0.5,
         "tp_mode": "single_with_trail",
-        "tp1": 114.06,
+        "tp1": 113.57,
         "tp2": 114.54,
         "tp3": 115.02,
         "sl_width": 0.97,
-        "tp1_width": 0.97,
-        "rr_tp1": 1.0,
+        "tp1_width": 0.48,
+        "rr_tp1": 0.5,
         "rr_tp2": 1.5,
         "rr_tp3": 2.0,
         "regime_label": "通常ボラ相場",
-        "strategy": "TP(114.06)到達 → SLを BE+0.5R(113.57) へ移動 → トレーリング(3.0×ATR=0.97)発動 → 利を伸ばす（理論最大: 115.02）",
+        "strategy": "TP(113.57)到達 → SLを BE+0.5R(113.57) へ移動 → トレーリング(2.0×ATR=0.64)発動 → 利を伸ばす（理論最大: 115.02）",
         "chandelier_sl_active": false,
         "chandelier_note": ""
       },
@@ -1219,6 +1227,8 @@
         ],
         "message": "ピボットPP（113.03676）に接近 あと0.05% → 反発でのロング候補"
       },
+      "regime_filter_applied": true,
+      "regime_filter_reason": "⚠️ BOJサイクルフィルタ: AUD(RBA ease/stable) + JPY(日銀 pause) = LONGはダブル逆風",
       "cb_meeting_blackout": {
         "active": false,
         "severity": "none",
@@ -1227,553 +1237,30 @@
       "strength_context": {
         "base_currency": "AUD",
         "quote_currency": "JPY",
-        "base_score": -49.0,
+        "base_score": -40.3,
         "base_label": "やや弱い",
         "base_rank": 11,
-        "quote_score": -26.4,
+        "quote_score": -32.1,
         "quote_label": "やや弱い",
-        "quote_rank": 9,
-        "spread": -22.6,
-        "context": "やや弱い通貨 vs 強め（ショート寄り）",
-        "bias": "slight_short"
-      }
-    },
-    {
-      "pair": "NZDJPY",
-      "label": "NZD/JPY",
-      "price": 92.59278,
-      "ta_score": 78.0,
-      "dma_score": 85,
-      "macd_score": 15,
-      "rsi_score": 35,
-      "trend_strength": 18,
-      "atr_quality": 0,
-      "breakout_bonus": 15,
-      "dma200": 91.02114,
-      "dma50": 93.47386,
-      "rsi": 40.48,
-      "macd": -0.19295,
-      "macd_signal": -0.04318,
-      "atr": 0.30096,
-      "fa_score": 66.9,
-      "fa_direction": "buy",
-      "fa_rate_diff": 2.25,
-      "fa_detail": "RBNZ(3.25% ease/decelerating) vs 日銀(1.00% pause/peak) 差+2.25% / NZDサイクル強化(decelerating)",
-      "stars": 2,
-      "verdict": "○ ロング条件成立",
-      "direction": "LONG",
-      "pair_type": "major",
-      "upcoming_events": [
-        {
-          "name": "S&P Global Manufacturing PMI Flash",
-          "currency": "JPY",
-          "importance": "high",
-          "hours_until": 19.3,
-          "date": "2026-06-23T00:30:00Z"
-        },
-        {
-          "name": "S&P Global Services PMI Flash",
-          "currency": "JPY",
-          "importance": "high",
-          "hours_until": 19.3,
-          "date": "2026-06-23T00:30:00Z"
-        },
-        {
-          "name": "BoJ Summary of Opinions",
-          "currency": "JPY",
-          "importance": "critical",
-          "hours_until": 42.6,
-          "date": "2026-06-23T23:50:00Z"
-        },
-        {
-          "name": "Tokyo Core CPI YoY",
-          "currency": "JPY",
-          "importance": "critical",
-          "hours_until": 90.3,
-          "date": "2026-06-25T23:30:00Z"
-        },
-        {
-          "name": "Tokyo CPI Ex Food and Energy YoY",
-          "currency": "JPY",
-          "importance": "critical",
-          "hours_until": 90.3,
-          "date": "2026-06-25T23:30:00Z"
-        },
-        {
-          "name": "Tokyo CPI YoY",
-          "currency": "JPY",
-          "importance": "critical",
-          "hours_until": 90.3,
-          "date": "2026-06-25T23:30:00Z"
-        },
-        {
-          "name": "BoJ JGB Purchase",
-          "currency": "JPY",
-          "importance": "critical",
-          "hours_until": 94.4,
-          "date": "2026-06-26T03:35:00Z"
-        },
-        {
-          "name": "Retail Sales MoM",
-          "currency": "JPY",
-          "importance": "high",
-          "hours_until": 114.6,
-          "date": "2026-06-26T23:50:00Z"
-        },
-        {
-          "name": "Retail Sales YoY",
-          "currency": "JPY",
-          "importance": "high",
-          "hours_until": 114.6,
-          "date": "2026-06-26T23:50:00Z"
-        }
-      ],
-      "volatility_regime": {
-        "regime": "normal",
-        "regime_label": "通常ボラ相場",
-        "atr_ratio": 0.9,
-        "atr_90d": 0.33392,
-        "sl_multiplier": 3.0,
-        "tp1_multiplier": 3.0,
-        "tp2_multiplier": 4.5,
-        "tp3_multiplier": 6.0,
-        "note": "ATR比率0.9 → E案最適設定（PF 2.15/+48.4pips）"
-      },
-      "staged_tp": {
-        "sl": 91.69,
-        "tp": 93.5,
-        "trail_atr_mult": 3.0,
-        "trail_distance": 0.9,
-        "be_plus_offset": 0.45,
-        "be_target_after_tp": 93.04,
-        "max_target": 94.4,
-        "rr_tp": 1.0,
-        "tp_mode": "single_with_trail",
-        "tp1": 93.5,
-        "tp2": 93.95,
-        "tp3": 94.4,
-        "sl_width": 0.9,
-        "tp1_width": 0.9,
-        "rr_tp1": 1.0,
-        "rr_tp2": 1.5,
-        "rr_tp3": 2.0,
-        "regime_label": "通常ボラ相場",
-        "strategy": "TP(93.5)到達 → SLを BE+0.5R(93.04) へ移動 → トレーリング(3.0×ATR=0.9)発動 → 利を伸ばす（理論最大: 94.4）",
-        "chandelier_sl_active": false,
-        "chandelier_note": ""
-      },
-      "carry_score": {
-        "carry_score": 6.92,
-        "label": "非常に優れたキャリー",
-        "annual_swap_pct": 2.25,
-        "daily_volatility_pct": 0.33,
-        "breakeven_days": 131,
-        "note": "SL幅をスワップで回収: 約131日"
-      },
-      "support_resistance": {
-        "resistance": [
-          {
-            "price": 93.67,
-            "strength": 4,
-            "label": "強いレジスタンス",
-            "distance_pct": 1.16
-          },
-          {
-            "price": 94.23,
-            "strength": 1,
-            "label": "弱いレジスタンス",
-            "distance_pct": 1.77
-          },
-          {
-            "price": 94.45,
-            "strength": 1,
-            "label": "弱いレジスタンス",
-            "distance_pct": 2.01
-          },
-          {
-            "price": 95.15,
-            "strength": 1,
-            "label": "弱いレジスタンス",
-            "distance_pct": 2.76
-          }
-        ],
-        "support": [
-          {
-            "price": 92.195,
-            "strength": 2,
-            "label": "サポート",
-            "distance_pct": 0.43
-          },
-          {
-            "price": 85.45,
-            "strength": 1,
-            "label": "弱いサポート",
-            "distance_pct": 7.71
-          },
-          {
-            "price": 86.05,
-            "strength": 1,
-            "label": "弱いサポート",
-            "distance_pct": 7.07
-          },
-          {
-            "price": 86.21,
-            "strength": 1,
-            "label": "弱いサポート",
-            "distance_pct": 6.89
-          }
-        ],
-        "nearest_resistance": {
-          "price": 93.67,
-          "strength": 4,
-          "label": "強いレジスタンス",
-          "distance_pct": 1.16
-        },
-        "nearest_support": {
-          "price": 92.195,
-          "strength": 2,
-          "label": "サポート",
-          "distance_pct": 0.43
-        },
-        "context": "レジスタンス(93.67)まで1.16% / サポート(92.195)まで0.43%（非常に近い・注意）"
-      },
-      "market_regime": {
-        "adx": 54.9,
-        "plus_di": 22.6,
-        "minus_di": 77.4,
-        "regime": "trending",
-        "regime_label": "トレンド相場",
-        "trend_direction": "down",
-        "note": "順張りシグナル有効"
-      },
-      "performance_adjusted": true,
-      "performance": {
-        "win_rate": 0.0,
-        "total_trades": 5,
-        "adjustment": -2,
-        "note": "実績低調・要注意"
-      },
-      "ambush": {
-        "has_alert": false,
-        "approaching": []
-      },
-      "cb_meeting_blackout": {
-        "active": false,
-        "severity": "none",
-        "reason": ""
-      },
-      "strength_context": {
-        "base_currency": "NZD",
-        "quote_currency": "JPY",
-        "base_score": -81.8,
-        "base_label": "弱い",
-        "base_rank": 13,
-        "quote_score": -26.4,
-        "quote_label": "やや弱い",
-        "quote_rank": 9,
-        "spread": -55.4,
-        "context": "弱い通貨 vs 強い通貨（ショート有利）",
-        "bias": "short"
-      }
-    },
-    {
-      "pair": "CADJPY",
-      "label": "CAD/JPY",
-      "price": 113.92655,
-      "ta_score": 78.0,
-      "dma_score": 85,
-      "macd_score": 15,
-      "rsi_score": 35,
-      "trend_strength": 18,
-      "atr_quality": 0,
-      "breakout_bonus": 15,
-      "dma200": 112.87732,
-      "dma50": 115.33753,
-      "rsi": 33.04,
-      "macd": -0.34936,
-      "macd_signal": -0.23784,
-      "atr": 0.20408,
-      "fa_score": 69.1,
-      "fa_direction": "buy",
-      "fa_rate_diff": 1.75,
-      "fa_detail": "BOC(2.75% neutral/stable) vs 日銀(1.00% pause/peak) 差+1.75% / CADサイクル強化(stable)",
-      "stars": 3,
-      "verdict": "◎ 高信頼ロング",
-      "direction": "LONG",
-      "pair_type": "major",
-      "upcoming_events": [
-        {
-          "name": "Core Inflation Rate MoM",
-          "currency": "CAD",
-          "importance": "critical",
-          "hours_until": 7.3,
-          "date": "2026-06-22T12:30:00Z"
-        },
-        {
-          "name": "Core Inflation Rate YoY",
-          "currency": "CAD",
-          "importance": "critical",
-          "hours_until": 7.3,
-          "date": "2026-06-22T12:30:00Z"
-        },
-        {
-          "name": "CPI Common YoY",
-          "currency": "CAD",
-          "importance": "critical",
-          "hours_until": 7.3,
-          "date": "2026-06-22T12:30:00Z"
-        },
-        {
-          "name": "CPI Median YoY",
-          "currency": "CAD",
-          "importance": "critical",
-          "hours_until": 7.3,
-          "date": "2026-06-22T12:30:00Z"
-        },
-        {
-          "name": "CPI Trimmed-Mean YoY",
-          "currency": "CAD",
-          "importance": "critical",
-          "hours_until": 7.3,
-          "date": "2026-06-22T12:30:00Z"
-        },
-        {
-          "name": "Inflation Rate MoM",
-          "currency": "CAD",
-          "importance": "critical",
-          "hours_until": 7.3,
-          "date": "2026-06-22T12:30:00Z"
-        },
-        {
-          "name": "Inflation Rate YoY",
-          "currency": "CAD",
-          "importance": "critical",
-          "hours_until": 7.3,
-          "date": "2026-06-22T12:30:00Z"
-        },
-        {
-          "name": "S&P Global Manufacturing PMI Flash",
-          "currency": "JPY",
-          "importance": "high",
-          "hours_until": 19.3,
-          "date": "2026-06-23T00:30:00Z"
-        },
-        {
-          "name": "S&P Global Services PMI Flash",
-          "currency": "JPY",
-          "importance": "high",
-          "hours_until": 19.3,
-          "date": "2026-06-23T00:30:00Z"
-        },
-        {
-          "name": "BoJ Summary of Opinions",
-          "currency": "JPY",
-          "importance": "critical",
-          "hours_until": 42.6,
-          "date": "2026-06-23T23:50:00Z"
-        },
-        {
-          "name": "Tokyo Core CPI YoY",
-          "currency": "JPY",
-          "importance": "critical",
-          "hours_until": 90.3,
-          "date": "2026-06-25T23:30:00Z"
-        },
-        {
-          "name": "Tokyo CPI Ex Food and Energy YoY",
-          "currency": "JPY",
-          "importance": "critical",
-          "hours_until": 90.3,
-          "date": "2026-06-25T23:30:00Z"
-        },
-        {
-          "name": "Tokyo CPI YoY",
-          "currency": "JPY",
-          "importance": "critical",
-          "hours_until": 90.3,
-          "date": "2026-06-25T23:30:00Z"
-        },
-        {
-          "name": "BoJ JGB Purchase",
-          "currency": "JPY",
-          "importance": "critical",
-          "hours_until": 94.4,
-          "date": "2026-06-26T03:35:00Z"
-        },
-        {
-          "name": "Retail Sales MoM",
-          "currency": "JPY",
-          "importance": "high",
-          "hours_until": 114.6,
-          "date": "2026-06-26T23:50:00Z"
-        },
-        {
-          "name": "Retail Sales YoY",
-          "currency": "JPY",
-          "importance": "high",
-          "hours_until": 114.6,
-          "date": "2026-06-26T23:50:00Z"
-        }
-      ],
-      "volatility_regime": {
-        "regime": "low",
-        "regime_label": "低ボラ相場",
-        "atr_ratio": 0.65,
-        "atr_90d": 0.31604,
-        "sl_multiplier": 2.5,
-        "tp1_multiplier": 2.5,
-        "tp2_multiplier": 4.0,
-        "tp3_multiplier": 5.0,
-        "note": "ATRが90日平均の0.6倍 → SL幅を縮小（E案連動）"
-      },
-      "staged_tp": {
-        "sl": 113.42,
-        "tp": 114.44,
-        "trail_atr_mult": 2.5,
-        "trail_distance": 0.51,
-        "be_plus_offset": 0.26,
-        "be_target_after_tp": 114.18,
-        "max_target": 114.95,
-        "rr_tp": 1.0,
-        "tp_mode": "single_with_trail",
-        "tp1": 114.44,
-        "tp2": 114.74,
-        "tp3": 114.95,
-        "sl_width": 0.51,
-        "tp1_width": 0.51,
-        "rr_tp1": 1.0,
-        "rr_tp2": 1.6,
-        "rr_tp3": 2.0,
-        "regime_label": "低ボラ相場",
-        "strategy": "TP(114.44)到達 → SLを BE+0.5R(114.18) へ移動 → トレーリング(2.5×ATR=0.51)発動 → 利を伸ばす（理論最大: 114.95）",
-        "chandelier_sl_active": false,
-        "chandelier_note": ""
-      },
-      "carry_score": {
-        "carry_score": 9.77,
-        "label": "非常に優れたキャリー",
-        "annual_swap_pct": 1.75,
-        "daily_volatility_pct": 0.18,
-        "breakeven_days": 93,
-        "note": "SL幅をスワップで回収: 約93日"
-      },
-      "support_resistance": {
-        "resistance": [
-          {
-            "price": 114.45,
-            "strength": 2,
-            "label": "レジスタンス",
-            "distance_pct": 0.46
-          },
-          {
-            "price": 114.95,
-            "strength": 2,
-            "label": "レジスタンス",
-            "distance_pct": 0.9
-          },
-          {
-            "price": 115.45,
-            "strength": 1,
-            "label": "弱いレジスタンス",
-            "distance_pct": 1.34
-          },
-          {
-            "price": 115.66,
-            "strength": 1,
-            "label": "弱いレジスタンス",
-            "distance_pct": 1.52
-          }
-        ],
-        "support": [
-          {
-            "price": 110.725,
-            "strength": 2,
-            "label": "サポート",
-            "distance_pct": 2.81
-          },
-          {
-            "price": 112.115,
-            "strength": 2,
-            "label": "サポート",
-            "distance_pct": 1.59
-          },
-          {
-            "price": 105.28,
-            "strength": 1,
-            "label": "弱いサポート",
-            "distance_pct": 7.59
-          },
-          {
-            "price": 107.18,
-            "strength": 1,
-            "label": "弱いサポート",
-            "distance_pct": 5.92
-          }
-        ],
-        "nearest_resistance": {
-          "price": 114.45,
-          "strength": 2,
-          "label": "レジスタンス",
-          "distance_pct": 0.46
-        },
-        "nearest_support": {
-          "price": 112.115,
-          "strength": 2,
-          "label": "サポート",
-          "distance_pct": 1.59
-        },
-        "context": "レジスタンス(114.45)まで0.46%（非常に近い・注意） / サポート(112.115)まで1.59%"
-      },
-      "market_regime": {
-        "adx": 53.6,
-        "plus_di": 23.2,
-        "minus_di": 76.8,
-        "regime": "trending",
-        "regime_label": "トレンド相場",
-        "trend_direction": "down",
-        "note": "順張りシグナル有効"
-      },
-      "performance_adjusted": true,
-      "performance": {
-        "win_rate": 20.0,
-        "total_trades": 5,
-        "adjustment": -2,
-        "note": "実績低調・要注意"
-      },
-      "ambush": {
-        "has_alert": false,
-        "approaching": []
-      },
-      "cb_meeting_blackout": {
-        "active": false,
-        "severity": "none",
-        "reason": ""
-      },
-      "strength_context": {
-        "base_currency": "CAD",
-        "quote_currency": "JPY",
-        "base_score": -74.5,
-        "base_label": "弱い",
-        "base_rank": 12,
-        "quote_score": -26.4,
-        "quote_label": "やや弱い",
-        "quote_rank": 9,
-        "spread": -48.1,
-        "context": "弱い通貨 vs 強い通貨（ショート有利）",
-        "bias": "short"
+        "quote_rank": 10,
+        "spread": -8.2,
+        "context": "通貨強弱が拮抗（中立）",
+        "bias": "neutral"
       }
     },
     {
       "pair": "CHFJPY",
       "label": "CHF/JPY",
       "price": 199.91349,
-      "ta_score": 78.0,
+      "ta_score": 66.0,
       "dma_score": 85,
       "macd_score": 15,
       "rsi_score": 35,
       "trend_strength": 18,
       "atr_quality": 0,
       "breakout_bonus": 15,
+      "divergence_adj": 0,
+      "ema_short_bonus": -12,
       "dma200": 197.37197,
       "dma50": 202.04827,
       "rsi": 38.76,
@@ -1793,70 +1280,70 @@
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 19.3,
+          "hours_until": 14.3,
           "date": "2026-06-23T00:30:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 19.3,
+          "hours_until": 14.3,
           "date": "2026-06-23T00:30:00Z"
         },
         {
           "name": "BoJ Summary of Opinions",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 42.6,
+          "hours_until": 37.6,
           "date": "2026-06-23T23:50:00Z"
         },
         {
           "name": "SNB Quarterly Bulletin",
           "currency": "CHF",
           "importance": "critical",
-          "hours_until": 55.8,
+          "hours_until": 50.8,
           "date": "2026-06-24T13:00:00Z"
         },
         {
           "name": "Tokyo Core CPI YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 90.3,
+          "hours_until": 85.3,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "Tokyo CPI Ex Food and Energy YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 90.3,
+          "hours_until": 85.3,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "Tokyo CPI YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 90.3,
+          "hours_until": 85.3,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "BoJ JGB Purchase",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 94.4,
+          "hours_until": 89.4,
           "date": "2026-06-26T03:35:00Z"
         },
         {
           "name": "Retail Sales MoM",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 114.6,
+          "hours_until": 109.6,
           "date": "2026-06-26T23:50:00Z"
         },
         {
           "name": "Retail Sales YoY",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 114.6,
+          "hours_until": 109.6,
           "date": "2026-06-26T23:50:00Z"
         }
       ],
@@ -1866,31 +1353,31 @@
         "atr_ratio": 0.98,
         "atr_90d": 0.56771,
         "sl_multiplier": 3.0,
-        "tp1_multiplier": 3.0,
+        "tp1_multiplier": 1.5,
         "tp2_multiplier": 4.5,
         "tp3_multiplier": 6.0,
-        "note": "ATR比率1.0 → E案最適設定（PF 2.15/+48.4pips）"
+        "note": "ATR比率1.0 → TP=1.5×ATR（Phase1出口改善・到達率向上）"
       },
       "staged_tp": {
         "sl": 198.24,
-        "tp": 201.59,
-        "trail_atr_mult": 3.0,
-        "trail_distance": 1.68,
+        "tp": 200.75,
+        "trail_atr_mult": 2.0,
+        "trail_distance": 1.12,
         "be_plus_offset": 0.84,
         "be_target_after_tp": 200.75,
         "max_target": 203.27,
-        "rr_tp": 1.0,
+        "rr_tp": 0.5,
         "tp_mode": "single_with_trail",
-        "tp1": 201.59,
+        "tp1": 200.75,
         "tp2": 202.43,
         "tp3": 203.27,
         "sl_width": 1.68,
-        "tp1_width": 1.68,
-        "rr_tp1": 1.0,
+        "tp1_width": 0.84,
+        "rr_tp1": 0.5,
         "rr_tp2": 1.5,
         "rr_tp3": 2.0,
         "regime_label": "通常ボラ相場",
-        "strategy": "TP(201.59)到達 → SLを BE+0.5R(200.75) へ移動 → トレーリング(3.0×ATR=1.68)発動 → 利を伸ばす（理論最大: 203.27）",
+        "strategy": "TP(200.75)到達 → SLを BE+0.5R(200.75) へ移動 → トレーリング(2.0×ATR=1.12)発動 → 利を伸ばす（理論最大: 203.27）",
         "chandelier_sl_active": false,
         "chandelier_note": ""
       },
@@ -1990,13 +1477,13 @@
       "strength_context": {
         "base_currency": "CHF",
         "quote_currency": "JPY",
-        "base_score": -31.3,
+        "base_score": -25.7,
         "base_label": "やや弱い",
-        "base_rank": 10,
-        "quote_score": -26.4,
+        "base_rank": 9,
+        "quote_score": -32.1,
         "quote_label": "やや弱い",
-        "quote_rank": 9,
-        "spread": -4.9,
+        "quote_rank": 10,
+        "spread": 6.4,
         "context": "通貨強弱が拮抗（中立）",
         "bias": "neutral"
       }
@@ -2012,6 +1499,8 @@
       "trend_strength": 18,
       "atr_quality": 0,
       "breakout_bonus": 15,
+      "divergence_adj": 0,
+      "ema_short_bonus": 12,
       "dma200": 121.56536,
       "dma50": 124.4965,
       "rsi": 56.12,
@@ -2031,112 +1520,112 @@
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 19.3,
+          "hours_until": 14.3,
           "date": "2026-06-23T00:30:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 19.3,
+          "hours_until": 14.3,
           "date": "2026-06-23T00:30:00Z"
         },
         {
           "name": "Core Inflation Rate YoY",
           "currency": "SGD",
           "importance": "critical",
-          "hours_until": 23.8,
+          "hours_until": 18.8,
           "date": "2026-06-23T05:00:00Z"
         },
         {
           "name": "Inflation Rate MoM",
           "currency": "SGD",
           "importance": "critical",
-          "hours_until": 23.8,
+          "hours_until": 18.8,
           "date": "2026-06-23T05:00:00Z"
         },
         {
           "name": "Inflation Rate YoY",
           "currency": "SGD",
           "importance": "critical",
-          "hours_until": 23.8,
+          "hours_until": 18.8,
           "date": "2026-06-23T05:00:00Z"
         },
         {
           "name": "BoJ Summary of Opinions",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 42.6,
+          "hours_until": 37.6,
           "date": "2026-06-23T23:50:00Z"
         },
         {
           "name": "Tokyo Core CPI YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 90.3,
+          "hours_until": 85.3,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "Tokyo CPI Ex Food and Energy YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 90.3,
+          "hours_until": 85.3,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "Tokyo CPI YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 90.3,
+          "hours_until": 85.3,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "PPI YoY",
           "currency": "SGD",
           "importance": "high",
-          "hours_until": 94.3,
+          "hours_until": 89.3,
           "date": "2026-06-26T03:30:00Z"
         },
         {
           "name": "BoJ JGB Purchase",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 94.4,
+          "hours_until": 89.4,
           "date": "2026-06-26T03:35:00Z"
         },
         {
           "name": "Industrial Production MoM",
           "currency": "SGD",
           "importance": "high",
-          "hours_until": 95.8,
+          "hours_until": 90.8,
           "date": "2026-06-26T05:00:00Z"
         },
         {
           "name": "Industrial Production YoY",
           "currency": "SGD",
           "importance": "high",
-          "hours_until": 95.8,
+          "hours_until": 90.8,
           "date": "2026-06-26T05:00:00Z"
         },
         {
           "name": "Unemployment Rate Final",
           "currency": "SGD",
           "importance": "critical",
-          "hours_until": 98.8,
+          "hours_until": 93.8,
           "date": "2026-06-26T08:00:00Z"
         },
         {
           "name": "Retail Sales MoM",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 114.6,
+          "hours_until": 109.6,
           "date": "2026-06-26T23:50:00Z"
         },
         {
           "name": "Retail Sales YoY",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 114.6,
+          "hours_until": 109.6,
           "date": "2026-06-26T23:50:00Z"
         }
       ],
@@ -2146,31 +1635,31 @@
         "atr_ratio": 0.69,
         "atr_90d": 0.24261,
         "sl_multiplier": 2.5,
-        "tp1_multiplier": 2.5,
+        "tp1_multiplier": 1.25,
         "tp2_multiplier": 4.0,
         "tp3_multiplier": 5.0,
-        "note": "ATRが90日平均の0.7倍 → SL幅を縮小（E案連動）"
+        "note": "ATRが90日平均の0.7倍 → SL縮小・TP縮小（Phase1出口改善）"
       },
       "staged_tp": {
         "sl": 124.66,
-        "tp": 125.3,
-        "trail_atr_mult": 2.5,
-        "trail_distance": 0.42,
+        "tp": 125.09,
+        "trail_atr_mult": 2.0,
+        "trail_distance": 0.33,
         "be_plus_offset": 0.21,
         "be_target_after_tp": 125.09,
         "max_target": 125.72,
-        "rr_tp": 1.0,
+        "rr_tp": 0.5,
         "tp_mode": "single_with_trail",
-        "tp1": 125.3,
+        "tp1": 125.09,
         "tp2": 125.55,
         "tp3": 125.72,
         "sl_width": 0.42,
-        "tp1_width": 0.42,
-        "rr_tp1": 1.0,
+        "tp1_width": 0.21,
+        "rr_tp1": 0.5,
         "rr_tp2": 1.6,
         "rr_tp3": 2.0,
         "regime_label": "低ボラ相場",
-        "strategy": "TP(125.3)到達 → SLを BE+0.5R(125.09) へ移動 → トレーリング(2.5×ATR=0.42)発動 → 利を伸ばす（理論最大: 125.72）",
+        "strategy": "TP(125.09)到達 → SLを BE+0.5R(125.09) へ移動 → トレーリング(2.0×ATR=0.33)発動 → 利を伸ばす（理論最大: 125.72）",
         "chandelier_sl_active": true,
         "chandelier_note": "Chandelier Exit: 過去22日高値(125.08)-2.5xATR"
       },
@@ -2299,29 +1788,31 @@
       "strength_context": {
         "base_currency": "SGD",
         "quote_currency": "JPY",
-        "base_score": 30.2,
+        "base_score": 24.8,
         "base_label": "やや強い",
         "base_rank": 6,
-        "quote_score": -26.4,
+        "quote_score": -32.1,
         "quote_label": "やや弱い",
-        "quote_rank": 9,
-        "spread": 56.6,
+        "quote_rank": 10,
+        "spread": 56.9,
         "context": "強い通貨 vs 弱い通貨（ロング有利）",
         "bias": "long"
       },
-      "ai_exit_advice": "# SGDJPY LONG ポジション分析\n\n## 1. 現状整理\nレンジ相場(ADX3.3)で方向性が弱く、テクニカルスコア高(TA98)ですが、金利差+1.50%のキャリー収益が活きる環境です。MAS強化スタンスで中期的なSGD買い支持材料は存在します。\n\n## 2. 利益を伸ばす選択肢\n\n**A) トレール切替（TP1手前でトレール開始）**\n- 狙い：レンジ上抜けでトレンド化した場合、利を大きく伸ばせる\n- リスク：レンジ内での上下動でトレール引かかる可能性\n\n**B) 部分利確＋スワップ長期保有**\n- TP1(125.30)で30-50%利確、残玉をSL124.66で保有継続\n- 狙い：確定利益＋金利差+1.50%のスワップ享受（SL回収日数が不明だが、この金利差なら数週間で有意）\n- リスク：残玉下抜けで損失相殺される可能性\n\n**C) OCO固定維持**\n- 推奨TP/SLで機械的実行\n- 狙い：判断の一貫性、感情的な延長を避ける\n- リスク：レンジ相場では利小損大になりやすい\n\n## 3. 留意点\nMAS金利据え置きが長期化した場合の金利差縮小、日銀政策転換時の急変リスク、BOJ介入警戒が必要です。"
+      "ai_exit_advice": "## ポジション分析：SGDJPY LONG\n\n### 1. 現状整理\nSGDJPYはレンジ相場（ADX3.3＝弱いトレンド）で推移しており、テクニカルスコア98で強気シグナルが出ています。金利差+1.50%のキャリーメリットが存在する環境です。\n\n### 2. 利益を伸ばす選択肢\n\n**A案：トレール切替戦略**\nTP1(125.09)到達時点でOCO固定をトレーリングストップ（例：15-20pips）に切替え、レンジ上限(125.55~125.72)まで利を伸ばす狙い。\n- 狙い：弱トレンド環境での段階的利益確保\n- リスク：反転時の含み益消失\n\n**B案：部分利確ラダー型**\nTP1で30%、TP2で40%、TP3で残30%と分割決済。各段階でリスク・リウォード比を改善。\n- 狙い：期待値最大化と心理的安定の両立\n- リスク：全Tipまで保有する機会コスト\n\n**C案：長期スワップ保有**\nSL124.66を確保しつつ、金利差1.50%で複数週保有。キャリー蓄積とレンジ上抜けの両方を狙う。\n- 狙い：スワップ収益＋値上がり益の二層構造\n- リスク：SL回収日数が不明なため、資金効率性が不透明\n\n### 3. 留意点\nMAS金利据置一方で日銀の追加利上げ観測や円売り介入の可能性により金利差が縮小するリスクを注視してください。"
     },
     {
       "pair": "HKDJPY",
       "label": "HKD/JPY",
       "price": 20.56805,
-      "ta_score": 88.3,
+      "ta_score": 98,
       "dma_score": 85,
       "macd_score": 85,
       "rsi_score": 20,
       "trend_strength": 10,
       "atr_quality": 0,
       "breakout_bonus": 15,
+      "divergence_adj": 0,
+      "ema_short_bonus": 12,
       "dma200": 19.99201,
       "dma50": 20.31255,
       "rsi": 71.24,
@@ -2341,77 +1832,77 @@
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 19.3,
+          "hours_until": 14.3,
           "date": "2026-06-23T00:30:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 19.3,
+          "hours_until": 14.3,
           "date": "2026-06-23T00:30:00Z"
         },
         {
           "name": "Inflation Rate MoM",
           "currency": "HKD",
           "importance": "critical",
-          "hours_until": 27.3,
+          "hours_until": 22.3,
           "date": "2026-06-23T08:30:00Z"
         },
         {
           "name": "Inflation Rate YoY",
           "currency": "HKD",
           "importance": "critical",
-          "hours_until": 27.3,
+          "hours_until": 22.3,
           "date": "2026-06-23T08:30:00Z"
         },
         {
           "name": "BoJ Summary of Opinions",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 42.6,
+          "hours_until": 37.6,
           "date": "2026-06-23T23:50:00Z"
         },
         {
           "name": "Tokyo Core CPI YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 90.3,
+          "hours_until": 85.3,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "Tokyo CPI Ex Food and Energy YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 90.3,
+          "hours_until": 85.3,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "Tokyo CPI YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 90.3,
+          "hours_until": 85.3,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "BoJ JGB Purchase",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 94.4,
+          "hours_until": 89.4,
           "date": "2026-06-26T03:35:00Z"
         },
         {
           "name": "Retail Sales MoM",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 114.6,
+          "hours_until": 109.6,
           "date": "2026-06-26T23:50:00Z"
         },
         {
           "name": "Retail Sales YoY",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 114.6,
+          "hours_until": 109.6,
           "date": "2026-06-26T23:50:00Z"
         }
       ],
@@ -2421,31 +1912,31 @@
         "atr_ratio": 0.54,
         "atr_90d": 0.0546,
         "sl_multiplier": 2.5,
-        "tp1_multiplier": 2.5,
+        "tp1_multiplier": 1.25,
         "tp2_multiplier": 4.0,
         "tp3_multiplier": 5.0,
-        "note": "ATRが90日平均の0.5倍 → SL幅を縮小（E案連動）"
+        "note": "ATRが90日平均の0.5倍 → SL縮小・TP縮小（Phase1出口改善）"
       },
       "staged_tp": {
         "sl": 20.49,
-        "tp": 20.64,
-        "trail_atr_mult": 2.5,
-        "trail_distance": 0.07,
+        "tp": 20.6,
+        "trail_atr_mult": 2.0,
+        "trail_distance": 0.06,
         "be_plus_offset": 0.04,
         "be_target_after_tp": 20.6,
         "max_target": 20.71,
-        "rr_tp": 1.0,
+        "rr_tp": 0.5,
         "tp_mode": "single_with_trail",
-        "tp1": 20.64,
+        "tp1": 20.6,
         "tp2": 20.69,
         "tp3": 20.71,
         "sl_width": 0.07,
-        "tp1_width": 0.07,
-        "rr_tp1": 1.0,
+        "tp1_width": 0.04,
+        "rr_tp1": 0.5,
         "rr_tp2": 1.6,
         "rr_tp3": 2.0,
         "regime_label": "低ボラ相場",
-        "strategy": "TP(20.64)到達 → SLを BE+0.5R(20.6) へ移動 → トレーリング(2.5×ATR=0.07)発動 → 利を伸ばす（理論最大: 20.71）",
+        "strategy": "TP(20.6)到達 → SLを BE+0.5R(20.6) へ移動 → トレーリング(2.0×ATR=0.06)発動 → 利を伸ばす（理論最大: 20.71）",
         "chandelier_sl_active": false,
         "chandelier_note": ""
       },
@@ -2521,29 +2012,31 @@
       "strength_context": {
         "base_currency": "HKD",
         "quote_currency": "JPY",
-        "base_score": 77.6,
+        "base_score": 63.8,
         "base_label": "強い",
         "base_rank": 4,
-        "quote_score": -26.4,
+        "quote_score": -32.1,
         "quote_label": "やや弱い",
-        "quote_rank": 9,
-        "spread": 104.0,
+        "quote_rank": 10,
+        "spread": 95.9,
         "context": "強い通貨 vs 弱い通貨（ロング有利）",
         "bias": "long"
       },
-      "ai_exit_advice": "## 現状整理\n強いトレンド相場（ADX62.7）でHKDJPY LONGが堅調に推移中。テクニカルスコア88.3と高く、+2.75%の金利差がスワップ収益源となる環境。\n\n## 利益を伸ばす選択肢\n\n**A案：トレール切替（短期トレンド追従）**\n- 狙い：TP1(20.64)超えでトレール幅を段階的に狭める戦略。トレンド継続時の利益拡大、転換時の機敏な損切り\n- リスク：トレンド転換時の急落で想定より低い価格で刈られる可能性\n\n**B案：段階的部分利確＋コア保有（スワップ組込）**\n- 狙い：TP1で20-30%決済し確定利益を獲得、残ポジはTP2/3目指しつつスワップを継続取得。心理的余裕が生まれ、より長期保有が可能\n- リスク：分割利確による平均建値上昇で、SL到達時の損失が相対的に拡大\n\n**C案：完全長期保有（スワップメイン）**\n- 狙い：年利+2.75%、仮にSL20.49到達まで約120日間保有で約+0.9%のスワップ獲得が見込まれ、テクニカル利益と合算で期待値向上\n- リスク：スワップスコア・キャリー回収日数不明なため、実現スワップが未確認；急落時にSLで損切り\n\n## 留意点\n香港はドルペッグ制・日銀金利据え置き予想で金利差は安定的ですが、米中金融政策の急転・要人発言による介入リスクを監視してください。"
+      "ai_exit_advice": "# ポジション分析：HKDJPY LONG\n\n## 1. 現状整理\n強いトレンド相場（ADX62.7）で高TA評価（98）のロングポジション。金利差+2.75%のキャリーと組み合わせ、利を伸ばす環境が整っています。\n\n## 2. 利益を伸ばす選択肢\n\n**A案：トレイリングストップ切替**\n- **狙い**：TP1（20.49）到達後、利を伸ばしながら下値保護。強トレンド継続時にTP2/3への利益拡大が期待できます\n- **リスク**：早期の損切りリスク。ボラティリティ調整が必須\n\n**B案：段階的部分利確＋残玉トレイル**\n- **狙い**：TP1で30～50%利確して確定利益化。残玉でキャリー受取＋上値狙いの二段構え\n- **リスク**：機会損失（強トレンド継続時）と確定利益のバランス判断が必要\n\n**C案：長期保有（スワップ活用）**\n- **狙い**：TP1超過後も保有継続。金利差+2.75%のキャリーが日次で蓄積。トレンド継続なら複利効果\n- **リスク**：SL20.49まで戻るまでの回収日数が不透明。金利差縮小リスク\n\n## 3. 留意点\nHKMA米ドルペッグ維持が前提のため、金利差急縮小や日銀政策転換、人民元変動による介入リスクに留意してください。"
     },
     {
       "pair": "CNYJPY",
       "label": "CNY/JPY",
       "price": 23.81738,
-      "ta_score": 96.3,
+      "ta_score": 98,
       "dma_score": 85,
       "macd_score": 85,
       "rsi_score": 20,
       "trend_strength": 18,
       "atr_quality": 0,
       "breakout_bonus": 15,
+      "divergence_adj": 0,
+      "ema_short_bonus": 12,
       "dma200": 22.44863,
       "dma50": 23.41455,
       "rsi": 76.7,
@@ -2555,8 +2048,8 @@
       "fa_rate_diff": 2.0,
       "fa_detail": "PBOC(3.00% ease/stable) vs 日銀(1.00% pause/peak) 差+2.00% / CNYサイクル強化(stable)",
       "stars": 2,
-      "verdict": "⚠ 地政学リスク(medium)考慮 ○ ロング条件成立",
-      "direction": "LONG",
+      "verdict": "🔻 BOJサイクルフィルタ: CNY(PBOC ease/stable) + JPY(日銀 pause) = LONGはダブル逆風",
+      "direction": "NO_TRADE",
       "pair_type": "emerging_market",
       "geopolitical_risk": {
         "risk_level": "medium",
@@ -2565,8 +2058,8 @@
         "recent_news": [
           "\"China (election OR protest OR crisis OR sanction OR \"central bank\" OR geopolitics)\" - Google News",
           "Google News",
-          "China keeps lending benchmark LPRs unchanged for 13th month in June - Reuters",
-          "Opinion | China-Asean relations are bigger than mere geopolitics - South China Morning Post"
+          "A change of pace at China’s central bank - The Economist",
+          "China keeps lending benchmark LPRs unchanged for 13th month in June - Reuters"
         ],
         "categories": {
           "political_instability": {
@@ -2592,63 +2085,63 @@
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 19.3,
+          "hours_until": 14.3,
           "date": "2026-06-23T00:30:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 19.3,
+          "hours_until": 14.3,
           "date": "2026-06-23T00:30:00Z"
         },
         {
           "name": "BoJ Summary of Opinions",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 42.6,
+          "hours_until": 37.6,
           "date": "2026-06-23T23:50:00Z"
         },
         {
           "name": "Tokyo Core CPI YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 90.3,
+          "hours_until": 85.3,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "Tokyo CPI Ex Food and Energy YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 90.3,
+          "hours_until": 85.3,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "Tokyo CPI YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 90.3,
+          "hours_until": 85.3,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "BoJ JGB Purchase",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 94.4,
+          "hours_until": 89.4,
           "date": "2026-06-26T03:35:00Z"
         },
         {
           "name": "Retail Sales MoM",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 114.6,
+          "hours_until": 109.6,
           "date": "2026-06-26T23:50:00Z"
         },
         {
           "name": "Retail Sales YoY",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 114.6,
+          "hours_until": 109.6,
           "date": "2026-06-26T23:50:00Z"
         }
       ],
@@ -2658,31 +2151,31 @@
         "atr_ratio": 0.59,
         "atr_90d": 0.05616,
         "sl_multiplier": 2.5,
-        "tp1_multiplier": 2.5,
+        "tp1_multiplier": 1.25,
         "tp2_multiplier": 4.0,
         "tp3_multiplier": 5.0,
-        "note": "ATRが90日平均の0.6倍 → SL幅を縮小（E案連動）"
+        "note": "ATRが90日平均の0.6倍 → SL縮小・TP縮小（Phase1出口改善）"
       },
       "staged_tp": {
         "sl": 23.73,
-        "tp": 23.9,
-        "trail_atr_mult": 2.5,
-        "trail_distance": 0.08,
+        "tp": 23.86,
+        "trail_atr_mult": 2.0,
+        "trail_distance": 0.07,
         "be_plus_offset": 0.04,
         "be_target_after_tp": 23.86,
         "max_target": 23.98,
-        "rr_tp": 1.0,
+        "rr_tp": 0.5,
         "tp_mode": "single_with_trail",
-        "tp1": 23.9,
+        "tp1": 23.86,
         "tp2": 23.95,
         "tp3": 23.98,
         "sl_width": 0.08,
-        "tp1_width": 0.08,
-        "rr_tp1": 1.0,
+        "tp1_width": 0.04,
+        "rr_tp1": 0.5,
         "rr_tp2": 1.6,
         "rr_tp3": 2.0,
         "regime_label": "低ボラ相場",
-        "strategy": "TP(23.9)到達 → SLを BE+0.5R(23.86) へ移動 → トレーリング(2.5×ATR=0.08)発動 → 利を伸ばす（理論最大: 23.98）",
+        "strategy": "TP(23.86)到達 → SLを BE+0.5R(23.86) へ移動 → トレーリング(2.0×ATR=0.07)発動 → 利を伸ばす（理論最大: 23.98）",
         "chandelier_sl_active": false,
         "chandelier_note": ""
       },
@@ -2750,6 +2243,8 @@
         "has_alert": false,
         "approaching": []
       },
+      "regime_filter_applied": true,
+      "regime_filter_reason": "⚠️ BOJサイクルフィルタ: CNY(PBOC ease/stable) + JPY(日銀 pause) = LONGはダブル逆風",
       "cb_meeting_blackout": {
         "active": false,
         "severity": "none",
@@ -2758,13 +2253,13 @@
       "strength_context": {
         "base_currency": "CNY",
         "quote_currency": "JPY",
-        "base_score": 94.8,
+        "base_score": 77.9,
         "base_label": "強い",
         "base_rank": 2,
-        "quote_score": -26.4,
+        "quote_score": -32.1,
         "quote_label": "やや弱い",
-        "quote_rank": 9,
-        "spread": 121.2,
+        "quote_rank": 10,
+        "spread": 110.0,
         "context": "強い通貨 vs 弱い通貨（ロング有利）",
         "bias": "long"
       }
@@ -2780,6 +2275,8 @@
       "trend_strength": 18,
       "atr_quality": 0,
       "breakout_bonus": 15,
+      "divergence_adj": 0,
+      "ema_short_bonus": 12,
       "dma200": 8.77706,
       "dma50": 9.18684,
       "rsi": 59.44,
@@ -2790,7 +2287,7 @@
       "fa_direction": "buy",
       "fa_rate_diff": 8.0,
       "fa_detail": "Banxico(9.00% ease/decelerating) vs 日銀(1.00% pause/peak) 差+8.00% / MXNサイクル強化(decelerating)",
-      "stars": 3,
+      "stars": 2,
       "verdict": "⚠ 地政学リスク(medium)考慮 ◎ 高信頼ロング",
       "direction": "LONG",
       "pair_type": "emerging_market",
@@ -2828,126 +2325,126 @@
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 19.3,
+          "hours_until": 14.3,
           "date": "2026-06-23T00:30:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 19.3,
+          "hours_until": 14.3,
           "date": "2026-06-23T00:30:00Z"
         },
         {
           "name": "Retail Sales MoM",
           "currency": "MXN",
           "importance": "high",
-          "hours_until": 30.8,
+          "hours_until": 25.8,
           "date": "2026-06-23T12:00:00Z"
         },
         {
           "name": "Retail Sales YoY",
           "currency": "MXN",
           "importance": "high",
-          "hours_until": 30.8,
+          "hours_until": 25.8,
           "date": "2026-06-23T12:00:00Z"
         },
         {
           "name": "BoJ Summary of Opinions",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 42.6,
+          "hours_until": 37.6,
           "date": "2026-06-23T23:50:00Z"
         },
         {
           "name": "Mid-month Core Inflation Rate MoM",
           "currency": "MXN",
           "importance": "critical",
-          "hours_until": 54.8,
+          "hours_until": 49.8,
           "date": "2026-06-24T12:00:00Z"
         },
         {
           "name": "Mid-month Core Inflation Rate YoY",
           "currency": "MXN",
           "importance": "critical",
-          "hours_until": 54.8,
+          "hours_until": 49.8,
           "date": "2026-06-24T12:00:00Z"
         },
         {
           "name": "Mid-month Inflation Rate MoM",
           "currency": "MXN",
           "importance": "critical",
-          "hours_until": 54.8,
+          "hours_until": 49.8,
           "date": "2026-06-24T12:00:00Z"
         },
         {
           "name": "Mid-month Inflation Rate YoY",
           "currency": "MXN",
           "importance": "critical",
-          "hours_until": 54.8,
+          "hours_until": 49.8,
           "date": "2026-06-24T12:00:00Z"
         },
         {
           "name": "Unemployment Rate",
           "currency": "MXN",
           "importance": "critical",
-          "hours_until": 78.8,
+          "hours_until": 73.8,
           "date": "2026-06-25T12:00:00Z"
         },
         {
           "name": "Interest Rate Decision",
           "currency": "MXN",
           "importance": "critical",
-          "hours_until": 85.8,
+          "hours_until": 80.8,
           "date": "2026-06-25T19:00:00Z"
         },
         {
           "name": "Tokyo Core CPI YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 90.3,
+          "hours_until": 85.3,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "Tokyo CPI Ex Food and Energy YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 90.3,
+          "hours_until": 85.3,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "Tokyo CPI YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 90.3,
+          "hours_until": 85.3,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "BoJ JGB Purchase",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 94.4,
+          "hours_until": 89.4,
           "date": "2026-06-26T03:35:00Z"
         },
         {
           "name": "Banxico政策金利発表",
           "currency": "MXN",
           "importance": "critical",
-          "hours_until": 108.8,
+          "hours_until": 103.8,
           "date": "2026-06-26T18:00:00Z"
         },
         {
           "name": "Retail Sales MoM",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 114.6,
+          "hours_until": 109.6,
           "date": "2026-06-26T23:50:00Z"
         },
         {
           "name": "Retail Sales YoY",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 114.6,
+          "hours_until": 109.6,
           "date": "2026-06-26T23:50:00Z"
         }
       ],
@@ -2957,31 +2454,31 @@
         "atr_ratio": 0.78,
         "atr_90d": 0.03662,
         "sl_multiplier": 3.0,
-        "tp1_multiplier": 3.0,
+        "tp1_multiplier": 1.5,
         "tp2_multiplier": 4.5,
         "tp3_multiplier": 6.0,
-        "note": "ATR比率0.8 → E案最適設定（PF 2.15/+48.4pips）"
+        "note": "ATR比率0.8 → TP=1.5×ATR（Phase1出口改善・到達率向上）"
       },
       "staged_tp": {
         "sl": 9.23648,
-        "tp": 9.38621,
-        "trail_atr_mult": 3.0,
-        "trail_distance": 0.08622,
+        "tp": 9.3431,
+        "trail_atr_mult": 2.0,
+        "trail_distance": 0.05748,
         "be_plus_offset": 0.04311,
         "be_target_after_tp": 9.3431,
         "max_target": 9.47243,
-        "rr_tp": 1.0,
+        "rr_tp": 0.5,
         "tp_mode": "single_with_trail",
-        "tp1": 9.38621,
+        "tp1": 9.3431,
         "tp2": 9.42932,
         "tp3": 9.47243,
         "sl_width": 0.08622,
-        "tp1_width": 0.08622,
-        "rr_tp1": 1.0,
+        "tp1_width": 0.04311,
+        "rr_tp1": 0.5,
         "rr_tp2": 1.5,
         "rr_tp3": 2.0,
         "regime_label": "通常ボラ相場",
-        "strategy": "TP(9.38621)到達 → SLを BE+0.5R(9.3431) へ移動 → トレーリング(3.0×ATR=0.08622)発動 → 利を伸ばす（理論最大: 9.47243）",
+        "strategy": "TP(9.3431)到達 → SLを BE+0.5R(9.3431) へ移動 → トレーリング(2.0×ATR=0.05748)発動 → 利を伸ばす（理論最大: 9.47243）",
         "chandelier_sl_active": true,
         "chandelier_note": "Chandelier Exit: 過去22日高値(9.3227)-3.0xATR"
       },
@@ -3067,6 +2564,8 @@
         ],
         "message": "ピボットPP（9.292）に接近 あと0.09% → 反発でのロング候補"
       },
+      "regime_filter_applied": true,
+      "regime_filter_reason": "⚠️ BOJサイクル軽警告: MXN(Banxico ease/decelerating) + JPY(日銀 pause) = LONG方向注意",
       "cb_meeting_blackout": {
         "active": false,
         "severity": "none",
@@ -3075,13 +2574,13 @@
       "strength_context": {
         "base_currency": "MXN",
         "quote_currency": "JPY",
-        "base_score": 63.7,
+        "base_score": 52.4,
         "base_label": "強い",
         "base_rank": 5,
-        "quote_score": -26.4,
+        "quote_score": -32.1,
         "quote_label": "やや弱い",
-        "quote_rank": 9,
-        "spread": 90.1,
+        "quote_rank": 10,
+        "spread": 84.5,
         "context": "強い通貨 vs 弱い通貨（ロング有利）",
         "bias": "long"
       }
@@ -3090,13 +2589,15 @@
       "pair": "ZARJPY",
       "label": "ZAR/JPY",
       "price": 9.78683,
-      "ta_score": 74.7,
+      "ta_score": 86.7,
       "dma_score": 85,
       "macd_score": 35,
       "rsi_score": 50,
       "trend_strength": 18,
       "atr_quality": 0,
       "breakout_bonus": 0,
+      "divergence_adj": 0,
+      "ema_short_bonus": 12,
       "dma200": 9.35619,
       "dma50": 9.68122,
       "rsi": 53.07,
@@ -3107,19 +2608,19 @@
       "fa_direction": "buy",
       "fa_rate_diff": 6.25,
       "fa_detail": "SARB(7.25% neutral/stable) vs 日銀(1.00% pause/peak) 差+6.25% / ZARサイクル強化(stable)",
-      "stars": 2,
-      "verdict": "⚠ 地政学リスク(high)考慮 ○ ロング条件成立",
+      "stars": 3,
+      "verdict": "⚠ 地政学リスク(high)考慮 ◎ 高信頼ロング",
       "direction": "LONG",
       "pair_type": "emerging_market",
       "geopolitical_risk": {
         "risk_level": "high",
-        "risk_score": 54,
+        "risk_score": 55,
         "reason": "political_instability: protest / geopolitical: sanction, war",
         "recent_news": [
           "\"South Africa (election OR protest OR crisis OR sanction OR \"central bank\" OR geopolitics)\" - Google News",
           "Google News",
-          "Gallery of A Sustainable Solution for South Africa's Toilet Crisis by the Community, for the Community - 1 - ArchDaily en Español",
-          "South African central bank sees financial system staying resilient despite Iran war - CNBC Africa"
+          "The Camp That Reveals South Africa’s Growing Migrant Crisis - Bloomberg.com",
+          "South Sudan’s sexual violence crisis: more than a wartime phenomenon - ISS Africa"
         ],
         "categories": {
           "political_instability": {
@@ -3129,101 +2630,102 @@
             ]
           },
           "geopolitical": {
-            "score": 24,
+            "score": 25,
             "hits": [
               "sanction",
-              "war"
+              "war",
+              "conflict"
             ]
           }
         },
         "country": "South Africa",
         "news_volume": 8
       },
-      "original_stars": 4,
-      "risk_adjustment": -54,
+      "original_stars": 5,
+      "risk_adjustment": -55,
       "upcoming_events": [
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 19.3,
+          "hours_until": 14.3,
           "date": "2026-06-23T00:30:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 19.3,
+          "hours_until": 14.3,
           "date": "2026-06-23T00:30:00Z"
         },
         {
           "name": "Consumer Confidence",
           "currency": "ZAR",
           "importance": "high",
-          "hours_until": 26.8,
+          "hours_until": 21.8,
           "date": "2026-06-23T08:00:00Z"
         },
         {
           "name": "BoJ Summary of Opinions",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 42.6,
+          "hours_until": 37.6,
           "date": "2026-06-23T23:50:00Z"
         },
         {
           "name": "PPI MoM",
           "currency": "ZAR",
           "importance": "high",
-          "hours_until": 76.3,
+          "hours_until": 71.3,
           "date": "2026-06-25T09:30:00Z"
         },
         {
           "name": "PPI YoY",
           "currency": "ZAR",
           "importance": "high",
-          "hours_until": 76.3,
+          "hours_until": 71.3,
           "date": "2026-06-25T09:30:00Z"
         },
         {
           "name": "Tokyo Core CPI YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 90.3,
+          "hours_until": 85.3,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "Tokyo CPI Ex Food and Energy YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 90.3,
+          "hours_until": 85.3,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "Tokyo CPI YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 90.3,
+          "hours_until": 85.3,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "BoJ JGB Purchase",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 94.4,
+          "hours_until": 89.4,
           "date": "2026-06-26T03:35:00Z"
         },
         {
           "name": "Retail Sales MoM",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 114.6,
+          "hours_until": 109.6,
           "date": "2026-06-26T23:50:00Z"
         },
         {
           "name": "Retail Sales YoY",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 114.6,
+          "hours_until": 109.6,
           "date": "2026-06-26T23:50:00Z"
         }
       ],
@@ -3233,31 +2735,31 @@
         "atr_ratio": 0.73,
         "atr_90d": 0.0584,
         "sl_multiplier": 3.0,
-        "tp1_multiplier": 3.0,
+        "tp1_multiplier": 1.5,
         "tp2_multiplier": 4.5,
         "tp3_multiplier": 6.0,
-        "note": "ATR比率0.7 → E案最適設定（PF 2.15/+48.4pips）"
+        "note": "ATR比率0.7 → TP=1.5×ATR（Phase1出口改善・到達率向上）"
       },
       "staged_tp": {
         "sl": 9.7783,
-        "tp": 9.91463,
-        "trail_atr_mult": 3.0,
-        "trail_distance": 0.1278,
+        "tp": 9.85073,
+        "trail_atr_mult": 2.0,
+        "trail_distance": 0.0852,
         "be_plus_offset": 0.0639,
         "be_target_after_tp": 9.85073,
         "max_target": 10.04243,
-        "rr_tp": 1.0,
+        "rr_tp": 0.5,
         "tp_mode": "single_with_trail",
-        "tp1": 9.91463,
+        "tp1": 9.85073,
         "tp2": 9.97853,
         "tp3": 10.04243,
         "sl_width": 0.1278,
-        "tp1_width": 0.1278,
-        "rr_tp1": 1.0,
+        "tp1_width": 0.0639,
+        "rr_tp1": 0.5,
         "rr_tp2": 1.5,
         "rr_tp3": 2.0,
         "regime_label": "通常ボラ相場",
-        "strategy": "TP(9.91463)到達 → SLを BE+0.5R(9.85073) へ移動 → トレーリング(3.0×ATR=0.1278)発動 → 利を伸ばす（理論最大: 10.04243）",
+        "strategy": "TP(9.85073)到達 → SLを BE+0.5R(9.85073) へ移動 → トレーリング(2.0×ATR=0.0852)発動 → 利を伸ばす（理論最大: 10.04243）",
         "chandelier_sl_active": true,
         "chandelier_note": "Chandelier Exit: 過去22日高値(9.9061)-3.0xATR"
       },
@@ -3381,13 +2883,13 @@
       "strength_context": {
         "base_currency": "ZAR",
         "quote_currency": "JPY",
-        "base_score": 94.2,
+        "base_score": 77.4,
         "base_label": "強い",
         "base_rank": 3,
-        "quote_score": -26.4,
+        "quote_score": -32.1,
         "quote_label": "やや弱い",
-        "quote_rank": 9,
-        "spread": 120.6,
+        "quote_rank": 10,
+        "spread": 109.5,
         "context": "強い通貨 vs 弱い通貨（ロング有利）",
         "bias": "long"
       }
@@ -3396,13 +2898,15 @@
       "pair": "GBPUSD",
       "label": "GBP/USD",
       "price": 1.32332,
-      "ta_score": 21.7,
+      "ta_score": 9.7,
       "dma_score": 30,
       "macd_score": 15,
       "rsi_score": 35,
       "trend_strength": -20,
       "atr_quality": 0,
       "breakout_bonus": 15,
+      "divergence_adj": 0,
+      "ema_short_bonus": -12,
       "dma200": 1.34109,
       "dma50": 1.34613,
       "rsi": 32.32,
@@ -3422,56 +2926,56 @@
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "GBP",
           "importance": "high",
-          "hours_until": 27.3,
+          "hours_until": 22.3,
           "date": "2026-06-23T08:30:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "GBP",
           "importance": "high",
-          "hours_until": 27.3,
+          "hours_until": 22.3,
           "date": "2026-06-23T08:30:00Z"
         },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "USD",
           "importance": "high",
-          "hours_until": 32.5,
+          "hours_until": 27.5,
           "date": "2026-06-23T13:45:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "USD",
           "importance": "high",
-          "hours_until": 32.5,
+          "hours_until": 27.5,
           "date": "2026-06-23T13:45:00Z"
         },
         {
           "name": "GDP Growth Rate QoQ Final",
           "currency": "USD",
           "importance": "critical",
-          "hours_until": 79.3,
+          "hours_until": 74.3,
           "date": "2026-06-25T12:30:00Z"
         },
         {
           "name": "GDP Price Index QoQ Final",
           "currency": "USD",
           "importance": "critical",
-          "hours_until": 79.3,
+          "hours_until": 74.3,
           "date": "2026-06-25T12:30:00Z"
         },
         {
           "name": "GDP Sales QoQ Final",
           "currency": "USD",
           "importance": "critical",
-          "hours_until": 79.3,
+          "hours_until": 74.3,
           "date": "2026-06-25T12:30:00Z"
         },
         {
           "name": "Goods Trade Balance Adv",
           "currency": "USD",
           "importance": "high",
-          "hours_until": 103.3,
+          "hours_until": 98.3,
           "date": "2026-06-26T12:30:00Z"
         }
       ],
@@ -3481,31 +2985,31 @@
         "atr_ratio": 0.82,
         "atr_90d": 0.00426,
         "sl_multiplier": 3.0,
-        "tp1_multiplier": 3.0,
+        "tp1_multiplier": 1.5,
         "tp2_multiplier": 4.5,
         "tp3_multiplier": 6.0,
-        "note": "ATR比率0.8 → E案最適設定（PF 2.15/+48.4pips）"
+        "note": "ATR比率0.8 → TP=1.5×ATR（Phase1出口改善・到達率向上）"
       },
       "staged_tp": {
         "sl": 1.33331,
-        "tp": 1.31291,
-        "trail_atr_mult": 3.0,
-        "trail_distance": 0.01041,
+        "tp": 1.31812,
+        "trail_atr_mult": 2.0,
+        "trail_distance": 0.00694,
         "be_plus_offset": 0.0052,
         "be_target_after_tp": 1.31812,
         "max_target": 1.3025,
-        "rr_tp": 1.0,
+        "rr_tp": 0.5,
         "tp_mode": "single_with_trail",
-        "tp1": 1.31291,
+        "tp1": 1.31812,
         "tp2": 1.30771,
         "tp3": 1.3025,
         "sl_width": 0.01041,
-        "tp1_width": 0.01041,
-        "rr_tp1": 1.0,
+        "tp1_width": 0.0052,
+        "rr_tp1": 0.5,
         "rr_tp2": 1.5,
         "rr_tp3": 2.0,
         "regime_label": "通常ボラ相場",
-        "strategy": "TP(1.31291)到達 → SLを BE+0.5R(1.31812) へ移動 → トレーリング(3.0×ATR=0.01041)発動 → 利を伸ばす（理論最大: 1.3025）",
+        "strategy": "TP(1.31812)到達 → SLを BE+0.5R(1.31812) へ移動 → トレーリング(2.0×ATR=0.00694)発動 → 利を伸ばす（理論最大: 1.3025）",
         "chandelier_sl_active": true,
         "chandelier_note": "Chandelier Exit: 過去22日安値(1.3229)+3.0xATR"
       },
@@ -3599,13 +3103,13 @@
       "strength_context": {
         "base_currency": "GBP",
         "quote_currency": "USD",
-        "base_score": -22.0,
-        "base_label": "やや弱い",
+        "base_score": -18.1,
+        "base_label": "中立",
         "base_rank": 8,
-        "quote_score": 100.0,
+        "quote_score": 82.2,
         "quote_label": "強い",
         "quote_rank": 1,
-        "spread": -122.0,
+        "spread": -100.3,
         "context": "弱い通貨 vs 強い通貨（ショート有利）",
         "bias": "short"
       }
@@ -3614,13 +3118,15 @@
       "pair": "AUDUSD",
       "label": "AUD/USD",
       "price": 0.70143,
-      "ta_score": 78.0,
+      "ta_score": 66.0,
       "dma_score": 85,
       "macd_score": 15,
       "rsi_score": 35,
       "trend_strength": 18,
       "atr_quality": 0,
       "breakout_bonus": 15,
+      "divergence_adj": 0,
+      "ema_short_bonus": -12,
       "dma200": 0.68518,
       "dma50": 0.71374,
       "rsi": 37.88,
@@ -3640,112 +3146,112 @@
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "AUD",
           "importance": "high",
-          "hours_until": 17.8,
+          "hours_until": 12.8,
           "date": "2026-06-22T23:00:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "AUD",
           "importance": "high",
-          "hours_until": 17.8,
+          "hours_until": 12.8,
           "date": "2026-06-22T23:00:00Z"
         },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "USD",
           "importance": "high",
-          "hours_until": 32.5,
+          "hours_until": 27.5,
           "date": "2026-06-23T13:45:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "USD",
           "importance": "high",
-          "hours_until": 32.5,
+          "hours_until": 27.5,
           "date": "2026-06-23T13:45:00Z"
         },
         {
           "name": "CPI",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 44.3,
+          "hours_until": 39.3,
           "date": "2026-06-24T01:30:00Z"
         },
         {
           "name": "Inflation Rate MoM",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 44.3,
+          "hours_until": 39.3,
           "date": "2026-06-24T01:30:00Z"
         },
         {
           "name": "Inflation Rate YoY",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 44.3,
+          "hours_until": 39.3,
           "date": "2026-06-24T01:30:00Z"
         },
         {
           "name": "RBA Trimmed Mean CPI MoM",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 44.3,
+          "hours_until": 39.3,
           "date": "2026-06-24T01:30:00Z"
         },
         {
           "name": "RBA Trimmed Mean CPI YoY",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 44.3,
+          "hours_until": 39.3,
           "date": "2026-06-24T01:30:00Z"
         },
         {
           "name": "RBA Weighted Median CPI MoM",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 44.3,
+          "hours_until": 39.3,
           "date": "2026-06-24T01:30:00Z"
         },
         {
           "name": "RBA Weighted Median CPI YoY",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 44.3,
+          "hours_until": 39.3,
           "date": "2026-06-24T01:30:00Z"
         },
         {
           "name": "Unemployment Rate",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 68.3,
+          "hours_until": 63.3,
           "date": "2026-06-25T01:30:00Z"
         },
         {
           "name": "GDP Growth Rate QoQ Final",
           "currency": "USD",
           "importance": "critical",
-          "hours_until": 79.3,
+          "hours_until": 74.3,
           "date": "2026-06-25T12:30:00Z"
         },
         {
           "name": "GDP Price Index QoQ Final",
           "currency": "USD",
           "importance": "critical",
-          "hours_until": 79.3,
+          "hours_until": 74.3,
           "date": "2026-06-25T12:30:00Z"
         },
         {
           "name": "GDP Sales QoQ Final",
           "currency": "USD",
           "importance": "critical",
-          "hours_until": 79.3,
+          "hours_until": 74.3,
           "date": "2026-06-25T12:30:00Z"
         },
         {
           "name": "Goods Trade Balance Adv",
           "currency": "USD",
           "importance": "high",
-          "hours_until": 103.3,
+          "hours_until": 98.3,
           "date": "2026-06-26T12:30:00Z"
         }
       ],
@@ -3755,31 +3261,31 @@
         "atr_ratio": 0.72,
         "atr_90d": 0.00319,
         "sl_multiplier": 3.0,
-        "tp1_multiplier": 3.0,
+        "tp1_multiplier": 1.5,
         "tp2_multiplier": 4.5,
         "tp3_multiplier": 6.0,
-        "note": "ATR比率0.7 → E案最適設定（PF 2.15/+48.4pips）"
+        "note": "ATR比率0.7 → TP=1.5×ATR（Phase1出口改善・到達率向上）"
       },
       "staged_tp": {
         "sl": 0.69453,
-        "tp": 0.70833,
-        "trail_atr_mult": 3.0,
-        "trail_distance": 0.0069,
+        "tp": 0.70488,
+        "trail_atr_mult": 2.0,
+        "trail_distance": 0.0046,
         "be_plus_offset": 0.00345,
         "be_target_after_tp": 0.70488,
         "max_target": 0.71523,
-        "rr_tp": 1.0,
+        "rr_tp": 0.5,
         "tp_mode": "single_with_trail",
-        "tp1": 0.70833,
+        "tp1": 0.70488,
         "tp2": 0.71178,
         "tp3": 0.71523,
         "sl_width": 0.0069,
-        "tp1_width": 0.0069,
-        "rr_tp1": 1.0,
+        "tp1_width": 0.00345,
+        "rr_tp1": 0.5,
         "rr_tp2": 1.5,
         "rr_tp3": 2.0,
         "regime_label": "通常ボラ相場",
-        "strategy": "TP(0.70833)到達 → SLを BE+0.5R(0.70488) へ移動 → トレーリング(3.0×ATR=0.0069)発動 → 利を伸ばす（理論最大: 0.71523）",
+        "strategy": "TP(0.70488)到達 → SLを BE+0.5R(0.70488) へ移動 → トレーリング(2.0×ATR=0.0046)発動 → 利を伸ばす（理論最大: 0.71523）",
         "chandelier_sl_active": false,
         "chandelier_note": ""
       },
@@ -3885,13 +3391,13 @@
       "strength_context": {
         "base_currency": "AUD",
         "quote_currency": "USD",
-        "base_score": -49.0,
+        "base_score": -40.3,
         "base_label": "やや弱い",
         "base_rank": 11,
-        "quote_score": 100.0,
+        "quote_score": 82.2,
         "quote_label": "強い",
         "quote_rank": 1,
-        "spread": -149.0,
+        "spread": -122.5,
         "context": "弱い通貨 vs 強い通貨（ショート有利）",
         "bias": "short"
       }
@@ -3900,13 +3406,15 @@
       "pair": "NZDUSD",
       "label": "NZD/USD",
       "price": 0.5743,
-      "ta_score": 46.7,
+      "ta_score": 34.7,
       "dma_score": 45,
       "macd_score": 15,
       "rsi_score": 35,
       "trend_strength": 0,
       "atr_quality": 0,
       "breakout_bonus": 15,
+      "divergence_adj": 0,
+      "ema_short_bonus": -12,
       "dma200": 0.58326,
       "dma50": 0.58744,
       "rsi": 34.34,
@@ -3926,42 +3434,42 @@
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "USD",
           "importance": "high",
-          "hours_until": 32.5,
+          "hours_until": 27.5,
           "date": "2026-06-23T13:45:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "USD",
           "importance": "high",
-          "hours_until": 32.5,
+          "hours_until": 27.5,
           "date": "2026-06-23T13:45:00Z"
         },
         {
           "name": "GDP Growth Rate QoQ Final",
           "currency": "USD",
           "importance": "critical",
-          "hours_until": 79.3,
+          "hours_until": 74.3,
           "date": "2026-06-25T12:30:00Z"
         },
         {
           "name": "GDP Price Index QoQ Final",
           "currency": "USD",
           "importance": "critical",
-          "hours_until": 79.3,
+          "hours_until": 74.3,
           "date": "2026-06-25T12:30:00Z"
         },
         {
           "name": "GDP Sales QoQ Final",
           "currency": "USD",
           "importance": "critical",
-          "hours_until": 79.3,
+          "hours_until": 74.3,
           "date": "2026-06-25T12:30:00Z"
         },
         {
           "name": "Goods Trade Balance Adv",
           "currency": "USD",
           "importance": "high",
-          "hours_until": 103.3,
+          "hours_until": 98.3,
           "date": "2026-06-26T12:30:00Z"
         }
       ],
@@ -3971,31 +3479,31 @@
         "atr_ratio": 0.92,
         "atr_90d": 0.00254,
         "sl_multiplier": 3.0,
-        "tp1_multiplier": 3.0,
+        "tp1_multiplier": 1.5,
         "tp2_multiplier": 4.5,
         "tp3_multiplier": 6.0,
-        "note": "ATR比率0.9 → E案最適設定（PF 2.15/+48.4pips）"
+        "note": "ATR比率0.9 → TP=1.5×ATR（Phase1出口改善・到達率向上）"
       },
       "staged_tp": {
         "sl": 0.58129,
-        "tp": 0.56731,
-        "trail_atr_mult": 3.0,
-        "trail_distance": 0.00699,
+        "tp": 0.57081,
+        "trail_atr_mult": 2.0,
+        "trail_distance": 0.00466,
         "be_plus_offset": 0.00349,
         "be_target_after_tp": 0.57081,
         "max_target": 0.56032,
-        "rr_tp": 1.0,
+        "rr_tp": 0.5,
         "tp_mode": "single_with_trail",
-        "tp1": 0.56731,
+        "tp1": 0.57081,
         "tp2": 0.56382,
         "tp3": 0.56032,
         "sl_width": 0.00699,
-        "tp1_width": 0.00699,
-        "rr_tp1": 1.0,
+        "tp1_width": 0.00349,
+        "rr_tp1": 0.5,
         "rr_tp2": 1.5,
         "rr_tp3": 2.0,
         "regime_label": "通常ボラ相場",
-        "strategy": "TP(0.56731)到達 → SLを BE+0.5R(0.57081) へ移動 → トレーリング(3.0×ATR=0.00699)発動 → 利を伸ばす（理論最大: 0.56032）",
+        "strategy": "TP(0.57081)到達 → SLを BE+0.5R(0.57081) へ移動 → トレーリング(2.0×ATR=0.00466)発動 → 利を伸ばす（理論最大: 0.56032）",
         "chandelier_sl_active": true,
         "chandelier_note": "Chandelier Exit: 過去22日安値(0.5743)+3.0xATR"
       },
@@ -4095,13 +3603,13 @@
       "strength_context": {
         "base_currency": "NZD",
         "quote_currency": "USD",
-        "base_score": -81.8,
+        "base_score": -100.0,
         "base_label": "弱い",
         "base_rank": 13,
-        "quote_score": 100.0,
+        "quote_score": 82.2,
         "quote_label": "強い",
         "quote_rank": 1,
-        "spread": -181.8,
+        "spread": -182.2,
         "context": "弱い通貨 vs 強い通貨（ショート有利）",
         "bias": "short"
       }
@@ -4110,13 +3618,15 @@
       "pair": "USDCAD",
       "label": "USD/CAD",
       "price": 1.41519,
-      "ta_score": 53.3,
+      "ta_score": 65.3,
       "dma_score": 70,
       "macd_score": 85,
       "rsi_score": 20,
       "trend_strength": -20,
       "atr_quality": 0,
       "breakout_bonus": 15,
+      "divergence_adj": 0,
+      "ema_short_bonus": 12,
       "dma200": 1.38273,
       "dma50": 1.37974,
       "rsi": 82.96,
@@ -4136,91 +3646,91 @@
           "name": "Core Inflation Rate MoM",
           "currency": "CAD",
           "importance": "critical",
-          "hours_until": 7.3,
+          "hours_until": 2.3,
           "date": "2026-06-22T12:30:00Z"
         },
         {
           "name": "Core Inflation Rate YoY",
           "currency": "CAD",
           "importance": "critical",
-          "hours_until": 7.3,
+          "hours_until": 2.3,
           "date": "2026-06-22T12:30:00Z"
         },
         {
           "name": "CPI Common YoY",
           "currency": "CAD",
           "importance": "critical",
-          "hours_until": 7.3,
+          "hours_until": 2.3,
           "date": "2026-06-22T12:30:00Z"
         },
         {
           "name": "CPI Median YoY",
           "currency": "CAD",
           "importance": "critical",
-          "hours_until": 7.3,
+          "hours_until": 2.3,
           "date": "2026-06-22T12:30:00Z"
         },
         {
           "name": "CPI Trimmed-Mean YoY",
           "currency": "CAD",
           "importance": "critical",
-          "hours_until": 7.3,
+          "hours_until": 2.3,
           "date": "2026-06-22T12:30:00Z"
         },
         {
           "name": "Inflation Rate MoM",
           "currency": "CAD",
           "importance": "critical",
-          "hours_until": 7.3,
+          "hours_until": 2.3,
           "date": "2026-06-22T12:30:00Z"
         },
         {
           "name": "Inflation Rate YoY",
           "currency": "CAD",
           "importance": "critical",
-          "hours_until": 7.3,
+          "hours_until": 2.3,
           "date": "2026-06-22T12:30:00Z"
         },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "USD",
           "importance": "high",
-          "hours_until": 32.5,
+          "hours_until": 27.5,
           "date": "2026-06-23T13:45:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "USD",
           "importance": "high",
-          "hours_until": 32.5,
+          "hours_until": 27.5,
           "date": "2026-06-23T13:45:00Z"
         },
         {
           "name": "GDP Growth Rate QoQ Final",
           "currency": "USD",
           "importance": "critical",
-          "hours_until": 79.3,
+          "hours_until": 74.3,
           "date": "2026-06-25T12:30:00Z"
         },
         {
           "name": "GDP Price Index QoQ Final",
           "currency": "USD",
           "importance": "critical",
-          "hours_until": 79.3,
+          "hours_until": 74.3,
           "date": "2026-06-25T12:30:00Z"
         },
         {
           "name": "GDP Sales QoQ Final",
           "currency": "USD",
           "importance": "critical",
-          "hours_until": 79.3,
+          "hours_until": 74.3,
           "date": "2026-06-25T12:30:00Z"
         },
         {
           "name": "Goods Trade Balance Adv",
           "currency": "USD",
           "importance": "high",
-          "hours_until": 103.3,
+          "hours_until": 98.3,
           "date": "2026-06-26T12:30:00Z"
         }
       ],
@@ -4230,31 +3740,31 @@
         "atr_ratio": 0.99,
         "atr_90d": 0.00267,
         "sl_multiplier": 3.0,
-        "tp1_multiplier": 3.0,
+        "tp1_multiplier": 1.5,
         "tp2_multiplier": 4.5,
         "tp3_multiplier": 6.0,
-        "note": "ATR比率1.0 → E案最適設定（PF 2.15/+48.4pips）"
+        "note": "ATR比率1.0 → TP=1.5×ATR（Phase1出口改善・到達率向上）"
       },
       "staged_tp": {
         "sl": 1.40725,
-        "tp": 1.42314,
-        "trail_atr_mult": 3.0,
-        "trail_distance": 0.00795,
+        "tp": 1.41917,
+        "trail_atr_mult": 2.0,
+        "trail_distance": 0.0053,
         "be_plus_offset": 0.00398,
         "be_target_after_tp": 1.41917,
         "max_target": 1.43109,
-        "rr_tp": 1.0,
+        "rr_tp": 0.5,
         "tp_mode": "single_with_trail",
-        "tp1": 1.42314,
+        "tp1": 1.41917,
         "tp2": 1.42711,
         "tp3": 1.43109,
         "sl_width": 0.00795,
-        "tp1_width": 0.00795,
-        "rr_tp1": 1.0,
+        "tp1_width": 0.00398,
+        "rr_tp1": 0.5,
         "rr_tp2": 1.5,
         "rr_tp3": 2.0,
         "regime_label": "通常ボラ相場",
-        "strategy": "TP(1.42314)到達 → SLを BE+0.5R(1.41917) へ移動 → トレーリング(3.0×ATR=0.00795)発動 → 利を伸ばす（理論最大: 1.43109）",
+        "strategy": "TP(1.41917)到達 → SLを BE+0.5R(1.41917) へ移動 → トレーリング(2.0×ATR=0.0053)発動 → 利を伸ばす（理論最大: 1.43109）",
         "chandelier_sl_active": true,
         "chandelier_note": "Chandelier Exit: 過去22日高値(1.4152)-3.0xATR"
       },
@@ -4330,13 +3840,13 @@
       "strength_context": {
         "base_currency": "USD",
         "quote_currency": "CAD",
-        "base_score": 100.0,
+        "base_score": 82.2,
         "base_label": "強い",
         "base_rank": 1,
-        "quote_score": -74.5,
+        "quote_score": -95.6,
         "quote_label": "弱い",
         "quote_rank": 12,
-        "spread": 174.5,
+        "spread": 177.8,
         "context": "強い通貨 vs 弱い通貨（ロング有利）",
         "bias": "long"
       }
@@ -4345,13 +3855,15 @@
       "pair": "EURGBP",
       "label": "EUR/GBP",
       "price": 0.86653,
-      "ta_score": 48.3,
+      "ta_score": 40.3,
       "dma_score": 30,
       "macd_score": 65,
       "rsi_score": 65,
       "trend_strength": -20,
       "atr_quality": 0,
       "breakout_bonus": 15,
+      "divergence_adj": 0,
+      "ema_short_bonus": -8,
       "dma200": 0.87026,
       "dma50": 0.86609,
       "rsi": 55.73,
@@ -4371,112 +3883,112 @@
           "name": "Consumer Confidence Flash",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 8.8,
+          "hours_until": 3.8,
           "date": "2026-06-22T14:00:00Z"
         },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 26.0,
+          "hours_until": 21.0,
           "date": "2026-06-23T07:15:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 26.0,
+          "hours_until": 21.0,
           "date": "2026-06-23T07:15:00Z"
         },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 26.3,
+          "hours_until": 21.3,
           "date": "2026-06-23T07:30:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 26.3,
+          "hours_until": 21.3,
           "date": "2026-06-23T07:30:00Z"
         },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 26.8,
+          "hours_until": 21.8,
           "date": "2026-06-23T08:00:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 26.8,
+          "hours_until": 21.8,
           "date": "2026-06-23T08:00:00Z"
         },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "GBP",
           "importance": "high",
-          "hours_until": 27.3,
+          "hours_until": 22.3,
           "date": "2026-06-23T08:30:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "GBP",
           "importance": "high",
-          "hours_until": 27.3,
+          "hours_until": 22.3,
           "date": "2026-06-23T08:30:00Z"
         },
         {
           "name": "GfK Consumer Confidence",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 72.8,
+          "hours_until": 67.8,
           "date": "2026-06-25T06:00:00Z"
         },
         {
           "name": "Consumer Confidence",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 73.5,
+          "hours_until": 68.5,
           "date": "2026-06-25T06:45:00Z"
         },
         {
           "name": "ECB General Council Meeting",
           "currency": "EUR",
           "importance": "critical",
-          "hours_until": 73.8,
+          "hours_until": 68.8,
           "date": "2026-06-25T07:00:00Z"
         },
         {
           "name": "GDP Growth Rate QoQ Final",
           "currency": "EUR",
           "importance": "critical",
-          "hours_until": 73.8,
+          "hours_until": 68.8,
           "date": "2026-06-25T07:00:00Z"
         },
         {
           "name": "GDP Growth Rate YoY Final",
           "currency": "EUR",
           "importance": "critical",
-          "hours_until": 73.8,
+          "hours_until": 68.8,
           "date": "2026-06-25T07:00:00Z"
         },
         {
           "name": "PPI YoY",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 73.8,
+          "hours_until": 68.8,
           "date": "2026-06-25T07:00:00Z"
         },
         {
           "name": "Consumer Confidence",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 99.8,
+          "hours_until": 94.8,
           "date": "2026-06-26T09:00:00Z"
         }
       ],
@@ -4486,31 +3998,31 @@
         "atr_ratio": 0.72,
         "atr_90d": 0.00121,
         "sl_multiplier": 3.0,
-        "tp1_multiplier": 3.0,
+        "tp1_multiplier": 1.5,
         "tp2_multiplier": 4.5,
         "tp3_multiplier": 6.0,
-        "note": "ATR比率0.7 → E案最適設定（PF 2.15/+48.4pips）"
+        "note": "ATR比率0.7 → TP=1.5×ATR（Phase1出口改善・到達率向上）"
       },
       "staged_tp": {
         "sl": 0.86917,
-        "tp": 0.86389,
-        "trail_atr_mult": 3.0,
-        "trail_distance": 0.00264,
+        "tp": 0.86521,
+        "trail_atr_mult": 2.0,
+        "trail_distance": 0.00176,
         "be_plus_offset": 0.00132,
         "be_target_after_tp": 0.86521,
         "max_target": 0.86125,
-        "rr_tp": 1.0,
+        "rr_tp": 0.5,
         "tp_mode": "single_with_trail",
-        "tp1": 0.86389,
+        "tp1": 0.86521,
         "tp2": 0.86257,
         "tp3": 0.86125,
         "sl_width": 0.00264,
-        "tp1_width": 0.00264,
-        "rr_tp1": 1.0,
+        "tp1_width": 0.00132,
+        "rr_tp1": 0.5,
         "rr_tp2": 1.5,
         "rr_tp3": 2.0,
         "regime_label": "通常ボラ相場",
-        "strategy": "TP(0.86389)到達 → SLを BE+0.5R(0.86521) へ移動 → トレーリング(3.0×ATR=0.00264)発動 → 利を伸ばす（理論最大: 0.86125）",
+        "strategy": "TP(0.86521)到達 → SLを BE+0.5R(0.86521) へ移動 → トレーリング(2.0×ATR=0.00176)発動 → 利を伸ばす（理論最大: 0.86125）",
         "chandelier_sl_active": false,
         "chandelier_note": ""
       },
@@ -4616,13 +4128,13 @@
       "strength_context": {
         "base_currency": "EUR",
         "quote_currency": "GBP",
-        "base_score": 4.3,
+        "base_score": 3.6,
         "base_label": "中立",
         "base_rank": 7,
-        "quote_score": -22.0,
-        "quote_label": "やや弱い",
+        "quote_score": -18.1,
+        "quote_label": "中立",
         "quote_rank": 8,
-        "spread": 26.3,
+        "spread": 21.7,
         "context": "やや強い通貨 vs 弱め（ロング寄り）",
         "bias": "slight_long"
       }
@@ -4631,13 +4143,15 @@
       "pair": "EURAUD",
       "label": "EUR/AUD",
       "price": 1.6348,
-      "ta_score": 68.0,
+      "ta_score": 56.0,
       "dma_score": 15,
       "macd_score": 85,
       "rsi_score": 50,
       "trend_strength": 18,
       "atr_quality": 0,
       "breakout_bonus": 0,
+      "divergence_adj": 0,
+      "ema_short_bonus": -12,
       "dma200": 1.70554,
       "dma50": 1.63351,
       "rsi": 49.56,
@@ -4657,168 +4171,168 @@
           "name": "Consumer Confidence Flash",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 8.8,
+          "hours_until": 3.8,
           "date": "2026-06-22T14:00:00Z"
         },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "AUD",
           "importance": "high",
-          "hours_until": 17.8,
+          "hours_until": 12.8,
           "date": "2026-06-22T23:00:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "AUD",
           "importance": "high",
-          "hours_until": 17.8,
+          "hours_until": 12.8,
           "date": "2026-06-22T23:00:00Z"
         },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 26.0,
+          "hours_until": 21.0,
           "date": "2026-06-23T07:15:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 26.0,
+          "hours_until": 21.0,
           "date": "2026-06-23T07:15:00Z"
         },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 26.3,
+          "hours_until": 21.3,
           "date": "2026-06-23T07:30:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 26.3,
+          "hours_until": 21.3,
           "date": "2026-06-23T07:30:00Z"
         },
         {
           "name": "S&P Global Manufacturing PMI Flash",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 26.8,
+          "hours_until": 21.8,
           "date": "2026-06-23T08:00:00Z"
         },
         {
           "name": "S&P Global Services PMI Flash",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 26.8,
+          "hours_until": 21.8,
           "date": "2026-06-23T08:00:00Z"
         },
         {
           "name": "CPI",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 44.3,
+          "hours_until": 39.3,
           "date": "2026-06-24T01:30:00Z"
         },
         {
           "name": "Inflation Rate MoM",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 44.3,
+          "hours_until": 39.3,
           "date": "2026-06-24T01:30:00Z"
         },
         {
           "name": "Inflation Rate YoY",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 44.3,
+          "hours_until": 39.3,
           "date": "2026-06-24T01:30:00Z"
         },
         {
           "name": "RBA Trimmed Mean CPI MoM",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 44.3,
+          "hours_until": 39.3,
           "date": "2026-06-24T01:30:00Z"
         },
         {
           "name": "RBA Trimmed Mean CPI YoY",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 44.3,
+          "hours_until": 39.3,
           "date": "2026-06-24T01:30:00Z"
         },
         {
           "name": "RBA Weighted Median CPI MoM",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 44.3,
+          "hours_until": 39.3,
           "date": "2026-06-24T01:30:00Z"
         },
         {
           "name": "RBA Weighted Median CPI YoY",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 44.3,
+          "hours_until": 39.3,
           "date": "2026-06-24T01:30:00Z"
         },
         {
           "name": "Unemployment Rate",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 68.3,
+          "hours_until": 63.3,
           "date": "2026-06-25T01:30:00Z"
         },
         {
           "name": "GfK Consumer Confidence",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 72.8,
+          "hours_until": 67.8,
           "date": "2026-06-25T06:00:00Z"
         },
         {
           "name": "Consumer Confidence",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 73.5,
+          "hours_until": 68.5,
           "date": "2026-06-25T06:45:00Z"
         },
         {
           "name": "ECB General Council Meeting",
           "currency": "EUR",
           "importance": "critical",
-          "hours_until": 73.8,
+          "hours_until": 68.8,
           "date": "2026-06-25T07:00:00Z"
         },
         {
           "name": "GDP Growth Rate QoQ Final",
           "currency": "EUR",
           "importance": "critical",
-          "hours_until": 73.8,
+          "hours_until": 68.8,
           "date": "2026-06-25T07:00:00Z"
         },
         {
           "name": "GDP Growth Rate YoY Final",
           "currency": "EUR",
           "importance": "critical",
-          "hours_until": 73.8,
+          "hours_until": 68.8,
           "date": "2026-06-25T07:00:00Z"
         },
         {
           "name": "PPI YoY",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 73.8,
+          "hours_until": 68.8,
           "date": "2026-06-25T07:00:00Z"
         },
         {
           "name": "Consumer Confidence",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 99.8,
+          "hours_until": 94.8,
           "date": "2026-06-26T09:00:00Z"
         }
       ],
@@ -4828,31 +4342,31 @@
         "atr_ratio": 0.7,
         "atr_90d": 0.0044,
         "sl_multiplier": 2.5,
-        "tp1_multiplier": 2.5,
+        "tp1_multiplier": 1.25,
         "tp2_multiplier": 4.0,
         "tp3_multiplier": 5.0,
-        "note": "ATRが90日平均の0.7倍 → SL幅を縮小（E案連動）"
+        "note": "ATRが90日平均の0.7倍 → SL縮小・TP縮小（Phase1出口改善）"
       },
       "staged_tp": {
         "sl": 1.62712,
-        "tp": 1.64248,
-        "trail_atr_mult": 2.5,
-        "trail_distance": 0.00767,
+        "tp": 1.63864,
+        "trail_atr_mult": 2.0,
+        "trail_distance": 0.00614,
         "be_plus_offset": 0.00384,
         "be_target_after_tp": 1.63864,
         "max_target": 1.65015,
-        "rr_tp": 1.0,
+        "rr_tp": 0.5,
         "tp_mode": "single_with_trail",
-        "tp1": 1.64248,
+        "tp1": 1.63864,
         "tp2": 1.64708,
         "tp3": 1.65015,
         "sl_width": 0.00767,
-        "tp1_width": 0.00767,
-        "rr_tp1": 1.0,
+        "tp1_width": 0.00384,
+        "rr_tp1": 0.5,
         "rr_tp2": 1.6,
         "rr_tp3": 2.0,
         "regime_label": "低ボラ相場",
-        "strategy": "TP(1.64248)到達 → SLを BE+0.5R(1.63864) へ移動 → トレーリング(2.5×ATR=0.00767)発動 → 利を伸ばす（理論最大: 1.65015）",
+        "strategy": "TP(1.63864)到達 → SLを BE+0.5R(1.63864) へ移動 → トレーリング(2.0×ATR=0.00614)発動 → 利を伸ばす（理論最大: 1.65015）",
         "chandelier_sl_active": false,
         "chandelier_note": ""
       },
@@ -4952,29 +4466,29 @@
       "strength_context": {
         "base_currency": "EUR",
         "quote_currency": "AUD",
-        "base_score": 4.3,
+        "base_score": 3.6,
         "base_label": "中立",
         "base_rank": 7,
-        "quote_score": -49.0,
+        "quote_score": -40.3,
         "quote_label": "やや弱い",
         "quote_rank": 11,
-        "spread": 53.3,
+        "spread": 43.9,
         "context": "強い通貨 vs 弱い通貨（ロング有利）",
         "bias": "long"
       }
     }
   ],
   "sentiment": {
-    "vix": 16.4,
+    "vix": 17.5,
     "vix_level": "normal",
     "risk_off_strength": 0,
-    "dxy": 100.91,
+    "dxy": 100.88,
     "dxy_30d_avg": 99.36,
     "dxy_trend": "flat",
     "us10y": 4.451,
     "bond_pressure": "normal",
-    "gold": 4199.0,
-    "gold_20d_avg": 4359.65,
+    "gold": 4227.1,
+    "gold_20d_avg": 4361.06,
     "gold_trend": "falling",
     "risk_mode": "normal"
   },
@@ -5126,85 +4640,84 @@
   },
   "currency_strength": {
     "USD": {
-      "score": 100.0,
+      "score": 82.2,
       "label": "強い",
       "rank": 1
     },
     "JPY": {
-      "score": -26.4,
+      "score": -32.1,
       "label": "やや弱い",
-      "rank": 9
+      "rank": 10
     },
     "EUR": {
-      "score": 4.3,
+      "score": 3.6,
       "label": "中立",
       "rank": 7
     },
     "GBP": {
-      "score": -22.0,
-      "label": "やや弱い",
+      "score": -18.1,
+      "label": "中立",
       "rank": 8
     },
     "AUD": {
-      "score": -49.0,
+      "score": -40.3,
       "label": "やや弱い",
       "rank": 11
     },
-    "NZD": {
-      "score": -81.8,
-      "label": "弱い",
-      "rank": 13
-    },
-    "CAD": {
-      "score": -74.5,
-      "label": "弱い",
-      "rank": 12
-    },
     "CHF": {
-      "score": -31.3,
+      "score": -25.7,
       "label": "やや弱い",
-      "rank": 10
+      "rank": 9
     },
     "SGD": {
-      "score": 30.2,
+      "score": 24.8,
       "label": "やや強い",
       "rank": 6
     },
     "HKD": {
-      "score": 77.6,
+      "score": 63.8,
       "label": "強い",
       "rank": 4
     },
     "CNY": {
-      "score": 94.8,
+      "score": 77.9,
       "label": "強い",
       "rank": 2
     },
     "MXN": {
-      "score": 63.7,
+      "score": 52.4,
       "label": "強い",
       "rank": 5
     },
     "ZAR": {
-      "score": 94.2,
+      "score": 77.4,
       "label": "強い",
       "rank": 3
+    },
+    "NZD": {
+      "score": -100.0,
+      "label": "弱い",
+      "rank": 13
+    },
+    "CAD": {
+      "score": -95.6,
+      "label": "弱い",
+      "rank": 12
     }
   },
   "portfolio_risk": {
     "currency_exposure": {
       "USD": 1,
-      "JPY": -5,
-      "EUR": 1,
+      "JPY": -4,
       "GBP": 1,
       "SGD": 1,
       "HKD": 1
     },
     "warnings": [
-      "⚠ JPY売りポジションが5件集中 → 同方向リスクに注意"
+      "⚠ JPY売りポジションが4件集中 → 同方向リスクに注意"
     ],
     "risk_level": "high",
     "recommendation": "同一通貨のポジション集中を解消するか、ロットを半減することを推奨",
-    "active_signals_count": 5
+    "active_signals_count": 4
   }
 }
