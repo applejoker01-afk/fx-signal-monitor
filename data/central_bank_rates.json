@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-06-16",
+  "last_updated": "2026-06-21",
   "notes": "中央銀行会合のたびに手動更新する。stance は tighten/neutral/ease のいずれか。rate_momentum は accelerating/decelerating/peak/trough/stable のいずれか（金利サイクルの勢い）。FRED API + Finnhub API 設定済みなら週次自動更新される。",
   "data_source": "BIS + 各国中央銀行公式発表 + Web検証 (2026-06-11)",
   "verification_source": {
@@ -21,12 +21,14 @@
       "auto_source": "FRED FEDFUNDS"
     },
     "EUR": {
-      "rate": 2.15,
+      "rate": 2.4,
       "next_meeting": "2026-07-24",
       "stance": "ease",
       "rate_momentum": "decelerating",
       "cb_name": "ECB",
-      "cb_note": "利下げサイクル後半。2.0%に向けて段階的引き下げ中だがペース鈍化。"
+      "cb_note": "利下げサイクル後半。2.0%に向けて段階的引き下げ中だがペース鈍化。",
+      "last_auto_update": "2026-06-21",
+      "auto_source": "ECB SDMX (MRR_FR)"
     },
     "JPY": {
       "rate": 1.0,
@@ -137,5 +139,5 @@
     }
   },
   "warning": "JPYは2026-06-17の日銀会合で利上げ確実視。会合後に rate=1.0, rate_momentum='peak'? に更新すること。",
-  "last_auto_run": "2026-06-14T03:34:49.481502+00:00"
+  "last_auto_run": "2026-06-21T03:41:04.771761+00:00"
 }
