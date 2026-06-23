@@ -284,7 +284,8 @@ function normalizePair(raw){
   if (PAIR_ALIASES[upper]) return PAIR_ALIASES[upper];
   return upper; // 未知はそのまま大文字で
 }
-function pairDecimals(pair){ return pair.endsWith("JPY") ? 3 : 5; }
+// 規約: JPYクロス=3桁、それ以外=6桁（取引シグナル精度の統一）
+function pairDecimals(pair){ return pair.endsWith("JPY") ? 3 : 6; }
 
 // ===== スワップ方向判定（2ロット超長期運用の補助）=====
 // 各通貨の政策金利（2026年6月時点・フォールバック）。

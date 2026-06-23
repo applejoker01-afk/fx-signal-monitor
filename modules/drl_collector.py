@@ -149,8 +149,9 @@ def build_state_vector(result: dict, cb_rates: dict = None) -> dict:
         "stars": stars,
         "direction": direction,
         "action": action,
-        "price": round(price, 5) if price else 0,
-        "atr": round(atr, 5) if atr else 0,
+        # 価格・ATRはペア別精度で丸める（JPYクロス=3、それ以外=6）
+        "price": round(price, 3 if pair.endswith("JPY") else 6) if price else 0,
+        "atr": round(atr, 3 if pair.endswith("JPY") else 6) if atr else 0,
         "regime": regime.get("regime", "normal"),
     }
 

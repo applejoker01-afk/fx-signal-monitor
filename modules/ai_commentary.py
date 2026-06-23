@@ -149,7 +149,7 @@ def generate_trade_review(closed_trade: dict) -> str:
 エントリー価格: {closed_trade.get('entry_price')}
 決済価格: {closed_trade.get('exit_price')}
 決済理由: {reason_label}
-損益: {closed_trade.get('pips', 0):+.4f}
+損益: {closed_trade.get('pips', 0):+.{3 if (closed_trade.get('pair','') or '').endswith('JPY') else 6}f}
 保有時間: {closed_trade.get('hold_hours', 0)}時間
 エントリー時TA: {closed_trade.get('ta_score', '?')}
 エントリー時FA: {closed_trade.get('fa_score', '?')}

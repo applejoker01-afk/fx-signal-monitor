@@ -1,10 +1,10 @@
 {
-  "last_updated": "2026-06-21",
+  "last_updated": "2026-06-23",
   "notes": "中央銀行会合のたびに手動更新する。stance は tighten/neutral/ease のいずれか。rate_momentum は accelerating/decelerating/peak/trough/stable のいずれか（金利サイクルの勢い）。FRED API + Finnhub API 設定済みなら週次自動更新される。",
   "data_source": "BIS + 各国中央銀行公式発表 + Web検証 (2026-06-11)",
   "verification_source": {
     "USD": "FRB 2026-06 (target range 3.5-4.0%; higher-for-longer pause; 次回会合 6/18 に据え置き濃厚)",
-    "EUR": "ECB 2026-06-05 (MRO 2.15%; 利下げサイクル後半・ペース鈍化)",
+    "EUR": "ECB 2026-06 (MRO 2.15%→2.4% 上昇; 利下げサイクル終了・利上げ転換の可能性で stance=neutral へ)",
     "GBP": "BOE MPC 2026-06-18予定 (Bank Rate 3.75%; データ依存・中立)",
     "JPY": "日銀 2026-06-16/17 (0.75%→1.0%へ利上げ確率80-96%; stance=tighten accelerating)",
     "AUD": "RBA 2026-06-03 (cash rate 4.35% → 4.10%に引き下げ; ease転換確認)"
@@ -23,10 +23,10 @@
     "EUR": {
       "rate": 2.4,
       "next_meeting": "2026-07-24",
-      "stance": "ease",
-      "rate_momentum": "decelerating",
+      "stance": "neutral",
+      "rate_momentum": "trough",
       "cb_name": "ECB",
-      "cb_note": "利下げサイクル後半。2.0%に向けて段階的引き下げ中だがペース鈍化。",
+      "cb_note": "MRO 2.15%→2.4%へ上昇(2026-06)。利下げサイクルは事実上終了とみられ、利上げ転換の可能性。7/24会合で方針確認まで neutral へ。",
       "last_auto_update": "2026-06-21",
       "auto_source": "ECB SDMX (MRR_FR)"
     },

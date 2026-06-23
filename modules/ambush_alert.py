@@ -44,6 +44,11 @@ def calc_pivot_points(prev_high, prev_low, prev_close):
     }
 
 
+def _pair_decimals(pair: str) -> int:
+    """JPYクロス=3、それ以外=6。signal_scanner.pair_decimals と同規約。"""
+    return 3 if pair and pair.upper().endswith("JPY") else 6
+
+
 def build_poi_levels(pair, price, prices, support_resistance=None):
     """
     1通貨ペアの重要価格（POI）一覧を構築。
@@ -60,6 +65,8 @@ def build_poi_levels(pair, price, prices, support_resistance=None):
     if not prices or len(prices) < 50:
         return levels
 
+    _d = _pair_decimals(pair)
+
     # ── 移動平均（動的サポレジ）──
     ema50 = calc_ema(prices, 50)
     ema200 = calc_ema(prices, 200) if len(prices) >= 200 else None
@@ -67,12 +74,12 @@ def build_poi_levels(pair, price, prices, support_resistance=None):
     if ema50:
         kind = "support" if price > ema50 else "resistance"
         role = "押し目候補(50EMA)" if kind == "support" else "戻り候補(50EMA)"
-        levels.append({"type": "50EMA", "price": round(ema50, 5),
+        levels.append({"type": "50EMA", "price": round(ema50, _d),
                        "role": role, "kind": kind})
     if ema200:
         kind = "support" if price > ema200 else "resistance"
         role = "強サポート(200EMA)" if kind == "support" else "強レジスタンス(200EMA)"
-        levels.append({"type": "200EMA", "price": round(ema200, 5),
+        levels.append({"type": "200EMA", "price": round(ema200, _d),
                        "role": role, "kind": kind})
 
     # ── 前日高安（直近の足から推定）──
@@ -92,7 +99,7 @@ def build_poi_levels(pair, price, prices, support_resistance=None):
             for key, label in [("r1", "R1"), ("s1", "S1"), ("pp", "PP")]:
                 pv = piv[key]
                 kind = "support" if pv < price else "resistance"
-                levels.append({"type": f"ピボット{label}", "price": round(pv, 5),
+                levels.append({"type": f"ピボット{label}", "price": round(pv, _d),
                                "role": f"ピボット{label}", "kind": kind})
 
     # ── サポレジ（advanced_analyticsの検出結果を流用）──
@@ -134,13 +141,14 @@ def check_ambush_proximity(pair, price, prices, atr,
     threshold = atr * threshold_atr
     approaching = []
 
+    _d = _pair_decimals(pair)
     for lv in levels:
         distance = abs(price - lv["price"])
         if distance <= threshold:
             dist_pct = distance / price * 100
             approaching.append({
                 **lv,
-                "distance": round(distance, 5),
+                "distance": round(distance, _d),
                 "distance_pct": round(dist_pct, 3),
             })
 
@@ -206,7 +214,7 @@ def evaluate_ambush(result, prices, atr_threshold=0.5):
     return result
 
 
-def calc_poi_trade_plan(poi, atr, sl_mult=1.5, tp_mults=(1.5, 3.0, 5.0)):
+def calc_poi_trade_plan(poi, atr, sl_mult=1.5, tp_mults=(1.5, 3.0, 5.0), pair=""):
     """
     POI（重要価格）での反発を狙うトレードプランを算出。
 
@@ -235,8 +243,9 @@ def calc_poi_trade_plan(poi, atr, sl_mult=1.5, tp_mults=(1.5, 3.0, 5.0)):
     entry = poi["price"]
     kind = poi.get("kind", "")
 
-    # pip精度（JPYクロスは2桁、その他5桁）
-    decimals = 2 if entry > 10 else 5
+    # ペア別の表示桁数（JPYクロス=3、それ以外=6）
+    # 旧呼び出し互換のため pair 未指定時は entry>10 をフォールバック
+    decimals = _pair_decimals(pair) if pair else (3 if entry > 10 else 6)
 
     if kind == "support":
         # 反発ロング: POIで買い、SLはPOIの下（ATR×1.5バッファ）
@@ -305,7 +314,7 @@ def collect_ambush_alerts(all_results):
             })
         else:
             # ★4未満でもPOI接近は「待ち伏せ候補」として拾う
-            plan = calc_poi_trade_plan(ambush["nearest"], r.get("atr"))
+            plan = calc_poi_trade_plan(ambush["nearest"], r.get("atr"), pair=r.get("pair", ""))
             approaching.append({
                 "pair": r["pair"],
                 "label": r.get("label", r["pair"]),

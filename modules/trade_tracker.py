@@ -120,6 +120,11 @@ def _hours_between(iso_start: str, dt_end: datetime) -> float:
         return 0.0
 
 
+def _pair_decimals(pair: str) -> int:
+    """JPYクロス=3、それ以外=6。signal_scanner.pair_decimals と同規約。"""
+    return 3 if pair and pair.upper().endswith("JPY") else 6
+
+
 def check_exit_condition(trade: dict, current_price: float,
                          current_stars: int, current_direction: str) -> dict:
     """
@@ -281,10 +286,11 @@ def check_exit_condition(trade: dict, current_price: float,
     else:
         result = "WIN" if pips > 0 else ("LOSS" if pips < 0 else "EVEN")
 
+    _d = _pair_decimals(trade.get("pair", ""))
     return {
         "exit_reason": exit_reason,
-        "exit_price": round(exit_price, 5),
-        "pips": round(pips, 5),
+        "exit_price": round(exit_price, _d),
+        "pips": round(pips, _d),
         "result": result,
     }
 
@@ -328,8 +334,9 @@ def update_trades(results: list, now: datetime) -> dict:
             cur.get("direction", ""),
         )
 
-        # 現在価格を保存（保有ポジション表示用）
-        trade["current_price"] = current_price
+        # 現在価格を保存（保有ポジション表示用） — ペア別精度で丸める
+        _d = _pair_decimals(pair)
+        trade["current_price"] = round(current_price, _d) if current_price is not None else current_price
         trade["current_stars"] = cur.get("stars", 0)
 
         if exit_info is None:
@@ -341,6 +348,10 @@ def update_trades(results: list, now: datetime) -> dict:
             # tp_hit_time を必要なら設定
             if state_update.get("tp_hit") and "tp_hit_time" in state_update and state_update["tp_hit_time"] is None:
                 state_update["tp_hit_time"] = now.isoformat()
+            # 価格スケール値をペア別精度で丸める（Discord/JSON 表示の桁ズレ防止）
+            for _k in ("sl", "extreme_price", "trail_distance"):
+                if state_update.get(_k) is not None:
+                    state_update[_k] = round(state_update[_k], _d)
             trade.update(state_update)
             state_changes.append({
                 "pair": pair,

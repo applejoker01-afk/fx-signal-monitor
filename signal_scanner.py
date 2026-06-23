@@ -174,6 +174,25 @@ PAIR_LABEL = {
 
 API_SYMBOLS = "USD,JPY,GBP,AUD,NZD,CAD,CHF,SGD,HKD,CNY,MXN,TRY,ZAR,INR"
 
+
+# === 価格表示桁数の一元管理 ===
+# JPYクロス: 小数3桁 / それ以外: 小数6桁
+# 取引シグナルとして適切な精度で出力するための共通ヘルパー
+def pair_decimals(pair: str) -> int:
+    """ペアに応じた小数桁数を返す。JPYクロス=3、それ以外=6。"""
+    return 3 if pair and pair.upper().endswith("JPY") else 6
+
+
+def fmt_price(pair: str, value) -> str:
+    """価格を pair に応じた固定桁数の文字列で返す。None/非数は '—'。"""
+    if value is None:
+        return "—"
+    try:
+        return f"{float(value):.{pair_decimals(pair)}f}"
+    except (TypeError, ValueError):
+        return str(value)
+
+
 LATEST_ENDPOINTS = [
     ("Frankfurter v1",
      f"https://api.frankfurter.dev/v1/latest?base=EUR&symbols={API_SYMBOLS}"),
@@ -395,6 +414,8 @@ def compute_ta_score(price, prices):
         "breakout_bonus": breakout_bonus,
         "divergence_adj": divergence_adj,      # 2026-06-22: RSIダイバージェンス
         "ema_short_bonus": ema_short_bonus,    # 2026-06-22: EMA20短期トレンド
+        # 価格スケールの指標(DMA/MACD/ATR)はペア別精度で丸める
+        # → ここでは pair が未確定なので一旦5桁で保持し、evaluate_full で再丸めする
         "dma200": round(dma200, 5) if dma200 else None,
         "dma50": round(dma50, 5) if dma50 else None,
         "rsi": round(rsi_v, 2) if rsi_v else None,
@@ -432,9 +453,15 @@ def evaluate_full(pair, price, prices, cb_rates, sentiment, now):
         stars = 2; verdict = "△ 弱シグナル"
         direction = "LIGHT_" + ("LONG" if (ta_sign + fa_sign) > 0 else "SHORT")
 
+    # ペア別精度で価格と価格スケール指標を再丸め
+    _d = pair_decimals(pair)
+    ta_rounded = dict(ta)
+    for _k in ("dma200", "dma50", "macd", "macd_signal", "atr"):
+        if ta_rounded.get(_k) is not None:
+            ta_rounded[_k] = round(ta_rounded[_k], _d)
     result = {
-        "pair": pair, "label": PAIR_LABEL[pair], "price": round(price, 5),
-        **ta,
+        "pair": pair, "label": PAIR_LABEL[pair], "price": round(price, _d),
+        **ta_rounded,
         "fa_score": fa["score"], "fa_direction": fa["direction"],
         "fa_rate_diff": fa["rate_diff"], "fa_detail": fa["detail"],
         "stars": stars, "verdict": verdict, "direction": direction,
@@ -658,10 +685,12 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results,
             for t in newly_closed[:5]:
                 rl = reason_label.get(t.get("exit_reason"), t.get("exit_reason", "?"))
                 prefix = "+" if t.get("result") == "WIN" else ("-" if t.get("result") == "LOSS" else " ")
+                _p = t.get("pair", "")
+                _d = pair_decimals(_p)
                 lines.append(
-                    f"{prefix} {t['pair']} {t['direction']} {rl}\n"
-                    f"   {t.get('entry_price','?')} → {t.get('exit_price','?')} "
-                    f"({t.get('pips',0):+.4f}) 保有{t.get('hold_hours',0)}h"
+                    f"{prefix} {_p} {t['direction']} {rl}\n"
+                    f"   {fmt_price(_p, t.get('entry_price'))} → {fmt_price(_p, t.get('exit_price'))} "
+                    f"({t.get('pips',0):+.{_d}f}) 保有{t.get('hold_hours',0)}h"
                 )
             embeds[0]["fields"].append({
                 "name": f"💼 シグナル決着（{len(newly_closed)}件）",
@@ -676,15 +705,16 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results,
             for sc in state_changes[:5]:
                 t = sc["trade"]
                 upd = sc["update"]
+                _p = t.get("pair", "")
                 if upd.get("tp_hit"):
                     lines.append(
-                        f"🎯 {t['pair']} {t['direction']} TP到達!\n"
-                        f"   SLを BE+0.5R({upd.get('sl','?')}) へ移動 → トレーリング発動"
+                        f"🎯 {_p} {t['direction']} TP到達!\n"
+                        f"   SLを BE+0.5R({fmt_price(_p, upd.get('sl'))}) へ移動 → トレーリング発動"
                     )
                 elif "sl" in upd and "extreme_price" in upd:
                     lines.append(
-                        f"📈 {t['pair']} {t['direction']} トレール更新\n"
-                        f"   高値/安値: {upd.get('extreme_price','?')} | SL: {upd.get('sl','?')}"
+                        f"📈 {_p} {t['direction']} トレール更新\n"
+                        f"   高値/安値: {fmt_price(_p, upd.get('extreme_price'))} | SL: {fmt_price(_p, upd.get('sl'))}"
                     )
             if lines:
                 embeds[0]["fields"].append({
@@ -733,9 +763,11 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results,
                     hold_str = ""
 
                 sign = "+" if unreal >= 0 else ""
+                _d = pair_decimals(pair)
                 lines.append(
                     f"{icon} {pair} {direction[:5]} {phase} | "
-                    f"@{entry}→{cur_price} ({sign}{unreal:+.4f}) {progress} {hold_str}"
+                    f"@{fmt_price(pair, entry)}→{fmt_price(pair, cur_price)} "
+                    f"({sign}{unreal:+.{_d}f}) {progress} {hold_str}"
                 )
             embeds[0]["fields"].append({
                 "name": f"📋 保有中ポジション（{len(open_trades_dict)}件）",
@@ -759,7 +791,7 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results,
         # 基本情報
         value = (
             f"```\n"
-            f"価格: {r['price']}\n"
+            f"価格: {fmt_price(r['pair'], r['price'])}\n"
             f"方向: {r['direction']}\n"
             f"TA: {r['ta_score']}/100  FA: {r['fa_score']}/100\n"
             f"金利差: {rate_diff_str}\n"
@@ -769,23 +801,24 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results,
         if regime:
             value += f"ボラ: {regime.get('regime_label','')} (ATR比{regime.get('atr_ratio',1):.1f}倍)\n"
         if staged:
-            tp_main = staged.get("tp") or staged.get("tp1", "?")
+            _p = r["pair"]
+            tp_main = staged.get("tp") or staged.get("tp1")
             tp_mode = staged.get("tp_mode", "")
             if tp_mode == "single_with_trail":
                 # 新方式: 単一TP + トレーリング
                 value += (
-                    f"SL: {staged.get('sl','?')} | TP: {tp_main} (RR 1:{staged.get('rr_tp','?')})\n"
-                    f"📍TP到達後: SL→BE+0.5R({staged.get('be_target_after_tp','?')}) "
+                    f"SL: {fmt_price(_p, staged.get('sl'))} | TP: {fmt_price(_p, tp_main)} (RR 1:{staged.get('rr_tp','?')})\n"
+                    f"📍TP到達後: SL→BE+0.5R({fmt_price(_p, staged.get('be_target_after_tp'))}) "
                     f"+ トレール{staged.get('trail_atr_mult','3.0')}×ATR\n"
-                    f"🎯理論最大: {staged.get('max_target','?')} (参考のみ)\n"
+                    f"🎯理論最大: {fmt_price(_p, staged.get('max_target'))} (参考のみ)\n"
                 )
             else:
                 # 旧方式（後方互換）
                 value += (
-                    f"SL: {staged.get('sl','?')} | "
-                    f"TP1: {staged.get('tp1','?')} | "
-                    f"TP2: {staged.get('tp2','?')} | "
-                    f"TP3: {staged.get('tp3','?')}\n"
+                    f"SL: {fmt_price(_p, staged.get('sl'))} | "
+                    f"TP1: {fmt_price(_p, staged.get('tp1'))} | "
+                    f"TP2: {fmt_price(_p, staged.get('tp2'))} | "
+                    f"TP3: {fmt_price(_p, staged.get('tp3'))}\n"
                     f"RR: 1:{staged.get('rr_tp1','?')} / 1:{staged.get('rr_tp2','?')} / 1:{staged.get('rr_tp3','?')}\n"
                 )
         value += "```\n"
@@ -827,25 +860,26 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results,
         })
 
     for r in upgraded:
+        _p = r["pair"]
         staged = r.get("staged_tp", {})
         tp_sl = ""
         if staged:
-            tp_main = staged.get("tp") or staged.get("tp1", "?")
+            tp_main = staged.get("tp") or staged.get("tp1")
             if staged.get("tp_mode") == "single_with_trail":
                 tp_sl = (
-                    f"\nSL: {staged.get('sl','?')} | TP: {tp_main} (RR 1:{staged.get('rr_tp','?')})"
+                    f"\nSL: {fmt_price(_p, staged.get('sl'))} | TP: {fmt_price(_p, tp_main)} (RR 1:{staged.get('rr_tp','?')})"
                     f"\nTP到達後→トレール {staged.get('trail_atr_mult','3.0')}×ATR"
                 )
             else:
                 tp_sl = (
-                    f"\nSL: {staged.get('sl','?')} | "
-                    f"TP1: {staged.get('tp1','?')} | "
-                    f"TP2: {staged.get('tp2','?')} | "
-                    f"TP3: {staged.get('tp3','?')}"
+                    f"\nSL: {fmt_price(_p, staged.get('sl'))} | "
+                    f"TP1: {fmt_price(_p, staged.get('tp1'))} | "
+                    f"TP2: {fmt_price(_p, staged.get('tp2'))} | "
+                    f"TP3: {fmt_price(_p, staged.get('tp3'))}"
                 )
         embeds[0]["fields"].append({
             "name": f"⬆ 昇格: {r['label']} ★4→★5",
-            "value": f"```\n価格: {r['price']}  方向: {r['direction']}{tp_sl}\n```",
+            "value": f"```\n価格: {fmt_price(_p, r['price'])}  方向: {r['direction']}{tp_sl}\n```",
             "inline": False
         })
 
@@ -903,13 +937,14 @@ def send_email(smtp_host, smtp_port, smtp_user, smtp_pass,
     )
 
     def fmt_signal(r):
+        _p = r["pair"]
         staged = r.get("staged_tp", {})
         regime = r.get("volatility_regime", {})
         carry = r.get("carry_score", {})
         sr = r.get("support_resistance", {})
         interv = r.get("intervention_risk", {})
         lines = [
-            f"{stars_to_text(r['stars'])} {r['label']} @ {r['price']}",
+            f"{stars_to_text(r['stars'])} {r['label']} @ {fmt_price(_p, r['price'])}",
             f"  {r['verdict']} / {r['direction']}",
             f"  TA={r['ta_score']}/100  FA={r['fa_score']}/100  金利差{r.get('fa_rate_diff','N/A'):+.2f}%",
             f"  {r['fa_detail']}",
@@ -917,7 +952,12 @@ def send_email(smtp_host, smtp_port, smtp_user, smtp_pass,
         if regime:
             lines.append(f"  ② ボラ: {regime.get('regime_label','')} (比率{regime.get('atr_ratio',1):.1f}x)")
         if staged:
-            lines.append(f"  ③ SL:{staged.get('sl','?')} TP1:{staged.get('tp1','?')} TP2:{staged.get('tp2','?')} TP3:{staged.get('tp3','?')}")
+            lines.append(
+                f"  ③ SL:{fmt_price(_p, staged.get('sl'))} "
+                f"TP1:{fmt_price(_p, staged.get('tp1'))} "
+                f"TP2:{fmt_price(_p, staged.get('tp2'))} "
+                f"TP3:{fmt_price(_p, staged.get('tp3'))}"
+            )
             lines.append(f"     戦略: {staged.get('strategy','')}")
         if carry and r.get("fa_rate_diff", 0) and r.get("fa_rate_diff", 0) > 0:
             lines.append(f"  ⑤ キャリー: {carry.get('label','')} | SL回収{carry.get('breakeven_days','?')}日")
@@ -1054,16 +1094,17 @@ def generate_html_report(results, sentiment, us_yields, cb_rates,
             badges.append(f'<span class="badge" style="background:rgba(248,113,113,0.15);color:#f87171;border:1px solid rgba(248,113,113,0.3)">🚨介入{interv.get("risk_score",0)}</span>')
 
         # SR最近傍
+        _p = r["pair"]
         sr = r.get("support_resistance", {})
         sr_str = ""
         if sr.get("nearest_resistance") and row_cls == "buy":
             nr = sr["nearest_resistance"]
             if nr["distance_pct"] < 0.5:
-                sr_str = f'<div class="warn-line">⚠ レジスタンス({nr["price"]})まで{nr["distance_pct"]:.2f}%</div>'
+                sr_str = f'<div class="warn-line">⚠ レジスタンス({fmt_price(_p, nr["price"])})まで{nr["distance_pct"]:.2f}%</div>'
         elif sr.get("nearest_support") and row_cls == "sell":
             ns = sr["nearest_support"]
             if ns["distance_pct"] < 0.5:
-                sr_str = f'<div class="warn-line">⚠ サポート({ns["price"]})まで{ns["distance_pct"]:.2f}%</div>'
+                sr_str = f'<div class="warn-line">⚠ サポート({fmt_price(_p, ns["price"])})まで{ns["distance_pct"]:.2f}%</div>'
 
         # TP情報
         staged = r.get("staged_tp", {})
@@ -1071,8 +1112,8 @@ def generate_html_report(results, sentiment, us_yields, cb_rates,
         if staged:
             tp_str = (
                 f'<div style="font-family:var(--mono);font-size:0.7rem;color:var(--text-muted);margin-top:0.2rem">'
-                f'SL:{staged.get("sl","?")} TP1:{staged.get("tp1","?")} '
-                f'TP2:{staged.get("tp2","?")} TP3:{staged.get("tp3","?")}'
+                f'SL:{fmt_price(_p, staged.get("sl"))} TP1:{fmt_price(_p, staged.get("tp1"))} '
+                f'TP2:{fmt_price(_p, staged.get("tp2"))} TP3:{fmt_price(_p, staged.get("tp3"))}'
                 f'</div>'
             )
 
@@ -1114,7 +1155,7 @@ def generate_html_report(results, sentiment, us_yields, cb_rates,
             <div class="pair-main">{r['label']} {warn_html}</div>
             {strength_ctx_str}{event_html}{sr_str}{tp_str}{carry_str}
           </td>
-          <td class="num-cell">{r['price']}</td>
+          <td class="num-cell">{fmt_price(_p, r['price'])}</td>
           <td class="num-cell score-ta">{r['ta_score']}</td>
           <td class="num-cell score-fa">{r['fa_score']}</td>
           <td class="num-cell">{diff_str}</td>
@@ -1476,7 +1517,7 @@ def main():
             if r.get("intervention_risk", {}).get("risk_level") in ("HIGH","CRITICAL"):
                 warn += f" 🚨介入"
             print(
-                f"  [{stars_to_text(r['stars'])}] {pair:8} {price:>10.4f}  "
+                f"  [{stars_to_text(r['stars'])}] {pair:8} {fmt_price(pair, price):>12}  "
                 f"TA={r['ta_score']:.0f} FA={r['fa_score']:.0f}  "
                 f"{r['verdict']}{warn}"
             )
@@ -1536,13 +1577,16 @@ def main():
     if trade_update["newly_opened"]:
         print(f"\n[TRADE] 新規エントリー {len(trade_update['newly_opened'])}件:")
         for t in trade_update["newly_opened"]:
-            print(f"  + {t['pair']} {t['direction']} @ {t['entry_price']} "
-                  f"(SL:{t.get('sl')} TP1:{t.get('tp1')})")
+            _p = t.get("pair", "")
+            print(f"  + {_p} {t['direction']} @ {fmt_price(_p, t['entry_price'])} "
+                  f"(SL:{fmt_price(_p, t.get('sl'))} TP1:{fmt_price(_p, t.get('tp1'))})")
     if trade_update["newly_closed"]:
         print(f"[TRADE] 決済 {len(trade_update['newly_closed'])}件:")
         for t in trade_update["newly_closed"]:
-            print(f"  - {t['pair']} {t['direction']} {t['result']} "
-                  f"({t['exit_reason']}) {t.get('pips',0):+.4f} "
+            _p = t.get("pair", "")
+            _d = pair_decimals(_p)
+            print(f"  - {_p} {t['direction']} {t['result']} "
+                  f"({t['exit_reason']}) {t.get('pips',0):+.{_d}f} "
                   f"保有{t.get('hold_hours',0)}h")
     print(f"[TRADE] 現在保有中: {trade_update['still_open']}件")
     open_trades = load_open_trades()

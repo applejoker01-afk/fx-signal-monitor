@@ -194,19 +194,20 @@ a{color:var(--gold);}
 // ============================================================
 // 設定
 // ============================================================
+// 表示桁数規約: JPYクロス=3桁、それ以外=6桁（取引シグナル精度の統一）
 const PAIRS = [
-  { key: "USDJPY", label: "USD/JPY", yahoo: "USDJPY=X", decimals: 2 },
-  { key: "EURUSD", label: "EUR/USD", yahoo: "EURUSD=X", decimals: 5 },
-  { key: "GBPJPY", label: "GBP/JPY", yahoo: "GBPJPY=X", decimals: 2 },
-  { key: "AUDJPY", label: "AUD/JPY", yahoo: "AUDJPY=X", decimals: 2 },
-  { key: "EURJPY", label: "EUR/JPY", yahoo: "EURJPY=X", decimals: 2 },
-  { key: "AUDUSD", label: "AUD/USD", yahoo: "AUDUSD=X", decimals: 5 },
+  { key: "USDJPY", label: "USD/JPY", yahoo: "USDJPY=X", decimals: 3 },
+  { key: "EURUSD", label: "EUR/USD", yahoo: "EURUSD=X", decimals: 6 },
+  { key: "GBPJPY", label: "GBP/JPY", yahoo: "GBPJPY=X", decimals: 3 },
+  { key: "AUDJPY", label: "AUD/JPY", yahoo: "AUDJPY=X", decimals: 3 },
+  { key: "EURJPY", label: "EUR/JPY", yahoo: "EURJPY=X", decimals: 3 },
+  { key: "AUDUSD", label: "AUD/USD", yahoo: "AUDUSD=X", decimals: 6 },
   // Step1追加（2026-06-12）: 主要国の流動性高いクロス。
   // 戦略マップ生成で勝てる戦略がないペアは自動的に「⏸見送り」になる。
-  { key: "GBPUSD", label: "GBP/USD", yahoo: "GBPUSD=X", decimals: 5 },
-  { key: "USDCAD", label: "USD/CAD", yahoo: "USDCAD=X", decimals: 5 },
-  { key: "USDCHF", label: "USD/CHF", yahoo: "USDCHF=X", decimals: 5 },
-  { key: "NZDJPY", label: "NZD/JPY", yahoo: "NZDJPY=X", decimals: 2 },
+  { key: "GBPUSD", label: "GBP/USD", yahoo: "GBPUSD=X", decimals: 6 },
+  { key: "USDCAD", label: "USD/CAD", yahoo: "USDCAD=X", decimals: 6 },
+  { key: "USDCHF", label: "USD/CHF", yahoo: "USDCHF=X", decimals: 6 },
+  { key: "NZDJPY", label: "NZD/JPY", yahoo: "NZDJPY=X", decimals: 3 },
 ];
 
 // CORSプロキシ候補（順に試す）。直接 → プロキシの順。

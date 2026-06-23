@@ -245,8 +245,17 @@ def _default_regime() -> dict:
 # ③ 段階的TP計算
 # ============================================================
 
+def _pair_decimals(pair: str) -> int:
+    """ペアに応じた小数桁数を返す。JPYクロス=3、それ以外=6。
+
+    signal_scanner.py の pair_decimals と同じ規約を局所複製。
+    モジュール循環を避けるため独立定義。
+    """
+    return 3 if pair and pair.upper().endswith("JPY") else 6
+
+
 def calc_staged_tp(price: float, direction: str, atr: float, regime: dict,
-                   prices: list = None) -> dict:
+                   prices: list = None, pair: str = "") -> dict:
     """
     単一TP + トレーリングストップ戦略を計算（2026-06-10刷新）。
 
@@ -329,7 +338,7 @@ def calc_staged_tp(price: float, direction: str, atr: float, regime: dict,
                 chandelier_sl_active = True
                 chandelier_note = (
                     f"Chandelier Exit: 過去{CHANDELIER_PERIOD}日高値"
-                    f"({round(recent_high, 5)})-{sl_mult}xATR"
+                    f"({round(recent_high, _pair_decimals(pair))})-{sl_mult}xATR"
                 )
             else:
                 sl = sl_fixed  # 固定SLの方が安全（広い）場合はそちらを使用
@@ -353,7 +362,7 @@ def calc_staged_tp(price: float, direction: str, atr: float, regime: dict,
                 chandelier_sl_active = True
                 chandelier_note = (
                     f"Chandelier Exit: 過去{CHANDELIER_PERIOD}日安値"
-                    f"({round(recent_low, 5)})+{sl_mult}xATR"
+                    f"({round(recent_low, _pair_decimals(pair))})+{sl_mult}xATR"
                 )
             else:
                 sl = sl_fixed
@@ -363,8 +372,9 @@ def calc_staged_tp(price: float, direction: str, atr: float, regime: dict,
     else:
         return {}
 
-    # pip精度（JPYペアは小数点2桁、その他は5桁）
-    decimals = 2 if price > 10 else 5
+    # ペア別の表示桁数（JPYクロス=3、それ以外=6）
+    # 注: pair 未指定の旧呼び出し互換のため price>10 をフォールバックに残す
+    decimals = _pair_decimals(pair) if pair else (3 if price > 10 else 6)
 
     rr_tp = round(tp_mult / sl_mult, 1)
     rr_tp2 = round(tp2_mult / sl_mult, 1)
@@ -549,7 +559,7 @@ def calc_carry_score(pair: str, rate_diff: float, atr: float, price: float) -> d
 # ⑥ サポート・レジスタンス自動検出
 # ============================================================
 
-def detect_support_resistance(prices: list, current_price: float) -> dict:
+def detect_support_resistance(prices: list, current_price: float, pair: str = "") -> dict:
     """
     過去の価格から主要なサポート・レジスタンス水準を検出。
 
@@ -604,7 +614,7 @@ def detect_support_resistance(prices: list, current_price: float) -> dict:
                 current_cluster.append(level)
             else:
                 avg = sum(current_cluster) / len(current_cluster)
-                clusters.append({"price": round(avg, 3), "count": len(current_cluster)})
+                clusters.append({"price": round(avg, _pair_decimals(pair)), "count": len(current_cluster)})
                 current_cluster = [level]
         if current_cluster:
             avg = sum(current_cluster) / len(current_cluster)
@@ -869,7 +879,7 @@ def run_advanced_analytics(
 
     # ③ 段階的TP計算（Chandelier Exit 動的SL付き: 2026-06-11 研究C反映）
     if direction.endswith(("LONG", "SHORT")) and atr:
-        staged_tp = calc_staged_tp(price, direction, atr, regime, prices=prices)
+        staged_tp = calc_staged_tp(price, direction, atr, regime, prices=prices, pair=pair)
         result["staged_tp"] = staged_tp
 
     # ⑤ キャリートレード魅力度スコア
@@ -879,7 +889,7 @@ def run_advanced_analytics(
 
     # ⑥ サポート・レジスタンス
     if prices and len(prices) >= 20:
-        sr = detect_support_resistance(prices, price)
+        sr = detect_support_resistance(prices, price, pair=pair)
         result["support_resistance"] = sr
 
     # ⑧ 日銀介入リスク（USDJPYのみ）

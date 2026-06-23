@@ -3090,13 +3090,10 @@ const PAIR_LABEL = {
 };
 
 // Decimal places helper - centralized for all pairs
+// 規約: JPYクロス=3桁、それ以外=6桁（取引シグナル精度の統一）
 function getDecimals(pair) {
-  // Small-value JPY crosses (EM/exotic): 3 decimals
-  if (['MXNJPY', 'TRYJPY', 'ZARJPY', 'INRJPY'].includes(pair)) return 3;
-  // Standard JPY crosses: 2 decimals
-  if (pair.endsWith('JPY')) return 2;
-  // Non-JPY pairs (dollar straights, EUR crosses): 4 decimals
-  return 4;
+  if (pair.endsWith('JPY')) return 3;
+  return 6;
 }
 
 // ===== Technical Indicator Calculations =====
@@ -3282,7 +3279,7 @@ function updateDiagPanel() {
   if (DIAG.successEndpoint) document.getElementById('diagEndpoint').className = 'diag-val ok';
 
   document.getElementById('diagPairs').textContent = DIAG.parsedPairs ?
-    Object.entries(DIAG.parsedPairs).map(([k,v]) => `${k}=${v?.toFixed(k==='EURUSD'?4:3) ?? 'N/A'}`).join(', ') : '—';
+    Object.entries(DIAG.parsedPairs).map(([k,v]) => `${k}=${v?.toFixed(getDecimals(k)) ?? 'N/A'}`).join(', ') : '—';
 
   const errEl = document.getElementById('diagErrors');
   if (DIAG.errors.length === 0) {
@@ -3737,14 +3734,14 @@ function updateSnapshot() {
     else { rsiLevelEl.textContent = '中立〜弱気'; rsiLevelEl.className = 'snap-diff negative'; }
   }
 
-  document.getElementById('snapMACD').textContent = STATE.macd?.toFixed(d === 4 ? 4 : 3) ?? '--';
+  document.getElementById('snapMACD').textContent = STATE.macd?.toFixed(d) ?? '--';
   const macdDirEl = document.getElementById('snapMACDDir');
   if (STATE.macd != null && STATE.macdSignal != null) {
     if (STATE.macd > STATE.macdSignal) { macdDirEl.textContent = '↑ ゴールデン'; macdDirEl.className = 'snap-diff positive'; }
     else { macdDirEl.textContent = '↓ デッド'; macdDirEl.className = 'snap-diff negative'; }
   }
 
-  document.getElementById('snapATR').textContent = STATE.atr?.toFixed(d === 4 ? 5 : 3) ?? '--';
+  document.getElementById('snapATR').textContent = STATE.atr?.toFixed(d) ?? '--';
   const atrPctEl = document.getElementById('snapATRPct');
   if (STATE.atr && STATE.price) {
     const pct = (STATE.atr / STATE.price) * 100;
@@ -3842,8 +3839,8 @@ function syncToTabs() {
   setVal('tech200dma', STATE.dma200?.toFixed(d) ?? STATE.price.toFixed(d));
   setVal('tech50dma', STATE.dma50?.toFixed(d) ?? STATE.price.toFixed(d));
   setVal('techRSI', Math.round(STATE.rsi ?? 50));
-  setVal('techMACD', STATE.macd?.toFixed(d === 4 ? 4 : 3) ?? 0);
-  setVal('techSignal', STATE.macdSignal?.toFixed(d === 4 ? 4 : 3) ?? 0);
+  setVal('techMACD', STATE.macd?.toFixed(d) ?? 0);
+  setVal('techSignal', STATE.macdSignal?.toFixed(d) ?? 0);
   // Trend direction
   let trendVal = 'flat';
   if (STATE.dma200 && STATE.dma50) {
@@ -3873,7 +3870,7 @@ function syncToTabs() {
   // Tab 6: ATR Stop
   setVal('atrDir', direction);
   setVal('atrEntry', STATE.price.toFixed(d));
-  setVal('atrVal', (STATE.atr ?? 0).toFixed(d === 4 ? 5 : 3));
+  setVal('atrVal', (STATE.atr ?? 0).toFixed(d));
   setVal('atrMult', STATE.atrMult);
 
   // Tab 7: Pyramiding
@@ -3881,7 +3878,7 @@ function syncToTabs() {
   setVal('pyrEntry', STATE.price.toFixed(d));
   setVal('pyrTotal', STATE.totalLot);
   // Step = 2 × ATR (typical pyramiding trigger)
-  setVal('pyrStep', ((STATE.atr ?? 0) * 2).toFixed(d === 4 ? 5 : 3));
+  setVal('pyrStep', ((STATE.atr ?? 0) * 2).toFixed(d));
 
   // Tab 8: Backtest
   setVal('btBalance', STATE.balance);
@@ -4588,10 +4585,13 @@ function updateATR() {
     locked = Math.max(0, entry - trail);
   }
 
-  document.getElementById('atrInitStop').textContent = initStop.toFixed(3);
-  document.getElementById('atrDist').textContent = dist.toFixed(3) + ' (' + (dist / (entry.toString().includes('.') && entry < 10 ? 0.0001 : 0.01)).toFixed(0) + ' pips)';
-  document.getElementById('atrTrail').textContent = trail.toFixed(3);
-  document.getElementById('atrLocked').textContent = locked > 0 ? '+' + locked.toFixed(3) : '0.000';
+  // ペアに応じた表示桁数（JPY=3、それ以外=6）
+  const _d = getDecimals(STATE.pair);
+  const _zero = (0).toFixed(_d);
+  document.getElementById('atrInitStop').textContent = initStop.toFixed(_d);
+  document.getElementById('atrDist').textContent = dist.toFixed(_d) + ' (' + (dist / (entry.toString().includes('.') && entry < 10 ? 0.0001 : 0.01)).toFixed(0) + ' pips)';
+  document.getElementById('atrTrail').textContent = trail.toFixed(_d);
+  document.getElementById('atrLocked').textContent = locked > 0 ? '+' + locked.toFixed(_d) : _zero;
 
   // Chart simulation
   const days = 15;
@@ -4698,13 +4698,16 @@ function updatePyramid() {
   let totalLot = initLot;
   let totalCost = initLot * entry;
 
+  // ペアに応じた価格表示桁数（JPY=3、それ以外=6）
+  const _pd = getDecimals(STATE.pair);
+
   // Initial entry
   html += `
     <div class="pyramid-row">
       <div class="pyramid-tier" style="border-left-color: var(--accent-amber);">
         <div>
           <span class="pyramid-tier-num">[初期] </span>
-          <strong style="color: var(--accent-gold);">${entry.toFixed(2)}</strong>
+          <strong style="color: var(--accent-gold);">${entry.toFixed(_pd)}</strong>
         </div>
         <div class="pyramid-tier-info">
           <span style="color: var(--text-secondary);">${initLot.toFixed(2)} ロット</span>
@@ -4721,15 +4724,15 @@ function updatePyramid() {
     totalCost += stageLots[i] * priceLevel;
     const avgPrice = totalCost / totalLot;
     const stopRaise = dir === 'long'
-      ? (priceLevel - step * 0.5).toFixed(2)
-      : (priceLevel + step * 0.5).toFixed(2);
+      ? (priceLevel - step * 0.5).toFixed(_pd)
+      : (priceLevel + step * 0.5).toFixed(_pd);
 
     html += `
       <div class="pyramid-row">
         <div class="pyramid-tier">
           <div>
             <span class="pyramid-tier-num">[追加${i + 1}] </span>
-            <strong style="color: var(--accent-gold);">${priceLevel.toFixed(2)}</strong>
+            <strong style="color: var(--accent-gold);">${priceLevel.toFixed(_pd)}</strong>
           </div>
           <div class="pyramid-tier-info">
             <span style="color: var(--text-secondary);">+${stageLots[i].toFixed(2)} ロット</span>
@@ -4749,7 +4752,7 @@ function updatePyramid() {
     ? (finalPrice - avgPrice) * totalLot
     : (avgPrice - finalPrice) * totalLot;
 
-  document.getElementById('pyrAvg').textContent = avgPrice.toFixed(3);
+  document.getElementById('pyrAvg').textContent = avgPrice.toFixed(_pd);
   document.getElementById('pyrSum').textContent = totalLot.toFixed(2) + ' ロット';
   document.getElementById('pyrProfit').textContent = '+' + profit.toFixed(2) + ' (価格×ロット)';
 }
