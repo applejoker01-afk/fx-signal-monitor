@@ -254,6 +254,27 @@ def _pair_decimals(pair: str) -> int:
     return 3 if pair and pair.upper().endswith("JPY") else 6
 
 
+def _spread_for_pair(pair: str) -> float:
+    """ペアの代表スプレッドを価格単位で返す（signal_scanner.SPREAD_PIPS と同期）。
+    モジュール循環を避けるためテーブルを局所複製。
+    """
+    if not pair:
+        return 0.0
+    table = {
+        "USDJPY": 0.2, "EURJPY": 0.3, "GBPJPY": 2.0,
+        "AUDJPY": 1.5, "NZDJPY": 2.0, "CADJPY": 1.5, "CHFJPY": 2.0,
+        "SGDJPY": 2.5, "HKDJPY": 3.0,
+        "CNYJPY": 5.0, "MXNJPY": 5.0, "ZARJPY": 10.0,
+        "INRJPY": 8.0, "TRYJPY": 30.0,
+        "EURUSD": 0.5, "GBPUSD": 1.5, "AUDUSD": 1.0, "NZDUSD": 2.0,
+        "USDCAD": 1.5, "USDCHF": 2.0,
+        "EURGBP": 1.5, "EURAUD": 3.0,
+    }
+    pips = table.get(pair.upper(), 0.0)
+    pip_size = 0.01 if pair.upper().endswith("JPY") else 0.0001
+    return pips * pip_size
+
+
 def calc_staged_tp(price: float, direction: str, atr: float, regime: dict,
                    prices: list = None, pair: str = "") -> dict:
     """
@@ -380,6 +401,23 @@ def calc_staged_tp(price: float, direction: str, atr: float, regime: dict,
     rr_tp2 = round(tp2_mult / sl_mult, 1)
     rr_tp3 = round(tp3_mult / sl_mult, 1)
 
+    # ── スプレッド補正（2026-06-23 追加）──
+    # bid/ask スプレッドを考慮した実効 SL/TP 距離と RR を算出。
+    # 中値ベースの sl/tp はそのまま、effective_* で表示用の歪み補正値を提供。
+    # LONG: ASK=mid+spread/2 で約定 → SL までの距離+spread/2、TP までの距離-spread/2
+    # SHORT: BID=mid-spread/2 で約定 → SL までの距離+spread/2、TP までの距離-spread/2
+    spread_price = _spread_for_pair(pair)
+    spread_half = spread_price / 2.0
+    # 中値ベースの距離
+    sl_dist_mid = sl_width  # = atr * sl_mult
+    tp_dist_mid = tp_width  # = atr * tp_mult
+    # 実効距離（スプレッドにより SL は近く、TP は遠くなる）
+    sl_dist_effective = sl_dist_mid + spread_half
+    tp_dist_effective = max(tp_dist_mid - spread_half, 0.0)
+    rr_effective = round(tp_dist_effective / sl_dist_effective, 2) if sl_dist_effective > 0 else 0
+    # spread/ATR 比（降格フィルタ判定で使用）
+    spread_atr_ratio = round(spread_price / atr, 3) if atr else 0
+
     return {
         # ── 新方式（単一TP + トレーリング）──
         "sl": round(sl, decimals),
@@ -400,6 +438,13 @@ def calc_staged_tp(price: float, direction: str, atr: float, regime: dict,
         "rr_tp1": rr_tp,
         "rr_tp2": rr_tp2,
         "rr_tp3": rr_tp3,
+        # ── スプレッド補正情報（表示用）──
+        "spread_price": round(spread_price, decimals),
+        "spread_pips": round(spread_price / (0.01 if pair.upper().endswith("JPY") else 0.0001), 1) if pair else 0,
+        "spread_atr_ratio": spread_atr_ratio,
+        "sl_dist_effective": round(sl_dist_effective, decimals),
+        "tp_dist_effective": round(tp_dist_effective, decimals),
+        "rr_effective": rr_effective,
         # ── 共通メタ ──
         "regime_label": regime.get("regime_label", ""),
         "strategy": (

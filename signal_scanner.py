@@ -46,6 +46,7 @@ from modules.performance_intelligence import (
     PAIR_EXCLUDE, apply_static_baseline,       # 2026-06-16 軌道修正
     apply_boj_cycle_directional_filter,        # 2026-06-19 BOJサイクル方向フィルタ
     apply_vix_regime_filter,                   # 2026-06-22 VIXレジームフィルタ
+    apply_spread_filter,                       # 2026-06-23 スプレッド/ATR比フィルタ
 )
 from modules.ai_commentary import generate_market_commentary, generate_exit_advice
 from modules.ambush_alert import evaluate_ambush, collect_ambush_alerts
@@ -191,6 +192,42 @@ def fmt_price(pair: str, value) -> str:
         return f"{float(value):.{pair_decimals(pair)}f}"
     except (TypeError, ValueError):
         return str(value)
+
+
+# === スプレッド代表値テーブル（2026-06 リテール FX 平均値） ===
+# 単位: pip（JPYクロスは 0.01、非JPYは 0.0001 が 1pip）
+# Frankfurter は中値のみ提供のため、bid/ask の実効スプレッドはここで補正する。
+# 値は実際のリテール標準スプレッド（メジャー: タイト、エキゾチック: ワイド）。
+SPREAD_PIPS = {
+    # メジャー JPY（タイト）
+    "USDJPY": 0.2, "EURJPY": 0.3, "GBPJPY": 2.0,
+    # 流動性中程度 JPY
+    "AUDJPY": 1.5, "NZDJPY": 2.0, "CADJPY": 1.5, "CHFJPY": 2.0,
+    "SGDJPY": 2.5, "HKDJPY": 3.0,
+    # エキゾチック JPY（ワイド・要警戒）
+    "CNYJPY": 5.0, "MXNJPY": 5.0, "ZARJPY": 10.0,
+    "INRJPY": 8.0, "TRYJPY": 30.0,
+    # メジャー非JPY
+    "EURUSD": 0.5, "GBPUSD": 1.5, "AUDUSD": 1.0, "NZDUSD": 2.0,
+    "USDCAD": 1.5, "USDCHF": 2.0,
+    "EURGBP": 1.5, "EURAUD": 3.0,
+}
+
+
+def pip_size(pair: str) -> float:
+    """1 pip の価格単位。JPYクロス=0.01、それ以外=0.0001。"""
+    return 0.01 if pair and pair.upper().endswith("JPY") else 0.0001
+
+
+def typical_spread_price(pair: str) -> float:
+    """ペアの代表スプレッドを価格単位で返す。未定義は 0 で扱う。"""
+    pips = SPREAD_PIPS.get(pair.upper() if pair else "", 0.0)
+    return pips * pip_size(pair)
+
+
+def typical_spread_pips(pair: str) -> float:
+    """ペアの代表スプレッドを pip 単位で返す。"""
+    return SPREAD_PIPS.get(pair.upper() if pair else "", 0.0)
 
 
 LATEST_ENDPOINTS = [
@@ -804,10 +841,21 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results,
             _p = r["pair"]
             tp_main = staged.get("tp") or staged.get("tp1")
             tp_mode = staged.get("tp_mode", "")
+            # スプレッド情報（中値ベース RR と 実効 RR の併記）
+            sp_pips = staged.get("spread_pips", 0)
+            rr_eff = staged.get("rr_effective")
+            sp_ratio = staged.get("spread_atr_ratio", 0)
+            spread_note = ""
+            if sp_pips and rr_eff is not None:
+                pct = sp_ratio * 100
+                if pct > 10:
+                    spread_note = f" ⚠スプレッド{sp_pips:.1f}pips({pct:.0f}%) 実効RR1:{rr_eff}"
+                else:
+                    spread_note = f" (spread {sp_pips:.1f}pips, 実効RR1:{rr_eff})"
             if tp_mode == "single_with_trail":
                 # 新方式: 単一TP + トレーリング
                 value += (
-                    f"SL: {fmt_price(_p, staged.get('sl'))} | TP: {fmt_price(_p, tp_main)} (RR 1:{staged.get('rr_tp','?')})\n"
+                    f"SL: {fmt_price(_p, staged.get('sl'))} | TP: {fmt_price(_p, tp_main)} (RR 1:{staged.get('rr_tp','?')}){spread_note}\n"
                     f"📍TP到達後: SL→BE+0.5R({fmt_price(_p, staged.get('be_target_after_tp'))}) "
                     f"+ トレール{staged.get('trail_atr_mult','3.0')}×ATR\n"
                     f"🎯理論最大: {fmt_price(_p, staged.get('max_target'))} (参考のみ)\n"
@@ -819,7 +867,7 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results,
                     f"TP1: {fmt_price(_p, staged.get('tp1'))} | "
                     f"TP2: {fmt_price(_p, staged.get('tp2'))} | "
                     f"TP3: {fmt_price(_p, staged.get('tp3'))}\n"
-                    f"RR: 1:{staged.get('rr_tp1','?')} / 1:{staged.get('rr_tp2','?')} / 1:{staged.get('rr_tp3','?')}\n"
+                    f"RR: 1:{staged.get('rr_tp1','?')} / 1:{staged.get('rr_tp2','?')} / 1:{staged.get('rr_tp3','?')}{spread_note}\n"
                 )
         value += "```\n"
         value += f"📊 {r['fa_detail']}"
@@ -853,6 +901,11 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results,
             value += f"\n⚠ {r['event_warning']}"
         if r.get("sentiment_notes"):
             value += f"\n🌐 " + " / ".join(r["sentiment_notes"])
+        # 💸 スプレッドフィルタ警告/注意
+        if r.get("spread_filter_applied"):
+            value += f"\n{r.get('spread_filter_reason', '')}"
+        elif r.get("spread_caution"):
+            value += f"\n{r.get('spread_caution_reason', '')}"
 
         embeds[0]["fields"].append({
             "name": f"{stars_to_text(r['stars'])} {r['label']} - {r['verdict']}",
@@ -1092,6 +1145,13 @@ def generate_html_report(results, sentiment, us_yields, cb_rates,
         interv = r.get("intervention_risk", {})
         if interv.get("risk_level") in ("HIGH", "CRITICAL"):
             badges.append(f'<span class="badge" style="background:rgba(248,113,113,0.15);color:#f87171;border:1px solid rgba(248,113,113,0.3)">🚨介入{interv.get("risk_score",0)}</span>')
+        # 💸 スプレッドバッジ
+        _staged_for_badge = r.get("staged_tp", {})
+        _sp_ratio = _staged_for_badge.get("spread_atr_ratio", 0) if _staged_for_badge else 0
+        if _sp_ratio > 0.30:
+            badges.append(f'<span class="badge" style="background:rgba(248,113,113,0.15);color:#f87171;border:1px solid rgba(248,113,113,0.3)">💸spread致命{_sp_ratio*100:.0f}%</span>')
+        elif _sp_ratio > 0.10:
+            badges.append(f'<span class="badge" style="background:rgba(251,191,36,0.15);color:#fbbf24;border:1px solid rgba(251,191,36,0.3)">💸spread{_sp_ratio*100:.0f}%</span>')
 
         # SR最近傍
         _p = r["pair"]
@@ -1110,11 +1170,26 @@ def generate_html_report(results, sentiment, us_yields, cb_rates,
         staged = r.get("staged_tp", {})
         tp_str = ""
         if staged:
+            # スプレッド情報を併記（広い場合のみ表示）
+            sp_pips = staged.get("spread_pips", 0)
+            rr_mid = staged.get("rr_tp")
+            rr_eff = staged.get("rr_effective")
+            sp_ratio = staged.get("spread_atr_ratio", 0)
+            spread_line = ""
+            if sp_pips and sp_ratio > 0.05 and rr_eff is not None:
+                color = "#f87171" if sp_ratio > 0.30 else ("#fbbf24" if sp_ratio > 0.10 else "var(--text-muted)")
+                spread_line = (
+                    f'<div style="font-family:var(--mono);font-size:0.7rem;color:{color};margin-top:0.15rem">'
+                    f'💸 spread {sp_pips:.1f}pips ({sp_ratio*100:.0f}% of ATR) | '
+                    f'実効RR 1:{rr_mid}→1:{rr_eff}'
+                    f'</div>'
+                )
             tp_str = (
                 f'<div style="font-family:var(--mono);font-size:0.7rem;color:var(--text-muted);margin-top:0.2rem">'
                 f'SL:{fmt_price(_p, staged.get("sl"))} TP1:{fmt_price(_p, staged.get("tp1"))} '
                 f'TP2:{fmt_price(_p, staged.get("tp2"))} TP3:{fmt_price(_p, staged.get("tp3"))}'
                 f'</div>'
+                f'{spread_line}'
             )
 
         warn_html = " ".join(badges)
@@ -1123,6 +1198,8 @@ def generate_html_report(results, sentiment, us_yields, cb_rates,
             event_html = f'<div class="warn-line">⏸ {r["event_warning"]}</div>'
         if r.get("sentiment_notes"):
             event_html += '<div class="warn-line">🌐 ' + " / ".join(r["sentiment_notes"]) + '</div>'
+        if r.get("spread_filter_applied"):
+            event_html += f'<div class="warn-line">{r.get("spread_filter_reason","")}</div>'
 
         # 通貨強弱コンテキスト
         sc = r.get("strength_context", {})
@@ -1483,6 +1560,17 @@ def main():
                 print(f"         └─ {r.get('vix_filter_reason', '')}")
             elif r.get("vix_caution"):
                 print(f"         └─ {r.get('vix_caution_reason', '')}")
+
+            # 💸 スプレッド/ATR比フィルタ（2026-06-23追加）
+            # spread/ATR > 30%: ★≤2 強制（実質取引禁止・主にエキゾチック）
+            # spread/ATR > 10%: ★≤3 上限
+            # bid/ask スプレッドが ATR に対して大きいペアは、実効SL距離が
+            # 中値ベース計算より狭くなり SL に引っかかりやすいため降格。
+            r = apply_spread_filter(r)
+            if r.get("spread_filter_applied"):
+                print(f"         └─ {r.get('spread_filter_reason', '')}")
+            elif r.get("spread_caution"):
+                print(f"         └─ {r.get('spread_caution_reason', '')}")
 
             # 🏦 CB会合ブラックアウト（2026-06-16追加）
             cb_blackout = check_cb_meeting_blackout(pair, cb_rates, now)

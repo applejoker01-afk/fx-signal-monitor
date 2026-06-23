@@ -247,6 +247,70 @@ def apply_vix_regime_filter(result: dict, sentiment: dict) -> dict:
 
 
 # ============================================================
+# 💸 スプレッド/ATR比フィルタ（2026-06-23 追加）
+# ============================================================
+
+def apply_spread_filter(result: dict) -> dict:
+    """
+    スプレッド/ATR 比に応じてエキゾチック系シグナルを降格する。
+
+    根拠: Frankfurter API は中値(mid)のみ提供のため、bid/ask スプレッドが
+    広い通貨では、実際の ASK エントリーから見ると SL に既に近い状態となる。
+    特に ZARJPY/TRYJPY/INRJPY/MXNJPY などエキゾチック系は致命的。
+
+    閾値:
+      spread/ATR > 30%  → ★≤2 強制（実質取引禁止）
+      spread/ATR > 10%  → ★≤3 上限（エントリー注意）
+      spread/ATR ≤ 10%  → 影響軽微・降格なし
+
+    staged_tp['spread_atr_ratio'] を見て判定する。
+    """
+    staged = result.get("staged_tp") or {}
+    ratio = staged.get("spread_atr_ratio")
+    spread_pips = staged.get("spread_pips", 0)
+    if ratio is None or ratio == 0:
+        return result
+
+    pair = result.get("pair", "")
+    rr_eff = staged.get("rr_effective")
+    rr_mid = staged.get("rr_tp")
+
+    if ratio > 0.30:
+        # 致命的スプレッド: ★≤2 強制
+        original_stars = result.get("stars", 1)
+        new_stars = min(2, original_stars)
+        if new_stars != original_stars:
+            result["stars"] = new_stars
+            result["spread_filter_applied"] = True
+            result["spread_filter_reason"] = (
+                f"💸 スプレッド致命的: {pair} spread={spread_pips:.1f}pips "
+                f"({ratio*100:.0f}% of ATR) — 実効RR 1:{rr_mid}→1:{rr_eff} に劣化。"
+                f"取引非推奨で★{original_stars}→★{new_stars}降格。"
+            )
+    elif ratio > 0.10:
+        # スプレッド広い: ★≤3 上限
+        original_stars = result.get("stars", 1)
+        new_stars = min(3, original_stars)
+        if new_stars != original_stars:
+            result["stars"] = new_stars
+            result["spread_filter_applied"] = True
+            result["spread_filter_reason"] = (
+                f"💸 スプレッド広め: {pair} spread={spread_pips:.1f}pips "
+                f"({ratio*100:.0f}% of ATR) — 実効RR 1:{rr_mid}→1:{rr_eff}。"
+                f"★{original_stars}→★{new_stars}降格。"
+            )
+        else:
+            # 元から★3以下でも警告だけ残す
+            result["spread_caution"] = True
+            result["spread_caution_reason"] = (
+                f"💸 スプレッド広め: {pair} spread={spread_pips:.1f}pips "
+                f"({ratio*100:.0f}% of ATR)。実効RR 1:{rr_eff}"
+            )
+
+    return result
+
+
+# ============================================================
 # ⑩ 自己学習型シグナル重み付け
 # ============================================================
 
