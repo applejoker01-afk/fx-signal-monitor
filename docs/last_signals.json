@@ -1,7 +1,7 @@
 {
-  "timestamp": "2026-06-24T04:20:47.655683+00:00",
+  "timestamp": "2026-06-24T08:28:19.346328+00:00",
   "signals": {
-    "USDJPY": 4,
+    "USDJPY": 3,
     "EURJPY": 2,
     "GBPJPY": 5,
     "AUDJPY": 2,
@@ -14,7 +14,7 @@
     "GBPUSD": 2,
     "AUDUSD": 2,
     "NZDUSD": 2,
-    "USDCAD": 2,
+    "USDCAD": 3,
     "EURGBP": 2,
     "EURAUD": 2
   },
@@ -42,8 +42,8 @@
       "fa_direction": "buy",
       "fa_rate_diff": 2.75,
       "fa_detail": "FRB(3.75% neutral/stable) vs 日銀(1.00% pause/peak) 差+2.75% / USDサイクル強化(stable)",
-      "stars": 4,
-      "verdict": "◎ 高信頼ロング ⚠介入リスクHIGH(50)",
+      "stars": 3,
+      "verdict": "◎ 高信頼ロング ⚠介入リスクCRITICAL(70)",
       "direction": "LONG",
       "pair_type": "safe_haven",
       "upcoming_events": [
@@ -51,70 +51,70 @@
           "name": "GDP Growth Rate QoQ Final",
           "currency": "USD",
           "importance": "critical",
-          "hours_until": 32.2,
+          "hours_until": 28.0,
           "date": "2026-06-25T12:30:00Z"
         },
         {
           "name": "GDP Price Index QoQ Final",
           "currency": "USD",
           "importance": "critical",
-          "hours_until": 32.2,
+          "hours_until": 28.0,
           "date": "2026-06-25T12:30:00Z"
         },
         {
           "name": "GDP Sales QoQ Final",
           "currency": "USD",
           "importance": "critical",
-          "hours_until": 32.2,
+          "hours_until": 28.0,
           "date": "2026-06-25T12:30:00Z"
         },
         {
           "name": "Tokyo Core CPI YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 43.2,
+          "hours_until": 39.0,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "Tokyo CPI Ex Food and Energy YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 43.2,
+          "hours_until": 39.0,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "Tokyo CPI YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 43.2,
+          "hours_until": 39.0,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "BoJ JGB Purchase",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 47.2,
+          "hours_until": 43.1,
           "date": "2026-06-26T03:35:00Z"
         },
         {
           "name": "Goods Trade Balance Adv",
           "currency": "USD",
           "importance": "high",
-          "hours_until": 56.2,
+          "hours_until": 52.0,
           "date": "2026-06-26T12:30:00Z"
         },
         {
           "name": "Retail Sales MoM",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 67.5,
+          "hours_until": 63.4,
           "date": "2026-06-26T23:50:00Z"
         },
         {
           "name": "Retail Sales YoY",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 67.5,
+          "hours_until": 63.4,
           "date": "2026-06-26T23:50:00Z"
         }
       ],
@@ -204,9 +204,9 @@
         "context": "サポート(153.095)まで5.22%"
       },
       "intervention_risk": {
-        "risk_score": 50,
-        "risk_level": "HIGH",
-        "risk_label": "介入リスク 高い",
+        "risk_score": 70,
+        "risk_level": "CRITICAL",
+        "risk_label": "介入リスク 極めて高い",
         "components": {
           "price": {
             "score": 35,
@@ -221,12 +221,12 @@
             "note": "直近7日ATRが30日平均の1.4倍（やや拡大）"
           },
           "dxy": {
-            "score": 0,
-            "note": "DXYトレンド: flat"
+            "score": 20,
+            "note": "DXY急上昇（ドル独歩高・介入誘因が高い）"
           }
         },
         "nearest_historical_level": "2024年7月 介入実績",
-        "recommendation": "ロングシグナルを1〜2段階降格。ストップを近めに設定"
+        "recommendation": "ロングシグナルを2〜3段階強制降格。新規ロング原則禁止"
       },
       "market_regime": {
         "adx": 56.4,
@@ -264,8 +264,7 @@
         "spread": 90.4,
         "context": "強い通貨 vs 弱い通貨（ロング有利）",
         "bias": "long"
-      },
-      "ai_exit_advice": "# ポジション状況整理・選択肢提示\n\n## 1. 現状整理\nUSDJPY LONGは金利差+2.75%のキャリー有利かつ、ADX56.4の強いトレンド相場で好位置にあります。テクニカル推奨値も段階的なTP設定で利益を伸ばす設計になっています。\n\n## 2. 利益を伸ばす選択肢\n\n**A. トレール転換戦略**\n- **狙い**: TP1(161.853)到達後、SLをブレイクイーブン付近まで上げ、トレンド継続時の利益拡大を狙う\n- **リスク**: トレンド転換時に利益の一部を失う可能性\n\n**B. 段階分割売却 + 長期保有**\n- **狙い**: TP1・TP2で部分利確（ポジションの50-60%決済）し、残枠は金利差+2.75%のスワップ活用で中期保有\n- **根拠**: FRB安定・日銀継続緩和で金利差縮小リスク低い局面\n- **リスク**: 残ポジションがトレンド転換で損失化\n\n**C. 固定OCO維持**\n- **狙い**: テクニカル推奨値に従い、感情的な早期決済を避ける\n- **リスク**: トレンド転換でTP到達前に損失確定の可能性\n\n## 3. 留意点\nFRB金利据置とドル強化継続が前提ですが、日銀政策変更や介入示唆があれば金利差が急速に縮小するため、その場合のPlan B（損切水準調整など）を事前設定することを推奨します。"
+      }
     },
     {
       "pair": "EURJPY",
@@ -299,91 +298,91 @@
           "name": "GfK Consumer Confidence",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 25.7,
+          "hours_until": 21.5,
           "date": "2026-06-25T06:00:00Z"
         },
         {
           "name": "Consumer Confidence",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 26.4,
+          "hours_until": 22.3,
           "date": "2026-06-25T06:45:00Z"
         },
         {
           "name": "ECB General Council Meeting",
           "currency": "EUR",
           "importance": "critical",
-          "hours_until": 26.7,
+          "hours_until": 22.5,
           "date": "2026-06-25T07:00:00Z"
         },
         {
           "name": "GDP Growth Rate QoQ Final",
           "currency": "EUR",
           "importance": "critical",
-          "hours_until": 26.7,
+          "hours_until": 22.5,
           "date": "2026-06-25T07:00:00Z"
         },
         {
           "name": "GDP Growth Rate YoY Final",
           "currency": "EUR",
           "importance": "critical",
-          "hours_until": 26.7,
+          "hours_until": 22.5,
           "date": "2026-06-25T07:00:00Z"
         },
         {
           "name": "PPI YoY",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 26.7,
+          "hours_until": 22.5,
           "date": "2026-06-25T07:00:00Z"
         },
         {
           "name": "Tokyo Core CPI YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 43.2,
+          "hours_until": 39.0,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "Tokyo CPI Ex Food and Energy YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 43.2,
+          "hours_until": 39.0,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "Tokyo CPI YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 43.2,
+          "hours_until": 39.0,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "BoJ JGB Purchase",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 47.2,
+          "hours_until": 43.1,
           "date": "2026-06-26T03:35:00Z"
         },
         {
           "name": "Consumer Confidence",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 52.7,
+          "hours_until": 48.5,
           "date": "2026-06-26T09:00:00Z"
         },
         {
           "name": "Retail Sales MoM",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 67.5,
+          "hours_until": 63.4,
           "date": "2026-06-26T23:50:00Z"
         },
         {
           "name": "Retail Sales YoY",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 67.5,
+          "hours_until": 63.4,
           "date": "2026-06-26T23:50:00Z"
         }
       ],
@@ -572,42 +571,42 @@
           "name": "Tokyo Core CPI YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 43.2,
+          "hours_until": 39.0,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "Tokyo CPI Ex Food and Energy YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 43.2,
+          "hours_until": 39.0,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "Tokyo CPI YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 43.2,
+          "hours_until": 39.0,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "BoJ JGB Purchase",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 47.2,
+          "hours_until": 43.1,
           "date": "2026-06-26T03:35:00Z"
         },
         {
           "name": "Retail Sales MoM",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 67.5,
+          "hours_until": 63.4,
           "date": "2026-06-26T23:50:00Z"
         },
         {
           "name": "Retail Sales YoY",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 67.5,
+          "hours_until": 63.4,
           "date": "2026-06-26T23:50:00Z"
         }
       ],
@@ -758,7 +757,7 @@
         "context": "通貨強弱が拮抗（中立）",
         "bias": "neutral"
       },
-      "ai_exit_advice": "# ポジション状況整理・選択肢提示\n\n## 1. 現状整理\nGBPJPY LongはTA/FAスコア高く、金利差+2.75%のキャリー環境にあります。ただしADX20.1で弱トレンドのため、利確タイミングが利益最大化の鍵になります。\n\n## 2. 利益を伸ばす選択肢\n\n**A. トレール切替（当面OCO固定→上昇後トレール化）**\n- 狙い：弱トレンドで利が乗った局面を逃さず、さらなる伸びに対応\n- リスク：トレール幅を広く設定しないと騙し確定損になる可能性\n\n**B. 段階的部分利確（TP1で20-30%決済、残りはトレール継続）**\n- 狙い：確実利益を固定しつつ、期待値を活かす損失回避型アプローチ\n- リスク：トレンド転換時に取り残った分の回収ストップに引っかかるリスク\n\n**C. TP2/TP3を目指し長期保有（スワップ利用）**\n- 狙い：+2.75%金利差でスワップ拾いながら上値狙い、複利効果\n- リスク：SL回収日数が不明な点がネック、金利差縮小リスク\n\n## 3. 留意点\nBOE中立でGBPサイクル強化が続く一方、日銀政策転換や介入圧力がリスク、ADX低迷で反転脆弱性も監視要。"
+      "ai_exit_advice": "# ポジション状況整理と選択肢提示\n\n## 1. 現状整理\nGBPJPYロングは金利差+2.75%のキャリー優位で、テクニカルは弱トレンド（ADX20.1）ながらTA75.0の強気シグナルを保有。スワップ収益と値上がり益の両立が可能な局面です。\n\n## 2. 利益を伸ばす選択肢\n\n**選択肢A：トレイリングストップ切り替え**\n- 狙い：弱トレンドでも上昇継続時に利を最大化。TP1到達後、SLをTP1-20pips程度に設定し、さらなる上昇を狙う\n- リスク：トレンド転換時に利益を手放す可能性\n\n**選択肢B：部分利確 + 長期保有**\n- 狙い：TP1（214.305）で50%利確しリスク軽減、残玉はスワップ重視で保有（金利差+2.75%は高水準）\n- リスク：利確後の上昇で後悔するおそれ。キャリー回収日数が不明なため、必要margin効率を事前確認推奨\n\n**選択肢C：OCO固定維持**\n- 狙い：TA75.0の強度があれば、TP3（216.78）まで一貫性を保つ\n- リスク：中銀スタンス逆転や円介入で急反転の場合、取り返しがつかない\n\n## 3. 留意点\nBOE据え置き継続の確度とGBP/USD、ドル円の動向監視が重要。円介入圏と日銀政策転換が下値リスク。"
     },
     {
       "pair": "AUDJPY",
@@ -792,49 +791,49 @@
           "name": "Unemployment Rate",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 21.2,
+          "hours_until": 17.0,
           "date": "2026-06-25T01:30:00Z"
         },
         {
           "name": "Tokyo Core CPI YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 43.2,
+          "hours_until": 39.0,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "Tokyo CPI Ex Food and Energy YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 43.2,
+          "hours_until": 39.0,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "Tokyo CPI YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 43.2,
+          "hours_until": 39.0,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "BoJ JGB Purchase",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 47.2,
+          "hours_until": 43.1,
           "date": "2026-06-26T03:35:00Z"
         },
         {
           "name": "Retail Sales MoM",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 67.5,
+          "hours_until": 63.4,
           "date": "2026-06-26T23:50:00Z"
         },
         {
           "name": "Retail Sales YoY",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 67.5,
+          "hours_until": 63.4,
           "date": "2026-06-26T23:50:00Z"
         }
       ],
@@ -1020,49 +1019,49 @@
           "name": "SNB Quarterly Bulletin",
           "currency": "CHF",
           "importance": "critical",
-          "hours_until": 8.7,
+          "hours_until": 4.5,
           "date": "2026-06-24T13:00:00Z"
         },
         {
           "name": "Tokyo Core CPI YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 43.2,
+          "hours_until": 39.0,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "Tokyo CPI Ex Food and Energy YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 43.2,
+          "hours_until": 39.0,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "Tokyo CPI YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 43.2,
+          "hours_until": 39.0,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "BoJ JGB Purchase",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 47.2,
+          "hours_until": 43.1,
           "date": "2026-06-26T03:35:00Z"
         },
         {
           "name": "Retail Sales MoM",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 67.5,
+          "hours_until": 63.4,
           "date": "2026-06-26T23:50:00Z"
         },
         {
           "name": "Retail Sales YoY",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 67.5,
+          "hours_until": 63.4,
           "date": "2026-06-26T23:50:00Z"
         }
       ],
@@ -1263,70 +1262,70 @@
           "name": "Tokyo Core CPI YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 43.2,
+          "hours_until": 39.0,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "Tokyo CPI Ex Food and Energy YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 43.2,
+          "hours_until": 39.0,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "Tokyo CPI YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 43.2,
+          "hours_until": 39.0,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "PPI YoY",
           "currency": "SGD",
           "importance": "high",
-          "hours_until": 47.2,
+          "hours_until": 43.0,
           "date": "2026-06-26T03:30:00Z"
         },
         {
           "name": "BoJ JGB Purchase",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 47.2,
+          "hours_until": 43.1,
           "date": "2026-06-26T03:35:00Z"
         },
         {
           "name": "Industrial Production MoM",
           "currency": "SGD",
           "importance": "high",
-          "hours_until": 48.7,
+          "hours_until": 44.5,
           "date": "2026-06-26T05:00:00Z"
         },
         {
           "name": "Industrial Production YoY",
           "currency": "SGD",
           "importance": "high",
-          "hours_until": 48.7,
+          "hours_until": 44.5,
           "date": "2026-06-26T05:00:00Z"
         },
         {
           "name": "Unemployment Rate Final",
           "currency": "SGD",
           "importance": "critical",
-          "hours_until": 51.7,
+          "hours_until": 47.5,
           "date": "2026-06-26T08:00:00Z"
         },
         {
           "name": "Retail Sales MoM",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 67.5,
+          "hours_until": 63.4,
           "date": "2026-06-26T23:50:00Z"
         },
         {
           "name": "Retail Sales YoY",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 67.5,
+          "hours_until": 63.4,
           "date": "2026-06-26T23:50:00Z"
         }
       ],
@@ -1511,42 +1510,42 @@
           "name": "Tokyo Core CPI YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 43.2,
+          "hours_until": 39.0,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "Tokyo CPI Ex Food and Energy YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 43.2,
+          "hours_until": 39.0,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "Tokyo CPI YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 43.2,
+          "hours_until": 39.0,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "BoJ JGB Purchase",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 47.2,
+          "hours_until": 43.1,
           "date": "2026-06-26T03:35:00Z"
         },
         {
           "name": "Retail Sales MoM",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 67.5,
+          "hours_until": 63.4,
           "date": "2026-06-26T23:50:00Z"
         },
         {
           "name": "Retail Sales YoY",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 67.5,
+          "hours_until": 63.4,
           "date": "2026-06-26T23:50:00Z"
         }
       ],
@@ -1709,8 +1708,8 @@
         "recent_news": [
           "\"China (election OR protest OR crisis OR sanction OR \"central bank\" OR geopolitics)\" - Google News",
           "Google News",
-          "China’s central bank sets weaker yuan midpoint against US dollar for third day - South China Morning Post",
-          "China mulls revising central bank law to improve macro-prudential framework - chinadailyasia.com"
+          "China Is Luring the World to the Yuan—and Hobbling Western Sanctions - WSJ",
+          "China’s central bank sets weaker yuan midpoint against US dollar for third day - South China Morning Post"
         ],
         "categories": {
           "political_instability": {
@@ -1736,42 +1735,42 @@
           "name": "Tokyo Core CPI YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 43.2,
+          "hours_until": 39.0,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "Tokyo CPI Ex Food and Energy YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 43.2,
+          "hours_until": 39.0,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "Tokyo CPI YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 43.2,
+          "hours_until": 39.0,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "BoJ JGB Purchase",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 47.2,
+          "hours_until": 43.1,
           "date": "2026-06-26T03:35:00Z"
         },
         {
           "name": "Retail Sales MoM",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 67.5,
+          "hours_until": 63.4,
           "date": "2026-06-26T23:50:00Z"
         },
         {
           "name": "Retail Sales YoY",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 67.5,
+          "hours_until": 63.4,
           "date": "2026-06-26T23:50:00Z"
         }
       ],
@@ -1953,7 +1952,7 @@
           "\"Mexico (election OR protest OR crisis OR sanction OR \"central bank\" OR geopolitics)\" - Google News",
           "Google News",
           "Mexico: Women searchers planning World Cup protest over disappeared loved ones must be protected and heard - Amnesty International",
-          "New Mexico Secretary of State Maggie Toulouse Oliver suspends Dem Lt. Gov. campaign, citing health - Source New Mexico"
+          "While Trump drags his feet, Governor Newsom delivers $46M to help address the federally managed water crisis at the border - California State Portal | CA.gov"
         ],
         "categories": {
           "political_instability": {
@@ -1979,91 +1978,91 @@
           "name": "Mid-month Core Inflation Rate MoM",
           "currency": "MXN",
           "importance": "critical",
-          "hours_until": 7.7,
+          "hours_until": 3.5,
           "date": "2026-06-24T12:00:00Z"
         },
         {
           "name": "Mid-month Core Inflation Rate YoY",
           "currency": "MXN",
           "importance": "critical",
-          "hours_until": 7.7,
+          "hours_until": 3.5,
           "date": "2026-06-24T12:00:00Z"
         },
         {
           "name": "Mid-month Inflation Rate MoM",
           "currency": "MXN",
           "importance": "critical",
-          "hours_until": 7.7,
+          "hours_until": 3.5,
           "date": "2026-06-24T12:00:00Z"
         },
         {
           "name": "Mid-month Inflation Rate YoY",
           "currency": "MXN",
           "importance": "critical",
-          "hours_until": 7.7,
+          "hours_until": 3.5,
           "date": "2026-06-24T12:00:00Z"
         },
         {
           "name": "Unemployment Rate",
           "currency": "MXN",
           "importance": "critical",
-          "hours_until": 31.7,
+          "hours_until": 27.5,
           "date": "2026-06-25T12:00:00Z"
         },
         {
           "name": "Interest Rate Decision",
           "currency": "MXN",
           "importance": "critical",
-          "hours_until": 38.7,
+          "hours_until": 34.5,
           "date": "2026-06-25T19:00:00Z"
         },
         {
           "name": "Tokyo Core CPI YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 43.2,
+          "hours_until": 39.0,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "Tokyo CPI Ex Food and Energy YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 43.2,
+          "hours_until": 39.0,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "Tokyo CPI YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 43.2,
+          "hours_until": 39.0,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "BoJ JGB Purchase",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 47.2,
+          "hours_until": 43.1,
           "date": "2026-06-26T03:35:00Z"
         },
         {
           "name": "Banxico政策金利発表",
           "currency": "MXN",
           "importance": "critical",
-          "hours_until": 61.7,
+          "hours_until": 57.5,
           "date": "2026-06-26T18:00:00Z"
         },
         {
           "name": "Retail Sales MoM",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 67.5,
+          "hours_until": 63.4,
           "date": "2026-06-26T23:50:00Z"
         },
         {
           "name": "Retail Sales YoY",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 67.5,
+          "hours_until": 63.4,
           "date": "2026-06-26T23:50:00Z"
         }
       ],
@@ -2206,7 +2205,7 @@
       "cb_meeting_blackout": {
         "active": true,
         "severity": "warn",
-        "reason": "MXN 中銀会合まで 44h（要注意期間）",
+        "reason": "MXN 中銀会合まで 40h（要注意期間）",
         "currency": "MXN"
       },
       "strength_context": {
@@ -2257,8 +2256,8 @@
         "recent_news": [
           "\"South Africa (election OR protest OR crisis OR sanction OR \"central bank\" OR geopolitics)\" - Google News",
           "Google News",
-          "South African police tighten security as anti-migrant deadline approaches - Al Jazeera",
-          "The Camp That Reveals South Africa’s Growing Migrant Crisis - Bloomberg.com"
+          "South Africa migration crisis: Ramaphosa's plan faces doubt - dw.com",
+          "South African police tighten security as anti-migrant deadline approaches - Al Jazeera"
         ],
         "categories": {
           "political_instability": {
@@ -2285,56 +2284,56 @@
           "name": "PPI MoM",
           "currency": "ZAR",
           "importance": "high",
-          "hours_until": 29.2,
+          "hours_until": 25.0,
           "date": "2026-06-25T09:30:00Z"
         },
         {
           "name": "PPI YoY",
           "currency": "ZAR",
           "importance": "high",
-          "hours_until": 29.2,
+          "hours_until": 25.0,
           "date": "2026-06-25T09:30:00Z"
         },
         {
           "name": "Tokyo Core CPI YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 43.2,
+          "hours_until": 39.0,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "Tokyo CPI Ex Food and Energy YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 43.2,
+          "hours_until": 39.0,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "Tokyo CPI YoY",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 43.2,
+          "hours_until": 39.0,
           "date": "2026-06-25T23:30:00Z"
         },
         {
           "name": "BoJ JGB Purchase",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 47.2,
+          "hours_until": 43.1,
           "date": "2026-06-26T03:35:00Z"
         },
         {
           "name": "Retail Sales MoM",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 67.5,
+          "hours_until": 63.4,
           "date": "2026-06-26T23:50:00Z"
         },
         {
           "name": "Retail Sales YoY",
           "currency": "JPY",
           "importance": "high",
-          "hours_until": 67.5,
+          "hours_until": 63.4,
           "date": "2026-06-26T23:50:00Z"
         }
       ],
@@ -2513,28 +2512,28 @@
           "name": "GDP Growth Rate QoQ Final",
           "currency": "USD",
           "importance": "critical",
-          "hours_until": 32.2,
+          "hours_until": 28.0,
           "date": "2026-06-25T12:30:00Z"
         },
         {
           "name": "GDP Price Index QoQ Final",
           "currency": "USD",
           "importance": "critical",
-          "hours_until": 32.2,
+          "hours_until": 28.0,
           "date": "2026-06-25T12:30:00Z"
         },
         {
           "name": "GDP Sales QoQ Final",
           "currency": "USD",
           "importance": "critical",
-          "hours_until": 32.2,
+          "hours_until": 28.0,
           "date": "2026-06-25T12:30:00Z"
         },
         {
           "name": "Goods Trade Balance Adv",
           "currency": "USD",
           "importance": "high",
-          "hours_until": 56.2,
+          "hours_until": 52.0,
           "date": "2026-06-26T12:30:00Z"
         }
       ],
@@ -2711,35 +2710,35 @@
           "name": "Unemployment Rate",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 21.2,
+          "hours_until": 17.0,
           "date": "2026-06-25T01:30:00Z"
         },
         {
           "name": "GDP Growth Rate QoQ Final",
           "currency": "USD",
           "importance": "critical",
-          "hours_until": 32.2,
+          "hours_until": 28.0,
           "date": "2026-06-25T12:30:00Z"
         },
         {
           "name": "GDP Price Index QoQ Final",
           "currency": "USD",
           "importance": "critical",
-          "hours_until": 32.2,
+          "hours_until": 28.0,
           "date": "2026-06-25T12:30:00Z"
         },
         {
           "name": "GDP Sales QoQ Final",
           "currency": "USD",
           "importance": "critical",
-          "hours_until": 32.2,
+          "hours_until": 28.0,
           "date": "2026-06-25T12:30:00Z"
         },
         {
           "name": "Goods Trade Balance Adv",
           "currency": "USD",
           "importance": "high",
-          "hours_until": 56.2,
+          "hours_until": 52.0,
           "date": "2026-06-26T12:30:00Z"
         }
       ],
@@ -2928,28 +2927,28 @@
           "name": "GDP Growth Rate QoQ Final",
           "currency": "USD",
           "importance": "critical",
-          "hours_until": 32.2,
+          "hours_until": 28.0,
           "date": "2026-06-25T12:30:00Z"
         },
         {
           "name": "GDP Price Index QoQ Final",
           "currency": "USD",
           "importance": "critical",
-          "hours_until": 32.2,
+          "hours_until": 28.0,
           "date": "2026-06-25T12:30:00Z"
         },
         {
           "name": "GDP Sales QoQ Final",
           "currency": "USD",
           "importance": "critical",
-          "hours_until": 32.2,
+          "hours_until": 28.0,
           "date": "2026-06-25T12:30:00Z"
         },
         {
           "name": "Goods Trade Balance Adv",
           "currency": "USD",
           "importance": "high",
-          "hours_until": 56.2,
+          "hours_until": 52.0,
           "date": "2026-06-26T12:30:00Z"
         }
       ],
@@ -3111,37 +3110,40 @@
       "fa_direction": "neutral",
       "fa_rate_diff": 1.0,
       "fa_detail": "FRB(3.75% neutral/stable) vs BOC(2.75% neutral/stable) 差+1.00%",
-      "stars": 2,
+      "stars": 3,
       "verdict": "△ 弱シグナル",
       "direction": "LIGHT_LONG",
       "pair_type": "dollar",
+      "sentiment_notes": [
+        "DXY=101.64 上昇・ドル買い加勢"
+      ],
       "upcoming_events": [
         {
           "name": "GDP Growth Rate QoQ Final",
           "currency": "USD",
           "importance": "critical",
-          "hours_until": 32.2,
+          "hours_until": 28.0,
           "date": "2026-06-25T12:30:00Z"
         },
         {
           "name": "GDP Price Index QoQ Final",
           "currency": "USD",
           "importance": "critical",
-          "hours_until": 32.2,
+          "hours_until": 28.0,
           "date": "2026-06-25T12:30:00Z"
         },
         {
           "name": "GDP Sales QoQ Final",
           "currency": "USD",
           "importance": "critical",
-          "hours_until": 32.2,
+          "hours_until": 28.0,
           "date": "2026-06-25T12:30:00Z"
         },
         {
           "name": "Goods Trade Balance Adv",
           "currency": "USD",
           "importance": "high",
-          "hours_until": 56.2,
+          "hours_until": 52.0,
           "date": "2026-06-26T12:30:00Z"
         }
       ],
@@ -3300,49 +3302,49 @@
           "name": "GfK Consumer Confidence",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 25.7,
+          "hours_until": 21.5,
           "date": "2026-06-25T06:00:00Z"
         },
         {
           "name": "Consumer Confidence",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 26.4,
+          "hours_until": 22.3,
           "date": "2026-06-25T06:45:00Z"
         },
         {
           "name": "ECB General Council Meeting",
           "currency": "EUR",
           "importance": "critical",
-          "hours_until": 26.7,
+          "hours_until": 22.5,
           "date": "2026-06-25T07:00:00Z"
         },
         {
           "name": "GDP Growth Rate QoQ Final",
           "currency": "EUR",
           "importance": "critical",
-          "hours_until": 26.7,
+          "hours_until": 22.5,
           "date": "2026-06-25T07:00:00Z"
         },
         {
           "name": "GDP Growth Rate YoY Final",
           "currency": "EUR",
           "importance": "critical",
-          "hours_until": 26.7,
+          "hours_until": 22.5,
           "date": "2026-06-25T07:00:00Z"
         },
         {
           "name": "PPI YoY",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 26.7,
+          "hours_until": 22.5,
           "date": "2026-06-25T07:00:00Z"
         },
         {
           "name": "Consumer Confidence",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 52.7,
+          "hours_until": 48.5,
           "date": "2026-06-26T09:00:00Z"
         }
       ],
@@ -3533,56 +3535,56 @@
           "name": "Unemployment Rate",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 21.2,
+          "hours_until": 17.0,
           "date": "2026-06-25T01:30:00Z"
         },
         {
           "name": "GfK Consumer Confidence",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 25.7,
+          "hours_until": 21.5,
           "date": "2026-06-25T06:00:00Z"
         },
         {
           "name": "Consumer Confidence",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 26.4,
+          "hours_until": 22.3,
           "date": "2026-06-25T06:45:00Z"
         },
         {
           "name": "ECB General Council Meeting",
           "currency": "EUR",
           "importance": "critical",
-          "hours_until": 26.7,
+          "hours_until": 22.5,
           "date": "2026-06-25T07:00:00Z"
         },
         {
           "name": "GDP Growth Rate QoQ Final",
           "currency": "EUR",
           "importance": "critical",
-          "hours_until": 26.7,
+          "hours_until": 22.5,
           "date": "2026-06-25T07:00:00Z"
         },
         {
           "name": "GDP Growth Rate YoY Final",
           "currency": "EUR",
           "importance": "critical",
-          "hours_until": 26.7,
+          "hours_until": 22.5,
           "date": "2026-06-25T07:00:00Z"
         },
         {
           "name": "PPI YoY",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 26.7,
+          "hours_until": 22.5,
           "date": "2026-06-25T07:00:00Z"
         },
         {
           "name": "Consumer Confidence",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 52.7,
+          "hours_until": 48.5,
           "date": "2026-06-26T09:00:00Z"
         }
       ],
@@ -3735,25 +3737,25 @@
     }
   ],
   "sentiment": {
-    "vix": 19.49,
+    "vix": 19.21,
     "vix_level": "normal",
     "risk_off_strength": 0,
-    "dxy": 101.5,
-    "dxy_30d_avg": 99.6,
-    "dxy_trend": "flat",
-    "us10y": 4.493,
+    "dxy": 101.64,
+    "dxy_30d_avg": 99.61,
+    "dxy_trend": "strong",
+    "us10y": 4.451,
     "bond_pressure": "normal",
-    "gold": 4074.9,
-    "gold_20d_avg": 4317.97,
+    "gold": 4092.5,
+    "gold_20d_avg": 4318.88,
     "gold_trend": "falling",
     "risk_mode": "normal"
   },
   "us_yields": {
     "short": 4.85,
     "2y": 4.85,
-    "10y": 4.493,
+    "10y": 4.451,
     "30y": 4.55,
-    "spread_10y2y": -0.357,
+    "spread_10y2y": -0.399,
     "source": "fallback (estimated)",
     "avg_note_coupon": 4.35,
     "10y_source": "market yield (^TNX via Yahoo Finance)"
@@ -3963,15 +3965,12 @@
   },
   "portfolio_risk": {
     "currency_exposure": {
-      "USD": 1,
-      "JPY": -2,
-      "GBP": 1
+      "GBP": 1,
+      "JPY": -1
     },
-    "warnings": [
-      "△ JPY売りポジションが2件 → やや集中"
-    ],
-    "risk_level": "medium",
-    "recommendation": "同一通貨が2件重複。新規エントリー時は注意",
-    "active_signals_count": 2
+    "warnings": [],
+    "risk_level": "low",
+    "recommendation": "ポジション分散良好",
+    "active_signals_count": 1
   }
 }
