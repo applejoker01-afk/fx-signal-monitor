@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-06-27T10:17:29.705656+00:00",
+  "timestamp": "2026-06-27T12:12:22.305906+00:00",
   "signals": {
     "USDJPY": 5,
     "EURJPY": 1,
@@ -214,7 +214,7 @@
         "context": "強い通貨 vs 弱い通貨（ロング有利）",
         "bias": "long"
       },
-      "ai_exit_advice": "# ポジション分析：USDJPY LONG\n\n## 1. 現状整理\n強いトレンド相場（ADX46.2）の中でロングポジションを保有中。テクニカル・ファンダともに★5評価と堅調で、金利差+2.75%のキャリー利益も加算される環境です。\n\n## 2. 利益を伸ばす選択肢\n\n**A案：トレーリングストップ+TP1手仕舞い**\n- 狙い：強いトレンド継続時に上値を追いながら、TP1(161.948)で利益確定し、残玉をトレール運用。利を伸ばしつつ下値を守る\n- リスク：急反転で中途半端な利確となる可能性\n\n**B案：現SL固定＆複数TP段階売却**\n- 狙い：TP1→TP2→TP3で段階的に利確。トレンドが続く限り上値追求でき、早すぎる全決済を避ける\n- リスク：トレンド転換時に上位TPを取れない機会損失\n\n**C案：スワップ重視で長期保有**\n- 狙い：金利差2.75%の継続収益化。SL161.257までの余裕を活用し、トレンド終了まで保有\n- リスク：キャリー情報不足＆SL回収日数未確認のため、実現性判断が困難\n\n## 3. 留意点\n日銀政策転換や米金利低下による金利差縮小、ドル円介入リスク、ADX高値での反転に要警戒。"
+      "ai_exit_advice": "# ポジション整理・選択肢提示\n\n## 1. 現状整理\nADX46.2の強いトレンド相場で、USDJPYロングが機能している局面です。TA98/FA76.6という高スコアと+2.75%の金利差が有利に働いており、早期の利確は機会損失のリスクがあります。\n\n## 2. 利益を伸ばす選択肢\n\n**A案：トレイリングストップへの切替**\n- 狙い：TP3(162.837)への伸長余地を活かしながら、利益を保護\n- リスク：トレンド転換時の引き返しで利確されるため、強気局面では最大利益を逃す可能性\n\n**B案：部分利確 + 残枠トレール**\n- 狙い：TP1(161.948)で50%確定益化し、残50%をトレイリングで長期保有。金利差スワップも継続獲得\n- リスク：2分割により全体の期待値が減る可能性も、リスク調整効果で精神的安定が得られます\n\n**C案：現OCO維持 + スワップ長期保有意識**\n- 狙い：TP2/TP3への到達を目指し、FRB堅調スタンスが継続する限り金利差を活かす\n- リスク：SL(161.257)まで逆行した場合の損失が大きい；日銀スタンス転換に要警戒\n\n## 3. 留意点\n日銀利上げ示唆や米金利低下・日本銀行介入は金利差縮小の引き金となるため、中銀発言・ファンダ変化に即応できる環境構築が必須です。"
     },
     {
       "pair": "EURJPY",
@@ -1391,7 +1391,7 @@
           "\"China (election OR protest OR crisis OR sanction OR \"central bank\" OR geopolitics)\" - Google News",
           "Google News",
           "The crisis in the Strait of Hormuz will not replay itself in the South China Sea - Lowy Institute",
-          "China central bank to add tool to better manage short-term liquidity - Reuters"
+          "China's central bank urges banks to boost lending as demand remains weak, sources say - Reuters"
         ],
         "categories": {
           "political_instability": {
@@ -1603,7 +1603,7 @@
           "\"Mexico (election OR protest OR crisis OR sanction OR \"central bank\" OR geopolitics)\" - Google News",
           "Google News",
           "Mexico: Women searchers planning World Cup protest over disappeared loved ones must be protected and heard - Amnesty International",
-          "World Cup celebrations clash with social tensions in Mexico - PBS"
+          "Protesters, police clash outside World Cup opener in Mexico City - The Athletic - The New York Times"
         ],
         "categories": {
           "political_instability": {
@@ -1768,12 +1768,10 @@
       "regime_filter_applied": true,
       "regime_filter_reason": "⚠️ BOJサイクル軽警告: MXN(Banxico ease/decelerating) + JPY(日銀 pause) = LONG方向注意",
       "cb_meeting_blackout": {
-        "active": true,
-        "severity": "blackout",
-        "reason": "MXN 中銀会合後 34h（ブラックアウト 36h）",
-        "currency": "MXN"
+        "active": false,
+        "severity": "none",
+        "reason": ""
       },
-      "blackout_degraded": true,
       "strength_context": {
         "base_currency": "MXN",
         "quote_currency": "JPY",
@@ -3086,11 +3084,11 @@
     }
   ],
   "sentiment": {
-    "vix": 18.89,
+    "vix": 18.41,
     "vix_level": "normal",
     "risk_off_strength": 0,
-    "dxy": 101.43,
-    "dxy_30d_avg": 99.71,
+    "dxy": 101.36,
+    "dxy_30d_avg": 99.81,
     "dxy_trend": "flat",
     "us10y": 4.372,
     "bond_pressure": "normal",
