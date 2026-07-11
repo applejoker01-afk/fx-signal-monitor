@@ -34,7 +34,9 @@ PAIR_STATIC_BASELINE = {
     "SGDJPY": {"adjustment": +1,  "note": "主力ペア(実証76.9%)"},
     "EURAUD": {"adjustment": +1,  "note": "主力ペア(実証76.9%)"},
     # ✅ 好成績維持（69-72%）
-    "AUDJPY": {"adjustment": +1,  "note": "好成績(実証72.2%)"},
+    # AUDJPY: +1はSHORT方向のみ有効。LONG方向は apply_boj_cycle_directional_filter が
+    # AUD(ease/stable) + JPY(pause) の組み合わせで NO_TRADE にハードブロック済み（2026-07-02確認）
+    "AUDJPY": {"adjustment": +1,  "note": "好成績(実証72.2%) ※LONGはBOJサイクルフィルタでブロック済み"},
     "GBPJPY": {"adjustment": +1,  "note": "好成績(実証69.2%)"},
     # ❌ 慢性不振ペア（40%以下）→ PAIR_EXCLUDEに移動（ハードブロック）
     # "EURUSD": {"adjustment": -1,  "note": "不振ペア(実証40.0%)"},  # 除外済み

@@ -14,6 +14,8 @@ advanced_analytics.py
 import math
 from datetime import datetime, timezone
 
+from modules.spread_monitor import get_dynamic_spread_pips, get_dynamic_spread_metadata
+
 
 # ============================================================
 # ① 通貨強弱メーター
@@ -254,12 +256,23 @@ def _pair_decimals(pair: str) -> int:
     return 3 if pair and pair.upper().endswith("JPY") else 6
 
 
-def _spread_for_pair(pair: str) -> float:
-    """ペアの代表スプレッドを価格単位で返す（signal_scanner.SPREAD_PIPS と同期）。
-    モジュール循環を避けるためテーブルを局所複製。
+def _spread_for_pair(pair: str, dynamic_pips: float = None) -> float:
+    """ペアの実効スプレッドを価格単位で返す。
+
+    dynamic_pips が渡された場合はそれを優先（spread_monitor からの動的値）。
+    None の場合は静的テーブル（旧来ロジック）にフォールバックする。
+
+    Args:
+        pair:         通貨ペア名
+        dynamic_pips: セッション×VIX 補正済みスプレッド (pips)。None = 静的テーブル使用。
     """
     if not pair:
         return 0.0
+    pip_size = 0.01 if pair.upper().endswith("JPY") else 0.0001
+    if dynamic_pips is not None:
+        # 動的スプレッドを価格単位に変換して返す
+        return dynamic_pips * pip_size
+    # 静的テーブル fallback（spread_monitor.SPREAD_PIPS_BASE と同値）
     table = {
         "USDJPY": 0.2, "EURJPY": 0.3, "GBPJPY": 2.0,
         "AUDJPY": 1.5, "NZDJPY": 2.0, "CADJPY": 1.5, "CHFJPY": 2.0,
@@ -271,12 +284,12 @@ def _spread_for_pair(pair: str) -> float:
         "EURGBP": 1.5, "EURAUD": 3.0,
     }
     pips = table.get(pair.upper(), 0.0)
-    pip_size = 0.01 if pair.upper().endswith("JPY") else 0.0001
     return pips * pip_size
 
 
 def calc_staged_tp(price: float, direction: str, atr: float, regime: dict,
-                   prices: list = None, pair: str = "") -> dict:
+                   prices: list = None, pair: str = "",
+                   spread_pips: float = None) -> dict:
     """
     単一TP + トレーリングストップ戦略を計算（2026-06-10刷新）。
 
@@ -401,12 +414,14 @@ def calc_staged_tp(price: float, direction: str, atr: float, regime: dict,
     rr_tp2 = round(tp2_mult / sl_mult, 1)
     rr_tp3 = round(tp3_mult / sl_mult, 1)
 
-    # ── スプレッド補正（2026-06-23 追加）──
+    # ── スプレッド補正（2026-06-23 追加、2026-06-25 動的化）──
     # bid/ask スプレッドを考慮した実効 SL/TP 距離と RR を算出。
+    # spread_pips が渡されている場合はセッション×VIX 補正済みの動的値を使用する。
     # 中値ベースの sl/tp はそのまま、effective_* で表示用の歪み補正値を提供。
     # LONG: ASK=mid+spread/2 で約定 → SL までの距離+spread/2、TP までの距離-spread/2
     # SHORT: BID=mid-spread/2 で約定 → SL までの距離+spread/2、TP までの距離-spread/2
-    spread_price = _spread_for_pair(pair)
+    spread_price = _spread_for_pair(pair, dynamic_pips=spread_pips)
+    spread_is_dynamic = spread_pips is not None
     spread_half = spread_price / 2.0
     # 中値ベースの距離
     sl_dist_mid = sl_width  # = atr * sl_mult
@@ -445,6 +460,9 @@ def calc_staged_tp(price: float, direction: str, atr: float, regime: dict,
         "sl_dist_effective": round(sl_dist_effective, decimals),
         "tp_dist_effective": round(tp_dist_effective, decimals),
         "rr_effective": rr_effective,
+        # 動的スプレッドフラグ（2026-06-25 追加）
+        "spread_is_dynamic": spread_is_dynamic,
+        "spread_pips_dynamic": round(spread_pips, 2) if spread_pips is not None else None,
         # ── 共通メタ ──
         "regime_label": regime.get("regime_label", ""),
         "strategy": (
@@ -923,8 +941,21 @@ def run_advanced_analytics(
     result["volatility_regime"] = regime
 
     # ③ 段階的TP計算（Chandelier Exit 動的SL付き: 2026-06-11 研究C反映）
+    # 2026-06-25: spread_pips を動的に計算してスプレッド補正の精度を向上
+    #   - セッション乗数（London/NYタイト ×0.8、Asian非JPY ×1.4、Off-hours ×1.6）
+    #   - VIX 乗数（VIX>30: ×2.0、VIX>25: ×1.5）
     if direction.endswith(("LONG", "SHORT")) and atr:
-        staged_tp = calc_staged_tp(price, direction, atr, regime, prices=prices, pair=pair)
+        vix_val = sentiment.get("vix") if sentiment else None
+        dynamic_spread = get_dynamic_spread_pips(pair, vix=vix_val)
+        spread_meta = get_dynamic_spread_metadata(pair, vix=vix_val)
+        staged_tp = calc_staged_tp(
+            price, direction, atr, regime,
+            prices=prices, pair=pair,
+            spread_pips=dynamic_spread,
+        )
+        staged_tp["spread_session"] = spread_meta.get("session_label", "")
+        staged_tp["spread_session_mult"] = spread_meta.get("session_mult", 1.0)
+        staged_tp["spread_vix_mult"] = spread_meta.get("vix_mult", 1.0)
         result["staged_tp"] = staged_tp
 
     # ⑤ キャリートレード魅力度スコア

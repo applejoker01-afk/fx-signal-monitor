@@ -52,6 +52,9 @@ from modules.ai_commentary import generate_market_commentary, generate_exit_advi
 from modules.ambush_alert import evaluate_ambush, collect_ambush_alerts
 from modules.geopolitical_risk import apply_geopolitical_filter
 from modules.drl_collector import collect_scan_results, get_drl_stats  # 2026-06-11 研究A
+from modules.entry_validator import (                                   # 2026-06-25 エントリー有効性
+    validate_entry_for_result, format_entry_block, format_entry_block_short,
+)
 
 PAGES_URL = "https://applejoker01-afk.github.io/fx-signal-monitor/"
 
@@ -907,6 +910,11 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results,
         elif r.get("spread_caution"):
             value += f"\n{r.get('spread_caution_reason', '')}"
 
+        # 🎯 エントリー有効性チェック（2026-06-25 追加）
+        ev = validate_entry_for_result(r)
+        if ev:
+            value += f"\n{format_entry_block_short(ev, r['pair'])}"
+
         embeds[0]["fields"].append({
             "name": f"{stars_to_text(r['stars'])} {r['label']} - {r['verdict']}",
             "value": value[:1024], "inline": False
@@ -930,9 +938,11 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results,
                     f"TP2: {fmt_price(_p, staged.get('tp2'))} | "
                     f"TP3: {fmt_price(_p, staged.get('tp3'))}"
                 )
+        ev_up = validate_entry_for_result(r)
+        ev_line = f"\n{format_entry_block_short(ev_up, _p)}" if ev_up else ""
         embeds[0]["fields"].append({
             "name": f"⬆ 昇格: {r['label']} ★4→★5",
-            "value": f"```\n価格: {fmt_price(_p, r['price'])}  方向: {r['direction']}{tp_sl}\n```",
+            "value": f"```\n価格: {fmt_price(_p, r['price'])}  方向: {r['direction']}{tp_sl}\n```{ev_line}",
             "inline": False
         })
 
@@ -975,6 +985,14 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results,
 def send_email(smtp_host, smtp_port, smtp_user, smtp_pass,
                from_addr, to_addr, newly, upgraded, is_first,
                all_results, sentiment, us_yields):
+    """
+    シグナル通知メール送信（2026-06-25 モバイル最適化 + エントリー有効性追加）
+
+    スマートフォン通知での視認性を最優先に設計:
+      - Subject: 即読み可能な1行サマリー（ペア名・方向・星数）
+      - Body: エントリー上限価格を各シグナルの先頭に配置
+      - HTML版: 重要情報を色分け表示
+    """
     if not all([smtp_host, smtp_user, smtp_pass, from_addr, to_addr]):
         print("[INFO] Email not configured")
         return False
@@ -982,66 +1000,226 @@ def send_email(smtp_host, smtp_port, smtp_user, smtp_pass,
     jst = datetime.now(timezone.utc) + timedelta(hours=9)
     timestamp = jst.strftime("%Y-%m-%d %H:%M JST")
     risk_mode = sentiment.get("risk_mode", "?") if sentiment else "?"
+    risk_emoji = {
+        "panic": "🚨", "risk_off": "⚠️", "caution": "⚠",
+        "normal": "🟢", "complacent": "🟡",
+    }.get(risk_mode, "🔵")
 
-    subject = (
-        f"[FX Monitor L3] 監視開始 - ★4以上{len(newly)}件 / 市場:{risk_mode}"
-        if is_first else
-        f"[FX Monitor L3] 新規{len(newly)} / 昇格{len(upgraded)} / 市場:{risk_mode} ({timestamp})"
-    )
+    # ── Subject: スマホのプッシュ通知で内容がわかる1行 ──────────────────
+    if is_first:
+        subject = f"[FX] 監視開始 {risk_emoji} ★4以上{len(newly)}件 / {risk_mode}"
+    else:
+        # 新規シグナルの先頭1〜2件を件名に含める
+        sig_parts = []
+        for r in (newly + upgraded)[:2]:
+            dir_short = "↑" if "LONG" in r.get("direction", "") else "↓"
+            sig_parts.append(f"{r['pair']}{dir_short}★{r.get('stars','?')}")
+        sig_str = " ".join(sig_parts) if sig_parts else "変化なし"
+        subject = (
+            f"[FX] {risk_emoji}{sig_str} / 新規{len(newly)}昇格{len(upgraded)} {timestamp}"
+        )
 
-    def fmt_signal(r):
+    # ── 各シグナルのテキストブロック ─────────────────────────────────────
+    def fmt_signal_block(r, label_prefix=""):
         _p = r["pair"]
         staged = r.get("staged_tp", {})
         regime = r.get("volatility_regime", {})
         carry = r.get("carry_score", {})
         sr = r.get("support_resistance", {})
         interv = r.get("intervention_risk", {})
+        dir_arrow = "▲ LONG" if "LONG" in r.get("direction", "") else "▼ SHORT"
+
         lines = [
-            f"{stars_to_text(r['stars'])} {r['label']} @ {fmt_price(_p, r['price'])}",
-            f"  {r['verdict']} / {r['direction']}",
-            f"  TA={r['ta_score']}/100  FA={r['fa_score']}/100  金利差{r.get('fa_rate_diff','N/A'):+.2f}%",
-            f"  {r['fa_detail']}",
+            "━" * 50,
+            f"{label_prefix}{stars_to_text(r['stars'])}  {_p}  {dir_arrow}",
+            f"価格: {fmt_price(_p, r['price'])}  |  {r.get('verdict','')}",
+            f"TA={r['ta_score']}/100  FA={r['fa_score']}/100  金利差"
+            + (f"{r.get('fa_rate_diff',0):+.2f}%" if r.get('fa_rate_diff') is not None else "N/A"),
+            "",
         ]
-        if regime:
-            lines.append(f"  ② ボラ: {regime.get('regime_label','')} (比率{regime.get('atr_ratio',1):.1f}x)")
+
+        # SL / TP（最重要情報）
         if staged:
-            lines.append(
-                f"  ③ SL:{fmt_price(_p, staged.get('sl'))} "
-                f"TP1:{fmt_price(_p, staged.get('tp1'))} "
-                f"TP2:{fmt_price(_p, staged.get('tp2'))} "
-                f"TP3:{fmt_price(_p, staged.get('tp3'))}"
-            )
-            lines.append(f"     戦略: {staged.get('strategy','')}")
+            tp_mode = staged.get("tp_mode", "")
+            tp_main = staged.get("tp") or staged.get("tp1")
+            rr = staged.get("rr_tp") or staged.get("rr_tp1") or "?"
+            sp_pips = staged.get("spread_pips_dynamic") or staged.get("spread_pips", 0)
+            rr_eff = staged.get("rr_effective")
+            lines.append("【価格目標】")
+            lines.append(f"  SL: {fmt_price(_p, staged.get('sl'))}")
+            if tp_mode == "single_with_trail":
+                lines.append(f"  TP: {fmt_price(_p, tp_main)}  (RR 1:{rr})")
+                lines.append(f"  TP後→トレール {staged.get('trail_atr_mult','3.0')}×ATR")
+                lines.append(f"  理論最大: {fmt_price(_p, staged.get('max_target'))}")
+            else:
+                lines.append(f"  TP1:{fmt_price(_p, staged.get('tp1'))}  TP2:{fmt_price(_p, staged.get('tp2'))}")
+            if sp_pips and rr_eff is not None:
+                pct = staged.get("spread_atr_ratio", 0) * 100
+                lines.append(f"  スプレッド: {sp_pips:.1f}pips ({pct:.0f}%) 実効RR 1:{rr_eff}")
+            lines.append("")
+
+        # ▼ エントリー有効性チェック（新機能 2026-06-25）
+        ev = validate_entry_for_result(r)
+        if ev:
+            lines.append(format_entry_block(ev, _p))
+            lines.append("")
+
+        # その他分析
+        if regime:
+            lines.append(f"ボラ: {regime.get('regime_label','')} (ATR比{regime.get('atr_ratio',1):.1f}x)")
+        lines.append(f"FA: {r.get('fa_detail','')}")
         if carry and r.get("fa_rate_diff", 0) and r.get("fa_rate_diff", 0) > 0:
-            lines.append(f"  ⑤ キャリー: {carry.get('label','')} | SL回収{carry.get('breakeven_days','?')}日")
+            lines.append(f"キャリー: {carry.get('label','')} / SL回収{carry.get('breakeven_days','?')}日")
         if sr and sr.get("context"):
-            lines.append(f"  ⑥ SR: {sr.get('context','')}")
+            lines.append(f"SR: {sr.get('context','')}")
         if interv and interv.get("risk_level") in ("HIGH", "CRITICAL"):
-            lines.append(f"  ⑧ 介入リスク: {interv.get('risk_label','')} ({interv.get('risk_score',0)}/100)")
+            lines.append(f"🚨 介入リスク: {interv.get('risk_label','')} ({interv.get('risk_score',0)}/100)")
+        if r.get("event_warning"):
+            lines.append(f"⚠ {r['event_warning']}")
+
         return "\n".join(lines)
 
-    body_lines = ["=" * 60, f"  FX売買シグナル通知  {timestamp}", "=" * 60, ""]
+    # ── メール本文 ─────────────────────────────────────────────────────────
+    body_lines = [
+        "=" * 55,
+        f"  FX売買シグナル通知  {timestamp}",
+        f"  市場モード: {risk_emoji} {risk_mode.upper()}",
+        "=" * 55,
+        "",
+    ]
+
+    # 市場センチメント（コンパクト）
+    if sentiment:
+        vix = sentiment.get("vix", "?")
+        dxy = sentiment.get("dxy", "?")
+        body_lines += [
+            f"VIX: {vix} / DXY: {dxy} / 米10y: {sentiment.get('us10y','?')}%",
+            "",
+        ]
+
     if newly:
-        body_lines.append("【★4以上の新規シグナル】")
+        body_lines.append("【★4以上 新規シグナル】")
+        body_lines.append("")
         for r in newly:
-            body_lines.append(fmt_signal(r))
+            body_lines.append(fmt_signal_block(r, label_prefix="[新規] "))
             body_lines.append("")
+
     if upgraded:
         body_lines.append("【★4→★5 昇格】")
+        body_lines.append("")
         for r in upgraded:
-            body_lines.append(fmt_signal(r))
+            body_lines.append(fmt_signal_block(r, label_prefix="[昇格] "))
             body_lines.append("")
-    body_lines.extend([
-        "=" * 60,
-        f"  ダッシュボード: {PAGES_URL}",
-        "  本通知は教育・研究目的。投資判断は自己責任で。",
-        "=" * 60,
-    ])
 
+    body_lines += [
+        "=" * 55,
+        f"  ダッシュボード: {PAGES_URL}",
+        "  ※本通知は教育・研究目的。投資判断は自己責任で。",
+        "  ※エントリー上限価格はシグナル時の計算値。発注前に現在価格を確認。",
+        "=" * 55,
+    ]
+
+    plain_body = "\n".join(body_lines)
+
+    # ── HTML版（スマホで色分け表示） ─────────────────────────────────────
+    def _html_signal_card(r):
+        _p = r["pair"]
+        staged = r.get("staged_tp", {})
+        ev = validate_entry_for_result(r)
+        is_long = "LONG" in r.get("direction", "")
+        dir_color = "#2ecc71" if is_long else "#e74c3c"
+        dir_label = "▲ LONG" if is_long else "▼ SHORT"
+        status = ev.get("status", "") if ev else ""
+        status_color = {"ENTER": "#27ae60", "LIMIT": "#f39c12", "SKIP": "#c0392b"}.get(status, "#888")
+
+        tp_main = staged.get("tp") or staged.get("tp1") if staged else None
+        sl = staged.get("sl") if staged else None
+        rr = staged.get("rr_tp") or staged.get("rr_tp1", "?") if staged else "?"
+
+        ev_html = ""
+        if ev and status != "SKIP":
+            ev_html = f"""
+            <div style="background:#f8f9fa;border-left:4px solid {status_color};
+                        padding:8px 12px;margin:8px 0;border-radius:0 4px 4px 0;">
+              <div style="font-weight:bold;color:{status_color};">
+                {'✅ ENTER可' if status=='ENTER' else '⚠️ 指値推奨' if status=='LIMIT' else '🚫 SKIP'}
+              </div>
+              <div>最大ASK: <strong style="font-size:1.1em;">{ev.get('max_entry_exec','?')}</strong></div>
+              <div>推奨指値(mid): {ev.get('limit_order_price','?')}</div>
+              <div>スリッページ許容: {ev.get('slip_budget_pips',0):.1f}pips
+                   | spread: {ev.get('spread_pips',0):.1f}pips</div>
+              <div>RR: シグナル時1:{ev.get('rr_at_signal','?')} → MAX時1:{ev.get('rr_at_max_entry','?')}</div>
+            </div>"""
+        elif ev and status == "SKIP":
+            ev_html = f"""
+            <div style="background:#fdf0f0;border-left:4px solid #c0392b;
+                        padding:8px 12px;margin:8px 0;border-radius:0 4px 4px 0;">
+              <div style="font-weight:bold;color:#c0392b;">🚫 エントリー不可</div>
+              <div>{ev.get('note','')}</div>
+            </div>"""
+
+        return f"""
+        <div style="border:1px solid #ddd;border-radius:8px;padding:12px;
+                    margin:12px 0;background:#fff;">
+          <div style="font-size:1.2em;font-weight:bold;color:{dir_color};">
+            {stars_to_text(r['stars'])} {_p} {dir_label}
+          </div>
+          <div style="color:#666;font-size:0.9em;">{r.get('verdict','')}</div>
+          <div style="margin:8px 0;">
+            <span style="background:#f1f2f6;padding:2px 6px;border-radius:3px;
+                         font-size:0.85em;">TA {r['ta_score']}/100</span>
+            <span style="background:#f1f2f6;padding:2px 6px;border-radius:3px;
+                         font-size:0.85em;margin-left:4px;">FA {r['fa_score']}/100</span>
+          </div>
+          {"<div style='margin:4px 0;'>" +
+           f"SL: <code>{fmt_price(_p, sl)}</code> &nbsp;|&nbsp; "
+           f"TP: <code>{fmt_price(_p, tp_main)}</code> &nbsp;|&nbsp; RR 1:{rr}"
+           + "</div>" if staged else ""}
+          {ev_html}
+          <div style="font-size:0.85em;color:#555;margin-top:6px;">{r.get('fa_detail','')}</div>
+        </div>"""
+
+    risk_bg = {"panic": "#ffe0e0", "risk_off": "#fff3e0"}.get(risk_mode, "#f0fff4")
+    html_signals = "".join(_html_signal_card(r) for r in newly + upgraded)
+    html_body = f"""<!DOCTYPE html>
+<html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  body{{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+        max-width:600px;margin:0 auto;padding:16px;background:#f5f5f5;}}
+  .header{{background:{risk_bg};border-radius:8px;padding:12px 16px;margin-bottom:16px;}}
+  .footer{{font-size:0.8em;color:#888;margin-top:20px;text-align:center;}}
+  code{{background:#f1f2f6;padding:1px 4px;border-radius:3px;}}
+  a{{color:#2980b9;}}
+</style></head>
+<body>
+  <div class="header">
+    <div style="font-size:1.3em;font-weight:bold;">{risk_emoji} FXシグナル通知</div>
+    <div style="color:#555;">{timestamp} / 市場: {risk_mode.upper()}</div>
+    {"<div>VIX: " + str(sentiment.get('vix','?')) + " / DXY: " + str(sentiment.get('dxy','?')) + "</div>"
+     if sentiment else ""}
+  </div>
+
+  {"<h3 style='margin:16px 0 4px;'>★4以上 新規シグナル</h3>" if newly else ""}
+  {"".join(_html_signal_card(r) for r in newly)}
+
+  {"<h3 style='margin:16px 0 4px;'>★4→★5 昇格</h3>" if upgraded else ""}
+  {"".join(_html_signal_card(r) for r in upgraded)}
+
+  <div class="footer">
+    <a href="{PAGES_URL}">📊 ダッシュボードを開く</a><br>
+    ※本通知は教育・研究目的。投資判断は自己責任で。<br>
+    ※エントリー上限価格はシグナル時の計算値。発注前に現在価格を確認してください。
+  </div>
+</body></html>"""
+
+    # ── 送信 ─────────────────────────────────────────────────────────────
     msg = MIMEMultipart("alternative")
     msg["Subject"] = Header(subject, "utf-8")
-    msg["From"] = from_addr; msg["To"] = to_addr
-    msg.attach(MIMEText("\n".join(body_lines), "plain", "utf-8"))
+    msg["From"] = from_addr
+    msg["To"] = to_addr
+    msg.attach(MIMEText(plain_body, "plain", "utf-8"))
+    msg.attach(MIMEText(html_body, "html", "utf-8"))   # HTML版（後勝ち）
 
     try:
         with smtplib.SMTP_SSL(smtp_host, int(smtp_port or 465), timeout=20) as s:
