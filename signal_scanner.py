@@ -804,10 +804,11 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results,
 
                 sign = "+" if unreal >= 0 else ""
                 _d = pair_decimals(pair)
+                sl_str = f"逆指値{fmt_price(pair, sl)}" if sl is not None else ""
                 lines.append(
                     f"{icon} {pair} {direction[:5]} {phase} | "
                     f"@{fmt_price(pair, entry)}→{fmt_price(pair, cur_price)} "
-                    f"({sign}{unreal:+.{_d}f}) {progress} {hold_str}"
+                    f"({sign}{unreal:+.{_d}f}) {progress} {sl_str} {hold_str}"
                 )
             embeds[0]["fields"].append({
                 "name": f"📋 保有中ポジション（{len(open_trades_dict)}件）",
@@ -1905,9 +1906,10 @@ def main():
     # 7. 通知（中長期シグナル変化・決済・ドローダウンで送信）
     #    待ち伏せ・反発監視（短期）はデイトレ画面に集約したため中長期通知では送らない
     has_close = bool(trade_update.get("newly_closed"))
+    has_state_change = bool(trade_update.get("state_changes"))
     has_rate_warn = bool(rate_consistency.get("warnings"))
     if (newly or upgraded or (is_first and newly) or has_close
-            or drawdown.get("alert") or has_rate_warn):
+            or has_state_change or drawdown.get("alert") or has_rate_warn):
         _wh = os.environ.get("DISCORD_WEBHOOK_URL", "")
         _wh = _wh.replace("discordapp.com", "discord.com")
         send_discord(
