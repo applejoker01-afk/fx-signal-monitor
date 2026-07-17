@@ -89,7 +89,7 @@ jobs:
         run: |
           git config --local user.email "fx-monitor-bot@github-actions"
           git config --local user.name  "FX Monitor Bot"
-          git add docs/last_signals.json docs/index.html data/ 2>/dev/null || true
+          git add docs/ data/ 2>/dev/null || true
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
