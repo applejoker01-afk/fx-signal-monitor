@@ -1,22 +1,39 @@
 """
 ai_commentary.py
-Claude API活用モジュール
+Claude API活用モジュール（Gemini フォールバック対応）
 
 ⑮ AI市況コメンタリー : 全シグナルを俯瞰した自然言語の市況解説
 ⑯ AIトレード講評     : 決済トレードを「なぜ勝った/負けた」とAIが分析
 ⑰ AI週次総括         : 週次レポートに学びと改善提案を添える
 
-ANTHROPIC_API_KEY が未設定の場合は全機能スキップ（コスト0・後方互換）。
+優先順位: ANTHROPIC_API_KEY → GEMINI_API_KEY（未設定 or Claude失敗時）。
+どちらも未設定の場合は全機能スキップ（コスト0・後方互換）。
 """
 
 import json
 import os
+import re
 import urllib.request
 
 
 ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages"
 # コスト重視でHaiku、品質重視ならsonnetに変更可
 MODEL = "claude-haiku-4-5-20251001"
+
+GEMINI_LIST_URL = "https://generativelanguage.googleapis.com/v1beta/models"
+GEMINI_GENERATE_URL = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+
+# プロセス内キャッシュ（1回のスキャン実行中に何度もモデル一覧を叩かないため）
+_gemini_model_cache = {"model": None, "key": None}
+
+
+def has_ai_key() -> bool:
+    """Claude・GeminiいずれかのAキーが設定されているか。"""
+    return bool(
+        os.environ.get("ANTHROPIC_API_KEY")
+        or os.environ.get("GEMINI_API_KEY")
+        or os.environ.get("GOOGLE_API_KEY")
+    )
 
 
 def _call_claude(prompt: str, max_tokens: int = 1024, system: str = None) -> str:
@@ -65,6 +82,106 @@ def _call_claude(prompt: str, max_tokens: int = 1024, system: str = None) -> str
         return None
 
 
+def _select_gemini_model(api_key: str) -> str:
+    """
+    Gemini ListModels APIから generateContent 対応モデルを取得し、
+    バージョン番号最大（＝最新）のものを自動選択する。
+    一覧取得に失敗した場合は GEMINI_MODEL env（既定 "gemini-flash-latest"）にフォールバック。
+    プロセス内で一度選んだ結果はキャッシュする。
+    """
+    if _gemini_model_cache["model"] and _gemini_model_cache["key"] == api_key:
+        return _gemini_model_cache["model"]
+
+    fallback = os.environ.get("GEMINI_MODEL", "gemini-flash-latest")
+    try:
+        url = f"{GEMINI_LIST_URL}?key={api_key.strip()}"
+        with urllib.request.urlopen(urllib.request.Request(url), timeout=15) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+
+        names = []
+        for m in data.get("models", []):
+            name = m.get("name", "").split("/")[-1]
+            if "generateContent" not in m.get("supportedGenerationMethods", []):
+                continue
+            if any(bad in name for bad in
+                   ("embedding", "aqa", "vision", "image", "tts", "learnlm")):
+                continue
+            if "flash" not in name and "pro" not in name:
+                continue
+            names.append(name)
+
+        # 実験版/プレビュー版は他に候補があれば除外（安定版優先）
+        stable = [n for n in names if "exp" not in n and "preview" not in n]
+        pool = stable or names
+
+        def version_key(n):
+            nums = tuple(int(x) for x in re.findall(r"\d+", n))
+            return (nums, "flash" in n)  # 数字最大＝最新、同点ならflash優先（低コスト）
+
+        if pool:
+            best = max(pool, key=version_key)
+            _gemini_model_cache.update(model=best, key=api_key)
+            return best
+    except Exception as e:
+        print(f"[WARN] Geminiモデル一覧取得失敗（固定モデル {fallback} にフォールバック）: {e}")
+
+    _gemini_model_cache.update(model=fallback, key=api_key)
+    return fallback
+
+
+def _call_gemini(prompt: str, max_tokens: int = 1024, system: str = None) -> str:
+    """
+    Gemini APIを呼び出してテキスト応答を返す（ListModelsで選んだ最新モデルを使用）。
+    APIキー未設定・エラー時は None を返す（呼び出し側でスキップ）。
+    """
+    api_key = os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY") or ""
+    if not api_key:
+        return None
+
+    model = _select_gemini_model(api_key)
+    body = {
+        "contents": [{"parts": [{"text": prompt}]}],
+        "generationConfig": {"maxOutputTokens": max_tokens},
+    }
+    if system:
+        body["systemInstruction"] = {"parts": [{"text": system}]}
+
+    try:
+        url = f"{GEMINI_GENERATE_URL.format(model=model)}?key={api_key.strip()}"
+        req = urllib.request.Request(
+            url,
+            data=json.dumps(body).encode("utf-8"),
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        with urllib.request.urlopen(req, timeout=40) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+        texts = [
+            part.get("text", "")
+            for cand in data.get("candidates", [])
+            for part in cand.get("content", {}).get("parts", [])
+        ]
+        return "\n".join(texts).strip() or None
+    except urllib.error.HTTPError as e:
+        body_txt = e.read().decode("utf-8", errors="ignore")[:200]
+        print(f"[WARN] Gemini API ({model}) HTTP {e.code}: {body_txt}")
+        return None
+    except Exception as e:
+        print(f"[WARN] Gemini API ({model}) failed: {e}")
+        return None
+
+
+def _call_ai(prompt: str, max_tokens: int = 1024, system: str = None) -> str:
+    """
+    Claude優先で呼び出し、未設定または失敗（クレジット切れ等）ならGeminiにフォールバック。
+    """
+    if os.environ.get("ANTHROPIC_API_KEY"):
+        result = _call_claude(prompt, max_tokens=max_tokens, system=system)
+        if result:
+            return result
+    return _call_gemini(prompt, max_tokens=max_tokens, system=system)
+
+
 # ============================================================
 # ⑮ AI市況コメンタリー
 # ============================================================
@@ -75,7 +192,7 @@ def generate_market_commentary(results: list, sentiment: dict,
     """
     全シグナルとセンチメントを俯瞰した市況解説を生成。
     """
-    if not os.environ.get("ANTHROPIC_API_KEY"):
+    if not has_ai_key():
         return None
 
     # 上位シグナルを抽出
@@ -121,8 +238,8 @@ DXY: {sentiment.get('dxy','N/A')}
 - 「です・ます」調
 - 200字以内"""
 
-    return _call_claude(prompt, max_tokens=512,
-                        system="あなたは冷静で客観的なFX市場アナリストです。誇張せず事実ベースで簡潔に解説します。")
+    return _call_ai(prompt, max_tokens=512,
+                    system="あなたは冷静で客観的なFX市場アナリストです。誇張せず事実ベースで簡潔に解説します。")
 
 
 # ============================================================
@@ -133,7 +250,7 @@ def generate_trade_review(closed_trade: dict) -> str:
     """
     決済済みトレード1件について「なぜ勝った/負けたか」をAIが分析。
     """
-    if not os.environ.get("ANTHROPIC_API_KEY"):
+    if not has_ai_key():
         return None
 
     reason_label = {
@@ -160,8 +277,8 @@ def generate_trade_review(closed_trade: dict) -> str:
 - 次に活かせる学びを1つ
 - 100字以内・です/ます調"""
 
-    return _call_claude(prompt, max_tokens=400,
-                        system="あなたはトレード記録を客観的に振り返るコーチです。")
+    return _call_ai(prompt, max_tokens=400,
+                    system="あなたはトレード記録を客観的に振り返るコーチです。")
 
 
 # ============================================================
@@ -172,7 +289,7 @@ def generate_weekly_summary(stats: dict, backtest_overall: dict = None) -> str:
     """
     週次成績を分析し、学びと改善提案を生成。
     """
-    if not os.environ.get("ANTHROPIC_API_KEY"):
+    if not has_ai_key():
         return None
 
     reason_counts = stats.get("reason_counts", {})
@@ -213,8 +330,8 @@ def generate_weekly_summary(stats: dict, backtest_overall: dict = None) -> str:
 - 投資助言ではなくシステム運用の振り返りとして
 - 250字以内・です/ます調"""
 
-    return _call_claude(prompt, max_tokens=600,
-                        system="あなたはトレードシステムの運用を支援する冷静なアナリストです。")
+    return _call_ai(prompt, max_tokens=600,
+                    system="あなたはトレードシステムの運用を支援する冷静なアナリストです。")
 
 
 # ============================================================
@@ -230,7 +347,7 @@ def generate_exit_advice(result: dict) -> str:
 
     position_manager.html がこの結果を last_signals.json から読んで表示する。
     """
-    if not os.environ.get("ANTHROPIC_API_KEY"):
+    if not has_ai_key():
         return None
 
     pair = result.get("pair", "?")
@@ -275,5 +392,5 @@ def generate_exit_advice(result: dict) -> str:
 - 最終判断は本人が行う前提
 - 全体300字程度"""
 
-    return _call_claude(prompt, max_tokens=900,
-                        system="あなたは利益最大化を重視するトレーダーの判断を支援する冷静なアシスタントです。投資助言ではなく情報整理と選択肢提示に徹します。")
+    return _call_ai(prompt, max_tokens=900,
+                    system="あなたは利益最大化を重視するトレーダーの判断を支援する冷静なアシスタントです。投資助言ではなく情報整理と選択肢提示に徹します。")

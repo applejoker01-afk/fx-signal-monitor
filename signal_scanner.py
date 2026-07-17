@@ -48,7 +48,7 @@ from modules.performance_intelligence import (
     apply_vix_regime_filter,                   # 2026-06-22 VIXレジームフィルタ
     apply_spread_filter,                       # 2026-06-23 スプレッド/ATR比フィルタ
 )
-from modules.ai_commentary import generate_market_commentary, generate_exit_advice
+from modules.ai_commentary import generate_market_commentary, generate_exit_advice, has_ai_key
 from modules.ambush_alert import evaluate_ambush, collect_ambush_alerts
 from modules.geopolitical_risk import apply_geopolitical_filter
 from modules.drl_collector import collect_scan_results, get_drl_stats  # 2026-06-11 研究A
@@ -1880,7 +1880,7 @@ def main():
     if ambush_alerts["approaching"]:
         print(f"[AMBUSH] POI接近中 {len(ambush_alerts['approaching'])}件")
 
-    # ⑮ AI市況コメンタリー（ANTHROPIC_API_KEY設定時のみ）
+    # ⑮ AI市況コメンタリー（ANTHROPIC_API_KEY / GEMINI_API_KEY設定時のみ）
     ai_commentary = None
     if newly or upgraded or (is_first and newly):
         ai_commentary = generate_market_commentary(
@@ -1891,7 +1891,7 @@ def main():
 
     # 🤖 AI決済アドバイス（★4以上のペアに生成し、resultsに埋め込む）
     #    position_manager.html が last_signals.json からこれを読んで表示する
-    if os.environ.get("ANTHROPIC_API_KEY"):
+    if has_ai_key():
         advice_count = 0
         for r in results:
             if r.get("stars", 0) >= 4:

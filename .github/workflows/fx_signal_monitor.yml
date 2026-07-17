@@ -50,6 +50,7 @@ jobs:
           MAIL_FROM: ${{ secrets.MAIL_FROM }}
           MAIL_TO:   ${{ secrets.MAIL_TO }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
           FINNHUB: ${{ secrets.FINNHUB }}
           # Obsidian Vault連携（任意。未設定でもスキャンは継続）
@@ -61,6 +62,7 @@ jobs:
 
       - name: Push Geopolitical Risk Diary to separate repo
         if: always()
+        continue-on-error: true
         env:
           DIARY_TOKEN: ${{ secrets.DIARY_REPO_TOKEN }}
         run: |

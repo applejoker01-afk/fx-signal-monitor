@@ -66,7 +66,8 @@ def main():
         send_backtest_report(webhook, bt, lookback)
 
     # AI総括（オプション）
-    if os.environ.get("ANTHROPIC_API_KEY"):
+    from modules.ai_commentary import has_ai_key
+    if has_ai_key():
         try:
             from modules.ai_commentary import generate_weekly_summary
             # バックテストをstats形式に変換してAI総括
