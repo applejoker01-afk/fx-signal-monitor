@@ -298,13 +298,17 @@ def check_exit_condition(trade: dict, current_price: float,
 
 
 def update_trades(results: list, now: datetime,
-                   pair_api: dict = None, latest_pairs: dict = None) -> dict:
+                   pair_api: dict = None, latest_pairs: dict = None,
+                   entry_mode: str = "market") -> dict:
     """
     毎時スキャン時に呼ぶメイン関数。
 
     1. 既存の保有トレードの決済判定
     2. 新規エントリーの記録
     3. ファイル保存
+
+    entry_mode="limit" の場合、新規エントリーの即時オープンは行わない
+    （modules/pending_orders.py 経由の指値待機フローに委ねる。2026-07-20追加）。
 
     pair_api / latest_pairs を渡すと、2026-07-20追加のシミュレーション口座
     （data/virtual_account.json）と連動したポジションサイジングを行う:
@@ -399,11 +403,21 @@ def update_trades(results: list, now: datetime,
 
     # ── 2. 新規エントリーの記録 ──
     # 同一サイクルで決済したペアは再エントリーしない（決済と同時の即エントリー防止）
+    #
+    # entry_mode（2026-07-20追加）:
+    #   "market"（デフォルト・毎時スキャン）: 従来通り、★4以上を検出したその場で
+    #     現在値エントリーとして即座にopen_tradesへ記録する。
+    #   "limit"（1日3回の指値スキャン専用）: ここでは即座にオープンせず、
+    #     modules/pending_orders.py 側で押し目の指値注文として登録する
+    #     （signal_scanner.py の呼び出し元が別途処理する）。
     closed_this_cycle = set(pairs_to_close)
     for r in results:
         pair = r["pair"]
         stars = r.get("stars", 0)
         direction = r.get("direction", "")
+
+        if entry_mode == "limit":
+            continue
 
         # ★4以上 かつ 方向が明確 かつ まだ保有していない かつ 今サイクルで決済していない
         if (stars >= 4
@@ -472,6 +486,38 @@ def update_trades(results: list, now: datetime,
         "open_trades": open_trades,  # 保有ポジション一覧（Discord通知用）
         "still_open": len(open_trades),
     }
+
+
+# ============================================================
+# 指値待機注文の約定処理（2026-07-20追加）
+# ============================================================
+
+def open_trade_from_pending_fill(trade: dict, pair_api: dict = None,
+                                  latest_pairs: dict = None) -> dict:
+    """
+    modules.pending_orders.pending_order_to_trade() が生成したtradeレコードを
+    open_trades.jsonへ正式追加する（ポジションサイジング込み）。
+    毎時スキャン側で pending_orders.check_pending_fills() が約定を検知した際に呼ぶ。
+
+    通常の新規エントリー（update_trades内）と同じサイジングロジックを使うが、
+    こちらは1件ずつ即時に呼ばれる想定のため、呼び出し側で最新のopen_tradesを
+    渡すこと（同一サイクル内で複数約定した場合の証拠金二重計上を防ぐため）。
+    """
+    open_trades = load_open_trades()
+    pair = trade["pair"]
+
+    if pair_api is not None and latest_pairs is not None and trade.get("sl") is not None:
+        sizing = calc_position_size(
+            pair, trade["entry_price"], trade["sl"], pair_api, latest_pairs,
+            open_trades=open_trades,
+        )
+        trade["position_sizing"] = sizing
+        if sizing.get("tradable"):
+            trade["units"] = sizing["units"]
+
+    open_trades[pair] = trade
+    save_open_trades(open_trades)
+    return trade
 
 
 # ============================================================

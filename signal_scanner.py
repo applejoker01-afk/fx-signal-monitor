@@ -1054,6 +1054,100 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results,
         return False
 
 
+def send_discord_pending(webhook_url, newly_created, newly_filled, expired):
+    """
+    指値待機シグナル専用のDiscord通知（2026-07-20追加）。
+    1日3回（07:00/13:00/21:00 JST）の指値スキャンでの新規登録、
+    毎時スキャンでの約定・失効を通知する。
+    newly_created: {pair: order} — 今回の指値スキャンで新規登録した注文
+    newly_filled:  [trade, ...]   — 今回約定してopen_tradesへ追加されたトレード
+    expired:       {pair: order} — 有効期限切れで削除された注文
+    """
+    if not webhook_url:
+        return False
+    if not (newly_created or newly_filled or expired):
+        return False
+
+    jst = datetime.now(timezone.utc) + timedelta(hours=9)
+    timestamp = jst.strftime("%Y-%m-%d %H:%M JST")
+    fields = []
+
+    if newly_created:
+        lines = []
+        for pair, order in newly_created.items():
+            _p = pair
+            valid_until_jst = "?"
+            try:
+                vu = datetime.fromisoformat(order["valid_until"]) + timedelta(hours=9)
+                valid_until_jst = vu.strftime("%m/%d %H:%M JST")
+            except Exception:
+                pass
+            lines.append(
+                f"📌 {_p} {order['direction']} ★{order.get('initial_stars','?')}\n"
+                f"   指値: {fmt_price(_p, order.get('limit_price'))} "
+                f"(現在値{fmt_price(_p, order.get('scan_price'))}から"
+                f"{order.get('pullback_atr_mult', 0.3)}×ATR押し目)\n"
+                f"   SL: {fmt_price(_p, order.get('sl'))} | TP: {fmt_price(_p, order.get('tp'))}\n"
+                f"   有効期限: {valid_until_jst}まで（未到達なら自動失効）"
+            )
+        fields.append({
+            "name": f"📌 指値待機シグナル 新規登録（{len(newly_created)}件）",
+            "value": "```\n" + "\n".join(lines) + "\n```",
+            "inline": False,
+        })
+
+    if newly_filled:
+        lines = []
+        for t in newly_filled:
+            _p = t.get("pair", "")
+            sizing = t.get("position_sizing") or {}
+            lines.append(
+                f"✅ {_p} {t['direction']} 指値約定 @ {fmt_price(_p, t['entry_price'])}\n"
+                f"   {sizing.get('note', '')}"
+            )
+        fields.append({
+            "name": f"✅ 指値約定（{len(newly_filled)}件）",
+            "value": "```\n" + "\n".join(lines) + "\n```",
+            "inline": False,
+        })
+
+    if expired:
+        lines = [
+            f"⌛ {pair} {order.get('direction','')} "
+            f"指値{fmt_price(pair, order.get('limit_price'))}（未到達のまま失効）"
+            for pair, order in expired.items()
+        ]
+        fields.append({
+            "name": f"⌛ 指値失効（{len(expired)}件）",
+            "value": "```\n" + "\n".join(lines) + "\n```",
+            "inline": False,
+        })
+
+    embed = {
+        "title": "📌 指値待機シグナル アップデート",
+        "description": f"更新: {timestamp}",
+        "color": 0x60A5FA,
+        "fields": fields,
+    }
+    payload = {"embeds": [embed]}
+    try:
+        req = urllib.request.Request(
+            webhook_url,
+            data=json.dumps(payload).encode("utf-8"),
+            headers={
+                "Content-Type": "application/json",
+                "User-Agent": "DiscordBot (fx-signal-monitor, 1.0)",
+            },
+            method="POST",
+        )
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            print(f"[OK] Discord (pending) sent (HTTP {resp.status})")
+            return True
+    except Exception as e:
+        print(f"[ERROR] Discord (pending) send failed: {e}")
+        return False
+
+
 def send_email(smtp_host, smtp_port, smtp_user, smtp_pass,
                from_addr, to_addr, newly, upgraded, is_first,
                all_results, sentiment, us_yields):
@@ -1926,8 +2020,17 @@ def main():
           f"(first run: {is_first})")
 
     # ⑦ トレードのライフサイクル管理（通知の前に実行して情報を取得）
-    from modules.trade_tracker import load_open_trades
-    trade_update = update_trades(results, now, PAIR_API, latest["pairs"])
+    # ENTRY_MODE（2026-07-20追加）:
+    #   market（デフォルト、毎時cron）: 従来通り★4以上を即座に成行相当でオープン
+    #   limit（1日3回07:00/13:00/21:00 JSTのcron専用）: 即座にオープンせず、
+    #     押し目狙いの指値待機注文として登録する（下記参照）
+    from modules.trade_tracker import load_open_trades, open_trade_from_pending_fill
+    from modules.pending_orders import (
+        load_pending_orders, save_pending_orders, check_pending_fills,
+        create_pending_order, pending_order_to_trade,
+    )
+    entry_mode = os.environ.get("ENTRY_MODE", "market").strip().lower()
+    trade_update = update_trades(results, now, PAIR_API, latest["pairs"], entry_mode=entry_mode)
     if trade_update["newly_opened"]:
         print(f"\n[TRADE] 新規エントリー {len(trade_update['newly_opened'])}件:")
         for t in trade_update["newly_opened"]:
@@ -1948,6 +2051,45 @@ def main():
                   f"保有{t.get('hold_hours',0)}h{pnl_note}")
     print(f"[TRADE] 現在保有中: {trade_update['still_open']}件")
     open_trades = load_open_trades()
+
+    # 📌 指値待機シグナル（2026-07-20追加）
+    # (a) 毎回: 保留中の指値注文が約定/失効していないかチェック（market/limit両モードで実行）
+    pending_orders = load_pending_orders()
+    filled_orders, remaining_orders, expired_orders = check_pending_fills(
+        pending_orders, latest["pairs"], now
+    )
+    newly_filled_trades = []
+    for pair, order in filled_orders.items():
+        trade = pending_order_to_trade(order, now)
+        trade = open_trade_from_pending_fill(trade, PAIR_API, latest["pairs"])
+        newly_filled_trades.append(trade)
+        open_trades = load_open_trades()  # サイジングに反映させるため再読込
+        print(f"[PENDING] ✅約定: {pair} {order['direction']} "
+              f"指値{fmt_price(pair, order.get('limit_price'))}で約定")
+
+    # (b) limitモードのみ: 新規★4以上シグナルを指値待機として登録
+    newly_created_orders = {}
+    if entry_mode == "limit":
+        closed_this_cycle_pairs = {t.get("pair") for t in trade_update.get("newly_closed", [])}
+        for r in results:
+            pair = r["pair"]
+            if (r.get("stars", 0) >= 4
+                    and r.get("direction", "").endswith(("LONG", "SHORT"))
+                    and pair not in open_trades
+                    and pair not in remaining_orders
+                    and pair not in closed_this_cycle_pairs):
+                order = create_pending_order(r, now)
+                remaining_orders[pair] = order
+                newly_created_orders[pair] = order
+                print(f"[PENDING] 📌新規指値登録: {pair} {order['direction']} "
+                      f"指値{fmt_price(pair, order.get('limit_price'))} "
+                      f"(有効期限 {order.get('valid_until')})")
+
+    if expired_orders:
+        for pair in expired_orders:
+            print(f"[PENDING] ⌛失効: {pair}（次回スキャンまでに約定せず）")
+
+    save_pending_orders(remaining_orders)
 
     # ⑪ ドローダウン監視（決済後の全履歴で連敗チェック）
     closed_after = load_closed_trades(days_back=14)
@@ -2024,6 +2166,11 @@ def main():
         )
     else:
         print("[INFO] No significant changes, skipping notifications")
+
+    # 📌 指値待機シグナルの通知（新規登録・約定・失効があれば、上のnewly/upgraded判定とは無関係に送信）
+    if newly_created_orders or newly_filled_trades or expired_orders:
+        _wh_pending = os.environ.get("DISCORD_WEBHOOK_URL", "").replace("discordapp.com", "discord.com")
+        send_discord_pending(_wh_pending, newly_created_orders, newly_filled_trades, expired_orders)
 
     # 8. 状態保存
     save_current_state(
