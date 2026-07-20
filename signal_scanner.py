@@ -47,6 +47,8 @@ from modules.performance_intelligence import (
     apply_boj_cycle_directional_filter,        # 2026-06-19 BOJサイクル方向フィルタ
     apply_vix_regime_filter,                   # 2026-06-22 VIXレジームフィルタ
     apply_spread_filter,                       # 2026-06-23 スプレッド/ATR比フィルタ
+    apply_session_filter,                      # 2026-07-20 セッションフィルタ（London単独枠）
+    apply_seasonal_filter,                     # 2026-07-20 季節性フィルタ（AUDJPY 8月）
 )
 from modules.ai_commentary import generate_market_commentary, generate_exit_advice, has_ai_key
 from modules.ambush_alert import evaluate_ambush, collect_ambush_alerts
@@ -54,6 +56,10 @@ from modules.geopolitical_risk import apply_geopolitical_filter
 from modules.drl_collector import collect_scan_results, get_drl_stats  # 2026-06-11 研究A
 from modules.entry_validator import (                                   # 2026-06-25 エントリー有効性
     validate_entry_for_result, format_entry_block, format_entry_block_short,
+)
+from modules.position_sizing import (                                   # 2026-07-20 シミュレーション口座連動
+    calc_position_size, calc_maintenance_ratio, load_virtual_account,
+    LOSS_CUT_MAINTENANCE_RATIO,
 )
 
 PAGES_URL = "https://applejoker01-afk.github.io/fx-signal-monitor/"
@@ -163,6 +169,15 @@ PAIR_API = {
     "AUDUSD": ("AUD", "USD"), "NZDUSD": ("NZD", "USD"),
     "USDCAD": ("USD", "CAD"), "USDCHF": ("USD", "CHF"),
     "EURGBP": ("EUR", "GBP"), "EURAUD": ("EUR", "AUD"),
+    # 2026-07-20追加: SBI証券の取扱ペアに合わせて拡張
+    # (Frankfurter API のSEK/NOK/BRL/PLN/KRW対応を事前確認済み)
+    "SEKJPY": ("SEK", "JPY"), "NOKJPY": ("NOK", "JPY"),
+    "BRLJPY": ("BRL", "JPY"), "PLNJPY": ("PLN", "JPY"),
+    "KRWJPY": ("KRW", "JPY"),
+    "GBPAUD": ("GBP", "AUD"), "GBPCHF": ("GBP", "CHF"),
+    "AUDCHF": ("AUD", "CHF"), "EURCHF": ("EUR", "CHF"),
+    "AUDNZD": ("AUD", "NZD"), "EURNZD": ("EUR", "NZD"),
+    "USDCNY": ("USD", "CNY"),
 }
 
 PAIR_LABEL = {
@@ -174,9 +189,14 @@ PAIR_LABEL = {
     "GBPUSD": "GBP/USD", "AUDUSD": "AUD/USD", "NZDUSD": "NZD/USD",
     "USDCAD": "USD/CAD", "USDCHF": "USD/CHF", "EURGBP": "EUR/GBP",
     "EURAUD": "EUR/AUD",
+    # 2026-07-20追加
+    "SEKJPY": "SEK/JPY", "NOKJPY": "NOK/JPY", "BRLJPY": "BRL/JPY",
+    "PLNJPY": "PLN/JPY", "KRWJPY": "KRW/JPY", "GBPAUD": "GBP/AUD",
+    "GBPCHF": "GBP/CHF", "AUDCHF": "AUD/CHF", "EURCHF": "EUR/CHF",
+    "AUDNZD": "AUD/NZD", "EURNZD": "EUR/NZD", "USDCNY": "USD/CNY",
 }
 
-API_SYMBOLS = "USD,JPY,GBP,AUD,NZD,CAD,CHF,SGD,HKD,CNY,MXN,TRY,ZAR,INR"
+API_SYMBOLS = "USD,JPY,GBP,AUD,NZD,CAD,CHF,SGD,HKD,CNY,MXN,TRY,ZAR,INR,SEK,NOK,BRL,PLN,KRW"
 
 
 # === 価格表示桁数の一元管理 ===
@@ -197,23 +217,36 @@ def fmt_price(pair: str, value) -> str:
         return str(value)
 
 
-# === スプレッド代表値テーブル（2026-06 リテール FX 平均値） ===
+# === スプレッド代表値テーブル ===
 # 単位: pip（JPYクロスは 0.01、非JPYは 0.0001 が 1pip）
 # Frankfurter は中値のみ提供のため、bid/ask の実効スプレッドはここで補正する。
-# 値は実際のリテール標準スプレッド（メジャー: タイト、エキゾチック: ワイド）。
+# 2026-07-20: SBI証券公式のコアタイム(9:00-翌3:00)固定スプレッドが判明した5ペアは
+# 実測値に更新（★マーク）。それ以外は引き続き類似ペアからの推定値。
 SPREAD_PIPS = {
-    # メジャー JPY（タイト）
-    "USDJPY": 0.2, "EURJPY": 0.3, "GBPJPY": 2.0,
+    # メジャー JPY（タイト）★SBI公式コアタイム値
+    "USDJPY": 0.2, "EURJPY": 0.5, "GBPJPY": 0.9,
     # 流動性中程度 JPY
-    "AUDJPY": 1.5, "NZDJPY": 2.0, "CADJPY": 1.5, "CHFJPY": 2.0,
+    "AUDJPY": 0.6,   # ★SBI公式（旧推定1.5から実測値へ更新）
+    "NZDJPY": 2.0, "CADJPY": 1.5, "CHFJPY": 2.0,
     "SGDJPY": 2.5, "HKDJPY": 3.0,
     # エキゾチック JPY（ワイド・要警戒）
     "CNYJPY": 5.0, "MXNJPY": 5.0, "ZARJPY": 10.0,
     "INRJPY": 8.0, "TRYJPY": 30.0,
     # メジャー非JPY
-    "EURUSD": 0.5, "GBPUSD": 1.5, "AUDUSD": 1.0, "NZDUSD": 2.0,
+    "EURUSD": 0.4,   # ★SBI公式（旧推定0.5から実測値へ更新）
+    "GBPUSD": 1.5, "AUDUSD": 1.0, "NZDUSD": 2.0,
     "USDCAD": 1.5, "USDCHF": 2.0,
     "EURGBP": 1.5, "EURAUD": 3.0,
+    # 2026-07-20追加: SBI証券の取扱ペア拡張分
+    # 注意: 実測値ではなく類似ペアからの初期推定値（要検証・実運用で乖離すれば調整）
+    "SEKJPY": 5.0, "NOKJPY": 5.0,          # マイナーJPYクロス（CNYJPY/MXNJPY相当）
+    "BRLJPY": 12.0,                          # 高ボラエキゾチック（ZARJPY同等〜やや上）
+    "PLNJPY": 6.0, "KRWJPY": 4.0,           # 中欧・アジア新興国
+    "GBPAUD": 4.0, "GBPCHF": 3.5, "AUDCHF": 3.5,
+    "EURCHF": 2.0,                           # 主要通貨クロスでタイト
+    "AUDNZD": 2.5,                           # 流動性高い南半球クロス
+    "EURNZD": 5.0,
+    "USDCNY": 6.0,                           # 管理相場でワイド
 }
 
 
@@ -584,7 +617,7 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results,
                  sentiment, currency_strength=None, portfolio_risk=None,
                  trade_update=None, open_trades=None,
                  drawdown=None, ai_commentary=None, ambush_alerts=None,
-                 rate_warnings=None):
+                 rate_warnings=None, latest_pairs=None):
     if not webhook_url:
         print("[INFO] Discord webhook not configured")
         return False
@@ -810,11 +843,33 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results,
                     f"@{fmt_price(pair, entry)}→{fmt_price(pair, cur_price)} "
                     f"({sign}{unreal:+.{_d}f}) {progress} {sl_str} {hold_str}"
                 )
+            # 💳 証拠金維持率（2026-07-20追加、SBI公式ロスカット基準=50%を可視化）
+            margin_note = ""
+            if latest_pairs is not None:
+                mr = calc_maintenance_ratio(
+                    load_virtual_account(), open_trades_dict, PAIR_API, latest_pairs
+                )
+                ratio = mr.get("maintenance_ratio")
+                if ratio is not None:
+                    alert_icon = "🚨" if ratio < LOSS_CUT_MAINTENANCE_RATIO * 1.5 else "✅"
+                    margin_note = (
+                        f"\n{alert_icon} 証拠金維持率: {ratio:.0f}%"
+                        f"（資産評価額¥{mr['equity_jpy']:.0f} / 必要証拠金¥{mr['total_margin_jpy']:.0f}、"
+                        f"ロスカット基準50%）"
+                    )
             embeds[0]["fields"].append({
                 "name": f"📋 保有中ポジション（{len(open_trades_dict)}件）",
-                "value": "```\n" + "\n".join(lines) + "\n```",
+                "value": "```\n" + "\n".join(lines) + "\n```" + margin_note,
                 "inline": False
             })
+
+    # trade_trackerが新規エントリー時に確定させたポジションサイジングのpair→値マップ
+    # （2026-07-20追加、下記シグナルループでの二重計算防止用）
+    _newly_opened_sizing = {
+        t.get("pair"): t.get("position_sizing")
+        for t in (trade_update or {}).get("newly_opened", [])
+        if t.get("position_sizing")
+    }
 
     # 各シグナル
     for r in newly:
@@ -864,6 +919,22 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results,
                     f"+ トレール{staged.get('trail_atr_mult','3.0')}×ATR\n"
                     f"🎯理論最大: {fmt_price(_p, staged.get('max_target'))} (参考のみ)\n"
                 )
+                # 💰 ポジションサイジング（2026-07-20追加、シミュレーション口座連動）
+                # trade_trackerが新規エントリー時に既に確定させた値があればそれを使う
+                # （ここで再計算すると、既存ポジション控除後の証拠金余力を二重減算する
+                # おそれがあるため）。無い場合（例: ★4→5昇格などtrade_tracker側で
+                # 新規記録されていないケース）のみ、現在のopen_tradesを渡して見積もる。
+                _sizing = _newly_opened_sizing.get(_p)
+                if _sizing is None and latest_pairs is not None and staged.get("sl") is not None:
+                    _sizing = calc_position_size(
+                        _p, r.get("price"), staged.get("sl"), PAIR_API, latest_pairs,
+                        open_trades=open_trades,
+                    )
+                if _sizing:
+                    if _sizing.get("tradable"):
+                        value += f"💰 推奨ロット: {_sizing['note']}\n"
+                    else:
+                        value += f"💰 {_sizing.get('note', '取引不可')}\n"
             else:
                 # 旧方式（後方互換）
                 value += (
@@ -1751,6 +1822,22 @@ def main():
             elif r.get("spread_caution"):
                 print(f"         └─ {r.get('spread_caution_reason', '')}")
 
+            # 🕐 セッションフィルタ（2026-07-20追加）
+            # London単独枠(08-13 UTC)は実データで決着勝率11.1%(n=9)と最弱 → ★≤2
+            r = apply_session_filter(r, now)
+            if r.get("session_filter_applied"):
+                print(f"         └─ {r.get('session_filter_reason', '')}")
+            elif r.get("session_caution"):
+                print(f"         └─ {r.get('session_caution_reason', '')}")
+
+            # 📅 季節性フィルタ（2026-07-20追加）
+            # AUDJPY LONGは8月が過去20-24年で最弱の月(下落率70%) → ★≤3
+            r = apply_seasonal_filter(r, now)
+            if r.get("seasonal_filter_applied"):
+                print(f"         └─ {r.get('seasonal_filter_reason', '')}")
+            elif r.get("seasonal_caution"):
+                print(f"         └─ {r.get('seasonal_caution_reason', '')}")
+
             # 🏦 CB会合ブラックアウト（2026-06-16追加）
             cb_blackout = check_cb_meeting_blackout(pair, cb_rates, now)
             r["cb_meeting_blackout"] = cb_blackout
@@ -1840,21 +1927,25 @@ def main():
 
     # ⑦ トレードのライフサイクル管理（通知の前に実行して情報を取得）
     from modules.trade_tracker import load_open_trades
-    trade_update = update_trades(results, now)
+    trade_update = update_trades(results, now, PAIR_API, latest["pairs"])
     if trade_update["newly_opened"]:
         print(f"\n[TRADE] 新規エントリー {len(trade_update['newly_opened'])}件:")
         for t in trade_update["newly_opened"]:
             _p = t.get("pair", "")
             print(f"  + {_p} {t['direction']} @ {fmt_price(_p, t['entry_price'])} "
                   f"(SL:{fmt_price(_p, t.get('sl'))} TP1:{fmt_price(_p, t.get('tp1'))})")
+            sizing = t.get("position_sizing") or {}
+            if sizing:
+                print(f"    💰 {sizing.get('note', '')}")
     if trade_update["newly_closed"]:
         print(f"[TRADE] 決済 {len(trade_update['newly_closed'])}件:")
         for t in trade_update["newly_closed"]:
             _p = t.get("pair", "")
             _d = pair_decimals(_p)
+            pnl_note = f" 損益¥{t['pnl_jpy']:+.0f}" if "pnl_jpy" in t else ""
             print(f"  - {_p} {t['direction']} {t['result']} "
                   f"({t['exit_reason']}) {t.get('pips',0):+.{_d}f} "
-                  f"保有{t.get('hold_hours',0)}h")
+                  f"保有{t.get('hold_hours',0)}h{pnl_note}")
     print(f"[TRADE] 現在保有中: {trade_update['still_open']}件")
     open_trades = load_open_trades()
 
@@ -1922,6 +2013,7 @@ def main():
             ai_commentary=ai_commentary,
             ambush_alerts=None,
             rate_warnings=rate_consistency.get("warnings"),
+            latest_pairs=latest["pairs"],
         )
         send_email(
             os.environ.get("SMTP_HOST", "smtp.gmail.com"),

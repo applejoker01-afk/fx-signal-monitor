@@ -27,6 +27,8 @@ import json
 import os
 from datetime import datetime, timezone
 
+from modules.position_sizing import calc_position_size, pnl_to_jpy, record_trade_pnl
+
 
 OPEN_TRADES_FILE = "data/open_trades.json"
 CLOSED_TRADES_FILE = "data/closed_trades.jsonl"
@@ -295,13 +297,21 @@ def check_exit_condition(trade: dict, current_price: float,
     }
 
 
-def update_trades(results: list, now: datetime) -> dict:
+def update_trades(results: list, now: datetime,
+                   pair_api: dict = None, latest_pairs: dict = None) -> dict:
     """
     毎時スキャン時に呼ぶメイン関数。
 
     1. 既存の保有トレードの決済判定
     2. 新規エントリーの記録
     3. ファイル保存
+
+    pair_api / latest_pairs を渡すと、2026-07-20追加のシミュレーション口座
+    （data/virtual_account.json）と連動したポジションサイジングを行う:
+      - 新規エントリー時: 仮想残高・リスク許容度・SL値幅から推奨ロット数(units)を
+        計算しtradeに記録する。
+      - 決済時: units × 損益(円換算)をvirtual_accountのcurrent_balanceに反映する。
+    どちらも省略した場合はポジションサイジングを行わない（後方互換）。
 
     Returns:
         {
@@ -369,6 +379,16 @@ def update_trades(results: list, now: datetime) -> dict:
                 "hold_hours": _hours_between(trade["entry_time"], now),
                 **exit_info,
             }
+            # シミュレーション口座残高へ反映（2026-07-20追加）
+            # units（新規エントリー時にサイジング済み）が無いトレード（機能追加前の
+            # 既存ポジション等）はスキップし、残高は変動させない。
+            units = trade.get("units")
+            if units and pair_api is not None and latest_pairs is not None:
+                pnl_per_unit = pnl_to_jpy(pair, pair_api, exit_info.get("pips", 0), latest_pairs)
+                if pnl_per_unit is not None:
+                    pnl_jpy = round(units * pnl_per_unit, 0)
+                    closed["pnl_jpy"] = pnl_jpy
+                    record_trade_pnl(pnl_jpy)
             append_closed_trade(closed)
             newly_closed.append(closed)
             pairs_to_close.append(pair)
@@ -424,6 +444,20 @@ def update_trades(results: list, now: datetime) -> dict:
                 "fa_rate_diff": r.get("fa_rate_diff"),
                 "regime": r.get("volatility_regime", {}).get("regime"),
             }
+
+            # ポジションサイジング（2026-07-20追加、シミュレーション口座連動）
+            # open_trades（この時点でのメモリ上の状態）を明示的に渡すことで、
+            # 同一スキャンサイクル内で複数ペアが同時に新規シグナルを出した場合でも、
+            # 先に処理されたペアの証拠金を後続ペアの余力計算に正しく反映させる。
+            if pair_api is not None and latest_pairs is not None and initial_sl is not None:
+                sizing = calc_position_size(
+                    pair, entry_price, initial_sl, pair_api, latest_pairs,
+                    open_trades=open_trades,
+                )
+                trade["position_sizing"] = sizing
+                if sizing.get("tradable"):
+                    trade["units"] = sizing["units"]
+
             open_trades[pair] = trade
             newly_opened.append(trade)
 

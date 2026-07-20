@@ -1,6 +1,6 @@
 {
-  "last_updated": "2026-07-12",
-  "notes": "中央銀行会合のたびに手動更新する。stance は tighten/neutral/ease のいずれか。rate_momentum は accelerating/decelerating/peak/trough/stable のいずれか（金利サイクルの勢い）。FRED API + Finnhub API 設定済みなら週次自動更新される。",
+  "last_updated": "2026-07-20",
+  "notes": "中央銀行会合のたびに手動更新する。stance は tighten/neutral/ease のいずれか。rate_momentum は accelerating/decelerating/peak/trough/stable のいずれか（金利サイクルの勢い）。FRED API + Finnhub API 設定済みなら週次自動更新される。 2026-07-20: SBI証券取扱ペア拡張に伴いSEK/NOK/BRL/PLN/KRWを追加（Web検証、各中銀公式発表ベース）。FRED自動取得の対象外のため、定期autoresearchでの更新運用に切り替え予定。 2026-07-20: AUD/NZDのstance誤り(ease→正しくはpause/tighten)を訂正。旧データは実際には発生していない利下げを前提としていた。既存ロジック(apply_boj_cycle_directional_filter, compute_fa_score)への影響はwiki側に記録。",
   "data_source": "BIS + 各国中央銀行公式発表 + Web検証 (2026-06-11)",
   "verification_source": {
     "USD": "FRB 2026-06 (target range 3.5-4.0%; higher-for-longer pause; 次回会合 6/18 に据え置き濃厚)",
@@ -50,20 +50,20 @@
       "cb_note": "MPC データ依存。インフレ鈍化でeaseへの転換を検討中だが確認できず中立維持。"
     },
     "AUD": {
-      "rate": 4.1,
-      "next_meeting": "2026-07-08",
-      "stance": "ease",
+      "rate": 4.35,
+      "next_meeting": "2026-08-11",
+      "stance": "pause",
       "rate_momentum": "stable",
       "cb_name": "RBA",
-      "cb_note": "2026-06-03に4.35%→4.10%へ引き下げ。インフレ目標回帰受けてease転換。"
+      "cb_note": "2026-07-20訂正: 旧データは「6/3に4.35%→4.10%へ利下げ・ease転換」と誤記されていた（実際にはそのような利下げは発生していない）。正しくは2026年H1に3回連続利上げで4.35%に到達し、6月会合(6/16)で据え置き決定。3回連続利上げ後の一時停止であり、追加利上げの可能性を否定する材料は確認できていないため stance=pause（tightenではなくease方向でもない）とする。次回会合2026-08-11。"
     },
     "NZD": {
-      "rate": 3.25,
-      "next_meeting": "2026-07-09",
-      "stance": "ease",
-      "rate_momentum": "decelerating",
+      "rate": 2.5,
+      "next_meeting": "2026-09-02",
+      "stance": "tighten",
+      "rate_momentum": "accelerating",
       "cb_name": "RBNZ",
-      "cb_note": "利下げサイクル後半。3.00%付近で一時停止の可能性。"
+      "cb_note": "2026-07-20訂正: 旧データは「利下げサイクル後半・3.00%付近で一時停止の可能性」と誤記されていた（実際には利下げではなく利上げに転換している）。2026-05-27会合は2.25%で据え置き（僅差）、2026-07-08会合で+25bp利上げ→2.50%。3年ぶりの利上げでMPC全会一致。RBNZは「今後の会合でも追加利上げの可能性が高い」とガイダンス、アナリストは2026年末までにOCR約3.00%（9月・12月にあと2回の0.25%利上げ）を予想。次回会合2026-09-02。"
     },
     "CAD": {
       "rate": 2.75,
@@ -136,6 +136,46 @@
       "rate_momentum": "stable",
       "cb_name": "RBI",
       "cb_note": "成長支援のため緩和バイアス。"
+    },
+    "SEK": {
+      "rate": 2.0,
+      "next_meeting": "2026-08-20",
+      "stance": "tighten",
+      "rate_momentum": "accelerating",
+      "cb_name": "Riksbank",
+      "cb_note": "2026年6月まで1.75%を据え置いていたが、中東情勢由来のインフレ懸念を受け2026年7月に2.00%へ利上げ。2026年後半インフレ予想は下方修正(0.6%)も2027年は上方修正(2.7%)。"
+    },
+    "NOK": {
+      "rate": 4.25,
+      "next_meeting": "2026-08-13",
+      "stance": "pause",
+      "rate_momentum": "stable",
+      "cb_name": "Norges Bank",
+      "cb_note": "2026年5月に4.00%→4.25%へ利上げ、6月会合は据え置き。政策金利見通しは2026年末にかけて4.5%超えを示唆——一時停止だが追加利上げバイアス残る。"
+    },
+    "BRL": {
+      "rate": 14.25,
+      "next_meeting": "2026-08-04",
+      "stance": "ease",
+      "rate_momentum": "decelerating",
+      "cb_name": "BCB (Copom)",
+      "cb_note": "2026年3月のピーク15.00%から3会合連続0.25%利下げで14.25%（2026年6月時点）。積極引き締めの反動で慎重な利下げサイクルだが、インフレはなお目標(3%)を上回る約4.7%——利下げペースは緩やか。"
+    },
+    "PLN": {
+      "rate": 3.75,
+      "next_meeting": null,
+      "stance": "neutral",
+      "rate_momentum": "stable",
+      "cb_name": "NBP",
+      "cb_note": "2026年7月会合まで4会合連続で3.75%据え置き（2022年以来の最低水準）。6月インフレは2.5%に鈍化し目標レンジ中央值——様子見(wait-and-see)姿勢。次回会合日程は未確認。"
+    },
+    "KRW": {
+      "rate": 2.75,
+      "next_meeting": null,
+      "stance": "tighten",
+      "rate_momentum": "accelerating",
+      "cb_name": "Bank of Korea",
+      "cb_note": "2026年7月16日、2.50%→2.75%へ利上げ。2023年1月以来3.5年ぶりの利上げで新たな引き締めサイクル開始。6月消費者物価上昇率3.2%（目標2%超）・ウォン安・家計信用拡大が背景。全会一致決定。次回会合日程は未確認。"
     }
   },
   "warning": "JPYは2026-06-17の日銀会合で利上げ確実視。会合後に rate=1.0, rate_momentum='peak'? に更新すること。",

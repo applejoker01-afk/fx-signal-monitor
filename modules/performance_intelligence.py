@@ -29,14 +29,24 @@ PAIR_EXCLUDE = frozenset([
 
 # 静的★調整: バックテスト勝率が明確に良/悪で、closed_tradesが少ない段階でも反映
 # 値は adjustment (整数 or 0.5刻み)。build_pair_performance_mapの実績値とマージ
+#
+# 2026-07-20 autoresearch追記: AUDJPYの静的+1調整は2026-06-09の180日バックテスト
+# （72.2%勝率）に基づくが、その後の実運用71件（2026-06-01〜07-02）ではAUDJPY実績は
+# 5戦1勝3敗1分（勝率20%、-89.4pips）と大きく乖離。しかも5件全てがLONGで、
+# 「LONGはBOJサイクルフィルタでブロック済み」という想定と異なりLONGシグナルが
+# ★4-5で通過していた（該当フィルタは2026-06-19導入・これらのトレードの一部は
+# それ以前）。バックテストの想定と実運用実績が乖離しているため adjustment を
+# +1→+0.5 に引き下げ、build_pair_performance_map による動的な実績評価
+# （min_trades=5で既にAUDJPYは対象、実績が悪ければ自動的に負の調整が乗る）
+# に判断をより委ねる。詳細: wiki/finance/fx-signal-monitor-nzd-aud-improvement-plan.md
 PAIR_STATIC_BASELINE = {
     # 🏆 主力ペア昇格（76.9%勝率）
     "SGDJPY": {"adjustment": +1,  "note": "主力ペア(実証76.9%)"},
     "EURAUD": {"adjustment": +1,  "note": "主力ペア(実証76.9%)"},
-    # ✅ 好成績維持（69-72%）
-    # AUDJPY: +1はSHORT方向のみ有効。LONG方向は apply_boj_cycle_directional_filter が
-    # AUD(ease/stable) + JPY(pause) の組み合わせで NO_TRADE にハードブロック済み（2026-07-02確認）
-    "AUDJPY": {"adjustment": +1,  "note": "好成績(実証72.2%) ※LONGはBOJサイクルフィルタでブロック済み"},
+    # ⚠️ 静的ベースラインを引き下げ（2026-07-20、旧+1から変更）
+    # AUDJPY: バックテスト(72.2%)と実運用71件(20%・全てLONG)が乖離。
+    # 動的な build_pair_performance_map の実績評価に判断の重みを移す。
+    "AUDJPY": {"adjustment": +0.5, "note": "バックテスト72.2%だが実運用71件は20%(1W/3L/1E)に乖離・要監視"},
     "GBPJPY": {"adjustment": +1,  "note": "好成績(実証69.2%)"},
     # ❌ 慢性不振ペア（40%以下）→ PAIR_EXCLUDEに移動（ハードブロック）
     # "EURUSD": {"adjustment": -1,  "note": "不振ペア(実証40.0%)"},  # 除外済み
@@ -308,6 +318,115 @@ def apply_spread_filter(result: dict) -> dict:
                 f"💸 スプレッド広め: {pair} spread={spread_pips:.1f}pips "
                 f"({ratio*100:.0f}% of ATR)。実効RR 1:{rr_eff}"
             )
+
+    return result
+
+
+# ============================================================
+# 🕐 セッションフィルタ（2026-07-20追加）
+# autoresearch: wiki/finance/fx-signal-monitor-nzd-aud-improvement-plan.md
+# closed_trades.jsonl 71件をUTCセッション区分で実集計した結果、
+# 「Londonセッション単独（08-13 UTC）」が全ペア共通で決着勝率11.1%(n=9)と
+# 際立って悪いことが判明。Tokyo(00-08 UTC)も-271.6pipsと不振だが決着勝率
+# 自体は42.9%と極端ではないため、閾値超過が明確なLondon単独枠のみを対象とする。
+# ============================================================
+
+_LONDON_ONLY_START_HOUR = 8   # UTC
+_LONDON_ONLY_END_HOUR = 13    # UTC (exclusive)
+
+
+def apply_session_filter(result: dict, now) -> dict:
+    """
+    Londonセッション単独（08-13 UTC、日本時間17-22時）でのシグナルを降格する。
+
+    実データ根拠（closed_trades.jsonl 71件、2026-07-20実データ検証）:
+      London単独(08-13 UTC): n=9, 決着勝率11.1%, 合計-170.4pips（全区分中最悪）
+      比較) Overlap(13-17 UTC): 56.2% / NY(17-22 UTC): 57.1%
+
+    効果: ★≤2 に抑制（実質エントリー禁止。stars>=4のみが実取引される設計のため）。
+    サンプルはn=9とやや小さいため、NO_TRADEへのハードブロックではなく
+    ★上限による降格に留める（他フィルタのVIX panicほど強くしない）。
+    """
+    from datetime import timezone as _tz
+
+    if now is None:
+        return result
+
+    hour = now.astimezone(_tz.utc).hour if now.tzinfo else now.hour
+    if not (_LONDON_ONLY_START_HOUR <= hour < _LONDON_ONLY_END_HOUR):
+        return result
+
+    pair = result.get("pair", "")
+    original_stars = result.get("stars", 1)
+    new_stars = min(2, original_stars)
+    if new_stars != original_stars:
+        result["stars"] = new_stars
+        result["session_filter_applied"] = True
+        result["session_filter_reason"] = (
+            f"🕐 セッションフィルタ: {pair} London単独枠({hour:02d}:00 UTC, 08-13 UTC) — "
+            f"実データで決着勝率11.1%(n=9)と最弱の時間帯。★{original_stars}→★{new_stars}降格。"
+        )
+    else:
+        result["session_caution"] = True
+        result["session_caution_reason"] = (
+            f"🕐 London単独枠({hour:02d}:00 UTC) — 実データ最弱の時間帯"
+        )
+
+    return result
+
+
+# ============================================================
+# 📅 季節性フィルタ（2026-07-20追加）
+# autoresearch: wiki/finance/nzdjpy-audjpy-pair-specific-analysis.md
+# AUDJPYは過去20-24年で8月が最弱の月（平均-1.58〜-1.66%、下落率70%、
+# 夏季リスク選好低下+円安全資産フロー）と複数ソースで確認（seasonax.com）。
+# NZDJPYは直接データ未確認のため対象外（推測で適用しない）。
+# ============================================================
+
+_AUDJPY_WEAK_MONTH = 8  # August
+
+
+def apply_seasonal_filter(result: dict, now) -> dict:
+    """
+    AUDJPYの8月季節性弱含みをLONGシグナルの確信度に反映する。
+
+    実証根拠（seasonax.com, 過去20-24年統計）:
+      8月平均リターン: -1.58%〜-1.66%
+      下落確率: 70%（20年間）
+      最大下落: 2007年8月-8.38%、2008年8月-6.25%（ともにリスクオフ局面）
+
+    NZDJPYは同種データを未確認のため対象外。
+    SHORTシグナルは季節性と方向が一致するため対象外（降格しない）。
+    効果: ★≤3 上限（ハードブロックではなく、テクニカル・金利差など他要因との
+    総合判断の余地を残す中程度の警告）。
+    """
+    if now is None:
+        return result
+
+    pair = result.get("pair", "")
+    direction = result.get("direction", "")
+
+    if pair != "AUDJPY" or "LONG" not in direction:
+        return result
+
+    month = now.month
+    if month != _AUDJPY_WEAK_MONTH:
+        return result
+
+    original_stars = result.get("stars", 1)
+    new_stars = min(3, original_stars)
+    if new_stars != original_stars:
+        result["stars"] = new_stars
+        result["seasonal_filter_applied"] = True
+        result["seasonal_filter_reason"] = (
+            f"📅 季節性フィルタ: AUDJPY 8月は過去20-24年で最弱の月"
+            f"(平均-1.58〜-1.66%, 下落率70%) — LONGを★{original_stars}→★{new_stars}降格。"
+        )
+    else:
+        result["seasonal_caution"] = True
+        result["seasonal_caution_reason"] = (
+            "📅 AUDJPY 8月は季節的に弱含みやすい時期（過去20-24年で下落率70%）"
+        )
 
     return result
 
