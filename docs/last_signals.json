@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-21T06:34:56.286219+00:00",
+  "timestamp": "2026-07-21T06:36:18.225661+00:00",
   "signals": {
     "USDJPY": 5,
     "EURJPY": 4,
@@ -19,7 +19,7 @@
     "EURAUD": 2,
     "SEKJPY": 2,
     "NOKJPY": 2,
-    "BRLJPY": 1,
+    "BRLJPY": 2,
     "PLNJPY": 2,
     "KRWJPY": 2,
     "GBPAUD": 2,
@@ -28,7 +28,7 @@
     "EURCHF": 2,
     "AUDNZD": 2,
     "EURNZD": 2,
-    "USDCNY": 1
+    "USDCNY": 2
   },
   "results": [
     {
@@ -262,7 +262,7 @@
         "context": "やや強い通貨 vs 弱め（ロング寄り）",
         "bias": "slight_long"
       },
-      "ai_exit_advice": "【現状整理】\nファンダメンタルズは日米金利差（+2.75%）を背景にドル高優勢（FA76."
+      "ai_exit_advice": "1. **現状整理**\n現在ドル円のロングポジションを保有中で、ADX6.1とテクニカル面では強いレンジ相場を示唆しています。"
     },
     {
       "pair": "EURJPY",
@@ -486,8 +486,7 @@
         "spread": 4.7,
         "context": "通貨強弱が拮抗（中立）",
         "bias": "neutral"
-      },
-      "ai_exit_advice": "【現状整理】\nEURJPYは金利差+1.40%やEURの回復サイクル（trough）が下支えする一方、足元は"
+      }
     },
     {
       "pair": "GBPJPY",
@@ -643,8 +642,7 @@
         "spread": 54.0,
         "context": "強い通貨 vs 弱い通貨（ロング有利）",
         "bias": "long"
-      },
-      "ai_exit_advice": "### 1. 現状整理\nGBPJPYはADX45.4が示す強いトレンド相場にあり、日英金利差（+2.75%）やGBPの強さを示すファンダメンタルズも買い手に有利な状況です。\n\n### 2. 利益を伸ばす選択肢\n* **A) トレール注文への切り替えによる利益極大化**\n  * **狙い**: 強いトレンドを活かし、固定TP（利"
+      }
     },
     {
       "pair": "AUDJPY",
@@ -1418,35 +1416,6 @@
       "verdict": "🔻 BOJサイクルフィルタ: CNY(PBOC ease/stable) + JPY(日銀 pause) = LONGはダブル逆風",
       "direction": "NO_TRADE",
       "pair_type": "emerging_market",
-      "geopolitical_risk": {
-        "risk_level": "medium",
-        "risk_score": 42,
-        "reason": "political_instability: protest / geopolitical: sanction",
-        "recent_news": [
-          "\"China (election OR protest OR crisis OR sanction OR \"central bank\" OR geopolitics)\" - Google News",
-          "Google News",
-          "Fact-checking Trump's address on China, the 2020 election and what documents show - PBS",
-          "Trump stretches declassified China intelligence into broader 2020 election claims - Nextgov/FCW"
-        ],
-        "categories": {
-          "political_instability": {
-            "score": 15,
-            "hits": [
-              "protest"
-            ]
-          },
-          "geopolitical": {
-            "score": 12,
-            "hits": [
-              "sanction"
-            ]
-          }
-        },
-        "country": "China",
-        "news_volume": 8
-      },
-      "original_stars": 4,
-      "risk_adjustment": -42,
       "upcoming_events": [],
       "volatility_regime": {
         "regime": "normal",
@@ -1602,38 +1571,9 @@
       "fa_rate_diff": 8.0,
       "fa_detail": "Banxico(9.00% ease/decelerating) vs 日銀(1.00% pause/peak) 差+8.00% / MXNサイクル強化(decelerating)",
       "stars": 2,
-      "verdict": "⚠ 地政学リスク(medium)考慮 ◎ 高信頼ロング",
+      "verdict": "◎ 高信頼ロング",
       "direction": "LONG",
       "pair_type": "emerging_market",
-      "geopolitical_risk": {
-        "risk_level": "medium",
-        "risk_score": 42,
-        "reason": "political_instability: protest / geopolitical: sanction",
-        "recent_news": [
-          "\"Mexico (election OR protest OR crisis OR sanction OR \"central bank\" OR geopolitics)\" - Google News",
-          "Google News",
-          "How Mexico’s Sargassum Crisis Is Affecting Tourism - TravelAge West",
-          "Mexico’s cattle ranchers fear screwworm crisis could permanently reshape cross-border trade - Texas Public Radio | TPR"
-        ],
-        "categories": {
-          "political_instability": {
-            "score": 15,
-            "hits": [
-              "protest"
-            ]
-          },
-          "geopolitical": {
-            "score": 12,
-            "hits": [
-              "sanction"
-            ]
-          }
-        },
-        "country": "Mexico",
-        "news_volume": 8
-      },
-      "original_stars": 5,
-      "risk_adjustment": -42,
       "upcoming_events": [],
       "volatility_regime": {
         "regime": "normal",
@@ -1780,8 +1720,12 @@
         ],
         "message": "ピボットPP（9.29）に接近 あと0.07% → 反落でのショート候補"
       },
+      "high_confidence_zone": false,
+      "ambush_quality": "注意（シグナルとPOIが逆方向）",
       "regime_filter_applied": true,
       "regime_filter_reason": "⚠️ BOJサイクル軽警告: MXN(Banxico ease/decelerating) + JPY(日銀 pause) = LONG方向注意",
+      "spread_filter_applied": true,
+      "spread_filter_reason": "💸 スプレッド致命的: MXNJPY spread=4.5pips (173% of ATR) — 実効RR 1:0.5→1:0.16 に劣化。取引非推奨で★4→★2降格。",
       "cb_meeting_blackout": {
         "active": false,
         "severity": "none",
@@ -1825,38 +1769,9 @@
       "fa_rate_diff": 6.25,
       "fa_detail": "SARB(7.25% neutral/stable) vs 日銀(1.00% pause/peak) 差+6.25% / ZARサイクル強化(stable)",
       "stars": 2,
-      "verdict": "⚠ 地政学リスク(medium)考慮 ○ ロング条件成立",
+      "verdict": "○ ロング条件成立",
       "direction": "LONG",
       "pair_type": "emerging_market",
-      "geopolitical_risk": {
-        "risk_level": "medium",
-        "risk_score": 42,
-        "reason": "political_instability: protest / geopolitical: sanction",
-        "recent_news": [
-          "\"South Africa (election OR protest OR crisis OR sanction OR \"central bank\" OR geopolitics)\" - Google News",
-          "Google News",
-          "“None Of the Above” Would Win a South African Election - The Common Sense",
-          "South Africa’s anti-migrant protests are back - GIS Reports"
-        ],
-        "categories": {
-          "political_instability": {
-            "score": 15,
-            "hits": [
-              "protest"
-            ]
-          },
-          "geopolitical": {
-            "score": 12,
-            "hits": [
-              "sanction"
-            ]
-          }
-        },
-        "country": "South Africa",
-        "news_volume": 8
-      },
-      "original_stars": 4,
-      "risk_adjustment": -42,
       "upcoming_events": [],
       "volatility_regime": {
         "regime": "normal",
@@ -2023,6 +1938,10 @@
         ],
         "message": "弱いレジスタンス（9.859）に接近 あと0.11% → 反落でのショート候補"
       },
+      "high_confidence_zone": false,
+      "ambush_quality": "注意（シグナルとPOIが逆方向）",
+      "spread_filter_applied": true,
+      "spread_filter_reason": "💸 スプレッド致命的: ZARJPY spread=9.0pips (243% of ATR) — 実効RR 1:0.5→1:0.07 に劣化。取引非推奨で★4→★2降格。",
       "cb_meeting_blackout": {
         "active": false,
         "severity": "none",
@@ -3569,39 +3488,10 @@
       "fa_direction": "neutral",
       "fa_rate_diff": null,
       "fa_detail": "金利データ取得失敗",
-      "stars": 1,
-      "verdict": "⚠ 地政学リスク(medium)考慮 △ 弱シグナル",
+      "stars": 2,
+      "verdict": "△ 弱シグナル",
       "direction": "LIGHT_LONG",
       "pair_type": "major",
-      "geopolitical_risk": {
-        "risk_level": "medium",
-        "risk_score": 42,
-        "reason": "political_instability: protest / geopolitical: sanction",
-        "recent_news": [
-          "\"Brazil (election OR protest OR crisis OR sanction OR \"central bank\" OR geopolitics)\" - Google News",
-          "Google News",
-          "Brazil faces unforgiving economics after election - Financial Times",
-          "Nubank Strengthens Its Brazil Operation With a New Banking License - Yahoo Finance Singapore"
-        ],
-        "categories": {
-          "political_instability": {
-            "score": 15,
-            "hits": [
-              "protest"
-            ]
-          },
-          "geopolitical": {
-            "score": 12,
-            "hits": [
-              "sanction"
-            ]
-          }
-        },
-        "country": "Brazil",
-        "news_volume": 8
-      },
-      "original_stars": 2,
-      "risk_adjustment": -42,
       "upcoming_events": [],
       "volatility_regime": {
         "regime": "normal",
@@ -4637,7 +4527,7 @@
           "name": "ECB Interest Rate Decision",
           "currency": "EUR",
           "importance": "critical",
-          "hours_until": 53.7,
+          "hours_until": 53.6,
           "date": "2026-07-23T12:15:00Z"
         }
       ],
@@ -5051,7 +4941,7 @@
           "name": "ECB Interest Rate Decision",
           "currency": "EUR",
           "importance": "critical",
-          "hours_until": 53.7,
+          "hours_until": 53.6,
           "date": "2026-07-23T12:15:00Z"
         }
       ],
@@ -5212,39 +5102,10 @@
       "fa_direction": "neutral",
       "fa_rate_diff": 0.75,
       "fa_detail": "FRB(3.75% neutral/stable) vs PBOC(3.00% ease/stable) 差+0.75%",
-      "stars": 1,
-      "verdict": "⚠ 地政学リスク(medium)考慮 △ 弱シグナル",
+      "stars": 2,
+      "verdict": "△ 弱シグナル",
       "direction": "LIGHT_SHORT",
       "pair_type": "dollar",
-      "geopolitical_risk": {
-        "risk_level": "medium",
-        "risk_score": 42,
-        "reason": "political_instability: protest / geopolitical: sanction",
-        "recent_news": [
-          "\"China (election OR protest OR crisis OR sanction OR \"central bank\" OR geopolitics)\" - Google News",
-          "Google News",
-          "Fact-checking Trump's address on China, the 2020 election and what documents show - PBS",
-          "Trump stretches declassified China intelligence into broader 2020 election claims - Nextgov/FCW"
-        ],
-        "categories": {
-          "political_instability": {
-            "score": 15,
-            "hits": [
-              "protest"
-            ]
-          },
-          "geopolitical": {
-            "score": 12,
-            "hits": [
-              "sanction"
-            ]
-          }
-        },
-        "country": "China",
-        "news_volume": 8
-      },
-      "original_stars": 2,
-      "risk_adjustment": -42,
       "upcoming_events": [],
       "volatility_regime": {
         "regime": "normal",
@@ -5396,8 +5257,8 @@
     "dxy_trend": "flat",
     "us10y": 4.598,
     "bond_pressure": "elevated",
-    "gold": 4078.0,
-    "gold_20d_avg": 4062.47,
+    "gold": 4078.1,
+    "gold_20d_avg": 4062.51,
     "gold_trend": "flat",
     "risk_mode": "normal"
   },
