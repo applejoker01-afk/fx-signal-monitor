@@ -35,15 +35,27 @@ th{background:rgba(212,165,116,0.1);color:var(--gold);font-weight:600;}
   <a href="./rates.html" class="active">💴 金利モニター</a>
 </nav>
 <h1>💴 金利モニター</h1>
-<div class="sub">中央銀行政策金利（FRED自動取得）· stance矛盾検知 · 2026-07-21 09:51:37 時点</div>
-<div class="ok-banner">✅ 金利スタンスに矛盾は検知されていません</div>
+<div class="sub">中央銀行政策金利（FRED自動取得）· stance矛盾検知 · 2026-07-21 10:11:50 時点</div>
+
+        <div class="warn-banner">
+          <div class="warn-title">🔴 stance（金利スタンス）の見直しが必要です（1件）</div>
+          <div class="warn-item">⚠ RBNZ(NZD): 金利が3.25%→2.5%に低下したのに stance=tighten（利上げ中）。利下げ転換の可能性。stanceの見直しを。</div>
+          <div class="warn-note">data/central_bank_rates.json の stance を更新してください。</div>
+        </div>
 <table>
   <thead><tr><th>通貨</th><th>中央銀行</th><th>政策金利</th><th>スタンス</th><th>取得元</th></tr></thead>
   <tbody>
         <tr class="">
           <td class="ccy">AUD </td>
           <td>RBA</td>
-          <td class="rate-val">4.10%</td>
+          <td class="rate-val">4.35%</td>
+          <td style="color:#9ca3af;">pause</td>
+          <td class="src">手動</td>
+        </tr>
+        <tr class="">
+          <td class="ccy">BRL </td>
+          <td>BCB (Copom)</td>
+          <td class="rate-val">14.25%</td>
           <td style="color:#f87171;">利下げ</td>
           <td class="src">手動</td>
         </tr>
@@ -104,6 +116,13 @@ th{background:rgba(212,165,116,0.1);color:var(--gold);font-weight:600;}
           <td class="src">手動</td>
         </tr>
         <tr class="">
+          <td class="ccy">KRW </td>
+          <td>Bank of Korea</td>
+          <td class="rate-val">2.75%</td>
+          <td style="color:#4ade80;">利上げ</td>
+          <td class="src">手動</td>
+        </tr>
+        <tr class="">
           <td class="ccy">MXN </td>
           <td>Banxico</td>
           <td class="rate-val">9.00%</td>
@@ -111,10 +130,31 @@ th{background:rgba(212,165,116,0.1);color:var(--gold);font-weight:600;}
           <td class="src">手動</td>
         </tr>
         <tr class="">
-          <td class="ccy">NZD </td>
+          <td class="ccy">NOK </td>
+          <td>Norges Bank</td>
+          <td class="rate-val">4.25%</td>
+          <td style="color:#9ca3af;">pause</td>
+          <td class="src">手動</td>
+        </tr>
+        <tr class="warn-row">
+          <td class="ccy">NZD 🔴</td>
           <td>RBNZ</td>
-          <td class="rate-val">3.25%</td>
-          <td style="color:#f87171;">利下げ</td>
+          <td class="rate-warn">2.50%</td>
+          <td style="color:#4ade80;">利上げ</td>
+          <td class="src">手動</td>
+        </tr>
+        <tr class="">
+          <td class="ccy">PLN </td>
+          <td>NBP</td>
+          <td class="rate-val">3.75%</td>
+          <td style="color:#9ca3af;">中立</td>
+          <td class="src">手動</td>
+        </tr>
+        <tr class="">
+          <td class="ccy">SEK </td>
+          <td>Riksbank</td>
+          <td class="rate-val">2.00%</td>
+          <td style="color:#4ade80;">利上げ</td>
           <td class="src">手動</td>
         </tr>
         <tr class="">
