@@ -1054,7 +1054,7 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results,
         return False
 
 
-def send_discord_pending(webhook_url, newly_created, newly_filled, expired):
+def send_discord_pending(webhook_url, newly_created, newly_filled, expired, heartbeat=None):
     """
     指値待機シグナル専用のDiscord通知（2026-07-20追加）。
     1日3回（07:00/13:00/21:00 JST）の指値スキャンでの新規登録、
@@ -1062,10 +1062,15 @@ def send_discord_pending(webhook_url, newly_created, newly_filled, expired):
     newly_created: {pair: order} — 今回の指値スキャンで新規登録した注文
     newly_filled:  [trade, ...]   — 今回約定してopen_tradesへ追加されたトレード
     expired:       {pair: order} — 有効期限切れで削除された注文
+    heartbeat: {open_count, pending_count} または None（2026-07-21追加）。
+      3件とも0件のとき、Noneなら何も送らず「本当に動いているか」が外から
+      分からなくなるため、limitモード（1日3回）呼び出し時のみ渡し、
+      短い「変化なし」メッセージを送って死活監視を兼ねる。
     """
     if not webhook_url:
         return False
-    if not (newly_created or newly_filled or expired):
+    has_update = bool(newly_created or newly_filled or expired)
+    if not has_update and heartbeat is None:
         return False
 
     jst = datetime.now(timezone.utc) + timedelta(hours=9)
@@ -1123,12 +1128,24 @@ def send_discord_pending(webhook_url, newly_created, newly_filled, expired):
             "inline": False,
         })
 
-    embed = {
-        "title": "📌 指値待機シグナル アップデート",
-        "description": f"更新: {timestamp}",
-        "color": 0x60A5FA,
-        "fields": fields,
-    }
+    if has_update:
+        embed = {
+            "title": "📌 指値待機シグナル アップデート",
+            "description": f"更新: {timestamp}",
+            "color": 0x60A5FA,
+            "fields": fields,
+        }
+    else:
+        embed = {
+            "title": "📌 指値待機シグナル（定期チェック・変化なし）",
+            "description": (
+                f"更新: {timestamp}\n"
+                f"新規シグナル・約定・失効なし。ワークフローは正常稼働中です。\n"
+                f"保有中ポジション: {heartbeat.get('open_count', 0)}件 / "
+                f"指値待機中: {heartbeat.get('pending_count', 0)}件"
+            ),
+            "color": 0x94A3B8,
+        }
     payload = {"embeds": [embed]}
     try:
         req = urllib.request.Request(
@@ -1141,7 +1158,8 @@ def send_discord_pending(webhook_url, newly_created, newly_filled, expired):
             method="POST",
         )
         with urllib.request.urlopen(req, timeout=15) as resp:
-            print(f"[OK] Discord (pending) sent (HTTP {resp.status})")
+            kind = "pending" if has_update else "pending heartbeat"
+            print(f"[OK] Discord ({kind}) sent (HTTP {resp.status})")
             return True
     except Exception as e:
         print(f"[ERROR] Discord (pending) send failed: {e}")
@@ -2168,9 +2186,21 @@ def main():
         print("[INFO] No significant changes, skipping notifications")
 
     # 📌 指値待機シグナルの通知（新規登録・約定・失効があれば、上のnewly/upgraded判定とは無関係に送信）
-    if newly_created_orders or newly_filled_trades or expired_orders:
+    has_pending_update = bool(newly_created_orders or newly_filled_trades or expired_orders)
+    if has_pending_update:
         _wh_pending = os.environ.get("DISCORD_WEBHOOK_URL", "").replace("discordapp.com", "discord.com")
         send_discord_pending(_wh_pending, newly_created_orders, newly_filled_trades, expired_orders)
+    elif entry_mode == "limit":
+        # 変化が0件でも、1日3回の指値スキャンでは「稼働中で変化なし」を短く通知する。
+        # 沈黙のままだとワークフロー停止と見分けがつかないため（2026-07-21対応）。
+        _wh_pending = os.environ.get("DISCORD_WEBHOOK_URL", "").replace("discordapp.com", "discord.com")
+        send_discord_pending(
+            _wh_pending, newly_created_orders, newly_filled_trades, expired_orders,
+            heartbeat={
+                "open_count": trade_update.get("still_open", 0),
+                "pending_count": len(remaining_orders),
+            },
+        )
 
     # 8. 状態保存
     save_current_state(
