@@ -1,12 +1,12 @@
 {
-  "timestamp": "2026-07-21T06:36:18.225661+00:00",
+  "timestamp": "2026-07-21T09:32:24.941016+00:00",
   "signals": {
-    "USDJPY": 5,
-    "EURJPY": 4,
-    "GBPJPY": 5,
+    "USDJPY": 2,
+    "EURJPY": 2,
+    "GBPJPY": 2,
     "AUDJPY": 2,
     "CHFJPY": 2,
-    "SGDJPY": 3,
+    "SGDJPY": 2,
     "HKDJPY": 2,
     "CNYJPY": 2,
     "MXNJPY": 2,
@@ -19,16 +19,16 @@
     "EURAUD": 2,
     "SEKJPY": 2,
     "NOKJPY": 2,
-    "BRLJPY": 2,
+    "BRLJPY": 1,
     "PLNJPY": 2,
     "KRWJPY": 2,
     "GBPAUD": 2,
-    "GBPCHF": 3,
-    "AUDCHF": 3,
+    "GBPCHF": 2,
+    "AUDCHF": 2,
     "EURCHF": 2,
     "AUDNZD": 2,
     "EURNZD": 2,
-    "USDCNY": 2
+    "USDCNY": 1
   },
   "results": [
     {
@@ -54,7 +54,7 @@
       "fa_direction": "buy",
       "fa_rate_diff": 2.75,
       "fa_detail": "FRB(3.75% neutral/stable) vs 日銀(1.00% pause/peak) 差+2.75% / USDサイクル強化(stable)",
-      "stars": 5,
+      "stars": 2,
       "verdict": "◎ 高信頼ロング",
       "direction": "LONG",
       "pair_type": "safe_haven",
@@ -98,13 +98,13 @@
         "tp_dist_effective": 0.433,
         "rr_effective": 0.5,
         "spread_is_dynamic": true,
-        "spread_pips_dynamic": 0.18,
+        "spread_pips_dynamic": 0.17,
         "regime_label": "通常ボラ相場",
         "strategy": "TP(162.817)到達 → SLを BE+0.5R(162.817) へ移動 → トレーリング(2.0×ATR=0.578)発動 → 利を伸ばす（理論最大: 164.118）",
         "chandelier_sl_active": true,
         "chandelier_note": "Chandelier Exit: 過去22日高値(162.71)-3.0xATR",
-        "spread_session": "Asian/Tokyo",
-        "spread_session_mult": 0.9,
+        "spread_session": "London",
+        "spread_session_mult": 0.85,
         "spread_vix_mult": 1.0
       },
       "carry_score": {
@@ -244,6 +244,8 @@
       },
       "high_confidence_zone": true,
       "ambush_quality": "整合（シグナル方向とPOIが一致）",
+      "session_filter_applied": true,
+      "session_filter_reason": "🕐 セッションフィルタ: USDJPY London単独枠(09:00 UTC, 08-13 UTC) — 実データで決着勝率11.1%(n=9)と最弱の時間帯。★5→★2降格。",
       "cb_meeting_blackout": {
         "active": false,
         "severity": "none",
@@ -261,8 +263,7 @@
         "spread": 25.2,
         "context": "やや強い通貨 vs 弱め（ロング寄り）",
         "bias": "slight_long"
-      },
-      "ai_exit_advice": "1. **現状整理**\n現在ドル円のロングポジションを保有中で、ADX6.1とテクニカル面では強いレンジ相場を示唆しています。"
+      }
     },
     {
       "pair": "EURJPY",
@@ -287,7 +288,7 @@
       "fa_direction": "buy",
       "fa_rate_diff": 1.4,
       "fa_detail": "ECB(2.40% neutral/trough) vs 日銀(1.00% pause/peak) 差+1.40% / EURサイクル強化(trough)",
-      "stars": 4,
+      "stars": 2,
       "verdict": "◎ 高信頼ロング",
       "direction": "LONG",
       "pair_type": "major",
@@ -296,14 +297,14 @@
           "name": "ECB Interest Rate Decision",
           "currency": "EUR",
           "importance": "critical",
-          "hours_until": 53.7,
+          "hours_until": 50.7,
           "date": "2026-07-23T12:15:00Z"
         },
         {
           "name": "ECB Press Conference",
           "currency": "EUR",
           "importance": "critical",
-          "hours_until": 54.2,
+          "hours_until": 51.2,
           "date": "2026-07-23T12:45:00Z"
         }
       ],
@@ -343,13 +344,13 @@
         "tp_dist_effective": 0.585,
         "rr_effective": 0.5,
         "spread_is_dynamic": true,
-        "spread_pips_dynamic": 0.27,
+        "spread_pips_dynamic": 0.26,
         "regime_label": "通常ボラ相場",
         "strategy": "TP(186.126)到達 → SLを BE+0.5R(186.126) へ移動 → トレーリング(2.0×ATR=0.782)発動 → 利を伸ばす（理論最大: 187.886）",
         "chandelier_sl_active": true,
         "chandelier_note": "Chandelier Exit: 過去22日高値(185.99)-3.0xATR",
-        "spread_session": "Asian/Tokyo",
-        "spread_session_mult": 0.9,
+        "spread_session": "London",
+        "spread_session_mult": 0.85,
         "spread_vix_mult": 1.0
       },
       "carry_score": {
@@ -469,6 +470,8 @@
       },
       "high_confidence_zone": true,
       "ambush_quality": "整合（シグナル方向とPOIが一致）",
+      "session_filter_applied": true,
+      "session_filter_reason": "🕐 セッションフィルタ: EURJPY London単独枠(09:00 UTC, 08-13 UTC) — 実データで決着勝率11.1%(n=9)と最弱の時間帯。★4→★2降格。",
       "cb_meeting_blackout": {
         "active": false,
         "severity": "none",
@@ -511,7 +514,7 @@
       "fa_direction": "buy",
       "fa_rate_diff": 2.75,
       "fa_detail": "BOE(3.75% neutral/stable) vs 日銀(1.00% pause/peak) 差+2.75% / GBPサイクル強化(stable)",
-      "stars": 5,
+      "stars": 2,
       "verdict": "◎ 高信頼ロング",
       "direction": "LONG",
       "pair_type": "major",
@@ -545,20 +548,20 @@
         "rr_tp1": 0.5,
         "rr_tp2": 1.5,
         "rr_tp3": 2.0,
-        "spread_price": 0.018,
-        "spread_pips": 1.8,
-        "spread_atr_ratio": 0.034,
+        "spread_price": 0.017,
+        "spread_pips": 1.7,
+        "spread_atr_ratio": 0.032,
         "sl_dist_effective": 1.596,
         "tp_dist_effective": 0.785,
         "rr_effective": 0.49,
         "spread_is_dynamic": true,
-        "spread_pips_dynamic": 1.8,
+        "spread_pips_dynamic": 1.7,
         "regime_label": "通常ボラ相場",
         "strategy": "TP(219.363)到達 → SLを BE+0.5R(219.363) へ移動 → トレーリング(2.0×ATR=1.058)発動 → 利を伸ばす（理論最大: 221.744）",
         "chandelier_sl_active": true,
         "chandelier_note": "Chandelier Exit: 過去22日高値(219.14)-3.0xATR",
-        "spread_session": "Asian/Tokyo",
-        "spread_session_mult": 0.9,
+        "spread_session": "London",
+        "spread_session_mult": 0.85,
         "spread_vix_mult": 1.0
       },
       "carry_score": {
@@ -625,6 +628,8 @@
         "has_alert": false,
         "approaching": []
       },
+      "session_filter_applied": true,
+      "session_filter_reason": "🕐 セッションフィルタ: GBPJPY London単独枠(09:00 UTC, 08-13 UTC) — 実データで決着勝率11.1%(n=9)と最弱の時間帯。★5→★2降格。",
       "cb_meeting_blackout": {
         "active": false,
         "severity": "none",
@@ -701,20 +706,20 @@
         "rr_tp1": 0.5,
         "rr_tp2": 1.5,
         "rr_tp3": 2.0,
-        "spread_price": 0.014,
-        "spread_pips": 1.4,
-        "spread_atr_ratio": 0.042,
-        "sl_dist_effective": 0.979,
-        "tp_dist_effective": 0.479,
+        "spread_price": 0.013,
+        "spread_pips": 1.3,
+        "spread_atr_ratio": 0.039,
+        "sl_dist_effective": 0.978,
+        "tp_dist_effective": 0.48,
         "rr_effective": 0.49,
         "spread_is_dynamic": true,
-        "spread_pips_dynamic": 1.35,
+        "spread_pips_dynamic": 1.27,
         "regime_label": "通常ボラ相場",
         "strategy": "TP(114.265)到達 → SLを BE+0.5R(114.265) へ移動 → トレーリング(2.0×ATR=0.648)発動 → 利を伸ばす（理論最大: 115.723）",
         "chandelier_sl_active": true,
         "chandelier_note": "Chandelier Exit: 過去22日高値(113.78)-3.0xATR",
-        "spread_session": "Asian/Tokyo",
-        "spread_session_mult": 0.9,
+        "spread_session": "London",
+        "spread_session_mult": 0.85,
         "spread_vix_mult": 1.0
       },
       "carry_score": {
@@ -808,6 +813,8 @@
       },
       "regime_filter_applied": true,
       "regime_filter_reason": "⚠️ BOJサイクルフィルタ: AUD(RBA ease/stable) + JPY(日銀 pause) = LONGはダブル逆風",
+      "session_caution": true,
+      "session_caution_reason": "🕐 London単独枠(09:00 UTC) — 実データ最弱の時間帯",
       "cb_meeting_blackout": {
         "active": false,
         "severity": "none",
@@ -884,20 +891,20 @@
         "rr_tp1": 0.5,
         "rr_tp2": 1.5,
         "rr_tp3": 2.0,
-        "spread_price": 0.018,
-        "spread_pips": 1.8,
-        "spread_atr_ratio": 0.042,
-        "sl_dist_effective": 1.287,
-        "tp_dist_effective": 0.63,
+        "spread_price": 0.017,
+        "spread_pips": 1.7,
+        "spread_atr_ratio": 0.04,
+        "sl_dist_effective": 1.286,
+        "tp_dist_effective": 0.631,
         "rr_effective": 0.49,
         "spread_is_dynamic": true,
-        "spread_pips_dynamic": 1.8,
+        "spread_pips_dynamic": 1.7,
         "regime_label": "通常ボラ相場",
         "strategy": "TP(201.527)到達 → SLを BE+0.5R(201.527) へ移動 → トレーリング(2.0×ATR=0.852)発動 → 利を伸ばす（理論最大: 203.444）",
         "chandelier_sl_active": true,
         "chandelier_note": "Chandelier Exit: 過去22日高値(201.4)-3.0xATR",
-        "spread_session": "Asian/Tokyo",
-        "spread_session_mult": 0.9,
+        "spread_session": "London",
+        "spread_session_mult": 0.85,
         "spread_vix_mult": 1.0
       },
       "carry_score": {
@@ -1006,6 +1013,8 @@
         ],
         "message": "戻り候補(50EMA)（200.99）に接近 あと0.05% → 反落でのショート候補"
       },
+      "session_caution": true,
+      "session_caution_reason": "🕐 London単独枠(09:00 UTC) — 実データ最弱の時間帯",
       "cb_meeting_blackout": {
         "active": false,
         "severity": "none",
@@ -1048,7 +1057,7 @@
       "fa_direction": "buy",
       "fa_rate_diff": 1.5,
       "fa_detail": "MAS(2.50% neutral/stable) vs 日銀(1.00% pause/peak) 差+1.50% / SGDサイクル強化(stable)",
-      "stars": 3,
+      "stars": 2,
       "verdict": "○ ロング条件成立",
       "direction": "LONG",
       "pair_type": "major",
@@ -1082,20 +1091,20 @@
         "rr_tp1": 0.5,
         "rr_tp2": 1.5,
         "rr_tp3": 2.0,
-        "spread_price": 0.022,
-        "spread_pips": 2.2,
-        "spread_atr_ratio": 0.137,
+        "spread_price": 0.021,
+        "spread_pips": 2.1,
+        "spread_atr_ratio": 0.129,
         "sl_dist_effective": 0.503,
         "tp_dist_effective": 0.235,
         "rr_effective": 0.47,
         "spread_is_dynamic": true,
-        "spread_pips_dynamic": 2.25,
+        "spread_pips_dynamic": 2.12,
         "regime_label": "通常ボラ相場",
         "strategy": "TP(126.044)到達 → SLを BE+0.5R(126.044) へ移動 → トレーリング(2.0×ATR=0.328)発動 → 利を伸ばす（理論最大: 126.782）",
         "chandelier_sl_active": true,
         "chandelier_note": "Chandelier Exit: 過去22日高値(125.82)-3.0xATR",
-        "spread_session": "Asian/Tokyo",
-        "spread_session_mult": 0.9,
+        "spread_session": "London",
+        "spread_session_mult": 0.85,
         "spread_vix_mult": 1.0
       },
       "carry_score": {
@@ -1163,7 +1172,9 @@
         "approaching": []
       },
       "spread_filter_applied": true,
-      "spread_filter_reason": "💸 スプレッド広め: SGDJPY spread=2.2pips (14% of ATR) — 実効RR 1:0.5→1:0.47。★4→★3降格。",
+      "spread_filter_reason": "💸 スプレッド広め: SGDJPY spread=2.1pips (13% of ATR) — 実効RR 1:0.5→1:0.47。★4→★3降格。",
+      "session_filter_applied": true,
+      "session_filter_reason": "🕐 セッションフィルタ: SGDJPY London単独枠(09:00 UTC, 08-13 UTC) — 実データで決着勝率11.1%(n=9)と最弱の時間帯。★3→★2降格。",
       "cb_meeting_blackout": {
         "active": false,
         "severity": "none",
@@ -1240,20 +1251,20 @@
         "rr_tp1": 0.5,
         "rr_tp2": 1.5,
         "rr_tp3": 2.0,
-        "spread_price": 0.027,
-        "spread_pips": 2.7,
-        "spread_atr_ratio": 0.73,
+        "spread_price": 0.025,
+        "spread_pips": 2.5,
+        "spread_atr_ratio": 0.689,
         "sl_dist_effective": 0.124,
-        "tp_dist_effective": 0.042,
-        "rr_effective": 0.34,
+        "tp_dist_effective": 0.043,
+        "rr_effective": 0.35,
         "spread_is_dynamic": true,
-        "spread_pips_dynamic": 2.7,
+        "spread_pips_dynamic": 2.55,
         "regime_label": "通常ボラ相場",
         "strategy": "TP(20.766)到達 → SLを BE+0.5R(20.766) へ移動 → トレーリング(2.0×ATR=0.074)発動 → 利を伸ばす（理論最大: 20.933）",
         "chandelier_sl_active": true,
         "chandelier_note": "Chandelier Exit: 過去22日高値(20.743)-3.0xATR",
-        "spread_session": "Asian/Tokyo",
-        "spread_session_mult": 0.9,
+        "spread_session": "London",
+        "spread_session_mult": 0.85,
         "spread_vix_mult": 1.0
       },
       "carry_score": {
@@ -1369,7 +1380,9 @@
       "high_confidence_zone": true,
       "ambush_quality": "整合（シグナル方向とPOIが一致）",
       "spread_filter_applied": true,
-      "spread_filter_reason": "💸 スプレッド致命的: HKDJPY spread=2.7pips (73% of ATR) — 実効RR 1:0.5→1:0.34 に劣化。取引非推奨で★5→★2降格。",
+      "spread_filter_reason": "💸 スプレッド致命的: HKDJPY spread=2.5pips (69% of ATR) — 実効RR 1:0.5→1:0.35 に劣化。取引非推奨で★5→★2降格。",
+      "session_caution": true,
+      "session_caution_reason": "🕐 London単独枠(09:00 UTC) — 実データ最弱の時間帯",
       "cb_meeting_blackout": {
         "active": false,
         "severity": "none",
@@ -1416,6 +1429,35 @@
       "verdict": "🔻 BOJサイクルフィルタ: CNY(PBOC ease/stable) + JPY(日銀 pause) = LONGはダブル逆風",
       "direction": "NO_TRADE",
       "pair_type": "emerging_market",
+      "geopolitical_risk": {
+        "risk_level": "medium",
+        "risk_score": 42,
+        "reason": "political_instability: protest / geopolitical: sanction",
+        "recent_news": [
+          "\"China (election OR protest OR crisis OR sanction OR \"central bank\" OR geopolitics)\" - Google News",
+          "Google News",
+          "Fact-checking Trump's address on China, the 2020 election and what documents show - PBS",
+          "Trump stretches declassified China intelligence into broader 2020 election claims - Nextgov/FCW"
+        ],
+        "categories": {
+          "political_instability": {
+            "score": 15,
+            "hits": [
+              "protest"
+            ]
+          },
+          "geopolitical": {
+            "score": 12,
+            "hits": [
+              "sanction"
+            ]
+          }
+        },
+        "country": "China",
+        "news_volume": 8
+      },
+      "original_stars": 4,
+      "risk_adjustment": -42,
       "upcoming_events": [],
       "volatility_regime": {
         "regime": "normal",
@@ -1446,20 +1488,20 @@
         "rr_tp1": 0.5,
         "rr_tp2": 1.5,
         "rr_tp3": 2.0,
-        "spread_price": 0.045,
-        "spread_pips": 4.5,
-        "spread_atr_ratio": 1.216,
-        "sl_dist_effective": 0.133,
-        "tp_dist_effective": 0.033,
-        "rr_effective": 0.25,
+        "spread_price": 0.043,
+        "spread_pips": 4.2,
+        "spread_atr_ratio": 1.149,
+        "sl_dist_effective": 0.132,
+        "tp_dist_effective": 0.034,
+        "rr_effective": 0.26,
         "spread_is_dynamic": true,
-        "spread_pips_dynamic": 4.5,
+        "spread_pips_dynamic": 4.25,
         "regime_label": "通常ボラ相場",
         "strategy": "TP(24.052)到達 → SLを BE+0.5R(24.052) へ移動 → トレーリング(2.0×ATR=0.074)発動 → 利を伸ばす（理論最大: 24.219）",
         "chandelier_sl_active": false,
         "chandelier_note": "",
-        "spread_session": "Asian/Tokyo",
-        "spread_session_mult": 0.9,
+        "spread_session": "London",
+        "spread_session_mult": 0.85,
         "spread_vix_mult": 1.0
       },
       "carry_score": {
@@ -1528,6 +1570,8 @@
       },
       "regime_filter_applied": true,
       "regime_filter_reason": "⚠️ BOJサイクルフィルタ: CNY(PBOC ease/stable) + JPY(日銀 pause) = LONGはダブル逆風",
+      "session_caution": true,
+      "session_caution_reason": "🕐 London単独枠(09:00 UTC) — 実データ最弱の時間帯",
       "cb_meeting_blackout": {
         "active": false,
         "severity": "none",
@@ -1571,9 +1615,38 @@
       "fa_rate_diff": 8.0,
       "fa_detail": "Banxico(9.00% ease/decelerating) vs 日銀(1.00% pause/peak) 差+8.00% / MXNサイクル強化(decelerating)",
       "stars": 2,
-      "verdict": "◎ 高信頼ロング",
+      "verdict": "⚠ 地政学リスク(medium)考慮 ◎ 高信頼ロング",
       "direction": "LONG",
       "pair_type": "emerging_market",
+      "geopolitical_risk": {
+        "risk_level": "medium",
+        "risk_score": 42,
+        "reason": "political_instability: protest / geopolitical: sanction",
+        "recent_news": [
+          "\"Mexico (election OR protest OR crisis OR sanction OR \"central bank\" OR geopolitics)\" - Google News",
+          "Google News",
+          "Mexico’s cattle ranchers fear screwworm crisis could permanently reshape cross-border trade - Texas Public Radio | TPR",
+          "Cattle crisis: U.S., Mexico open facility to produce sterile flies to fight screwworm threat - nny360.com"
+        ],
+        "categories": {
+          "political_instability": {
+            "score": 15,
+            "hits": [
+              "protest"
+            ]
+          },
+          "geopolitical": {
+            "score": 12,
+            "hits": [
+              "sanction"
+            ]
+          }
+        },
+        "country": "Mexico",
+        "news_volume": 8
+      },
+      "original_stars": 5,
+      "risk_adjustment": -42,
       "upcoming_events": [],
       "volatility_regime": {
         "regime": "normal",
@@ -1604,20 +1677,20 @@
         "rr_tp1": 0.5,
         "rr_tp2": 1.5,
         "rr_tp3": 2.0,
-        "spread_price": 0.045,
-        "spread_pips": 4.5,
-        "spread_atr_ratio": 1.731,
-        "sl_dist_effective": 0.101,
-        "tp_dist_effective": 0.017,
-        "rr_effective": 0.16,
+        "spread_price": 0.043,
+        "spread_pips": 4.2,
+        "spread_atr_ratio": 1.635,
+        "sl_dist_effective": 0.099,
+        "tp_dist_effective": 0.018,
+        "rr_effective": 0.18,
         "spread_is_dynamic": true,
-        "spread_pips_dynamic": 4.5,
+        "spread_pips_dynamic": 4.25,
         "regime_label": "通常ボラ相場",
         "strategy": "TP(9.323)到達 → SLを BE+0.5R(9.323) へ移動 → トレーリング(2.0×ATR=0.052)発動 → 利を伸ばす（理論最大: 9.44）",
         "chandelier_sl_active": true,
         "chandelier_note": "Chandelier Exit: 過去22日高値(9.334)-3.0xATR",
-        "spread_session": "Asian/Tokyo",
-        "spread_session_mult": 0.9,
+        "spread_session": "London",
+        "spread_session_mult": 0.85,
         "spread_vix_mult": 1.0
       },
       "carry_score": {
@@ -1720,12 +1793,10 @@
         ],
         "message": "ピボットPP（9.29）に接近 あと0.07% → 反落でのショート候補"
       },
-      "high_confidence_zone": false,
-      "ambush_quality": "注意（シグナルとPOIが逆方向）",
       "regime_filter_applied": true,
       "regime_filter_reason": "⚠️ BOJサイクル軽警告: MXN(Banxico ease/decelerating) + JPY(日銀 pause) = LONG方向注意",
-      "spread_filter_applied": true,
-      "spread_filter_reason": "💸 スプレッド致命的: MXNJPY spread=4.5pips (173% of ATR) — 実効RR 1:0.5→1:0.16 に劣化。取引非推奨で★4→★2降格。",
+      "session_caution": true,
+      "session_caution_reason": "🕐 London単独枠(09:00 UTC) — 実データ最弱の時間帯",
       "cb_meeting_blackout": {
         "active": false,
         "severity": "none",
@@ -1769,9 +1840,38 @@
       "fa_rate_diff": 6.25,
       "fa_detail": "SARB(7.25% neutral/stable) vs 日銀(1.00% pause/peak) 差+6.25% / ZARサイクル強化(stable)",
       "stars": 2,
-      "verdict": "○ ロング条件成立",
+      "verdict": "⚠ 地政学リスク(medium)考慮 ○ ロング条件成立",
       "direction": "LONG",
       "pair_type": "emerging_market",
+      "geopolitical_risk": {
+        "risk_level": "medium",
+        "risk_score": 42,
+        "reason": "political_instability: protest / geopolitical: sanction",
+        "recent_news": [
+          "\"South Africa (election OR protest OR crisis OR sanction OR \"central bank\" OR geopolitics)\" - Google News",
+          "Google News",
+          "“None Of the Above” Would Win a South African Election - The Common Sense",
+          "South Africa’s anti-migrant protests are back - GIS Reports"
+        ],
+        "categories": {
+          "political_instability": {
+            "score": 15,
+            "hits": [
+              "protest"
+            ]
+          },
+          "geopolitical": {
+            "score": 12,
+            "hits": [
+              "sanction"
+            ]
+          }
+        },
+        "country": "South Africa",
+        "news_volume": 8
+      },
+      "original_stars": 4,
+      "risk_adjustment": -42,
       "upcoming_events": [],
       "volatility_regime": {
         "regime": "normal",
@@ -1802,20 +1902,20 @@
         "rr_tp1": 0.5,
         "rr_tp2": 1.5,
         "rr_tp3": 2.0,
-        "spread_price": 0.09,
-        "spread_pips": 9.0,
-        "spread_atr_ratio": 2.432,
-        "sl_dist_effective": 0.156,
-        "tp_dist_effective": 0.01,
-        "rr_effective": 0.07,
+        "spread_price": 0.085,
+        "spread_pips": 8.5,
+        "spread_atr_ratio": 2.297,
+        "sl_dist_effective": 0.153,
+        "tp_dist_effective": 0.013,
+        "rr_effective": 0.08,
         "spread_is_dynamic": true,
-        "spread_pips_dynamic": 9.0,
+        "spread_pips_dynamic": 8.5,
         "regime_label": "通常ボラ相場",
         "strategy": "TP(9.904)到達 → SLを BE+0.5R(9.904) へ移動 → トレーリング(2.0×ATR=0.074)発動 → 利を伸ばす（理論最大: 10.07）",
         "chandelier_sl_active": false,
         "chandelier_note": "",
-        "spread_session": "Asian/Tokyo",
-        "spread_session_mult": 0.9,
+        "spread_session": "London",
+        "spread_session_mult": 0.85,
         "spread_vix_mult": 1.0
       },
       "carry_score": {
@@ -1938,10 +2038,8 @@
         ],
         "message": "弱いレジスタンス（9.859）に接近 あと0.11% → 反落でのショート候補"
       },
-      "high_confidence_zone": false,
-      "ambush_quality": "注意（シグナルとPOIが逆方向）",
-      "spread_filter_applied": true,
-      "spread_filter_reason": "💸 スプレッド致命的: ZARJPY spread=9.0pips (243% of ATR) — 実効RR 1:0.5→1:0.07 に劣化。取引非推奨で★4→★2降格。",
+      "session_caution": true,
+      "session_caution_reason": "🕐 London単独枠(09:00 UTC) — 実データ最弱の時間帯",
       "cb_meeting_blackout": {
         "active": false,
         "severity": "none",
@@ -2018,20 +2116,20 @@
         "rr_tp1": 0.5,
         "rr_tp2": 1.5,
         "rr_tp3": 2.0,
-        "spread_price": 0.00021,
-        "spread_pips": 2.1,
-        "spread_atr_ratio": 0.059,
-        "sl_dist_effective": 0.010785,
-        "tp_dist_effective": 0.005235,
+        "spread_price": 0.000127,
+        "spread_pips": 1.3,
+        "spread_atr_ratio": 0.036,
+        "sl_dist_effective": 0.010743,
+        "tp_dist_effective": 0.005276,
         "rr_effective": 0.49,
         "spread_is_dynamic": true,
-        "spread_pips_dynamic": 2.1,
+        "spread_pips_dynamic": 1.27,
         "regime_label": "通常ボラ相場",
         "strategy": "TP(1.351349)到達 → SLを BE+0.5R(1.351349) へ移動 → トレーリング(2.0×ATR=0.00712)発動 → 利を伸ばす（理論最大: 1.367369）",
         "chandelier_sl_active": true,
         "chandelier_note": "Chandelier Exit: 過去22日高値(1.3511)-3.0xATR",
-        "spread_session": "Asian/Tokyo",
-        "spread_session_mult": 1.4,
+        "spread_session": "London",
+        "spread_session_mult": 0.85,
         "spread_vix_mult": 1.0
       },
       "carry_score": {
@@ -2140,6 +2238,8 @@
         ],
         "message": "ピボットPP（1.34517）に接近 あと0.06% → 反発でのロング候補"
       },
+      "session_caution": true,
+      "session_caution_reason": "🕐 London単独枠(09:00 UTC) — 実データ最弱の時間帯",
       "cb_meeting_blackout": {
         "active": false,
         "severity": "none",
@@ -2216,20 +2316,20 @@
         "rr_tp1": 0.5,
         "rr_tp2": 1.6,
         "rr_tp3": 2.0,
-        "spread_price": 0.00014,
-        "spread_pips": 1.4,
-        "spread_atr_ratio": 0.071,
-        "sl_dist_effective": 0.00497,
-        "tp_dist_effective": 0.00238,
-        "rr_effective": 0.48,
+        "spread_price": 8.5e-05,
+        "spread_pips": 0.8,
+        "spread_atr_ratio": 0.043,
+        "sl_dist_effective": 0.004942,
+        "tp_dist_effective": 0.002407,
+        "rr_effective": 0.49,
         "spread_is_dynamic": true,
-        "spread_pips_dynamic": 1.4,
+        "spread_pips_dynamic": 0.85,
         "regime_label": "低ボラ相場",
         "strategy": "TP(0.703131)到達 → SLを BE+0.5R(0.703131) へ移動 → トレーリング(2.0×ATR=0.00392)発動 → 利を伸ばす（理論最大: 0.710481）",
         "chandelier_sl_active": true,
         "chandelier_note": "Chandelier Exit: 過去22日高値(0.70084)-2.5xATR",
-        "spread_session": "Asian/Tokyo",
-        "spread_session_mult": 1.4,
+        "spread_session": "London",
+        "spread_session_mult": 0.85,
         "spread_vix_mult": 1.0
       },
       "carry_score": {
@@ -2352,6 +2452,8 @@
         ],
         "message": "戻り候補(50EMA)（0.700914）に接近 あと0.03% → 反落でのショート候補"
       },
+      "session_caution": true,
+      "session_caution_reason": "🕐 London単独枠(09:00 UTC) — 実データ最弱の時間帯",
       "cb_meeting_blackout": {
         "active": false,
         "severity": "none",
@@ -2428,20 +2530,20 @@
         "rr_tp1": 0.5,
         "rr_tp2": 1.5,
         "rr_tp3": 2.0,
-        "spread_price": 0.00028,
-        "spread_pips": 2.8,
-        "spread_atr_ratio": 0.138,
-        "sl_dist_effective": 0.00623,
-        "tp_dist_effective": 0.002905,
-        "rr_effective": 0.47,
+        "spread_price": 0.00017,
+        "spread_pips": 1.7,
+        "spread_atr_ratio": 0.084,
+        "sl_dist_effective": 0.006175,
+        "tp_dist_effective": 0.00296,
+        "rr_effective": 0.48,
         "spread_is_dynamic": true,
-        "spread_pips_dynamic": 2.8,
+        "spread_pips_dynamic": 1.7,
         "regime_label": "通常ボラ相場",
         "strategy": "TP(0.588393)到達 → SLを BE+0.5R(0.588393) へ移動 → トレーリング(2.0×ATR=0.00406)発動 → 利を伸ばす（理論最大: 0.597528）",
         "chandelier_sl_active": true,
         "chandelier_note": "Chandelier Exit: 過去22日高値(0.58556)-3.0xATR",
-        "spread_session": "Asian/Tokyo",
-        "spread_session_mult": 1.4,
+        "spread_session": "London",
+        "spread_session_mult": 0.85,
         "spread_vix_mult": 1.0
       },
       "carry_score": {
@@ -2550,8 +2652,8 @@
         ],
         "message": "弱いレジスタンス（0.58586）に接近 あと0.09% → 反落でのショート候補"
       },
-      "spread_caution": true,
-      "spread_caution_reason": "💸 スプレッド広め: NZDUSD spread=2.8pips (14% of ATR)。実効RR 1:0.47",
+      "session_caution": true,
+      "session_caution_reason": "🕐 London単独枠(09:00 UTC) — 実データ最弱の時間帯",
       "cb_meeting_blackout": {
         "active": false,
         "severity": "none",
@@ -2628,20 +2730,20 @@
         "rr_tp1": 0.5,
         "rr_tp2": 1.5,
         "rr_tp3": 2.0,
-        "spread_price": 0.00021,
-        "spread_pips": 2.1,
-        "spread_atr_ratio": 0.099,
-        "sl_dist_effective": 0.006465,
-        "tp_dist_effective": 0.003075,
-        "rr_effective": 0.48,
+        "spread_price": 0.000127,
+        "spread_pips": 1.3,
+        "spread_atr_ratio": 0.06,
+        "sl_dist_effective": 0.006423,
+        "tp_dist_effective": 0.003116,
+        "rr_effective": 0.49,
         "spread_is_dynamic": true,
-        "spread_pips_dynamic": 2.1,
+        "spread_pips_dynamic": 1.27,
         "regime_label": "通常ボラ相場",
         "strategy": "TP(1.406296)到達 → SLを BE+0.5R(1.406296) へ移動 → トレーリング(2.0×ATR=0.00424)発動 → 利を伸ばす（理論最大: 1.415836）",
         "chandelier_sl_active": false,
         "chandelier_note": "",
-        "spread_session": "Asian/Tokyo",
-        "spread_session_mult": 1.4,
+        "spread_session": "London",
+        "spread_session_mult": 0.85,
         "spread_vix_mult": 1.0
       },
       "carry_score": {
@@ -2732,6 +2834,8 @@
         "has_alert": false,
         "approaching": []
       },
+      "session_caution": true,
+      "session_caution_reason": "🕐 London単独枠(09:00 UTC) — 実データ最弱の時間帯",
       "cb_meeting_blackout": {
         "active": false,
         "severity": "none",
@@ -2783,14 +2887,14 @@
           "name": "ECB Interest Rate Decision",
           "currency": "EUR",
           "importance": "critical",
-          "hours_until": 53.7,
+          "hours_until": 50.7,
           "date": "2026-07-23T12:15:00Z"
         },
         {
           "name": "ECB Press Conference",
           "currency": "EUR",
           "importance": "critical",
-          "hours_until": 54.2,
+          "hours_until": 51.2,
           "date": "2026-07-23T12:45:00Z"
         }
       ],
@@ -2823,20 +2927,20 @@
         "rr_tp1": 0.5,
         "rr_tp2": 1.5,
         "rr_tp3": 2.0,
-        "spread_price": 0.00021,
-        "spread_pips": 2.1,
-        "spread_atr_ratio": 0.164,
-        "sl_dist_effective": 0.003945,
-        "tp_dist_effective": 0.001815,
-        "rr_effective": 0.46,
+        "spread_price": 0.000127,
+        "spread_pips": 1.3,
+        "spread_atr_ratio": 0.099,
+        "sl_dist_effective": 0.003904,
+        "tp_dist_effective": 0.001857,
+        "rr_effective": 0.48,
         "spread_is_dynamic": true,
-        "spread_pips_dynamic": 2.1,
+        "spread_pips_dynamic": 1.27,
         "regime_label": "通常ボラ相場",
         "strategy": "TP(0.84696)到達 → SLを BE+0.5R(0.84696) へ移動 → トレーリング(2.0×ATR=0.00256)発動 → 利を伸ばす（理論最大: 0.8412）",
         "chandelier_sl_active": true,
         "chandelier_note": "Chandelier Exit: 過去22日安値(0.84873)+3.0xATR",
-        "spread_session": "Asian/Tokyo",
-        "spread_session_mult": 1.4,
+        "spread_session": "London",
+        "spread_session_mult": 0.85,
         "spread_vix_mult": 1.0
       },
       "carry_score": {
@@ -2903,8 +3007,8 @@
         "has_alert": false,
         "approaching": []
       },
-      "spread_caution": true,
-      "spread_caution_reason": "💸 スプレッド広め: EURGBP spread=2.1pips (16% of ATR)。実効RR 1:0.46",
+      "session_caution": true,
+      "session_caution_reason": "🕐 London単独枠(09:00 UTC) — 実データ最弱の時間帯",
       "cb_meeting_blackout": {
         "active": false,
         "severity": "none",
@@ -2956,14 +3060,14 @@
           "name": "ECB Interest Rate Decision",
           "currency": "EUR",
           "importance": "critical",
-          "hours_until": 53.7,
+          "hours_until": 50.7,
           "date": "2026-07-23T12:15:00Z"
         },
         {
           "name": "ECB Press Conference",
           "currency": "EUR",
           "importance": "critical",
-          "hours_until": 54.2,
+          "hours_until": 51.2,
           "date": "2026-07-23T12:45:00Z"
         }
       ],
@@ -2996,20 +3100,20 @@
         "rr_tp1": 0.5,
         "rr_tp2": 1.5,
         "rr_tp3": 2.0,
-        "spread_price": 0.00042,
-        "spread_pips": 4.2,
-        "spread_atr_ratio": 0.13,
-        "sl_dist_effective": 0.00993,
-        "tp_dist_effective": 0.00465,
-        "rr_effective": 0.47,
+        "spread_price": 0.000255,
+        "spread_pips": 2.6,
+        "spread_atr_ratio": 0.079,
+        "sl_dist_effective": 0.009847,
+        "tp_dist_effective": 0.004732,
+        "rr_effective": 0.48,
         "spread_is_dynamic": true,
-        "spread_pips_dynamic": 4.2,
+        "spread_pips_dynamic": 2.55,
         "regime_label": "通常ボラ相場",
         "strategy": "TP(1.62584)到達 → SLを BE+0.5R(1.62584) へ移動 → トレーリング(2.0×ATR=0.00648)発動 → 利を伸ばす（理論最大: 1.61126）",
         "chandelier_sl_active": false,
         "chandelier_note": "",
-        "spread_session": "Asian/Tokyo",
-        "spread_session_mult": 1.4,
+        "spread_session": "London",
+        "spread_session_mult": 0.85,
         "spread_vix_mult": 1.0
       },
       "carry_score": {
@@ -3100,8 +3204,8 @@
         "has_alert": false,
         "approaching": []
       },
-      "spread_caution": true,
-      "spread_caution_reason": "💸 スプレッド広め: EURAUD spread=4.2pips (13% of ATR)。実効RR 1:0.47",
+      "session_caution": true,
+      "session_caution_reason": "🕐 London単独枠(09:00 UTC) — 実データ最弱の時間帯",
       "cb_meeting_blackout": {
         "active": false,
         "severity": "none",
@@ -3178,20 +3282,20 @@
         "rr_tp1": 0.5,
         "rr_tp2": 1.6,
         "rr_tp3": 2.0,
-        "spread_price": 0.027,
-        "spread_pips": 2.7,
-        "spread_atr_ratio": 0.574,
-        "sl_dist_effective": 0.131,
-        "tp_dist_effective": 0.045,
+        "spread_price": 0.025,
+        "spread_pips": 2.5,
+        "spread_atr_ratio": 0.543,
+        "sl_dist_effective": 0.13,
+        "tp_dist_effective": 0.046,
         "rr_effective": 0.35,
         "spread_is_dynamic": true,
-        "spread_pips_dynamic": 2.7,
+        "spread_pips_dynamic": 2.55,
         "regime_label": "低ボラ相場",
         "strategy": "TP(16.74)到達 → SLを BE+0.5R(16.74) へ移動 → トレーリング(2.0×ATR=0.094)発動 → 利を伸ばす（理論最大: 16.564）",
         "chandelier_sl_active": false,
         "chandelier_note": "",
-        "spread_session": "Asian/Tokyo",
-        "spread_session_mult": 0.9,
+        "spread_session": "London",
+        "spread_session_mult": 0.85,
         "spread_vix_mult": 1.0
       },
       "support_resistance": {
@@ -3292,6 +3396,8 @@
         ],
         "message": "ピボットPP（16.809）に接近 あと0.06% → 反落でのショート候補"
       },
+      "session_caution": true,
+      "session_caution_reason": "🕐 London単独枠(09:00 UTC) — 実データ最弱の時間帯",
       "cb_meeting_blackout": {
         "active": false,
         "severity": "none",
@@ -3368,20 +3474,20 @@
         "rr_tp1": 0.5,
         "rr_tp2": 1.5,
         "rr_tp3": 2.0,
-        "spread_price": 0.027,
-        "spread_pips": 2.7,
-        "spread_atr_ratio": 0.482,
-        "sl_dist_effective": 0.182,
+        "spread_price": 0.025,
+        "spread_pips": 2.5,
+        "spread_atr_ratio": 0.455,
+        "sl_dist_effective": 0.181,
         "tp_dist_effective": 0.071,
         "rr_effective": 0.39,
         "spread_is_dynamic": true,
-        "spread_pips_dynamic": 2.7,
+        "spread_pips_dynamic": 2.55,
         "regime_label": "通常ボラ相場",
         "strategy": "TP(16.887)到達 → SLを BE+0.5R(16.887) へ移動 → トレーリング(2.0×ATR=0.112)発動 → 利を伸ばす（理論最大: 17.139）",
         "chandelier_sl_active": true,
         "chandelier_note": "Chandelier Exit: 過去22日高値(16.818)-3.0xATR",
-        "spread_session": "Asian/Tokyo",
-        "spread_session_mult": 0.9,
+        "spread_session": "London",
+        "spread_session_mult": 0.85,
         "spread_vix_mult": 1.0
       },
       "support_resistance": {
@@ -3446,6 +3552,8 @@
         "has_alert": false,
         "approaching": []
       },
+      "session_caution": true,
+      "session_caution_reason": "🕐 London単独枠(09:00 UTC) — 実データ最弱の時間帯",
       "cb_meeting_blackout": {
         "active": false,
         "severity": "none",
@@ -3488,10 +3596,39 @@
       "fa_direction": "neutral",
       "fa_rate_diff": null,
       "fa_detail": "金利データ取得失敗",
-      "stars": 2,
-      "verdict": "△ 弱シグナル",
+      "stars": 1,
+      "verdict": "⚠ 地政学リスク(medium)考慮 △ 弱シグナル",
       "direction": "LIGHT_LONG",
       "pair_type": "major",
+      "geopolitical_risk": {
+        "risk_level": "medium",
+        "risk_score": 42,
+        "reason": "political_instability: protest / geopolitical: sanction",
+        "recent_news": [
+          "\"Brazil (election OR protest OR crisis OR sanction OR \"central bank\" OR geopolitics)\" - Google News",
+          "Google News",
+          "Brazil faces unforgiving economics after election - Financial Times",
+          "Brazil vows to retaliate if US imposes 25% tariffs on some of its products - The Guardian"
+        ],
+        "categories": {
+          "political_instability": {
+            "score": 15,
+            "hits": [
+              "protest"
+            ]
+          },
+          "geopolitical": {
+            "score": 12,
+            "hits": [
+              "sanction"
+            ]
+          }
+        },
+        "country": "Brazil",
+        "news_volume": 8
+      },
+      "original_stars": 2,
+      "risk_adjustment": -42,
       "upcoming_events": [],
       "volatility_regime": {
         "regime": "normal",
@@ -3522,20 +3659,20 @@
         "rr_tp1": 0.5,
         "rr_tp2": 1.5,
         "rr_tp3": 2.0,
-        "spread_price": 0.027,
-        "spread_pips": 2.7,
-        "spread_atr_ratio": 0.235,
-        "sl_dist_effective": 0.359,
-        "tp_dist_effective": 0.159,
-        "rr_effective": 0.44,
+        "spread_price": 0.025,
+        "spread_pips": 2.5,
+        "spread_atr_ratio": 0.222,
+        "sl_dist_effective": 0.358,
+        "tp_dist_effective": 0.16,
+        "rr_effective": 0.45,
         "spread_is_dynamic": true,
-        "spread_pips_dynamic": 2.7,
+        "spread_pips_dynamic": 2.55,
         "regime_label": "通常ボラ相場",
         "strategy": "TP(31.985)到達 → SLを BE+0.5R(31.985) へ移動 → トレーリング(2.0×ATR=0.23)発動 → 利を伸ばす（理論最大: 32.503）",
         "chandelier_sl_active": true,
         "chandelier_note": "Chandelier Exit: 過去22日高値(31.96)-3.0xATR",
-        "spread_session": "Asian/Tokyo",
-        "spread_session_mult": 0.9,
+        "spread_session": "London",
+        "spread_session_mult": 0.85,
         "spread_vix_mult": 1.0
       },
       "support_resistance": {
@@ -3625,7 +3762,9 @@
         "message": "ピボットPP（31.812）に接近 あと0.00% → 反発でのロング候補"
       },
       "spread_caution": true,
-      "spread_caution_reason": "💸 スプレッド広め: BRLJPY spread=2.7pips (24% of ATR)。実効RR 1:0.44",
+      "spread_caution_reason": "💸 スプレッド広め: BRLJPY spread=2.5pips (22% of ATR)。実効RR 1:0.45",
+      "session_caution": true,
+      "session_caution_reason": "🕐 London単独枠(09:00 UTC) — 実データ最弱の時間帯",
       "cb_meeting_blackout": {
         "active": false,
         "severity": "none",
@@ -3702,20 +3841,20 @@
         "rr_tp1": 0.5,
         "rr_tp2": 1.5,
         "rr_tp3": 2.0,
-        "spread_price": 0.027,
-        "spread_pips": 2.7,
-        "spread_atr_ratio": 0.17,
+        "spread_price": 0.025,
+        "spread_pips": 2.5,
+        "spread_atr_ratio": 0.16,
         "sl_dist_effective": 0.49,
-        "tp_dist_effective": 0.225,
+        "tp_dist_effective": 0.226,
         "rr_effective": 0.46,
         "spread_is_dynamic": true,
-        "spread_pips_dynamic": 2.7,
+        "spread_pips_dynamic": 2.55,
         "regime_label": "通常ボラ相場",
         "strategy": "TP(42.591)到達 → SLを BE+0.5R(42.591) へ移動 → トレーリング(2.0×ATR=0.318)発動 → 利を伸ばす（理論最大: 41.876）",
         "chandelier_sl_active": true,
         "chandelier_note": "Chandelier Exit: 過去22日安値(42.558)+3.0xATR",
-        "spread_session": "Asian/Tokyo",
-        "spread_session_mult": 0.9,
+        "spread_session": "London",
+        "spread_session_mult": 0.85,
         "spread_vix_mult": 1.0
       },
       "support_resistance": {
@@ -3811,7 +3950,9 @@
         "message": "ピボットPP（42.815）に接近 あと0.04% → 反発でのロング候補"
       },
       "spread_caution": true,
-      "spread_caution_reason": "💸 スプレッド広め: PLNJPY spread=2.7pips (17% of ATR)。実効RR 1:0.46",
+      "spread_caution_reason": "💸 スプレッド広め: PLNJPY spread=2.5pips (16% of ATR)。実効RR 1:0.46",
+      "session_caution": true,
+      "session_caution_reason": "🕐 London単独枠(09:00 UTC) — 実データ最弱の時間帯",
       "cb_meeting_blackout": {
         "active": false,
         "severity": "none",
@@ -3920,6 +4061,8 @@
         "has_alert": false,
         "approaching": []
       },
+      "session_caution": true,
+      "session_caution_reason": "🕐 London単独枠(09:00 UTC) — 実データ最弱の時間帯",
       "cb_meeting_blackout": {
         "active": false,
         "severity": "none",
@@ -3996,20 +4139,20 @@
         "rr_tp1": 0.5,
         "rr_tp2": 1.5,
         "rr_tp3": 2.0,
-        "spread_price": 0.00042,
-        "spread_pips": 4.2,
-        "spread_atr_ratio": 0.112,
-        "sl_dist_effective": 0.01146,
-        "tp_dist_effective": 0.005415,
-        "rr_effective": 0.47,
+        "spread_price": 0.000255,
+        "spread_pips": 2.6,
+        "spread_atr_ratio": 0.068,
+        "sl_dist_effective": 0.011377,
+        "tp_dist_effective": 0.005497,
+        "rr_effective": 0.48,
         "spread_is_dynamic": true,
-        "spread_pips_dynamic": 4.2,
+        "spread_pips_dynamic": 2.55,
         "regime_label": "通常ボラ相場",
         "strategy": "TP(1.926627)到達 → SLを BE+0.5R(1.926627) へ移動 → トレーリング(2.0×ATR=0.0075)発動 → 利を伸ばす（理論最大: 1.943502）",
         "chandelier_sl_active": true,
         "chandelier_note": "Chandelier Exit: 過去22日高値(1.9315)-3.0xATR",
-        "spread_session": "Asian/Tokyo",
-        "spread_session_mult": 1.4,
+        "spread_session": "London",
+        "spread_session_mult": 0.85,
         "spread_vix_mult": 1.0
       },
       "carry_score": {
@@ -4118,8 +4261,8 @@
         ],
         "message": "ピボットPP（1.922834）に接近 あと0.10% → 反落でのショート候補"
       },
-      "spread_caution": true,
-      "spread_caution_reason": "💸 スプレッド広め: GBPAUD spread=4.2pips (11% of ATR)。実効RR 1:0.47",
+      "session_caution": true,
+      "session_caution_reason": "🕐 London単独枠(09:00 UTC) — 実データ最弱の時間帯",
       "cb_meeting_blackout": {
         "active": false,
         "severity": "none",
@@ -4162,7 +4305,7 @@
       "fa_direction": "buy",
       "fa_rate_diff": 3.5,
       "fa_detail": "BOE(3.75% neutral/stable) vs SNB(0.25% ease/trough) 差+3.50% / CHFサイクル強化(trough)",
-      "stars": 3,
+      "stars": 2,
       "verdict": "◎ 高信頼ロング",
       "direction": "LONG",
       "pair_type": "major",
@@ -4196,20 +4339,20 @@
         "rr_tp1": 0.5,
         "rr_tp2": 1.5,
         "rr_tp3": 2.0,
-        "spread_price": 0.00042,
-        "spread_pips": 4.2,
-        "spread_atr_ratio": 0.204,
-        "sl_dist_effective": 0.00639,
-        "tp_dist_effective": 0.00288,
-        "rr_effective": 0.45,
+        "spread_price": 0.000255,
+        "spread_pips": 2.6,
+        "spread_atr_ratio": 0.124,
+        "sl_dist_effective": 0.006308,
+        "tp_dist_effective": 0.002963,
+        "rr_effective": 0.47,
         "spread_is_dynamic": true,
-        "spread_pips_dynamic": 4.2,
+        "spread_pips_dynamic": 2.55,
         "regime_label": "通常ボラ相場",
         "strategy": "TP(1.091112)到達 → SLを BE+0.5R(1.091112) へ移動 → トレーリング(2.0×ATR=0.00412)発動 → 利を伸ばす（理論最大: 1.100382）",
         "chandelier_sl_active": true,
         "chandelier_note": "Chandelier Exit: 過去22日高値(1.0899)-3.0xATR",
-        "spread_session": "Asian/Tokyo",
-        "spread_session_mult": 1.4,
+        "spread_session": "London",
+        "spread_session_mult": 0.85,
         "spread_vix_mult": 1.0
       },
       "carry_score": {
@@ -4291,7 +4434,9 @@
       "high_confidence_zone": true,
       "ambush_quality": "整合（シグナル方向とPOIが一致）",
       "spread_filter_applied": true,
-      "spread_filter_reason": "💸 スプレッド広め: GBPCHF spread=4.2pips (20% of ATR) — 実効RR 1:0.5→1:0.45。★5→★3降格。",
+      "spread_filter_reason": "💸 スプレッド広め: GBPCHF spread=2.6pips (12% of ATR) — 実効RR 1:0.5→1:0.47。★5→★3降格。",
+      "session_filter_applied": true,
+      "session_filter_reason": "🕐 セッションフィルタ: GBPCHF London単独枠(09:00 UTC, 08-13 UTC) — 実データで決着勝率11.1%(n=9)と最弱の時間帯。★3→★2降格。",
       "cb_meeting_blackout": {
         "active": false,
         "severity": "none",
@@ -4334,7 +4479,7 @@
       "fa_direction": "buy",
       "fa_rate_diff": 3.85,
       "fa_detail": "RBA(4.10% ease/stable) vs SNB(0.25% ease/trough) 差+3.85% / CHFサイクル強化(trough)",
-      "stars": 3,
+      "stars": 2,
       "verdict": "○ ロング条件成立",
       "direction": "LONG",
       "pair_type": "major",
@@ -4368,20 +4513,20 @@
         "rr_tp1": 0.5,
         "rr_tp2": 1.5,
         "rr_tp3": 2.0,
-        "spread_price": 0.00042,
-        "spread_pips": 4.2,
-        "spread_atr_ratio": 0.275,
-        "sl_dist_effective": 0.0048,
-        "tp_dist_effective": 0.002085,
-        "rr_effective": 0.43,
+        "spread_price": 0.000255,
+        "spread_pips": 2.6,
+        "spread_atr_ratio": 0.167,
+        "sl_dist_effective": 0.004717,
+        "tp_dist_effective": 0.002167,
+        "rr_effective": 0.46,
         "spread_is_dynamic": true,
-        "spread_pips_dynamic": 4.2,
+        "spread_pips_dynamic": 2.55,
         "regime_label": "通常ボラ相場",
         "strategy": "TP(0.568678)到達 → SLを BE+0.5R(0.568678) へ移動 → トレーリング(2.0×ATR=0.00306)発動 → 利を伸ばす（理論最大: 0.575563）",
         "chandelier_sl_active": true,
         "chandelier_note": "Chandelier Exit: 過去22日高値(0.56664)-3.0xATR",
-        "spread_session": "Asian/Tokyo",
-        "spread_session_mult": 1.4,
+        "spread_session": "London",
+        "spread_session_mult": 0.85,
         "spread_vix_mult": 1.0
       },
       "carry_score": {
@@ -4475,7 +4620,9 @@
       "high_confidence_zone": false,
       "ambush_quality": "注意（シグナルとPOIが逆方向）",
       "spread_filter_applied": true,
-      "spread_filter_reason": "💸 スプレッド広め: AUDCHF spread=4.2pips (28% of ATR) — 実効RR 1:0.5→1:0.43。★4→★3降格。",
+      "spread_filter_reason": "💸 スプレッド広め: AUDCHF spread=2.6pips (17% of ATR) — 実効RR 1:0.5→1:0.46。★4→★3降格。",
+      "session_filter_applied": true,
+      "session_filter_reason": "🕐 セッションフィルタ: AUDCHF London単独枠(09:00 UTC, 08-13 UTC) — 実データで決着勝率11.1%(n=9)と最弱の時間帯。★3→★2降格。",
       "cb_meeting_blackout": {
         "active": false,
         "severity": "none",
@@ -4527,7 +4674,7 @@
           "name": "ECB Interest Rate Decision",
           "currency": "EUR",
           "importance": "critical",
-          "hours_until": 53.6,
+          "hours_until": 50.7,
           "date": "2026-07-23T12:15:00Z"
         }
       ],
@@ -4560,20 +4707,20 @@
         "rr_tp1": 0.5,
         "rr_tp2": 1.5,
         "rr_tp3": 2.0,
-        "spread_price": 0.00042,
-        "spread_pips": 4.2,
-        "spread_atr_ratio": 0.375,
-        "sl_dist_effective": 0.00357,
-        "tp_dist_effective": 0.00147,
-        "rr_effective": 0.41,
+        "spread_price": 0.000255,
+        "spread_pips": 2.6,
+        "spread_atr_ratio": 0.228,
+        "sl_dist_effective": 0.003487,
+        "tp_dist_effective": 0.001552,
+        "rr_effective": 0.45,
         "spread_is_dynamic": true,
-        "spread_pips_dynamic": 4.2,
+        "spread_pips_dynamic": 2.55,
         "regime_label": "通常ボラ相場",
         "strategy": "TP(0.92528)到達 → SLを BE+0.5R(0.92528) へ移動 → トレーリング(2.0×ATR=0.00224)発動 → 利を伸ばす（理論最大: 0.93032）",
         "chandelier_sl_active": true,
         "chandelier_note": "Chandelier Exit: 過去22日高値(0.9257)-3.0xATR",
-        "spread_session": "Asian/Tokyo",
-        "spread_session_mult": 1.4,
+        "spread_session": "London",
+        "spread_session_mult": 0.85,
         "spread_vix_mult": 1.0
       },
       "carry_score": {
@@ -4690,6 +4837,10 @@
         ],
         "message": "ピボットPP（0.924033）に接近 あと0.05% → 反落でのショート候補"
       },
+      "spread_caution": true,
+      "spread_caution_reason": "💸 スプレッド広め: EURCHF spread=2.6pips (23% of ATR)。実効RR 1:0.45",
+      "session_caution": true,
+      "session_caution_reason": "🕐 London単独枠(09:00 UTC) — 実データ最弱の時間帯",
       "cb_meeting_blackout": {
         "active": false,
         "severity": "none",
@@ -4766,20 +4917,20 @@
         "rr_tp1": 0.5,
         "rr_tp2": 1.5,
         "rr_tp3": 2.0,
-        "spread_price": 0.00042,
-        "spread_pips": 4.2,
-        "spread_atr_ratio": 0.165,
-        "sl_dist_effective": 0.00786,
-        "tp_dist_effective": 0.003615,
-        "rr_effective": 0.46,
+        "spread_price": 0.000255,
+        "spread_pips": 2.6,
+        "spread_atr_ratio": 0.1,
+        "sl_dist_effective": 0.007778,
+        "tp_dist_effective": 0.003698,
+        "rr_effective": 0.48,
         "spread_is_dynamic": true,
-        "spread_pips_dynamic": 4.2,
+        "spread_pips_dynamic": 2.55,
         "regime_label": "通常ボラ相場",
         "strategy": "TP(1.200857)到達 → SLを BE+0.5R(1.200857) へ移動 → トレーリング(2.0×ATR=0.0051)発動 → 利を伸ばす（理論最大: 1.212332）",
         "chandelier_sl_active": false,
         "chandelier_note": "",
-        "spread_session": "Asian/Tokyo",
-        "spread_session_mult": 1.4,
+        "spread_session": "London",
+        "spread_session_mult": 0.85,
         "spread_vix_mult": 1.0
       },
       "carry_score": {
@@ -4888,8 +5039,8 @@
         ],
         "message": "ピボットPP（1.197844）に接近 あと0.07% → 反落でのショート候補"
       },
-      "spread_caution": true,
-      "spread_caution_reason": "💸 スプレッド広め: AUDNZD spread=4.2pips (16% of ATR)。実効RR 1:0.46",
+      "session_caution": true,
+      "session_caution_reason": "🕐 London単独枠(09:00 UTC) — 実データ最弱の時間帯",
       "cb_meeting_blackout": {
         "active": false,
         "severity": "none",
@@ -4941,7 +5092,7 @@
           "name": "ECB Interest Rate Decision",
           "currency": "EUR",
           "importance": "critical",
-          "hours_until": 53.6,
+          "hours_until": 50.7,
           "date": "2026-07-23T12:15:00Z"
         }
       ],
@@ -4974,20 +5125,20 @@
         "rr_tp1": 0.5,
         "rr_tp2": 1.5,
         "rr_tp3": 2.0,
-        "spread_price": 0.00042,
-        "spread_pips": 4.2,
-        "spread_atr_ratio": 0.081,
-        "sl_dist_effective": 0.01569,
-        "tp_dist_effective": 0.00753,
-        "rr_effective": 0.48,
+        "spread_price": 0.000255,
+        "spread_pips": 2.6,
+        "spread_atr_ratio": 0.049,
+        "sl_dist_effective": 0.015607,
+        "tp_dist_effective": 0.007612,
+        "rr_effective": 0.49,
         "spread_is_dynamic": true,
-        "spread_pips_dynamic": 4.2,
+        "spread_pips_dynamic": 2.55,
         "regime_label": "通常ボラ相場",
         "strategy": "TP(1.94426)到達 → SLを BE+0.5R(1.94426) へ移動 → トレーリング(2.0×ATR=0.01032)発動 → 利を伸ばす（理論最大: 1.92104）",
         "chandelier_sl_active": false,
         "chandelier_note": "",
-        "spread_session": "Asian/Tokyo",
-        "spread_session_mult": 1.4,
+        "spread_session": "London",
+        "spread_session_mult": 0.85,
         "spread_vix_mult": 1.0
       },
       "carry_score": {
@@ -5060,6 +5211,8 @@
         "has_alert": false,
         "approaching": []
       },
+      "session_caution": true,
+      "session_caution_reason": "🕐 London単独枠(09:00 UTC) — 実データ最弱の時間帯",
       "cb_meeting_blackout": {
         "active": false,
         "severity": "none",
@@ -5102,10 +5255,39 @@
       "fa_direction": "neutral",
       "fa_rate_diff": 0.75,
       "fa_detail": "FRB(3.75% neutral/stable) vs PBOC(3.00% ease/stable) 差+0.75%",
-      "stars": 2,
-      "verdict": "△ 弱シグナル",
+      "stars": 1,
+      "verdict": "⚠ 地政学リスク(medium)考慮 △ 弱シグナル",
       "direction": "LIGHT_SHORT",
       "pair_type": "dollar",
+      "geopolitical_risk": {
+        "risk_level": "medium",
+        "risk_score": 42,
+        "reason": "political_instability: protest / geopolitical: sanction",
+        "recent_news": [
+          "\"China (election OR protest OR crisis OR sanction OR \"central bank\" OR geopolitics)\" - Google News",
+          "Google News",
+          "Fact-checking Trump's address on China, the 2020 election and what documents show - PBS",
+          "Trump stretches declassified China intelligence into broader 2020 election claims - Nextgov/FCW"
+        ],
+        "categories": {
+          "political_instability": {
+            "score": 15,
+            "hits": [
+              "protest"
+            ]
+          },
+          "geopolitical": {
+            "score": 12,
+            "hits": [
+              "sanction"
+            ]
+          }
+        },
+        "country": "China",
+        "news_volume": 8
+      },
+      "original_stars": 2,
+      "risk_adjustment": -42,
       "upcoming_events": [],
       "volatility_regime": {
         "regime": "normal",
@@ -5136,20 +5318,20 @@
         "rr_tp1": 0.5,
         "rr_tp2": 1.5,
         "rr_tp3": 2.0,
-        "spread_price": 0.00042,
-        "spread_pips": 4.2,
-        "spread_atr_ratio": 0.057,
-        "sl_dist_effective": 0.02232,
-        "tp_dist_effective": 0.010845,
+        "spread_price": 0.000255,
+        "spread_pips": 2.6,
+        "spread_atr_ratio": 0.035,
+        "sl_dist_effective": 0.022237,
+        "tp_dist_effective": 0.010927,
         "rr_effective": 0.49,
         "spread_is_dynamic": true,
-        "spread_pips_dynamic": 4.2,
+        "spread_pips_dynamic": 2.55,
         "regime_label": "通常ボラ相場",
         "strategy": "TP(6.75588)到達 → SLを BE+0.5R(6.75588) へ移動 → トレーリング(2.0×ATR=0.01474)発動 → 利を伸ばす（理論最大: 6.722715）",
         "chandelier_sl_active": true,
         "chandelier_note": "Chandelier Exit: 過去22日安値(6.7669)+3.0xATR",
-        "spread_session": "Asian/Tokyo",
-        "spread_session_mult": 1.4,
+        "spread_session": "London",
+        "spread_session_mult": 0.85,
         "spread_vix_mult": 1.0
       },
       "carry_score": {
@@ -5228,6 +5410,8 @@
         "has_alert": false,
         "approaching": []
       },
+      "session_caution": true,
+      "session_caution_reason": "🕐 London単独枠(09:00 UTC) — 実データ最弱の時間帯",
       "cb_meeting_blackout": {
         "active": false,
         "severity": "none",
@@ -5249,16 +5433,16 @@
     }
   ],
   "sentiment": {
-    "vix": 18.65,
+    "vix": 17.43,
     "vix_level": "normal",
     "risk_off_strength": 0,
-    "dxy": 100.91,
+    "dxy": 100.92,
     "dxy_30d_avg": 100.74,
     "dxy_trend": "flat",
     "us10y": 4.598,
     "bond_pressure": "elevated",
-    "gold": 4078.1,
-    "gold_20d_avg": 4062.51,
+    "gold": 4070.9,
+    "gold_20d_avg": 4062.16,
     "gold_trend": "flat",
     "risk_mode": "normal"
   },
@@ -5501,17 +5685,8 @@
     }
   },
   "portfolio_risk": {
-    "currency_exposure": {
-      "USD": 1,
-      "JPY": -3,
-      "EUR": 1,
-      "GBP": 1
-    },
-    "warnings": [
-      "⚠ JPY売りポジションが3件集中 → 同方向リスクに注意"
-    ],
-    "risk_level": "high",
-    "recommendation": "同一通貨のポジション集中を解消するか、ロットを半減することを推奨",
-    "active_signals_count": 3
+    "currency_exposure": {},
+    "warnings": [],
+    "risk_level": "low"
   }
 }
