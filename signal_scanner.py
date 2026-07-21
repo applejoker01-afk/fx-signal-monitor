@@ -2187,11 +2187,6 @@ def main():
             rate_warnings=rate_consistency.get("warnings"),
             latest_pairs=latest["pairs"],
         )
-        for _dbg_name in ("SMTP_HOST", "SMTP_PORT", "SMTP_USER", "SMTP_PASS", "MAIL_FROM", "MAIL_TO"):
-            _v = os.environ.get(_dbg_name, "")
-            print(f"[DEBUG] {_dbg_name}: len={len(_v)} "
-                  f"leading_ws={_v != _v.lstrip()} trailing_ws={_v != _v.rstrip()} "
-                  f"has_at={'@' in _v} inner_space={' ' in _v.strip()}")
         send_email(
             os.environ.get("SMTP_HOST", "smtp.gmail.com"),
             os.environ.get("SMTP_PORT", "465"),
