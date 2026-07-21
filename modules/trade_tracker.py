@@ -28,6 +28,7 @@ import os
 from datetime import datetime, timezone
 
 from modules.position_sizing import calc_position_size, pnl_to_jpy, record_trade_pnl
+from modules.advanced_analytics import calc_correlated_exposure_multiplier
 
 
 OPEN_TRADES_FILE = "data/open_trades.json"
@@ -464,9 +465,16 @@ def update_trades(results: list, now: datetime,
             # 同一スキャンサイクル内で複数ペアが同時に新規シグナルを出した場合でも、
             # 先に処理されたペアの証拠金を後続ペアの余力計算に正しく反映させる。
             if pair_api is not None and latest_pairs is not None and initial_sl is not None:
+                # 相関エクスポージャー（2026-07-21追加）: 既存保有ポジションと
+                # 同方向の通貨エクスポージャーが重複していればロットを圧縮する。
+                exp_mult, exp_note = calc_correlated_exposure_multiplier(
+                    pair, direction, open_trades, pair_api
+                )
+                if exp_note:
+                    print(f"  [SIZING] {pair}: {exp_note}")
                 sizing = calc_position_size(
                     pair, entry_price, initial_sl, pair_api, latest_pairs,
-                    open_trades=open_trades,
+                    open_trades=open_trades, exposure_multiplier=exp_mult,
                 )
                 trade["position_sizing"] = sizing
                 if sizing.get("tradable"):
@@ -507,9 +515,14 @@ def open_trade_from_pending_fill(trade: dict, pair_api: dict = None,
     pair = trade["pair"]
 
     if pair_api is not None and latest_pairs is not None and trade.get("sl") is not None:
+        exp_mult, exp_note = calc_correlated_exposure_multiplier(
+            pair, trade.get("direction", ""), open_trades, pair_api
+        )
+        if exp_note:
+            print(f"  [SIZING] {pair}: {exp_note}")
         sizing = calc_position_size(
             pair, trade["entry_price"], trade["sl"], pair_api, latest_pairs,
-            open_trades=open_trades,
+            open_trades=open_trades, exposure_multiplier=exp_mult,
         )
         trade["position_sizing"] = sizing
         if sizing.get("tradable"):

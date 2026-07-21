@@ -175,11 +175,53 @@ def check_stance_consistency(rates, snapshot_file="docs/rates_snapshot.json"):
                 "message": f"{cb}({ccy}): 金利が{old}%→{rate}%に上昇したのに stance=ease（利下げ中）。利上げ転換の可能性。stanceの見直しを。",
             })
 
+    warnings.extend(check_central_bank_data_staleness())
+
     return {
         "warnings": warnings,
         "checked_at": datetime.now(timezone.utc).isoformat(),
         "rates": current,
     }
+
+
+def check_central_bank_data_staleness(max_age_days: int = 45) -> list:
+    """
+    central_bank_rates.json の last_updated が古すぎないか検知する（2026-07-21追加）。
+
+    背景: 2026-07-20にAUD/NZDのstance誤り（実際には発生していない利下げを前提と
+    していた）を手動訂正したが、その後の別コミットとのマージで訂正が silent に
+    元へ巻き戻り、システムは古い誤データのまま数日間シグナル生成を続けていた
+    （2026-07-21判明・訂正2回目）。他通貨の政策金利はFRED等での自動取得対象外
+    （手動メンテ）のため、更新が止まっても気づく仕組みがなかった。
+    このチェックはstance/rateの中身までは検証しないが、「最終更新から
+    max_age_days日以上経過」を検知して通知することで、今回のような巻き戻りや
+    更新忘れが長期間気づかれないリスクを減らす。
+    """
+    import json as _json
+    if not os.path.exists(CENTRAL_BANK_FILE):
+        return []
+    try:
+        with open(CENTRAL_BANK_FILE, "r", encoding="utf-8") as f:
+            data = _json.load(f)
+        last_updated_str = data.get("last_updated")
+        if not last_updated_str:
+            return []
+        last_updated = datetime.fromisoformat(last_updated_str).replace(tzinfo=timezone.utc)
+        age_days = (datetime.now(timezone.utc) - last_updated).days
+        if age_days >= max_age_days:
+            return [{
+                "ccy": "ALL",
+                "stance": None,
+                "message": (
+                    f"central_bank_rates.json の最終更新が{age_days}日前"
+                    f"（{last_updated_str}）と古く、fa_score算出に使われる各国政策金利・"
+                    f"stanceが実態と乖離している可能性があります。中銀会合の結果を確認し、"
+                    f"手動更新を検討してください。"
+                ),
+            }]
+    except Exception as e:
+        print(f"[WARN] central_bank_rates.json 鮮度チェック失敗: {e}")
+    return []
 
 
 def save_rates_snapshot(rates, snapshot_file="docs/rates_snapshot.json"):

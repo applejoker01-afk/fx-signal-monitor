@@ -526,6 +526,18 @@ def evaluate_full(pair, price, prices, cb_rates, sentiment, now):
         stars = 2; verdict = "△ 弱シグナル"
         direction = "LIGHT_" + ("LONG" if (ta_sign + fa_sign) > 0 else "SHORT")
 
+    # 過熱スコアキャップ（2026-07-21追加）:
+    # 2026-07-11実績評価（71トレード実データ）で、ta_scoreと成績が「逆U字」の関係にあると
+    # 判明した。中庸なQ2(68.0-78.3)が最良(勝率45.2%・+112.4p)なのに対し、最高スコア帯の
+    # Q4(83.0-98)は最悪(勝率20.0%・-245.1p)——スコアが高いほど「強いトレンド」ではなく
+    # 「伸びきって反転間際の過熱状態」を捉えている可能性が高い。★5判定は現行「ta_score>=78」
+    # で付与されるが、実データが裏付けるのはQ2止まりのため、83点以上（ロング）/
+    # 17点以下（ショート、50を軸にした対称値。SHORT側は実データが薄く外挿）は★5を
+    # 付与せず★4に格下げする。詳細: wiki/finance/2026-07-11-fx-signal-monitor-evaluation.md
+    if stars == 5 and (ta["ta_score"] >= 83 or ta["ta_score"] <= 17):
+        stars = 4
+        verdict += "（過熱スコア降格: ta_score逆U字の実績データに基づく）"
+
     # ペア別精度で価格と価格スケール指標を再丸め
     _d = pair_decimals(pair)
     ta_rounded = dict(ta)

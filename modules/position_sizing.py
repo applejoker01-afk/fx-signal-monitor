@@ -241,7 +241,8 @@ def calc_maintenance_ratio(account: dict, open_trades: dict, pair_api: dict,
 
 def calc_position_size(pair: str, entry_price: float, sl_price: float,
                         pair_api: dict, latest_pairs: dict,
-                        account: dict = None, open_trades: dict = None) -> dict:
+                        account: dict = None, open_trades: dict = None,
+                        exposure_multiplier: float = 1.0) -> dict:
     """
     仮想口座残高・リスク許容度・SL値幅から推奨ロット数を算出する。
 
@@ -249,6 +250,11 @@ def calc_position_size(pair: str, entry_price: float, sl_price: float,
     max_margin_usage_pct の上限を判定する（2026-07-20修正: 従来は新規ポジション単体
     でしか判定しておらず、複数ポジション保有時に合計証拠金がロスカット閾値に接近する
     リスクを見落としていた）。省略時はopen_trades.jsonを自動で読み込む。
+
+    exposure_multiplier: 通貨相関リスクによるロット圧縮倍率（2026-07-21追加、
+    modules.advanced_analytics.calc_correlated_exposure_multiplier()で算出）。
+    1.0未満ならリスク許容額を圧縮し、AUDJPY×NZDJPY同時保有のような
+    「別ペアでも同方向の通貨エクスポージャーが積み上がる」組み合わせのロットを抑える。
 
     Returns:
         {
@@ -300,7 +306,8 @@ def calc_position_size(pair: str, entry_price: float, sl_price: float,
     if loss_per_unit_jpy <= 0:
         return {"tradable": False, "units": 0, "note": "損失単価の計算に失敗"}
 
-    risk_amount_jpy = balance * (risk_pct / 100.0)
+    exposure_multiplier = max(0.0, min(1.0, exposure_multiplier))
+    risk_amount_jpy = balance * (risk_pct / 100.0) * exposure_multiplier
     raw_units_risk = risk_amount_jpy / loss_per_unit_jpy
 
     # 証拠金ベースの上限units（既存ポジション分を差し引いた残り予算で判定）
@@ -335,6 +342,10 @@ def calc_position_size(pair: str, entry_price: float, sl_price: float,
 
     margin_required_jpy = units * margin_per_unit_jpy
     estimated_loss_jpy = units * loss_per_unit_jpy
+    exposure_note = (
+        f" ※相関リスクでロット{exposure_multiplier:.0%}に圧縮"
+        if exposure_multiplier < 1.0 else ""
+    )
 
     return {
         "tradable": True,
@@ -343,5 +354,9 @@ def calc_position_size(pair: str, entry_price: float, sl_price: float,
         "risk_amount_jpy": round(risk_amount_jpy, 0),
         "estimated_loss_jpy": round(estimated_loss_jpy, 0),
         "existing_margin_jpy": round(existing_margin_jpy, 0),
-        "note": f"{units}{from_ccy}単位（証拠金約¥{margin_required_jpy:.0f}・想定損失¥{estimated_loss_jpy:.0f}）",
+        "exposure_multiplier": exposure_multiplier,
+        "note": (
+            f"{units}{from_ccy}単位（証拠金約¥{margin_required_jpy:.0f}・"
+            f"想定損失¥{estimated_loss_jpy:.0f}）{exposure_note}"
+        ),
     }

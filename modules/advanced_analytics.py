@@ -556,6 +556,64 @@ def calc_correlation_risk(all_results: list, pair_api: dict) -> dict:
     }
 
 
+def calc_correlated_exposure_multiplier(pair: str, direction: str,
+                                         open_trades: dict, pair_api: dict) -> tuple:
+    """
+    新規候補ポジションの通貨が、既存保有ポジション（open_trades）の通貨エクスポージャーと
+    同方向に重複する度合いに応じてロットサイズの倍率を返す（2026-07-21追加）。
+
+    背景: calc_correlation_risk()は「同一スキャン内の★4以上シグナル」だけを見て警告する
+    情報提供止まりで、実際の保有ポジションとの重複を見ておらず、ロットにも反映されない。
+    AUDJPYとNZDJPY等、別ペアでも同方向の通貨エクスポージャーが積み上がる組み合わせを
+    フルロットで同時保有すると、見た目の分散に反して実効リスクが集中する
+    （[[fx-signal-monitor-nzd-aud-improvement-plan]]改善案1）。
+
+    Returns:
+        (multiplier: float, note: str) — multiplier=1.0なら調整なし。
+    """
+    if pair not in pair_api or not direction.endswith(("LONG", "SHORT")):
+        return 1.0, ""
+
+    base, quote = pair_api[pair]
+    if direction.endswith("LONG"):
+        candidate = {base: 1, quote: -1}
+    else:
+        candidate = {base: -1, quote: 1}
+
+    exposure = {}
+    for p, t in open_trades.items():
+        if p == pair or p not in pair_api:
+            continue
+        b, q = pair_api[p]
+        d = str(t.get("direction", ""))
+        if d.endswith("LONG"):
+            exposure[b] = exposure.get(b, 0) + 1
+            exposure[q] = exposure.get(q, 0) - 1
+        elif d.endswith("SHORT"):
+            exposure[b] = exposure.get(b, 0) - 1
+            exposure[q] = exposure.get(q, 0) + 1
+
+    # 新規候補と同符号（同方向）に重なる既存エクスポージャーのうち最大のもの
+    max_overlap = 0
+    overlap_ccy = None
+    for ccy, cand_dir in candidate.items():
+        existing = exposure.get(ccy, 0)
+        if existing != 0 and (existing > 0) == (cand_dir > 0):
+            if abs(existing) > max_overlap:
+                max_overlap = abs(existing)
+                overlap_ccy = ccy
+
+    if max_overlap >= 2:
+        return 0.5, (
+            f"相関リスク: {overlap_ccy}が既存{max_overlap}件と同方向で重複 → ロット50%に圧縮"
+        )
+    if max_overlap == 1:
+        return 0.75, (
+            f"相関リスク: {overlap_ccy}が既存1件と同方向で重複 → ロット75%に圧縮"
+        )
+    return 1.0, ""
+
+
 # ============================================================
 # ⑤ キャリートレード魅力度スコア
 # ============================================================
