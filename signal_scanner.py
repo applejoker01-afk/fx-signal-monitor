@@ -180,6 +180,15 @@ PAIR_API = {
     "USDCNY": ("USD", "CNY"),
 }
 
+# KRWなど1単位あたりの価値が極端に小さい通貨は、日本の証券会社（SBI証券など）に
+# 倣い「100単位あたり」で建値表示する。TA/ATR/スプレッド/ポジションサイジングは
+# 内部的に1単位あたりの生レート(PAIR_API/fetch_latest_rates由来)のまま計算し続け、
+# ここは fmt_price() での表示専用のスケーリングとして使う（内部計算に混ぜると
+# position_sizing.py の1KRWあたり証拠金計算などが100倍ずれるため分離している）。
+DISPLAY_SCALE = {
+    "KRWJPY": 100.0,
+}
+
 PAIR_LABEL = {
     "USDJPY": "USD/JPY", "EURJPY": "EUR/JPY", "GBPJPY": "GBP/JPY",
     "AUDJPY": "AUD/JPY", "NZDJPY": "NZD/JPY", "CADJPY": "CAD/JPY",
@@ -208,11 +217,14 @@ def pair_decimals(pair: str) -> int:
 
 
 def fmt_price(pair: str, value) -> str:
-    """価格を pair に応じた固定桁数の文字列で返す。None/非数は '—'。"""
+    """価格を pair に応じた固定桁数の文字列で返す。None/非数は '—'。
+    KRWJPY等はDISPLAY_SCALEに従い、証券会社の建値慣行（100単位あたり等）に
+    合わせて表示専用でスケーリングする（内部計算値には影響しない）。"""
     if value is None:
         return "—"
     try:
-        return f"{float(value):.{pair_decimals(pair)}f}"
+        scale = DISPLAY_SCALE.get(pair.upper(), 1.0) if pair else 1.0
+        return f"{float(value) * scale:.{pair_decimals(pair)}f}"
     except (TypeError, ValueError):
         return str(value)
 
