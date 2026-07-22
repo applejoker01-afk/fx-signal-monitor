@@ -97,13 +97,24 @@ def resolve_symbol(pair: str) -> str | None:
     """自社ペア名(例:"USDJPY")をブローカーのシンボル名に変換し、
     Market Watchに存在する（＝取引可能）ことを確認する。
 
+    2026-07-23判明: XM(Tradexfin)デモでは主要7ペア(USDJPY/EURUSD/GBPUSD/
+    AUDUSD/NZDUSD/USDCAD/USDCHF)は接尾辞なし、クロス通貨(EURJPY/GBPJPY/
+    EURGBP/EURAUD/GBPAUD/GBPCHF/AUDCHF/EURCHF/AUDNZD/EURNZD等)は「#」付き
+    という2系統が混在している。エキゾチック通貨(SEK/NOK/BRL/PLN/KRW/TRY/
+    ZAR/INR/HKD/CNYの各JPYクロス、USDCNY)はどちらの形でも存在せず、
+    ブローカー側で本当に取り扱っていない（命名規則の問題ではない）。
+
     見つからない/取引不可の場合はNoneを返す（呼び出し側は
     「このブローカーでは扱っていないペア」として扱うこと）。
     """
-    suffix = os.environ.get("MT5_SYMBOL_SUFFIX", "")
-    candidates = [f"{pair}{suffix}"] if suffix else [pair]
-    if pair not in candidates:
-        candidates.append(pair)  # 接尾辞なし版も一応試す
+    env_suffix = os.environ.get("MT5_SYMBOL_SUFFIX", "")
+    # 環境変数指定があれば最優先、次に接尾辞なし、最後に"#"付きを自動フォールバック
+    candidates = []
+    if env_suffix:
+        candidates.append(f"{pair}{env_suffix}")
+    candidates.append(pair)
+    if f"{pair}#" not in candidates:
+        candidates.append(f"{pair}#")
 
     for symbol in candidates:
         info = mt5.symbol_info(symbol)
@@ -132,12 +143,28 @@ def build_latest_pairs(pair_api: dict) -> dict:
     """pair_api内の全ペアについて、このブローカーで取得できる現在値をまとめて返す。
     modules.position_sizing.calc_position_size() の latest_pairs 引数にそのまま渡せる。
     ブローカーが扱っていないペアはキーごと省略される
-    （from_currency_jpy_rate側がNone扱いで安全にフォールバックする）。"""
-    latest = {}
+    （from_currency_jpy_rate側がNone扱いで安全にフォールバックする）。
+
+    2026-07-23判明: symbol_select()でMarket Watchに追加した直後は、配信が
+    温まるまでtickが0で返ることがある（XM実機で確認、1回目22ペア中9ペアが
+    tick取得失敗→2回目は22/22件成功）。先に全シンボルをresolve/select してから
+    少し待ってティックを取得する2段階方式でこれを吸収する。"""
+    import time
+
+    symbols = {}
     for pair in pair_api:
-        price = get_tick_price(pair)
-        if price is not None:
-            latest[pair] = price
+        sym = resolve_symbol(pair)
+        if sym:
+            symbols[pair] = sym
+
+    if symbols:
+        time.sleep(0.5)  # 配信ウォームアップ待ち
+
+    latest = {}
+    for pair, sym in symbols.items():
+        tick = mt5.symbol_info_tick(sym)
+        if tick is not None and tick.bid != 0:
+            latest[pair] = float(tick.bid)
     return latest
 
 
