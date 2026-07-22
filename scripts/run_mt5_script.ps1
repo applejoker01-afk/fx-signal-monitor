@@ -46,6 +46,9 @@ try {
 }
 
 try {
+    # Pythonのstdout既定エンコーディング(Windowsではコンソールのcp932になりがち)が
+    # ログファイルへリダイレクトする際に文字化けするため、明示的にUTF-8を強制する。
+    $env:PYTHONIOENCODING = "utf-8"
     $runOutput = python $TargetScript 2>&1
     $runOutput | Out-File -FilePath $logFile -Append -Encoding utf8
 } catch {
@@ -53,4 +56,5 @@ try {
 }
 
 "=== $(Get-Date -Format 'yyyy-MM-dd_HH-mm-ss') 終了 ===" | Out-File -FilePath $logFile -Append -Encoding utf8
+
 
