@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>D系統: フロー文脈レイヤー | fx-signal-monitor</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  /* 埋め込み用にすべて --fp-* 変数化。既存サイトのテーマに合わせて上書き可 */
+  :root{
+    --fp-bg:#0e1116; --fp-surface:#151a22; --fp-line:#232b36;
+    --fp-fg:#e8ecf1; --fp-muted:#8b97a5;
+    --fp-up:#e05d4f;    /* 円安・上振れ（本邦チャート慣行の陽線=赤に合わせる） */
+    --fp-down:#4f83e0;  /* 円高・下振れ */
+    --fp-ok:#58a37a; --fp-warn:#d9a441;
+    --fp-radius:10px;
+    --fp-num:"SF Mono",ui-monospace,"Cascadia Mono","Roboto Mono",Consolas,monospace;
+    --fp-sans:"Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic UI",system-ui,sans-serif;
+  }
+  body{margin:0;background:var(--fp-bg);color:var(--fp-fg);font-family:var(--fp-sans)}
+  .fp{max-width:880px;margin:0 auto;padding:20px 16px 40px}
+  .fp *{box-sizing:border-box}
+
+  .fp-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px 14px;
+           border-bottom:1px solid var(--fp-line);padding-bottom:12px}
+  .fp-eyebrow{font-size:11px;letter-spacing:.18em;color:var(--fp-muted)}
+  .fp-title{font-size:20px;font-weight:700;margin:0}
+  .fp-badge{font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;
+            border:1px solid transparent}
+  .fp-badge[data-state="フロー整合圏"]{color:var(--fp-ok);border-color:var(--fp-ok)}
+  .fp-badge[data-state="乖離注意"]{color:var(--fp-warn);border-color:var(--fp-warn)}
+  .fp-badge[data-state="乖離大"]{color:var(--fp-up);border-color:var(--fp-up);background:rgba(224,93,79,.12)}
+  .fp-demo{font-size:11px;color:var(--fp-bg);background:var(--fp-warn);
+           padding:2px 8px;border-radius:4px;font-weight:700}
+  .fp-stamp{margin-left:auto;font-size:11px;color:var(--fp-muted);font-family:var(--fp-num)}
+
+  .fp-tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0}
+  @media(max-width:640px){.fp-tiles{grid-template-columns:repeat(2,1fr)}}
+  .fp-tile{background:var(--fp-surface);border:1px solid var(--fp-line);
+           border-radius:var(--fp-radius);padding:12px 14px}
+  .fp-tile .k{font-size:11px;color:var(--fp-muted);letter-spacing:.06em}
+  .fp-tile .v{font-family:var(--fp-num);font-variant-numeric:tabular-nums;
+              font-size:22px;font-weight:600;margin-top:4px;line-height:1.1}
+  .fp-tile .s{font-family:var(--fp-num);font-size:11px;color:var(--fp-muted);margin-top:4px}
+  .pos{color:var(--fp-up)} .neg{color:var(--fp-down)}
+
+  .fp-card{background:var(--fp-surface);border:1px solid var(--fp-line);
+           border-radius:var(--fp-radius);padding:14px;margin:12px 0}
+  .fp-card h2{font-size:13px;margin:0 0 10px;color:var(--fp-muted);font-weight:600;
+              letter-spacing:.08em}
+  .fp-chart{position:relative;height:240px}
+
+  .fp-alerts{margin:12px 0;display:grid;gap:8px}
+  .fp-alert{border-left:3px solid var(--fp-warn);background:var(--fp-surface);
+            border-radius:0 var(--fp-radius) var(--fp-radius) 0;
+            padding:10px 12px;font-size:13px}
+  .fp-note{font-size:12px;color:var(--fp-muted);line-height:1.7;margin-top:16px;
+           border-top:1px solid var(--fp-line);padding-top:12px}
+  .fp-note code{font-family:var(--fp-num);font-size:11px}
+  .fp-error{border:1px dashed var(--fp-line);border-radius:var(--fp-radius);
+            padding:18px;font-size:13px;color:var(--fp-muted);line-height:1.8}
+  a{color:var(--fp-down)}
+  :focus-visible{outline:2px solid var(--fp-warn);outline-offset:2px}
+</style>
+</head>
+<body>
+<div style="max-width:880px;margin:0 auto;padding:14px 16px 0">
+  <a href="./" style="font-size:12px;color:var(--fp-muted);text-decoration:none">← L3 ダッシュボードへ戻る</a>
+</div>
+<div class="fp" id="app">
+  <div class="fp-error" id="loading">flow_context.json を読み込んでいます…</div>
+</div>
+
+<script>
+"use strict";
+const $ = (h) => { const t = document.createElement("template"); t.innerHTML = h.trim(); return t.content.firstChild; };
+const fmt = (v, nd = 3) => (v == null || Number.isNaN(v)) ? "–" : Number(v).toFixed(nd);
+const fmtSign = (v, nd = 2, suf = "") => (v == null) ? "–" : `${v >= 0 ? "+" : ""}${Number(v).toFixed(nd)}${suf}`;
+const cls = (v) => (v == null) ? "" : (v >= 0 ? "pos" : "neg");
+
+const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+
+async function main(){
+  const app = document.getElementById("app");
+  let d;
+  try{
+    const r = await fetch("data/flow_context.json", {cache:"no-store"});
+    if(!r.ok) throw new Error(`HTTP ${r.status}`);
+    d = await r.json();
+  }catch(e){
+    app.innerHTML = "";
+    app.appendChild($(`<div class="fp-error">
+      <b>データを読み込めません。</b><br>
+      ・ローカル確認は <code>docs/</code> で <code>python -m http.server 8000</code> を起動してから
+      <code>http://localhost:8000/flow_panel.html</code> を開いてください（file:// では fetch が動きません）。<br>
+      ・デモデータは <code>python tests/make_demo_json.py</code> で生成できます。<br>
+      <span style="opacity:.7">詳細: ${String(e)}</span></div>`));
+    return;
+  }
+
+  const lt = d.latest || {}, now = d.now || {}, s = d.series || {};
+  app.innerHTML = "";
+
+  // ---- ヘッダー
+  app.appendChild($(`
+    <div class="fp-head">
+      <div>
+        <div class="fp-eyebrow">FX-SIGNAL-MONITOR ｜ ${d.layer || "D系統"}</div>
+        <h1 class="fp-title">${d.pair || "USDJPY"} フロー文脈</h1>
+      </div>
+      <span class="fp-badge" data-state="${lt.state || ""}">${lt.state || "–"}</span>
+      ${d.demo ? '<span class="fp-demo">DEMO</span>' : ""}
+      <span class="fp-stamp">更新 ${d.generated_at || "–"}</span>
+    </div>`));
+
+  // ---- タイル
+  const stale = (now.cot_staleness_days != null) ? `COT公表から${now.cot_staleness_days}日` : "";
+  app.appendChild($(`
+    <div class="fp-tiles">
+      <div class="fp-tile"><div class="k">イマココ価格 (${now.price_date || "–"})</div>
+        <div class="v">${fmt(now.price)}</div>
+        <div class="s">対FV ${fmtSign(now.gap_vs_fv_pct, 2, "%")}｜${stale}</div></div>
+      <div class="fp-tile"><div class="k">フェアバリュー (週次フィルタ値)</div>
+        <div class="v">${fmt(lt.fair_value)}</div>
+        <div class="s">報告 ${lt.report_date || "–"} / 公表 ${lt.release_date || "–"}</div></div>
+      <div class="fp-tile"><div class="k">3ヶ月累積・未説明変化</div>
+        <div class="v ${cls(lt.cum13_pct)}">${fmtSign(lt.cum13_pct, 2, "%")}</div>
+        <div class="s">z=${fmtSign(lt.cum13_z, 1)}｜今週サプライズ z=${fmtSign(lt.innov_z, 1)}</div></div>
+      <div class="fp-tile"><div class="k">COT投機筋ネット (円)</div>
+        <div class="v ${cls(lt.net_spec_contracts)}">${lt.net_spec_contracts == null ? "–" : lt.net_spec_contracts.toLocaleString("ja-JP", {signDisplay:"always"})}<span style="font-size:12px">枚</span></div>
+        <div class="s">z52=${fmtSign(lt.net_z52, 1)}｜約${lt.net_notional_oku_yen == null ? "–" : Math.round(lt.net_notional_oku_yen).toLocaleString("ja-JP")}億円</div></div>
+    </div>`));
+
+  // ---- アラート
+  if((d.alerts || []).length){
+    const box = $('<div class="fp-alerts"></div>');
+    d.alerts.forEach(a => box.appendChild($(`<div class="fp-alert">⚠ ${a}</div>`)));
+    app.appendChild(box);
+  }
+
+  // ---- チャート
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  Chart.defaults.color = css("--fp-muted");
+  Chart.defaults.borderColor = css("--fp-line");
+  Chart.defaults.font.family = css("--fp-num");
+  Chart.defaults.animation = reduce ? false : {duration: 300};
+
+  const dates = s.date || [];
+  const tickCb = (v, i) => (i % Math.ceil(dates.length / 8) === 0) ? dates[i] : "";
+
+  const c1 = $(`<div class="fp-card"><h2>価格 × フェアバリュー（週次・過去${dates.length}週）</h2>
+                <div class="fp-chart"><canvas></canvas></div></div>`);
+  app.appendChild(c1);
+  new Chart(c1.querySelector("canvas"), {
+    type: "line",
+    data: { labels: dates, datasets: [
+      { label:"価格", data: s.price || [], borderColor: css("--fp-fg"), borderWidth: 1.6, pointRadius: 0 },
+      { label:"FV",  data: s.fair_value || [], borderColor: css("--fp-warn"), borderWidth: 1.4,
+        borderDash:[5,4], pointRadius: 0 },
+    ]},
+    options: { maintainAspectRatio:false, interaction:{mode:"index", intersect:false},
+      scales:{ x:{ticks:{callback:tickCb, maxRotation:0}}, y:{position:"right"} },
+      plugins:{ legend:{labels:{boxWidth:14}} } }
+  });
+
+  const c2 = $(`<div class="fp-card"><h2>3ヶ月累積・未説明変化 z（±2 = 乖離大の目安）</h2>
+                <div class="fp-chart"><canvas></canvas></div></div>`);
+  app.appendChild(c2);
+  const z = s.cum13_z || [];
+  new Chart(c2.querySelector("canvas"), {
+    data: { labels: dates, datasets: [
+      { type:"bar", label:"cum13_z", data: z,
+        backgroundColor: z.map(v => (v == null) ? "transparent" : (v >= 0 ? css("--fp-up") : css("--fp-down"))) },
+      { type:"line", label:"+2σ", data: dates.map(()=> 2), borderColor: css("--fp-muted"),
+        borderWidth:1, borderDash:[3,4], pointRadius:0 },
+      { type:"line", label:"-2σ", data: dates.map(()=> -2), borderColor: css("--fp-muted"),
+        borderWidth:1, borderDash:[3,4], pointRadius:0 },
+    ]},
+    options: { maintainAspectRatio:false,
+      scales:{ x:{ticks:{callback:tickCb, maxRotation:0}}, y:{position:"right", suggestedMin:-3, suggestedMax:3} },
+      plugins:{ legend:{display:false}, tooltip:{filter: (i)=> i.datasetIndex === 0} } }
+  });
+
+  // ---- 注記
+  const m = d.model || {};
+  app.appendChild($(`
+    <div class="fp-note">
+      赤=円安側（フロー対比で上振れ）／青=円高側。表示はすべてフィルタ値（先読みなし）。
+      ${now.note ? now.note : ""}<br>
+      モデル: <code>${m.spec || ""}</code>｜β=${fmtSign(m.beta, 5)} √Q=${m.q ? Math.sqrt(m.q).toFixed(5) : "–"}
+      √R=${m.r ? Math.sqrt(m.r).toFixed(5) : "–"} n=${m.n_obs ?? "–"}<br>
+      ${d.disclaimer || ""}
+    </div>`));
+}
+main();
+</script>
+</body>
+</html>

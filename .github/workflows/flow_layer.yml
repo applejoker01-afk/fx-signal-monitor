@@ -1,0 +1,54 @@
+name: flow-layer-weekly
+
+on:
+  schedule:
+    # COT公表(通常 金曜15:30 ET)の後に実行:
+    # 金曜 21:30 UTC = 土曜 06:30 JST（夏時間/冬時間どちらでも公表後）
+    - cron: "30 21 * * 5"
+  workflow_dispatch: {}   # 初回セットアップと動作確認は手動実行で
+
+permissions:
+  contents: write
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r flow_layer/requirements.txt
+
+      - name: Run D-layer pipeline
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}          # 任意（価格フォールバック）
+          CFTC_APP_TOKEN: ${{ secrets.CFTC_APP_TOKEN }}      # 任意
+          # FLOW_OUTPUT_JSON: docs/data/flow_context.json    # Pages構成に合わせて変更可
+          # FLOW_DATA_DIR: data
+        run: python flow_layer/run_flow_layer.py
+
+      - name: Commit results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A data docs
+          git diff --cached --quiet && { echo "No changes to commit"; exit 0; } || git commit -m "D系統: フロー文脈レイヤー 週次更新"
+          # push競合対策: 最大3回リトライ（毎時ワークフローと同時push対策）
+          for i in 1 2 3; do
+            if git push; then
+              echo "✓ Push成功 (試行$i)"
+              exit 0
+            fi
+            echo "⚠ Push競合検知 (試行$i) → pull --rebase してリトライ"
+            git pull --rebase origin main || true
+            sleep 3
+          done
+          echo "✗ 3回試行しても失敗"
+          exit 1
