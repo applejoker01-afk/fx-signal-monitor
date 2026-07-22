@@ -25,6 +25,13 @@ param(
 
 $ErrorActionPreference = "Continue"
 
+# 2026-07-23実機判明: PYTHONIOENCODING=utf-8だけではPython側の出力バイト列を
+# UTF-8にできても、PowerShell 5.1が子プロセスのstdoutを取り込む際は
+# [Console]::OutputEncoding（既定はシステムのANSIコードページ=cp932）で
+# デコードするため、そちらも合わせないと文字化けが残る。
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+$OutputEncoding = [System.Text.Encoding]::UTF8
+
 $repoRoot = Split-Path -Parent $PSScriptRoot
 Set-Location $repoRoot
 
@@ -56,5 +63,6 @@ try {
 }
 
 "=== $(Get-Date -Format 'yyyy-MM-dd_HH-mm-ss') 終了 ===" | Out-File -FilePath $logFile -Append -Encoding utf8
+
 
 
