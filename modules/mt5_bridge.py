@@ -35,12 +35,25 @@ _connected = False
 
 
 def connect() -> tuple[bool, str]:
-    """MT5端末に接続しログインする。起動中のMT5端末が必要（IPC接続のため）。
+    """MT5端末に接続する。起動中のMT5端末が必要（IPC接続のため）。
+
+    2026-07-23実機確認: MT5端末が既にログイン済みなら、引数なしの
+    mt5.initialize()だけで現在のセッションにそのまま相乗りできる。
+    まずこれを試し、失敗した場合のみ環境変数(MT5_LOGIN/PASSWORD/SERVER)
+    による明示ログインにフォールバックする（端末が未起動、または
+    別口座へ切り替えたい場合向け）。
 
     Returns:
         (成功したか, メッセージ)
     """
     global _connected
+
+    if mt5.initialize():
+        info = mt5.account_info()
+        _connected = True
+        if info:
+            return True, f"MT5接続成功（起動中の端末に相乗り: {info.login}@{info.server}）"
+        return True, "MT5接続成功（起動中の端末に相乗り、口座情報は未取得）"
 
     login = os.environ.get("MT5_LOGIN")
     password = os.environ.get("MT5_PASSWORD")
@@ -48,7 +61,12 @@ def connect() -> tuple[bool, str]:
     terminal_path = os.environ.get("MT5_TERMINAL_PATH")
 
     if not (login and password and server):
-        return False, "MT5_LOGIN/MT5_PASSWORD/MT5_SERVER が未設定です"
+        code, desc = mt5.last_error()
+        return False, (
+            f"起動中端末への接続失敗 (code={code}): {desc} / "
+            "かつ MT5_LOGIN/MT5_PASSWORD/MT5_SERVER も未設定です。"
+            "MT5端末を起動してログインするか、環境変数を設定してください。"
+        )
 
     try:
         login_int = int(login)
@@ -66,7 +84,7 @@ def connect() -> tuple[bool, str]:
         return False, f"MT5接続失敗 (code={code}): {desc}"
 
     _connected = True
-    return True, "MT5接続成功"
+    return True, "MT5接続成功（環境変数によるログイン）"
 
 
 def disconnect():
@@ -95,31 +113,38 @@ def get_account_summary() -> dict | None:
 
 def resolve_symbol(pair: str) -> str | None:
     """自社ペア名(例:"USDJPY")をブローカーのシンボル名に変換し、
-    Market Watchに存在する（＝取引可能）ことを確認する。
+    実際に発注可能（trade_mode != DISABLED）なシンボルを返す。
 
-    2026-07-23判明: XM(Tradexfin)デモでは主要7ペア(USDJPY/EURUSD/GBPUSD/
-    AUDUSD/NZDUSD/USDCAD/USDCHF)は接尾辞なし、クロス通貨(EURJPY/GBPJPY/
-    EURGBP/EURAUD/GBPAUD/GBPCHF/AUDCHF/EURCHF/AUDNZD/EURNZD等)は「#」付き
-    という2系統が混在している。エキゾチック通貨(SEK/NOK/BRL/PLN/KRW/TRY/
-    ZAR/INR/HKD/CNYの各JPYクロス、USDCNY)はどちらの形でも存在せず、
-    ブローカー側で本当に取り扱っていない（命名規則の問題ではない）。
+    2026-07-23判明・重要: XM(Tradexfin)デモでは主要7ペア(USDJPY/EURUSD/
+    GBPUSD/AUDUSD/NZDUSD/USDCAD/USDCHF)の接尾辞なしシンボルは実在し
+    価格も付くが、trade_mode=DISABLED の「参照用」シンボルで発注できない
+    （実機でretcode 10017 "Trade disabled"を確認）。実際に発注できるのは
+    「#」付きの方（例: "USDJPY#"）。クロス通貨(EURJPY/GBPJPY/EURGBP/EURAUD/
+    GBPAUD/GBPCHF/AUDCHF/EURCHF/AUDNZD/EURNZD等)は「#」付きしか存在しない。
+    エキゾチック通貨(SEK/NOK/BRL/PLN/KRW/TRY/ZAR/INR/HKD/CNYの各JPYクロス、
+    USDCNY)はどちらの形でも存在せず、ブローカー側で本当に取り扱っていない。
 
-    見つからない/取引不可の場合はNoneを返す（呼び出し側は
+    そのため単に「存在するか」ではなく「trade_mode != DISABLED か」を
+    判定基準にする。見つからない/取引不可の場合はNoneを返す（呼び出し側は
     「このブローカーでは扱っていないペア」として扱うこと）。
     """
     env_suffix = os.environ.get("MT5_SYMBOL_SUFFIX", "")
-    # 環境変数指定があれば最優先、次に接尾辞なし、最後に"#"付きを自動フォールバック
+    # 環境変数指定があれば最優先、次に"#"付き（実機で判明した実際の取引可能形）、
+    # 最後に接尾辞なしを試す（"#"が存在しないブローカー・口座タイプ向けの保険）
     candidates = []
     if env_suffix:
         candidates.append(f"{pair}{env_suffix}")
-    candidates.append(pair)
     if f"{pair}#" not in candidates:
         candidates.append(f"{pair}#")
+    if pair not in candidates:
+        candidates.append(pair)
 
     for symbol in candidates:
         info = mt5.symbol_info(symbol)
         if info is None:
             continue
+        if info.trade_mode == mt5.SYMBOL_TRADE_MODE_DISABLED:
+            continue  # 価格は付くが発注不可な参照用シンボル。次の候補へ
         if not info.visible:
             if not mt5.symbol_select(symbol, True):
                 continue
