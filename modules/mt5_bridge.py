@@ -4,8 +4,9 @@ mt5_bridge.py
 MT5（MetaTrader5）ブローカーへの発注ブリッジ。
 
 前提・スコープ:
-  - これはローカルの投資専用PCで動く scripts/mt5_local_executor.py からのみ
-    呼び出される。GitHub Actions（クラウド側）からは絶対に呼び出さないこと
+  - これはローカルの投資専用PCで動く scripts/mt5_local_executor.py と
+    scripts/mt5_position_manager.py からのみ呼び出される。
+    GitHub Actions（クラウド側）からは絶対に呼び出さないこと
     （MT5端末はローカルPC上で起動・ログイン済みである必要があり、
     プロセス間通信でしか繋がらないため、クラウド環境では原理的に動作しない）。
   - シグナル判定（TA/FA/カルマンフローレイヤー等）は一切ここでは行わない。
@@ -240,6 +241,18 @@ def place_limit_order(
 ) -> dict:
     """指値(LIMIT)注文をブローカーへ送信する。
 
+    重要(2026-07-23修正): tp引数はブローカーへは送らない。
+    既存のシミュレーション戦略(modules/trade_tracker.py)の"tp"は
+    「ここで決済」ではなく「ここでSLをBE+0.5Rへ移動しトレーリング開始」
+    という"トリガー"であり、本物の利確価格ではない
+    （tp_mode="single_with_trail"、[[2026-06-10-fx-monitor-customization]]）。
+    ここでブローカー側のtpとして送ってしまうと、価格がtpに触れた瞬間に
+    本当に決済されてしまい、トレンド継続時の伸ばし分を全て取り逃す。
+    ブローカー側には初期SLのみを安全装置として送り、TP到達後の
+    BE移動・トレーリングは scripts/mt5_position_manager.py が
+    check_exit_condition()と同じロジックでSLを動的に更新することで実現する。
+    tp引数は将来の拡張用に残しているが現状は未使用（呼び出し側の互換性維持）。
+
     Returns:
         {"success": bool, "ticket": int|None, "retcode": int|None, "comment": str}
     """
@@ -258,7 +271,7 @@ def place_limit_order(
         "type": order_type,
         "price": limit_price,
         "sl": sl or 0.0,
-        "tp": tp or 0.0,
+        # tpはブローカーへ送らない（上記docstring参照）。position_managerが動的管理する。
         "type_time": mt5.ORDER_TIME_GTC,
         "type_filling": mt5.ORDER_FILLING_RETURN,
         "comment": comment[:31],  # MT5のcomment長制限
@@ -274,6 +287,107 @@ def place_limit_order(
     return {
         "success": success,
         "ticket": result.order if success else None,
+        "retcode": result.retcode,
+        "comment": result.comment,
+    }
+
+
+# ============================================================
+# 保有中ポジションの動的管理（2026-07-23追加）
+# ============================================================
+
+def get_open_positions(comment_filter: str | None = "fx-signal") -> list:
+    """自システムが発注したポジション一覧を返す（本物の口座上のポジション）。
+    comment_filterを指定すると、そのcommentを含むものだけに絞る
+    （手動で入れた他のポジションを誤って操作しないため）。"""
+    positions = mt5.positions_get()
+    if positions is None:
+        return []
+    result = []
+    for p in positions:
+        if comment_filter and comment_filter not in (p.comment or ""):
+            continue
+        result.append({
+            "ticket": p.ticket,
+            "symbol": p.symbol,
+            "type": "LONG" if p.type == mt5.ORDER_TYPE_BUY else "SHORT",
+            "volume": p.volume,
+            "price_open": p.price_open,
+            "sl": p.sl,
+            "tp": p.tp,
+            "price_current": p.price_current,
+            "profit": p.profit,
+            "comment": p.comment,
+            "time": p.time,
+        })
+    return result
+
+
+def get_pending_order_tickets(comment_filter: str | None = "fx-signal") -> set:
+    """未約定の指値注文チケット番号の集合を返す（約定検知の判定材料）。"""
+    orders = mt5.orders_get()
+    if orders is None:
+        return set()
+    return {
+        o.ticket for o in orders
+        if not comment_filter or comment_filter in (o.comment or "")
+    }
+
+
+def modify_position_sl(ticket: int, new_sl: float) -> dict:
+    """既存ポジションのSLのみを変更する（TPはposition_managerが管理するため送らない）。"""
+    pos = mt5.positions_get(ticket=ticket)
+    if not pos:
+        return {"success": False, "comment": f"ポジション#{ticket}が見つかりません"}
+    p = pos[0]
+
+    request = {
+        "action": mt5.TRADE_ACTION_SLTP,
+        "position": ticket,
+        "symbol": p.symbol,
+        "sl": new_sl,
+        "tp": p.tp,  # 既存のtp設定を保持（通常0のまま）
+    }
+    result = mt5.order_send(request)
+    if result is None:
+        code, desc = mt5.last_error()
+        return {"success": False, "comment": f"SL変更失敗 (code={code}): {desc}"}
+    success = result.retcode == mt5.TRADE_RETCODE_DONE
+    return {"success": success, "retcode": result.retcode, "comment": result.comment}
+
+
+def close_position(ticket: int, comment: str = "fx-signal-close") -> dict:
+    """成行でポジションを全量決済する。"""
+    pos = mt5.positions_get(ticket=ticket)
+    if not pos:
+        return {"success": False, "comment": f"ポジション#{ticket}が見つかりません（既に決済済みの可能性）"}
+    p = pos[0]
+
+    is_long = p.type == mt5.ORDER_TYPE_BUY
+    close_type = mt5.ORDER_TYPE_SELL if is_long else mt5.ORDER_TYPE_BUY
+    tick = mt5.symbol_info_tick(p.symbol)
+    if tick is None:
+        return {"success": False, "comment": f"{p.symbol}: ティック取得失敗"}
+    price = tick.bid if is_long else tick.ask
+
+    request = {
+        "action": mt5.TRADE_ACTION_DEAL,
+        "symbol": p.symbol,
+        "volume": p.volume,
+        "type": close_type,
+        "position": ticket,
+        "price": price,
+        "type_filling": mt5.ORDER_FILLING_RETURN,
+        "comment": comment[:31],
+    }
+    result = mt5.order_send(request)
+    if result is None:
+        code, desc = mt5.last_error()
+        return {"success": False, "comment": f"決済失敗 (code={code}): {desc}"}
+    success = result.retcode == mt5.TRADE_RETCODE_DONE
+    return {
+        "success": success,
+        "close_price": price if success else None,
         "retcode": result.retcode,
         "comment": result.comment,
     }
@@ -338,4 +452,81 @@ def notify_order_placed(pair: str, direction: str, order: dict, lots: float,
         return True
     except Exception as e:
         print(f"[ERROR] MT5発注通知メール送信失敗: {e}")
+        return False
+
+
+# ============================================================
+# 約定検知（2026-07-23追加）
+# ============================================================
+
+def get_order_final_state(ticket: int) -> dict | None:
+    """指値注文チケットの最終状態を調べる。
+
+    Returns:
+        None                                      … まだ約定待ち（発注中）
+        {"filled": True,  "position_ticket": int} … 約定してポジション化した
+        {"filled": False, "state": str}            … 取消/失効/拒否等で消滅した
+    """
+    # まだ「発注中(working)」ならhistory側には出てこず、orders_get側に残る
+    still_pending = mt5.orders_get(ticket=ticket)
+    if still_pending:
+        return None
+
+    hist = mt5.history_orders_get(ticket=ticket)
+    if not hist:
+        return None  # ブローカー側の反映待ち。次回また確認する
+
+    o = hist[0]
+    state_names = {
+        0: "STARTED", 1: "PLACED", 2: "CANCELED", 3: "PARTIAL",
+        4: "FILLED", 5: "REJECTED", 6: "EXPIRED",
+        7: "REQUEST_ADD", 8: "REQUEST_MODIFY", 9: "REQUEST_CANCEL",
+    }
+    if o.state == mt5.ORDER_STATE_FILLED:
+        return {"filled": True, "position_ticket": o.position_id}
+    return {"filled": False, "state": state_names.get(o.state, str(o.state))}
+
+
+def notify_position_closed(pair: str, trade: dict, exit_result: dict, close_result: dict) -> bool:
+    """保有中ポジションの決済（TP/SL/トレール/シグナル反転等）をメールで通知する。"""
+    smtp_host = os.environ.get("SMTP_HOST", "smtp.gmail.com")
+    smtp_port = os.environ.get("SMTP_PORT", "465")
+    smtp_user = os.environ.get("SMTP_USER")
+    smtp_pass = os.environ.get("SMTP_PASS")
+    from_addr = os.environ.get("MAIL_FROM")
+    to_addr = os.environ.get("MAIL_TO")
+
+    if not all([smtp_user, smtp_pass, from_addr, to_addr]):
+        print("[INFO] MT5決済通知: SMTP未設定のためメール送信をスキップ")
+        return False
+
+    reason = exit_result.get("exit_reason", "?")
+    result_label = exit_result.get("result", "?")
+    pips = exit_result.get("pips")
+    emoji = "✅" if result_label == "WIN" else ("➖" if result_label == "BE" else "❌")
+
+    subject = f"[MT5] {emoji}決済 {pair} {reason} ({result_label})"
+    body = (
+        f"MT5ポジションが決済されました。\n\n"
+        f"ペア: {pair}  方向: {trade.get('direction')}\n"
+        f"エントリー: {trade.get('entry_price')}\n"
+        f"決済理由: {reason}\n"
+        f"決済価格: {close_result.get('close_price')}\n"
+        f"pips: {pips}\n"
+        f"結果: {result_label}\n"
+    )
+
+    msg = MIMEText(body, "plain", "utf-8")
+    msg["Subject"] = Header(subject, "utf-8")
+    msg["From"] = from_addr
+    msg["To"] = to_addr
+
+    try:
+        with smtplib.SMTP_SSL(smtp_host, int(smtp_port or 465), timeout=20) as s:
+            s.login(smtp_user, smtp_pass)
+            s.send_message(msg)
+        print(f"[OK] MT5決済通知メール送信: {to_addr}")
+        return True
+    except Exception as e:
+        print(f"[ERROR] MT5決済通知メール送信失敗: {e}")
         return False

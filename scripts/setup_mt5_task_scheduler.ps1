@@ -20,21 +20,24 @@
 #        [Environment]::SetEnvironmentVariable("MAIL_TO","通知を受け取るアドレス","User")
 #      設定後はPowerShellを開き直すか、後述のタスク再登録が必要
 #
-# このスクリプトがやること:
-#   - python.exe のフルパスを自動検出
-#   - クラウド側の指値スキャン（07:00/13:00/21:00 JST）から15分後の
-#     07:15/13:15/21:15 JSTに scripts/run_mt5_executor.ps1 を実行するタスクを登録
-#     （クラウド側のGitHub Actionsがpending_orders.jsonをpushし終える猶予を見込む）
-#   - タスクは現在ログイン中のユーザーで、PCがスリープしていない限り実行される
-#     （スリープ復帰時にも走らせたい場合は後述の電源設定を別途調整すること）
+# このスクリプトが登録する2つのタスク:
+#   1. FX-MT5-LocalExecutor（1日3回・07:15/13:15/21:15 JST）
+#      クラウド側の指値待機シグナル(pending_orders.json)を読み、未発注分を
+#      自動発注する。クラウド側スキャン(07:00/13:00/21:00)の15分後に設定し、
+#      GitHub Actions側のpush完了を待つ猶予を持たせている。
+#   2. FX-MT5-PositionManager（毎時5分・実運用の要）
+#      保有中の実ポジションを再評価し、TP到達後のSL移動・トレーリング・
+#      SIGNAL_LOST/REVERSED判定による決済を行う。クラウド側の毎時スキャンと
+#      同じ頻度で回す必要がある（トレーリングは価格変動への追随が命なので、
+#      1日3回では粗すぎる）。
 
 $ErrorActionPreference = "Stop"
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
-$wrapperScript = Join-Path $repoRoot "scripts\run_mt5_executor.ps1"
+$wrapperScript = Join-Path $repoRoot "scripts\run_mt5_script.ps1"
 
 if (-not (Test-Path $wrapperScript)) {
-    Write-Error "run_mt5_executor.ps1 が見つかりません。このスクリプトはリポジトリ内のscripts/から実行してください。"
+    Write-Error "run_mt5_script.ps1 が見つかりません。このスクリプトはリポジトリ内のscripts/から実行してください。"
     exit 1
 }
 
@@ -45,36 +48,41 @@ if (-not $pythonPath) {
 }
 Write-Output "検出したpython: $pythonPath"
 
-$taskName = "FX-MT5-LocalExecutor"
 $powershellExe = (Get-Command powershell.exe).Source
-
-$action = New-ScheduledTaskAction -Execute $powershellExe `
-    -Argument "-NoProfile -ExecutionPolicy Bypass -File `"$wrapperScript`""
-
-$triggers = @(
-    New-ScheduledTaskTrigger -Daily -At "07:15"
-    New-ScheduledTaskTrigger -Daily -At "13:15"
-    New-ScheduledTaskTrigger -Daily -At "21:15"
-)
-
+$principal = New-ScheduledTaskPrincipal -UserId $env:USERNAME -LogonType Interactive -RunLevel Limited
 $settings = New-ScheduledTaskSettingsSet `
     -StartWhenAvailable `
     -DontStopOnIdleEnd `
     -ExecutionTimeLimit (New-TimeSpan -Minutes 10) `
     -RestartCount 2 -RestartInterval (New-TimeSpan -Minutes 5)
 
-$principal = New-ScheduledTaskPrincipal -UserId $env:USERNAME -LogonType Interactive -RunLevel Limited
+# ── タスク1: 発注（1日3回） ──────────────────────────────
+$executorAction = New-ScheduledTaskAction -Execute $powershellExe `
+    -Argument "-NoProfile -ExecutionPolicy Bypass -File `"$wrapperScript`" -TargetScript scripts\mt5_local_executor.py"
+$executorTriggers = @(
+    New-ScheduledTaskTrigger -Daily -At "07:15"
+    New-ScheduledTaskTrigger -Daily -At "13:15"
+    New-ScheduledTaskTrigger -Daily -At "21:15"
+)
+Register-ScheduledTask -TaskName "FX-MT5-LocalExecutor" -Action $executorAction `
+    -Trigger $executorTriggers -Settings $settings -Principal $principal `
+    -Description "fx-signal-monitor: 指値待機シグナルをMT5へ自動発注（1日3回）" -Force
+Write-Output "タスク 'FX-MT5-LocalExecutor' を登録（07:15/13:15/21:15 JST）"
 
-Register-ScheduledTask -TaskName $taskName -Action $action -Trigger $triggers `
-    -Settings $settings -Principal $principal -Description `
-    "fx-signal-monitor: クラウド側の指値待機シグナルをMT5へ自動発注（1日3回）" `
-    -Force
+# ── タスク2: ポジション管理（毎時） ────────────────────────
+$pmAction = New-ScheduledTaskAction -Execute $powershellExe `
+    -Argument "-NoProfile -ExecutionPolicy Bypass -File `"$wrapperScript`" -TargetScript scripts\mt5_position_manager.py"
+$pmTrigger = New-ScheduledTaskTrigger -Once -At "00:05" `
+    -RepetitionInterval (New-TimeSpan -Hours 1) -RepetitionDuration ([TimeSpan]::MaxValue)
+Register-ScheduledTask -TaskName "FX-MT5-PositionManager" -Action $pmAction `
+    -Trigger $pmTrigger -Settings $settings -Principal $principal `
+    -Description "fx-signal-monitor: 保有中MT5ポジションのSL/トレーリング/決済判定を毎時実行" -Force
+Write-Output "タスク 'FX-MT5-PositionManager' を登録（毎時05分）"
 
 Write-Output ""
-Write-Output "タスク '$taskName' を登録しました。1日3回（07:15/13:15/21:15 JST）に"
-Write-Output "$wrapperScript を実行します。"
+Write-Output "2つのタスクを登録しました。"
 Write-Output ""
-Write-Output "確認方法: タスクスケジューラー(taskschd.msc)を開いて '$taskName' を探すか、"
-Write-Output "以下のコマンドで手動テスト実行できます:"
-Write-Output "  Start-ScheduledTask -TaskName '$taskName'"
+Write-Output "確認方法: タスクスケジューラー(taskschd.msc)を開くか、以下で手動テスト実行できます:"
+Write-Output "  Start-ScheduledTask -TaskName 'FX-MT5-LocalExecutor'"
+Write-Output "  Start-ScheduledTask -TaskName 'FX-MT5-PositionManager'"
 Write-Output "実行後、$repoRoot\logs\ 配下のログファイルで結果を確認してください。"

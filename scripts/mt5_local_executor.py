@@ -178,6 +178,10 @@ def main() -> int:
             "ticket": result.get("ticket"),
             "retcode": result.get("retcode"),
             "comment": result.get("comment"),
+            # 約定検知後にtrade_tracker.check_exit_condition()互換のレコードを
+            # 組み立てるため、元の指値情報一式をそのまま保持しておく
+            # (scripts/mt5_position_manager.py が使う)
+            "order_snapshot": order,
         }
         save_sent(sent)
 
