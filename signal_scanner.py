@@ -212,8 +212,20 @@ API_SYMBOLS = "USD,JPY,GBP,AUD,NZD,CAD,CHF,SGD,HKD,CNY,MXN,TRY,ZAR,INR,SEK,NOK,B
 # JPYクロス: 小数3桁 / それ以外: 小数6桁
 # 取引シグナルとして適切な精度で出力するための共通ヘルパー
 def pair_decimals(pair: str) -> int:
-    """ペアに応じた小数桁数を返す。JPYクロス=3、それ以外=6。"""
-    return 3 if pair and pair.upper().endswith("JPY") else 6
+    """ペアに応じた小数桁数を返す。JPYクロス=3、それ以外=6。
+
+    DISPLAY_SCALEを持つペア（KRWJPY等、証券会社の建値慣行で100単位表示）は
+    生の内部価格が通常のJPYクロスより2桁小さいため、同じ3桁丸めを適用すると
+    ATRのような小さい値が0に潰れる（2026-07-22発見: KRWJPYのSL/TP/指値が
+    Discord通知から完全に消えるバグの原因。0.0はPythonでfalsy扱いのため
+    `if atr:` 判定がFalseになりstaged_tp計算自体がスキップされていた）。
+    DISPLAY_SCALEの桁数分だけ丸め精度を上乗せして防ぐ。
+    """
+    base = 3 if pair and pair.upper().endswith("JPY") else 6
+    scale = DISPLAY_SCALE.get(pair.upper(), 1.0) if pair else 1.0
+    if scale and scale != 1.0:
+        base += len(str(int(scale))) - 1
+    return base
 
 
 def fmt_price(pair: str, value) -> str:

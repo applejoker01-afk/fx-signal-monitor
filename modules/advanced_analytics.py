@@ -247,13 +247,26 @@ def _default_regime() -> dict:
 # ③ 段階的TP計算
 # ============================================================
 
+# KRWJPY等、証券会社の建値慣行で100単位表示するペアの生スケール補正。
+# signal_scanner.py の DISPLAY_SCALE と同じ内容を局所複製（モジュール循環回避）。
+# 変更時は両方を同期させること。
+_DISPLAY_SCALE = {"KRWJPY": 100.0}
+
+
 def _pair_decimals(pair: str) -> int:
     """ペアに応じた小数桁数を返す。JPYクロス=3、それ以外=6。
 
+    _DISPLAY_SCALEを持つペアは生の内部価格が2桁小さいため丸め精度を
+    上乗せする（2026-07-22発見: KRWJPYのSL/TPが0.0に潰れるバグの修正、
+    signal_scanner.pair_decimals と同じ規約）。
     signal_scanner.py の pair_decimals と同じ規約を局所複製。
     モジュール循環を避けるため独立定義。
     """
-    return 3 if pair and pair.upper().endswith("JPY") else 6
+    base = 3 if pair and pair.upper().endswith("JPY") else 6
+    scale = _DISPLAY_SCALE.get(pair.upper(), 1.0) if pair else 1.0
+    if scale and scale != 1.0:
+        base += len(str(int(scale))) - 1
+    return base
 
 
 def _spread_for_pair(pair: str, dynamic_pips: float = None) -> float:

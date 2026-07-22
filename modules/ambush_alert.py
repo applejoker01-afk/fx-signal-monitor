@@ -44,9 +44,22 @@ def calc_pivot_points(prev_high, prev_low, prev_close):
     }
 
 
+# KRWJPY等、証券会社の建値慣行で100単位表示するペアの生スケール補正。
+# signal_scanner.py の DISPLAY_SCALE と同じ内容を局所複製（モジュール循環回避）。
+_DISPLAY_SCALE = {"KRWJPY": 100.0}
+
+
 def _pair_decimals(pair: str) -> int:
-    """JPYクロス=3、それ以外=6。signal_scanner.pair_decimals と同規約。"""
-    return 3 if pair and pair.upper().endswith("JPY") else 6
+    """JPYクロス=3、それ以外=6。signal_scanner.pair_decimals と同規約。
+
+    _DISPLAY_SCALEを持つペアは丸め精度を上乗せする
+    （2026-07-22発見: KRWJPY等の小さい生値がゼロに潰れるバグの修正）。
+    """
+    base = 3 if pair and pair.upper().endswith("JPY") else 6
+    scale = _DISPLAY_SCALE.get(pair.upper(), 1.0) if pair else 1.0
+    if scale and scale != 1.0:
+        base += len(str(int(scale))) - 1
+    return base
 
 
 def build_poi_levels(pair, price, prices, support_resistance=None):
