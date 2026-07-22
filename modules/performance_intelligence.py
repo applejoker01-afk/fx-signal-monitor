@@ -21,10 +21,16 @@ from datetime import datetime, timedelta, timezone
 #              autoresearch実証: BOJ引き締め + RBNZ/BOC政策でダブル逆風。
 #              サンプルは少ないが、マクロ構造（RBNZ ease + JPY strong）で根拠十分。
 #              NZDJPY・AUDJPY は高相関のため、NZDJPY除外で AUDJPY を集中管理する。
+# 2026-07-22: PLNJPY を追加（7/20のSBIペア拡張分は未検証のまま取引対象になっていた）。
+#              run_pair_tuning_experiment.py で180日窓(勝率37.5%/PF0.7/全ペア最大の
+#              pips損失)・30日窓(0%・2連敗)の両方で悪化を確認。
+#              ※本件はバックテスト2窓のみの根拠（実運用実績はまだ僅少）。1ヶ月後に
+#              data/pair_tuning_experiment.json を再生成して妥当性を再確認すること。
 PAIR_EXCLUDE = frozenset([
     "INRJPY", "TRYJPY",           # 流動性・政治リスク（当初から）
     "EURUSD", "USDCHF",           # 慢性不振（実証40%/37.5%）2026-06-18追加
     "NZDJPY", "CADJPY",           # BOJ局面でダブル逆風（実証33%/0%）2026-06-19追加
+    "PLNJPY",                     # 新規追加ペアの不振（両窓実証37.5%/0%）2026-07-22追加
 ])
 
 # 静的★調整: バックテスト勝率が明確に良/悪で、closed_tradesが少ない段階でも反映
@@ -48,6 +54,12 @@ PAIR_STATIC_BASELINE = {
     # 動的な build_pair_performance_map の実績評価に判断の重みを移す。
     "AUDJPY": {"adjustment": +0.5, "note": "バックテスト72.2%だが実運用71件は20%(1W/3L/1E)に乖離・要監視"},
     "GBPJPY": {"adjustment": +1,  "note": "好成績(実証69.2%)"},
+    # ⚠️ 7/20拡張ペアの低成績組（2026-07-22 run_pair_tuning_experiment.py）:
+    # 180日窓のみの片窓根拠のためハードブロックにせずソフト降格(-1)に留める。
+    # ★5級のスコアが出た時だけ★4として取引可能になる設計。
+    # 30日窓でも悪化が続くようなら PAIR_EXCLUDE への昇格を検討（PLNJPYは昇格済み）。
+    "SEKJPY": {"adjustment": -1, "note": "新規ペア不振(180日窓37.5%/PF0.6)・要監視"},
+    "EURCHF": {"adjustment": -1, "note": "新規ペア不振(180日窓40.0%/PF0.82)・要監視"},
     # ❌ 慢性不振ペア（40%以下）→ PAIR_EXCLUDEに移動（ハードブロック）
     # "EURUSD": {"adjustment": -1,  "note": "不振ペア(実証40.0%)"},  # 除外済み
     # "USDCHF": {"adjustment": -1,  "note": "不振ペア(実証37.5%)"},  # 除外済み
