@@ -1,4 +1,4 @@
-# run_mt5_script.ps1
+﻿# run_mt5_script.ps1
 # タスクスケジューラーから呼ばれる汎用ラッパー（旧run_mt5_executor.ps1を汎用化）。
 #   1. リポジトリを最新に更新（クラウド側の指値スキャン/価格更新を取り込む）
 #   2. 指定されたPythonスクリプト（-TargetScript）を実行
@@ -53,3 +53,4 @@ try {
 }
 
 "=== $(Get-Date -Format 'yyyy-MM-dd_HH-mm-ss') 終了 ===" | Out-File -FilePath $logFile -Append -Encoding utf8
+
