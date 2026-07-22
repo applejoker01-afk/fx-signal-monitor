@@ -23,11 +23,17 @@ MT5（MetaTrader5）ブローカーへの発注ブリッジ。
                         （例: マイクロ口座で"USDJPYm"のような場合は"m"）
   MT5_LOT_SIZE_UNITS   任意。1.0ロット＝何FROM通貨単位か（既定100000＝標準口座想定。
                         マイクロ口座で1ロット=1,000通貨のブローカーもあるため要確認）
+  SMTP_HOST/SMTP_PORT/SMTP_USER/SMTP_PASS/MAIL_FROM/MAIL_TO
+                        任意。設定時のみ発注後にメール通知を送る
+                        （signal_scanner.pyと同じSMTP設定を流用可能）
 """
 
 from __future__ import annotations
 
 import os
+import smtplib
+from email.header import Header
+from email.mime.text import MIMEText
 
 import MetaTrader5 as mt5
 
@@ -271,3 +277,65 @@ def place_limit_order(
         "retcode": result.retcode,
         "comment": result.comment,
     }
+
+
+def notify_order_placed(pair: str, direction: str, order: dict, lots: float,
+                         send_result: dict) -> bool:
+    """指値発注（成功/失敗）をメールで通知する。
+
+    承認フローを持たない「自動発注→事後通知→気に入らなければ手動キャンセル」
+    運用のための通知。件名だけでスマホの通知欄から内容が分かるようにする。
+
+    Returns: 送信できたかどうか（SMTP未設定時はFalseを返すだけで例外にしない）
+    """
+    smtp_host = os.environ.get("SMTP_HOST", "smtp.gmail.com")
+    smtp_port = os.environ.get("SMTP_PORT", "465")
+    smtp_user = os.environ.get("SMTP_USER")
+    smtp_pass = os.environ.get("SMTP_PASS")
+    from_addr = os.environ.get("MAIL_FROM")
+    to_addr = os.environ.get("MAIL_TO")
+
+    if not all([smtp_user, smtp_pass, from_addr, to_addr]):
+        print("[INFO] MT5発注通知: SMTP未設定のためメール送信をスキップ")
+        return False
+
+    dir_arrow = "↑LONG" if "LONG" in direction else "↓SHORT"
+
+    if send_result.get("success"):
+        subject = f"[MT5] 指値発注 {pair}{dir_arrow} #{send_result['ticket']}"
+        body = (
+            f"MT5に指値注文を自動発注しました。\n\n"
+            f"ペア: {pair}  方向: {direction}\n"
+            f"指値: {order.get('limit_price')}\n"
+            f"SL: {order.get('sl')}  TP: {order.get('tp')}\n"
+            f"ロット: {lots}\n"
+            f"チケット: #{send_result['ticket']}\n\n"
+            f"この取引をしたくない場合は、MT5端末（またはXMのマイページ）から\n"
+            f"チケット#{send_result['ticket']}を手動でキャンセルしてください。\n"
+            f"未約定の指値は valid_until を過ぎても自動失効しません"
+            f"（クラウド側のpending_orders.jsonの失効判定とは独立しています）。\n"
+        )
+    else:
+        subject = f"[MT5] 発注失敗 {pair}{dir_arrow}"
+        body = (
+            f"MT5への指値発注が失敗しました。対応不要ですが記録として送信します。\n\n"
+            f"ペア: {pair}  方向: {direction}\n"
+            f"指値: {order.get('limit_price')}\n"
+            f"エラー: retcode={send_result.get('retcode')} "
+            f"{send_result.get('comment')}\n"
+        )
+
+    msg = MIMEText(body, "plain", "utf-8")
+    msg["Subject"] = Header(subject, "utf-8")
+    msg["From"] = from_addr
+    msg["To"] = to_addr
+
+    try:
+        with smtplib.SMTP_SSL(smtp_host, int(smtp_port or 465), timeout=20) as s:
+            s.login(smtp_user, smtp_pass)
+            s.send_message(msg)
+        print(f"[OK] MT5発注通知メール送信: {to_addr}")
+        return True
+    except Exception as e:
+        print(f"[ERROR] MT5発注通知メール送信失敗: {e}")
+        return False
