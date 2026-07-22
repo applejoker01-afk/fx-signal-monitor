@@ -356,6 +356,27 @@ def modify_position_sl(ticket: int, new_sl: float) -> dict:
     return {"success": success, "retcode": result.retcode, "comment": result.comment}
 
 
+def _pick_filling_mode(symbol: str) -> int:
+    """成行(TRADE_ACTION_DEAL)で使う約定方式をシンボルの対応状況に合わせて選ぶ。
+
+    2026-07-23実機判明: 指値(PENDING)注文はORDER_FILLING_RETURNで問題なく
+    通ったが、同じシンボル(USDJPY#)で成行決済(DEAL)を試すとfilling_mode
+    不一致でretcode 10030(INVALID_FILL)になった。symbol_info().filling_mode
+    はDEALの即時約定にのみ厳密に適用されるビットマスクのため、DEAL系
+    リクエストだけこの関数で動的に選ぶ（PENDING側は従来通りRETURN固定でよい）。
+    """
+    # MetaTrader5のPythonラッパーにはSYMBOL_FILLING_*定数が無いため、
+    # MT5公式ドキュメントのビット値を直接使う（SYMBOL_FILLING_FOK=1, IOC=2）。
+    FOK_BIT, IOC_BIT = 1, 2
+    info = mt5.symbol_info(symbol)
+    mode = info.filling_mode if info else 0
+    if mode & FOK_BIT:
+        return mt5.ORDER_FILLING_FOK
+    if mode & IOC_BIT:
+        return mt5.ORDER_FILLING_IOC
+    return mt5.ORDER_FILLING_RETURN
+
+
 def close_position(ticket: int, comment: str = "fx-signal-close") -> dict:
     """成行でポジションを全量決済する。"""
     pos = mt5.positions_get(ticket=ticket)
@@ -377,7 +398,7 @@ def close_position(ticket: int, comment: str = "fx-signal-close") -> dict:
         "type": close_type,
         "position": ticket,
         "price": price,
-        "type_filling": mt5.ORDER_FILLING_RETURN,
+        "type_filling": _pick_filling_mode(p.symbol),
         "comment": comment[:31],
     }
     result = mt5.order_send(request)

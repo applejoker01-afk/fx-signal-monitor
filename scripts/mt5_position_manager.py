@@ -144,13 +144,23 @@ def manage_positions(mt5_trades: dict, now: datetime) -> dict:
 
         if "_state_update" in result:
             upd = result["_state_update"]
-            trade.update(upd)
             if "sl" in upd:
                 mod = mt5_bridge.modify_position_sl(ticket, upd["sl"])
                 if mod.get("success"):
+                    trade.update(upd)
                     print(f"  [SL更新] {pair} #{ticket}: SL -> {fmt_price(pair, upd['sl'])}")
                 else:
-                    print(f"  [SL更新失敗] {pair} #{ticket}: {mod.get('comment')}")
+                    # 2026-07-23実機で判明: ブローカー側の変更が失敗した場合、
+                    # ローカルのtrade["sl"]だけは据え置き、それ以外(tp_hit/trail_active/
+                    # extreme_price等、実際に価格が到達した事実は変わらない)は反映する。
+                    # ここでslまで更新すると、ローカルの認識とブローカー上の実際のSLが
+                    # 食い違ったまま次回以降のトレーリング計算が進んでしまう。
+                    upd_without_sl = {k: v for k, v in upd.items() if k != "sl"}
+                    trade.update(upd_without_sl)
+                    print(f"  [SL更新失敗] {pair} #{ticket}: {mod.get('comment')}"
+                          f"（ローカルのSL記録は据え置き、次回また試行）")
+            else:
+                trade.update(upd)
         else:
             close_res = mt5_bridge.close_position(ticket)
             print(f"  [決済] {pair} #{ticket} 理由={result['exit_reason']} "
