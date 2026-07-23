@@ -41,9 +41,28 @@ from modules.pending_orders import load_pending_orders, PENDING_FILE
 from modules.position_sizing import (
     calc_position_size, load_virtual_account, load_open_trades_raw,
 )
+from modules.trade_tracker import MAX_POSITIONS_PER_PAIR
 from signal_scanner import PAIR_API, fmt_price
 
 SENT_FILE = "data/mt5_sent_orders.json"
+MT5_OPEN_TRADES_FILE = "data/mt5_open_trades.json"
+
+
+def count_mt5_positions_for_pair(pair: str) -> int:
+    """このPCが追跡中の実MT5ポジション数をペア別に数える(独立した安全装置)。
+
+    クラウド側open_trades.jsonの上限判定とは別に、MT5の実口座自体でも
+    MAX_POSITIONS_PER_PAIRを超えないようここで独立にチェックする
+    （クラウドとMT5は別々の帳簿のため、二重の安全網として必要）。
+    """
+    if not os.path.exists(MT5_OPEN_TRADES_FILE):
+        return 0
+    try:
+        with open(MT5_OPEN_TRADES_FILE, "r", encoding="utf-8") as f:
+            mt5_trades = json.load(f)
+    except Exception:
+        return 0
+    return sum(1 for t in mt5_trades.values() if t.get("pair") == pair)
 
 
 def load_sent() -> dict:
@@ -141,6 +160,12 @@ def main() -> int:
 
     for pair, order in targets.items():
         display_order(pair, order)
+
+        existing_count = count_mt5_positions_for_pair(pair)
+        if existing_count >= MAX_POSITIONS_PER_PAIR:
+            print(f"  ⚠ MT5実口座で既に{existing_count}件保有中"
+                  f"（上限{MAX_POSITIONS_PER_PAIR}）のため発注しません")
+            continue
 
         sizing = calc_position_size(
             pair, order.get("limit_price"), order.get("sl"),

@@ -39,7 +39,7 @@ from modules.advanced_analytics import (
     calc_global_analytics,
     get_pair_strength_context,
 )
-from modules.trade_tracker import update_trades
+from modules.trade_tracker import update_trades, MAX_POSITIONS_PER_PAIR
 from modules.performance_intelligence import (
     build_pair_performance_map, apply_performance_weighting,
     check_drawdown_alert, detect_market_regime,
@@ -833,10 +833,17 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results,
                 })
 
         # ──（3）保有中ポジション一覧（新機能！）──
+        # 2026-07-24: {pair: [trade,...]}のピラミッディング対応。全ペア全トレードを
+        # フラット化して表示する（2件目以降は"#2"のように連番を付ける）。
         open_trades_dict = trade_update.get("open_trades", {}) or open_trades or {}
-        if open_trades_dict:
+        flat_trades = [
+            (pair, t)
+            for pair, trades in open_trades_dict.items()
+            for t in (trades if isinstance(trades, list) else [trades])
+        ]
+        if flat_trades:
             lines = []
-            for pair, t in list(open_trades_dict.items())[:10]:
+            for pair, t in flat_trades[:10]:
                 cur_price = t.get("current_price") or t.get("entry_price")
                 entry = t.get("entry_price")
                 direction = t.get("direction", "")
@@ -874,8 +881,10 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results,
                 sign = "+" if unreal >= 0 else ""
                 _d = pair_decimals(pair)
                 sl_str = f"逆指値{fmt_price(pair, sl)}" if sl is not None else ""
+                seq = t.get("pyramid_seq")
+                pair_label = f"{pair}#{seq}" if seq and seq > 1 else pair
                 lines.append(
-                    f"{icon} {pair} {direction[:5]} {phase} | "
+                    f"{icon} {pair_label} {direction[:5]} {phase} | "
                     f"@{fmt_price(pair, entry)}→{fmt_price(pair, cur_price)} "
                     f"({sign}{unreal:+.{_d}f}) {progress} {sl_str} {hold_str}"
                 )
@@ -894,7 +903,7 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results,
                         f"ロスカット基準50%）"
                     )
             embeds[0]["fields"].append({
-                "name": f"📋 保有中ポジション（{len(open_trades_dict)}件）",
+                "name": f"📋 保有中ポジション（{len(flat_trades)}件）",
                 "value": "```\n" + "\n".join(lines) + "\n```" + margin_note,
                 "inline": False
             })
@@ -2122,14 +2131,26 @@ def main():
               f"指値{fmt_price(pair, order.get('limit_price'))}で約定")
 
     # (b) limitモードのみ: 新規★4以上シグナルを指値待機として登録
+    # 2026-07-24追加: 1ペア最大MAX_POSITIONS_PER_PAIR件のピラミッディングに対応。
+    # 既に保有中でも、直近ポジションが全てTP到達済み（勝ち確定・トレーリング中）で
+    # 同方向なら追加の指値を登録する（trade_tracker.update_trades()と同じルール）。
     newly_created_orders = {}
     if entry_mode == "limit":
         closed_this_cycle_pairs = {t.get("pair") for t in trade_update.get("newly_closed", [])}
         for r in results:
             pair = r["pair"]
+            direction = r.get("direction", "")
+            existing = open_trades.get(pair, [])
+            can_pyramid = (
+                len(existing) < MAX_POSITIONS_PER_PAIR
+                and (not existing or (
+                    all(t.get("tp_hit") for t in existing)
+                    and existing[-1].get("direction") == direction
+                ))
+            )
             if (r.get("stars", 0) >= 4
-                    and r.get("direction", "").endswith(("LONG", "SHORT"))
-                    and pair not in open_trades
+                    and direction.endswith(("LONG", "SHORT"))
+                    and can_pyramid
                     and pair not in remaining_orders
                     and pair not in closed_this_cycle_pairs):
                 order = create_pending_order(r, now)
@@ -2137,7 +2158,8 @@ def main():
                 newly_created_orders[pair] = order
                 print(f"[PENDING] 📌新規指値登録: {pair} {order['direction']} "
                       f"指値{fmt_price(pair, order.get('limit_price'))} "
-                      f"(有効期限 {order.get('valid_until')})")
+                      f"(有効期限 {order.get('valid_until')})"
+                      f"{'（ピラミッディング追加）' if existing else ''}")
 
     if expired_orders:
         for pair in expired_orders:

@@ -127,12 +127,19 @@ def send_weekly_report(webhook_url: str):
             "inline": False,
         })
 
-    if open_trades:
+    # 2026-07-24: {pair: [trade,...]}のピラミッディング対応
+    flat_open = [
+        (pair, t) for pair, trades in open_trades.items()
+        for t in (trades if isinstance(trades, list) else [trades])
+    ]
+    if flat_open:
         open_lines = []
-        for pair, t in list(open_trades.items())[:8]:
-            open_lines.append(f"{pair} {t['direction']} @ {t['entry_price']}")
+        for pair, t in flat_open[:8]:
+            seq = t.get("pyramid_seq")
+            pair_label = f"{pair}#{seq}" if seq and seq > 1 else pair
+            open_lines.append(f"{pair_label} {t['direction']} @ {t['entry_price']}")
         fields.append({
-            "name": f"📌 現在保有中（{len(open_trades)}件）",
+            "name": f"📌 現在保有中（{len(flat_open)}件）",
             "value": "```\n" + "\n".join(open_lines) + "\n```",
             "inline": False,
         })
@@ -141,8 +148,9 @@ def send_weekly_report(webhook_url: str):
         "name": "📝 注記",
         "value": (
             "1シグナル=1トレードとして集計。★4到達でエントリー、"
-            "TP/SL到達・シグナル消滅・方向反転で決済。同一ペアの"
-            "重複カウントは排除済み。"
+            "TP/SL到達・シグナル消滅・方向反転で決済。同一ペアは"
+            "最大2ポジションまでピラミッディング可能（2026-07-24〜、"
+            "既存ポジションがTP到達済み＝トレーリング中の時のみ追加）。"
         ),
         "inline": False,
     })

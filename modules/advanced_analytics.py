@@ -593,18 +593,24 @@ def calc_correlated_exposure_multiplier(pair: str, direction: str,
     else:
         candidate = {base: -1, quote: 1}
 
+    # 2026-07-24: 1ペア最大2ポジション（ピラミッディング）に対応。
+    # {pair: [trade,...]}の全トレードをエクスポージャーへ加算する
+    # （同一ペアで2ポジション保有中なら、その分エクスポージャーも2倍にカウントされる
+    # ——ピラミッディングで積み上がったリスクを正しく反映するため意図的な挙動）。
     exposure = {}
-    for p, t in open_trades.items():
+    for p, trades in open_trades.items():
         if p == pair or p not in pair_api:
             continue
         b, q = pair_api[p]
-        d = str(t.get("direction", ""))
-        if d.endswith("LONG"):
-            exposure[b] = exposure.get(b, 0) + 1
-            exposure[q] = exposure.get(q, 0) - 1
-        elif d.endswith("SHORT"):
-            exposure[b] = exposure.get(b, 0) - 1
-            exposure[q] = exposure.get(q, 0) + 1
+        trades_list = trades if isinstance(trades, list) else [trades]
+        for t in trades_list:
+            d = str(t.get("direction", ""))
+            if d.endswith("LONG"):
+                exposure[b] = exposure.get(b, 0) + 1
+                exposure[q] = exposure.get(q, 0) - 1
+            elif d.endswith("SHORT"):
+                exposure[b] = exposure.get(b, 0) - 1
+                exposure[q] = exposure.get(q, 0) + 1
 
     # 新規候補と同符号（同方向）に重なる既存エクスポージャーのうち最大のもの
     max_overlap = 0

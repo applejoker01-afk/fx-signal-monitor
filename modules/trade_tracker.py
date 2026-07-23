@@ -7,7 +7,14 @@ trade_tracker.py
 状態遷移:
   ★3以下 → ★4に上昇 = エントリー（open_trades.jsonに記録）
   ★4以上を維持 = 保有中（重複カウントしない）
-  決済条件 = TP/SL到達 or ★4を割る or 方向反転 → closed_trades.jsonlに記録
+  ★4へ再到達（一度4未満に下がってから再上昇） = 追加エントリー
+    （2026-07-24追加: 同一ペアで最大MAX_POSITIONS_PER_PAIR件まで同時保有可能。
+    open_trades.jsonのスキーマを {pair: trade} から {pair: [trade, ...]} に変更。
+    強いトレンド継続時のピラミッディングを許容し、既存の「1ペア1ポジション」
+    という単純化がバックテストのPF/勝率を過小評価していた可能性への対応。
+    ただしmodules/backtest.pyのバックテスト側は引き続き単一ポジション想定の
+    ままなので、既存のPF 2.08等の数値とは前提が異なる点に注意）
+  決済条件 = TP/SL到達 or ★4を割る or 方向反転 → closed_trades.jsonlに記録（個別トレード単位）
 
 決済理由（2026-06-10刷新：単一TP + トレーリング戦略）:
   TP_HIT      : TP到達（旧TP1相当・ほぼ確実に到達する利確水準）
@@ -34,6 +41,7 @@ from modules.advanced_analytics import calc_correlated_exposure_multiplier
 OPEN_TRADES_FILE = "data/open_trades.json"
 CLOSED_TRADES_FILE = "data/closed_trades.jsonl"
 MAX_CLOSED_DAYS = 120  # 120日分の決済履歴を保持
+MAX_POSITIONS_PER_PAIR = 2  # 2026-07-24追加: 同一ペアの最大同時保有数（ピラミッディング上限）
 
 
 # ============================================================
@@ -41,14 +49,24 @@ MAX_CLOSED_DAYS = 120  # 120日分の決済履歴を保持
 # ============================================================
 
 def load_open_trades() -> dict:
-    """保有中トレードを読み込む。{pair: trade_dict}"""
+    """保有中トレードを読み込む。{pair: [trade_dict, ...]}
+
+    2026-07-24: スキーマを {pair: trade_dict} から {pair: [trade_dict, ...]} へ変更。
+    旧スキーマのファイルを読んだ場合は自動的にリストへラップして後方互換を保つ
+    （保存時には新スキーマで書き戻される）。
+    """
     if not os.path.exists(OPEN_TRADES_FILE):
         return {}
     try:
         with open(OPEN_TRADES_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
+            raw = json.load(f)
     except Exception:
         return {}
+    # 旧スキーマ移行: 値がdict（単一trade）ならリストへラップする
+    return {
+        pair: (v if isinstance(v, list) else [v])
+        for pair, v in raw.items()
+    }
 
 
 def save_open_trades(open_trades: dict):
@@ -348,73 +366,83 @@ def update_trades(results: list, now: datetime,
     current_by_pair = {r["pair"]: r for r in results}
 
     # ── 1. 既存トレードの決済判定 ──
-    pairs_to_close = []
-    for pair, trade in open_trades.items():
+    # 2026-07-24: 1ペアにつき複数トレード(最大MAX_POSITIONS_PER_PAIR件)を
+    # 個別に判定する。決済されたトレードだけをリストから除去し、
+    # 同じペアの他のトレードは影響を受けない。
+    for pair, trades in list(open_trades.items()):
         cur = current_by_pair.get(pair)
         if not cur:
             # この通貨ペアが評価対象から消えた（データ欠損）→ そのまま保有継続
             continue
 
-        current_price = cur.get("price", trade["entry_price"])
-        exit_info = check_exit_condition(
-            trade,
-            current_price,
-            cur.get("stars", 0),
-            cur.get("direction", ""),
-        )
+        current_price = cur.get("price")
+        remaining_trades = []
+        for trade in trades:
+            price_for_trade = current_price if current_price is not None else trade["entry_price"]
+            exit_info = check_exit_condition(
+                trade,
+                price_for_trade,
+                cur.get("stars", 0),
+                cur.get("direction", ""),
+            )
 
-        # 現在価格を保存（保有ポジション表示用） — ペア別精度で丸める
-        _d = _pair_decimals(pair)
-        trade["current_price"] = round(current_price, _d) if current_price is not None else current_price
-        trade["current_stars"] = cur.get("stars", 0)
+            # 現在価格を保存（保有ポジション表示用） — ペア別精度で丸める
+            _d = _pair_decimals(pair)
+            trade["current_price"] = round(price_for_trade, _d) if price_for_trade is not None else price_for_trade
+            trade["current_stars"] = cur.get("stars", 0)
 
-        if exit_info is None:
-            continue
+            if exit_info is None:
+                remaining_trades.append(trade)
+                continue
 
-        # ── 状態更新のみ（決済しない）──
-        if "_state_update" in exit_info:
-            state_update = exit_info["_state_update"]
-            # tp_hit_time を必要なら設定
-            if state_update.get("tp_hit") and "tp_hit_time" in state_update and state_update["tp_hit_time"] is None:
-                state_update["tp_hit_time"] = now.isoformat()
-            # 価格スケール値をペア別精度で丸める（Discord/JSON 表示の桁ズレ防止）
-            for _k in ("sl", "extreme_price", "trail_distance"):
-                if state_update.get(_k) is not None:
-                    state_update[_k] = round(state_update[_k], _d)
-            trade.update(state_update)
-            state_changes.append({
-                "pair": pair,
-                "trade": trade,
-                "update": state_update,
-            })
-            continue
+            # ── 状態更新のみ（決済しない）──
+            if "_state_update" in exit_info:
+                state_update = exit_info["_state_update"]
+                # tp_hit_time を必要なら設定
+                if state_update.get("tp_hit") and "tp_hit_time" in state_update and state_update["tp_hit_time"] is None:
+                    state_update["tp_hit_time"] = now.isoformat()
+                # 価格スケール値をペア別精度で丸める（Discord/JSON 表示の桁ズレ防止）
+                for _k in ("sl", "extreme_price", "trail_distance"):
+                    if state_update.get(_k) is not None:
+                        state_update[_k] = round(state_update[_k], _d)
+                trade.update(state_update)
+                state_changes.append({
+                    "pair": pair,
+                    "trade": trade,
+                    "update": state_update,
+                })
+                remaining_trades.append(trade)
+                continue
 
-        # ── 決済 ──
-        if "exit_reason" in exit_info:
-            closed = {
-                **trade,
-                "exit_time": now.isoformat(),
-                "exit_date": now.strftime("%Y-%m-%d"),
-                "hold_hours": _hours_between(trade["entry_time"], now),
-                **exit_info,
-            }
-            # シミュレーション口座残高へ反映（2026-07-20追加）
-            # units（新規エントリー時にサイジング済み）が無いトレード（機能追加前の
-            # 既存ポジション等）はスキップし、残高は変動させない。
-            units = trade.get("units")
-            if units and pair_api is not None and latest_pairs is not None:
-                pnl_per_unit = pnl_to_jpy(pair, pair_api, exit_info.get("pips", 0), latest_pairs)
-                if pnl_per_unit is not None:
-                    pnl_jpy = round(units * pnl_per_unit, 0)
-                    closed["pnl_jpy"] = pnl_jpy
-                    record_trade_pnl(pnl_jpy)
-            append_closed_trade(closed)
-            newly_closed.append(closed)
-            pairs_to_close.append(pair)
+            # ── 決済 ──
+            if "exit_reason" in exit_info:
+                closed = {
+                    **trade,
+                    "exit_time": now.isoformat(),
+                    "exit_date": now.strftime("%Y-%m-%d"),
+                    "hold_hours": _hours_between(trade["entry_time"], now),
+                    **exit_info,
+                }
+                # シミュレーション口座残高へ反映（2026-07-20追加）
+                # units（新規エントリー時にサイジング済み）が無いトレード（機能追加前の
+                # 既存ポジション等）はスキップし、残高は変動させない。
+                units = trade.get("units")
+                if units and pair_api is not None and latest_pairs is not None:
+                    pnl_per_unit = pnl_to_jpy(pair, pair_api, exit_info.get("pips", 0), latest_pairs)
+                    if pnl_per_unit is not None:
+                        pnl_jpy = round(units * pnl_per_unit, 0)
+                        closed["pnl_jpy"] = pnl_jpy
+                        record_trade_pnl(pnl_jpy)
+                append_closed_trade(closed)
+                newly_closed.append(closed)
+                # remaining_tradesには追加しない = このトレードは除去
 
-    # 決済したトレードをオープンリストから除去
-    for pair in pairs_to_close:
-        del open_trades[pair]
+        if remaining_trades:
+            open_trades[pair] = remaining_trades
+        else:
+            del open_trades[pair]
+
+    pairs_to_close = {c["pair"] for c in newly_closed}
 
     # ── 2. 新規エントリーの記録 ──
     # 同一サイクルで決済したペアは再エントリーしない（決済と同時の即エントリー防止）
@@ -434,68 +462,83 @@ def update_trades(results: list, now: datetime,
         if entry_mode == "limit":
             continue
 
-        # ★4以上 かつ 方向が明確 かつ まだ保有していない かつ 今サイクルで決済していない
-        if (stars >= 4
+        existing = open_trades.get(pair, [])
+
+        # ★4以上 かつ 方向が明確 かつ 今サイクルで決済していない かつ 上限未満
+        if not (stars >= 4
                 and direction.endswith(("LONG", "SHORT"))
-                and pair not in open_trades
-                and pair not in closed_this_cycle):
+                and pair not in closed_this_cycle
+                and len(existing) < MAX_POSITIONS_PER_PAIR):
+            continue
 
-            staged = r.get("staged_tp", {})
-            entry_price = r.get("price")
-            initial_sl = staged.get("sl")
-            trade = {
-                "pair": pair,
-                "entry_time": now.isoformat(),
-                "entry_date": now.strftime("%Y-%m-%d"),
-                "entry_price": entry_price,
-                "direction": direction,
-                "initial_stars": stars,
-                "sl": initial_sl,
-                "initial_sl": initial_sl,  # トレーリング後も初期SLを保持
-                # ── 新方式: 単一TP + トレーリング ──
-                "tp": staged.get("tp") or staged.get("tp1"),  # 新旧両対応
-                "trail_distance": staged.get("trail_distance", 0),
-                "trail_atr_mult": staged.get("trail_atr_mult", 3.0),
-                "be_target_after_tp": staged.get("be_target_after_tp", entry_price),
-                "max_target": staged.get("max_target") or staged.get("tp3"),  # 参考
-                "tp_mode": staged.get("tp_mode", "single_with_trail"),
-                # ── 状態フラグ（初期値）──
-                "tp_hit": False,
-                "trail_active": False,
-                "extreme_price": entry_price,  # トレーリング基準
-                # ── 後方互換: 既存JSONとの整合性 ──
-                "tp1": staged.get("tp1") or staged.get("tp"),
-                "tp2": staged.get("tp2"),
-                "tp3": staged.get("tp3"),
-                # ── メタデータ ──
-                "ta_score": r.get("ta_score"),
-                "fa_score": r.get("fa_score"),
-                "fa_rate_diff": r.get("fa_rate_diff"),
-                "regime": r.get("volatility_regime", {}).get("regime"),
-            }
+        # 2026-07-24追加: 既にこのペアを保有中の場合（ピラミッディング）は、
+        # 直近のポジションが「勝ちが確定した状態（TP到達済み＝トレーリング中）」の
+        # 時だけ追加を許可する。含み損・未確定の段階で買い増す「ナンピン」とは
+        # 明確に区別する（勝ってるトレンドを伸ばす時だけ追加する設計）。
+        if existing and not all(t.get("tp_hit") for t in existing):
+            continue
+        # 同一方向への追加のみ許可（既存ポジションと逆方向は別の判断が必要なため対象外）
+        if existing and existing[-1].get("direction") != direction:
+            continue
 
-            # ポジションサイジング（2026-07-20追加、シミュレーション口座連動）
-            # open_trades（この時点でのメモリ上の状態）を明示的に渡すことで、
-            # 同一スキャンサイクル内で複数ペアが同時に新規シグナルを出した場合でも、
-            # 先に処理されたペアの証拠金を後続ペアの余力計算に正しく反映させる。
-            if pair_api is not None and latest_pairs is not None and initial_sl is not None:
-                # 相関エクスポージャー（2026-07-21追加）: 既存保有ポジションと
-                # 同方向の通貨エクスポージャーが重複していればロットを圧縮する。
-                exp_mult, exp_note = calc_correlated_exposure_multiplier(
-                    pair, direction, open_trades, pair_api
-                )
-                if exp_note:
-                    print(f"  [SIZING] {pair}: {exp_note}")
-                sizing = calc_position_size(
-                    pair, entry_price, initial_sl, pair_api, latest_pairs,
-                    open_trades=open_trades, exposure_multiplier=exp_mult,
-                )
-                trade["position_sizing"] = sizing
-                if sizing.get("tradable"):
-                    trade["units"] = sizing["units"]
+        staged = r.get("staged_tp", {})
+        entry_price = r.get("price")
+        initial_sl = staged.get("sl")
+        trade = {
+            "pair": pair,
+            "entry_time": now.isoformat(),
+            "entry_date": now.strftime("%Y-%m-%d"),
+            "entry_price": entry_price,
+            "direction": direction,
+            "initial_stars": stars,
+            "sl": initial_sl,
+            "initial_sl": initial_sl,  # トレーリング後も初期SLを保持
+            # ── 新方式: 単一TP + トレーリング ──
+            "tp": staged.get("tp") or staged.get("tp1"),  # 新旧両対応
+            "trail_distance": staged.get("trail_distance", 0),
+            "trail_atr_mult": staged.get("trail_atr_mult", 3.0),
+            "be_target_after_tp": staged.get("be_target_after_tp", entry_price),
+            "max_target": staged.get("max_target") or staged.get("tp3"),  # 参考
+            "tp_mode": staged.get("tp_mode", "single_with_trail"),
+            # ── 状態フラグ（初期値）──
+            "tp_hit": False,
+            "trail_active": False,
+            "extreme_price": entry_price,  # トレーリング基準
+            # ── 後方互換: 既存JSONとの整合性 ──
+            "tp1": staged.get("tp1") or staged.get("tp"),
+            "tp2": staged.get("tp2"),
+            "tp3": staged.get("tp3"),
+            # ── メタデータ ──
+            "ta_score": r.get("ta_score"),
+            "fa_score": r.get("fa_score"),
+            "fa_rate_diff": r.get("fa_rate_diff"),
+            "regime": r.get("volatility_regime", {}).get("regime"),
+            # ── ピラミッディング追跡用（2026-07-24追加）──
+            "pyramid_seq": len(existing) + 1,  # このペアの何本目のポジションか
+        }
 
-            open_trades[pair] = trade
-            newly_opened.append(trade)
+        # ポジションサイジング（2026-07-20追加、シミュレーション口座連動）
+        # open_trades（この時点でのメモリ上の状態）を明示的に渡すことで、
+        # 同一スキャンサイクル内で複数ペアが同時に新規シグナルを出した場合でも、
+        # 先に処理されたペアの証拠金を後続ペアの余力計算に正しく反映させる。
+        if pair_api is not None and latest_pairs is not None and initial_sl is not None:
+            # 相関エクスポージャー（2026-07-21追加）: 既存保有ポジションと
+            # 同方向の通貨エクスポージャーが重複していればロットを圧縮する。
+            exp_mult, exp_note = calc_correlated_exposure_multiplier(
+                pair, direction, open_trades, pair_api
+            )
+            if exp_note:
+                print(f"  [SIZING] {pair}: {exp_note}")
+            sizing = calc_position_size(
+                pair, entry_price, initial_sl, pair_api, latest_pairs,
+                open_trades=open_trades, exposure_multiplier=exp_mult,
+            )
+            trade["position_sizing"] = sizing
+            if sizing.get("tradable"):
+                trade["units"] = sizing["units"]
+
+        open_trades.setdefault(pair, []).append(trade)
+        newly_opened.append(trade)
 
     # ── 3. 保存 ──
     save_open_trades(open_trades)
@@ -506,7 +549,7 @@ def update_trades(results: list, now: datetime,
         "newly_closed": newly_closed,
         "state_changes": state_changes,
         "open_trades": open_trades,  # 保有ポジション一覧（Discord通知用）
-        "still_open": len(open_trades),
+        "still_open": sum(len(trades) for trades in open_trades.values()),
     }
 
 
@@ -527,6 +570,17 @@ def open_trade_from_pending_fill(trade: dict, pair_api: dict = None,
     """
     open_trades = load_open_trades()
     pair = trade["pair"]
+    existing = open_trades.get(pair, [])
+
+    # 2026-07-24追加: ピラミッディング上限チェック。指値待機経由の約定でも
+    # 同一ペアの同時保有数はMAX_POSITIONS_PER_PAIRまで
+    # （通常はpending_orders生成時点でも上限チェックしているため、ここは
+    # 二重の安全装置。約定検知のタイムラグで上限を超えるケースを防ぐ）。
+    if len(existing) >= MAX_POSITIONS_PER_PAIR:
+        print(f"  [PENDING] {pair}: 上限({MAX_POSITIONS_PER_PAIR})到達のため約定を破棄")
+        return trade
+
+    trade["pyramid_seq"] = len(existing) + 1
 
     if pair_api is not None and latest_pairs is not None and trade.get("sl") is not None:
         exp_mult, exp_note = calc_correlated_exposure_multiplier(
@@ -542,7 +596,7 @@ def open_trade_from_pending_fill(trade: dict, pair_api: dict = None,
         if sizing.get("tradable"):
             trade["units"] = sizing["units"]
 
-    open_trades[pair] = trade
+    open_trades.setdefault(pair, []).append(trade)
     save_open_trades(open_trades)
     return trade
 

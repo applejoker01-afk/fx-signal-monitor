@@ -151,14 +151,29 @@ def _margin_per_unit_jpy(entry_or_current_price: float, to_ccy: str,
 
 
 def load_open_trades_raw() -> dict:
-    """trade_trackerに依存せず直接open_trades.jsonを読む（循環import回避用）。"""
+    """trade_trackerに依存せず直接open_trades.jsonを読む（循環import回避用）。
+
+    2026-07-24: スキーマが{pair: trade}(旧)/{pair: [trade,...]}(新)どちらでも
+    後方互換で読めるよう、常にリストへ正規化して返す
+    （trade_tracker.load_open_trades()と同じ移行ロジック）。
+    """
     if not os.path.exists(OPEN_TRADES_FILE):
         return {}
     try:
         with open(OPEN_TRADES_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
+            raw = json.load(f)
     except Exception:
         return {}
+    return {pair: (v if isinstance(v, list) else [v]) for pair, v in raw.items()}
+
+
+def _iter_trades(open_trades: dict):
+    """{pair: [trade,...]}を(pair, trade)のフラットなイテレータにする。
+    後方互換: 値がdict(旧スキーマ)ならそのまま1件として扱う。"""
+    for pair, v in open_trades.items():
+        trades = v if isinstance(v, list) else [v]
+        for trade in trades:
+            yield pair, trade
 
 
 def total_open_margin_jpy(open_trades: dict, pair_api: dict, latest_pairs: dict) -> float:
@@ -166,11 +181,14 @@ def total_open_margin_jpy(open_trades: dict, pair_api: dict, latest_pairs: dict)
     現在保有中の全ポジションの必要証拠金(円)を合算する。
     可能な限り現在レートで再計算し（含み損益の変動を反映）、レート取得不可の場合は
     エントリー時点で記録したmargin_required_jpyにフォールバックする。
-    両建て（同一ペアで買い・売り同時保有）の証拠金圧縮はSBI仕様上あり得るが、
-    本システムはペアごとに単一ポジションしか保有しない設計のため考慮不要。
+
+    2026-07-24: 1ペアにつき最大2ポジション（ピラミッディング）保有可能になったため、
+    {pair: [trade,...]}の全トレードを合算する。両建て（同一ペアで買い・売り同時保有）の
+    証拠金圧縮はSBI仕様上あり得るが、本システムはピラミッディング時も同一方向のみを
+    許容する設計のため考慮不要。
     """
     total = 0.0
-    for pair, trade in open_trades.items():
+    for pair, trade in _iter_trades(open_trades):
         units = trade.get("units")
         if not units:
             continue
@@ -189,9 +207,10 @@ def total_open_margin_jpy(open_trades: dict, pair_api: dict, latest_pairs: dict)
 
 
 def unrealized_pnl_jpy(open_trades: dict, pair_api: dict, latest_pairs: dict) -> float:
-    """保有中全ポジションの含み損益(円)を合算する。レート取得不可のペアは0として扱う。"""
+    """保有中全ポジションの含み損益(円)を合算する。レート取得不可のペアは0として扱う。
+    2026-07-24: {pair: [trade,...]}の全トレードを合算するよう変更。"""
     total = 0.0
-    for pair, trade in open_trades.items():
+    for pair, trade in _iter_trades(open_trades):
         units = trade.get("units")
         if not units or pair not in pair_api:
             continue

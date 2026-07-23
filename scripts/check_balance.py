@@ -47,19 +47,26 @@ def main():
     print(f"証拠金使用上限: {account.get('max_margin_usage_pct', 30.0)}%（既存ポジション込み合計）")
     print(f"最終更新:     {account.get('last_updated', '?')}")
 
+    # 2026-07-24: {pair: [trade,...]}のピラミッディング対応
+    flat_trades = [
+        (pair, t) for pair, trades in open_trades.items()
+        for t in (trades if isinstance(trades, list) else [trades])
+    ]
     print()
-    print(f"📋 保有中ポジション: {len(open_trades)}件")
+    print(f"📋 保有中ポジション: {len(flat_trades)}件")
     no_units_count = 0
-    for pair, t in open_trades.items():
+    for pair, t in flat_trades:
         units = t.get("units")
         entry = t.get("entry_price", "?")
         direction = t.get("direction", "?")
         source = " [指値約定]" if t.get("entry_source") == "pending_limit_order" else ""
+        seq = t.get("pyramid_seq")
+        pair_label = f"{pair}#{seq}" if seq and seq > 1 else pair
         if units is None:
             no_units_count += 1
-            print(f"  {pair} {direction} 単位数未記録(★) @ {entry}{source}")
+            print(f"  {pair_label} {direction} 単位数未記録(★) @ {entry}{source}")
         else:
-            print(f"  {pair} {direction} {units}単位 @ {entry}{source}")
+            print(f"  {pair_label} {direction} {units}単位 @ {entry}{source}")
     if no_units_count:
         print(f"  (★ {no_units_count}件はポジションサイジング機能の導入前に建てたポジションのため、"
               f"証拠金維持率の計算には含まれません)")
