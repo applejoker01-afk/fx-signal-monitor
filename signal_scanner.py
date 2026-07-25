@@ -1833,6 +1833,14 @@ def main():
 
     now = datetime.now(timezone.utc)
 
+    # 0. 土日（JST）は為替市場が休場でシグナルが発生しないためスキップ
+    #    UTC→JSTはUTC+9。cronの曜日フィールドだけではUTC/JSTの日付ズレを
+    #    正しく扱えないため、ここで実時刻から判定する（2026-07-26対応）。
+    now_jst = now + timedelta(hours=9)
+    if now_jst.weekday() >= 5:  # 5=土, 6=日
+        print(f"[INFO] JST {now_jst:%Y-%m-%d(%a) %H:%M} は土日のためスキップ（FX市場休場）")
+        return
+
     # 1. 最新レート
     try:
         latest = fetch_latest_rates()
