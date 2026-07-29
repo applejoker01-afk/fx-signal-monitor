@@ -1,19 +1,19 @@
 {
-  "timestamp": "2026-07-29T17:22:26.505648+00:00",
+  "timestamp": "2026-07-29T19:34:20.944579+00:00",
   "signals": {
-    "USDJPY": 1,
+    "USDJPY": 3,
     "EURJPY": 1,
     "GBPJPY": 4,
     "AUDJPY": 1,
     "CHFJPY": 1,
-    "SGDJPY": 1,
+    "SGDJPY": 2,
     "HKDJPY": 1,
     "CNYJPY": 1,
     "MXNJPY": 1,
     "ZARJPY": 1,
-    "GBPUSD": 1,
-    "AUDUSD": 1,
-    "NZDUSD": 1,
+    "GBPUSD": 2,
+    "AUDUSD": 2,
+    "NZDUSD": 2,
     "USDCAD": 1,
     "EURGBP": 2,
     "EURAUD": 2,
@@ -53,60 +53,26 @@
       "fa_direction": "buy",
       "fa_rate_diff": 2.75,
       "fa_detail": "FRB(3.75% neutral/stable) vs 日銀(1.00% pause/peak) 差+2.75% / USDサイクル強化(stable)",
-      "stars": 1,
-      "verdict": "⏸ イベント前自動見送り",
-      "direction": "WAIT_EVENT",
+      "stars": 3,
+      "verdict": "◎ 高信頼ロング（過熱スコア降格: ta_score逆U字の実績データに基づく）",
+      "direction": "LONG",
       "pair_type": "safe_haven",
-      "original_stars": 4,
-      "event_warning": "重要イベント直前 (FOMC Interest Rate Decision まで 0.6h)",
-      "event_info": {
-        "date": "2026-07-29T18:00:00Z",
-        "country": "US",
-        "currency": "USD",
-        "name": "FOMC Interest Rate Decision",
-        "importance": "critical",
-        "affects_pairs": [
-          "USDJPY",
-          "EURUSD",
-          "GBPUSD",
-          "AUDUSD",
-          "NZDUSD",
-          "USDCAD",
-          "USDCHF",
-          "SGDJPY"
-        ],
-        "source": "manual",
-        "actual": null,
-        "estimate": null,
-        "previous": 4.5
-      },
+      "sentiment_notes": [
+        "米10y=4.622% ドル買い圧力"
+      ],
       "upcoming_events": [
-        {
-          "name": "FOMC Interest Rate Decision",
-          "currency": "USD",
-          "importance": "critical",
-          "hours_until": 0.6,
-          "date": "2026-07-29T18:00:00Z"
-        },
-        {
-          "name": "FOMC Press Conference",
-          "currency": "USD",
-          "importance": "critical",
-          "hours_until": 1.1,
-          "date": "2026-07-29T18:30:00Z"
-        },
         {
           "name": "BOJ Interest Rate Decision",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.6,
+          "hours_until": 7.4,
           "date": "2026-07-30T03:00:00Z"
         },
         {
           "name": "BOJ Governor Press Conference",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 13.1,
+          "hours_until": 10.9,
           "date": "2026-07-30T06:30:00Z"
         }
       ],
@@ -120,6 +86,40 @@
         "tp2_multiplier": 4.5,
         "tp3_multiplier": 6.0,
         "note": "ATR比率0.8 → TP=1.5×ATR（Phase1出口改善・到達率向上）"
+      },
+      "staged_tp": {
+        "sl": 163.061,
+        "tp": 164.106,
+        "trail_atr_mult": 2.0,
+        "trail_distance": 0.566,
+        "be_plus_offset": 0.424,
+        "be_target_after_tp": 164.106,
+        "max_target": 165.38,
+        "rr_tp": 0.5,
+        "tp_mode": "single_with_trail",
+        "tp1": 164.106,
+        "tp2": 164.956,
+        "tp3": 165.38,
+        "sl_width": 0.849,
+        "tp1_width": 0.424,
+        "rr_tp1": 0.5,
+        "rr_tp2": 1.5,
+        "rr_tp3": 2.0,
+        "spread_price": 0.002,
+        "spread_pips": 0.2,
+        "spread_atr_ratio": 0.007,
+        "sl_dist_effective": 0.85,
+        "tp_dist_effective": 0.423,
+        "rr_effective": 0.5,
+        "spread_is_dynamic": true,
+        "spread_pips_dynamic": 0.2,
+        "regime_label": "通常ボラ相場",
+        "strategy": "TP(164.106)到達 → SLを BE+0.5R(164.106) へ移動 → トレーリング(2.0×ATR=0.566)発動 → 利を伸ばす（理論最大: 165.38）",
+        "chandelier_sl_active": true,
+        "chandelier_note": "Chandelier Exit: 過去22日高値(163.91)-3.0xATR",
+        "spread_session": "NY afternoon",
+        "spread_session_mult": 1.0,
+        "spread_vix_mult": 1.0
       },
       "carry_score": {
         "carry_score": 15.91,
@@ -228,10 +228,12 @@
         ],
         "message": "ピボットPP（163.687）に接近 あと0.00% → 反落でのショート候補"
       },
+      "high_confidence_zone": false,
+      "ambush_quality": "注意（シグナルとPOIが逆方向）",
       "cb_meeting_blackout": {
         "active": true,
         "severity": "warn",
-        "reason": "JPY 中銀会合まで 7h（要注意期間）",
+        "reason": "JPY 中銀会合まで 4h（要注意期間）",
         "currency": "JPY"
       },
       "strength_context": {
@@ -280,14 +282,14 @@
           "name": "BOJ Interest Rate Decision",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.6,
+          "hours_until": 7.4,
           "date": "2026-07-30T03:00:00Z"
         },
         {
           "name": "BOJ Governor Press Conference",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 13.1,
+          "hours_until": 10.9,
           "date": "2026-07-30T06:30:00Z"
         }
       ],
@@ -450,7 +452,7 @@
       "cb_meeting_blackout": {
         "active": true,
         "severity": "warn",
-        "reason": "JPY 中銀会合まで 7h（要注意期間）",
+        "reason": "JPY 中銀会合まで 4h（要注意期間）",
         "currency": "JPY"
       },
       "strength_context": {
@@ -499,21 +501,21 @@
           "name": "BOJ Interest Rate Decision",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.6,
+          "hours_until": 7.4,
           "date": "2026-07-30T03:00:00Z"
         },
         {
           "name": "BOJ Governor Press Conference",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 13.1,
+          "hours_until": 10.9,
           "date": "2026-07-30T06:30:00Z"
         },
         {
           "name": "BOE Interest Rate Decision",
           "currency": "GBP",
           "importance": "critical",
-          "hours_until": 17.6,
+          "hours_until": 15.4,
           "date": "2026-07-30T11:00:00Z"
         }
       ],
@@ -642,7 +644,7 @@
       "cb_meeting_blackout": {
         "active": true,
         "severity": "warn",
-        "reason": "JPY 中銀会合まで 7h（要注意期間）",
+        "reason": "JPY 中銀会合まで 4h（要注意期間）",
         "currency": "JPY"
       },
       "strength_context": {
@@ -658,7 +660,7 @@
         "context": "強い通貨 vs 弱い通貨（ロング有利）",
         "bias": "long"
       },
-      "ai_exit_advice": "**1. 現状整理**\nファンダメンタルズは日英金利差+2.75%を背景に良好ですが、テクニカル"
+      "ai_exit_advice": "【現状整理】\nテクニカル面ではADX4.7と強いレンジ相場を示していますが、BOEと日銀の金利差（+2"
     },
     {
       "pair": "AUDJPY",
@@ -692,21 +694,21 @@
           "name": "BOJ Interest Rate Decision",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.6,
+          "hours_until": 7.4,
           "date": "2026-07-30T03:00:00Z"
         },
         {
           "name": "BOJ Governor Press Conference",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 13.1,
+          "hours_until": 10.9,
           "date": "2026-07-30T06:30:00Z"
         },
         {
           "name": "RBA Interest Rate Decision",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 129.1,
+          "hours_until": 126.9,
           "date": "2026-08-04T02:30:00Z"
         }
       ],
@@ -847,7 +849,7 @@
       "cb_meeting_blackout": {
         "active": true,
         "severity": "warn",
-        "reason": "JPY 中銀会合まで 7h（要注意期間）",
+        "reason": "JPY 中銀会合まで 4h（要注意期間）",
         "currency": "JPY"
       },
       "strength_context": {
@@ -896,7 +898,7 @@
           "name": "BOJ Interest Rate Decision",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.6,
+          "hours_until": 7.4,
           "date": "2026-07-30T03:00:00Z"
         }
       ],
@@ -1036,7 +1038,7 @@
       "cb_meeting_blackout": {
         "active": true,
         "severity": "warn",
-        "reason": "JPY 中銀会合まで 7h（要注意期間）",
+        "reason": "JPY 中銀会合まで 4h（要注意期間）",
         "currency": "JPY"
       },
       "strength_context": {
@@ -1076,53 +1078,23 @@
       "fa_direction": "buy",
       "fa_rate_diff": 1.5,
       "fa_detail": "MAS(2.50% neutral/stable) vs 日銀(1.00% pause/peak) 差+1.50% / SGDサイクル強化(stable)",
-      "stars": 1,
-      "verdict": "⏸ イベント前自動見送り",
-      "direction": "WAIT_EVENT",
+      "stars": 2,
+      "verdict": "○ ロング条件成立",
+      "direction": "LONG",
       "pair_type": "major",
-      "original_stars": 4,
-      "event_warning": "重要イベント直前 (FOMC Interest Rate Decision まで 0.6h)",
-      "event_info": {
-        "date": "2026-07-29T18:00:00Z",
-        "country": "US",
-        "currency": "USD",
-        "name": "FOMC Interest Rate Decision",
-        "importance": "critical",
-        "affects_pairs": [
-          "USDJPY",
-          "EURUSD",
-          "GBPUSD",
-          "AUDUSD",
-          "NZDUSD",
-          "USDCAD",
-          "USDCHF",
-          "SGDJPY"
-        ],
-        "source": "manual",
-        "actual": null,
-        "estimate": null,
-        "previous": 4.5
-      },
       "upcoming_events": [
-        {
-          "name": "FOMC Interest Rate Decision",
-          "currency": "USD",
-          "importance": "critical",
-          "hours_until": 0.6,
-          "date": "2026-07-29T18:00:00Z"
-        },
         {
           "name": "BOJ Interest Rate Decision",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.6,
+          "hours_until": 7.4,
           "date": "2026-07-30T03:00:00Z"
         },
         {
           "name": "BOJ Governor Press Conference",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 13.1,
+          "hours_until": 10.9,
           "date": "2026-07-30T06:30:00Z"
         }
       ],
@@ -1136,6 +1108,40 @@
         "tp2_multiplier": 4.5,
         "tp3_multiplier": 6.0,
         "note": "ATR比率0.8 → TP=1.5×ATR（Phase1出口改善・到達率向上）"
+      },
+      "staged_tp": {
+        "sl": 126.399,
+        "tp": 126.879,
+        "trail_atr_mult": 2.0,
+        "trail_distance": 0.334,
+        "be_plus_offset": 0.251,
+        "be_target_after_tp": 126.879,
+        "max_target": 127.63,
+        "rr_tp": 0.5,
+        "tp_mode": "single_with_trail",
+        "tp1": 126.879,
+        "tp2": 127.38,
+        "tp3": 127.63,
+        "sl_width": 0.501,
+        "tp1_width": 0.251,
+        "rr_tp1": 0.5,
+        "rr_tp2": 1.5,
+        "rr_tp3": 2.0,
+        "spread_price": 0.025,
+        "spread_pips": 2.5,
+        "spread_atr_ratio": 0.15,
+        "sl_dist_effective": 0.513,
+        "tp_dist_effective": 0.238,
+        "rr_effective": 0.46,
+        "spread_is_dynamic": true,
+        "spread_pips_dynamic": 2.5,
+        "regime_label": "通常ボラ相場",
+        "strategy": "TP(126.879)到達 → SLを BE+0.5R(126.879) へ移動 → トレーリング(2.0×ATR=0.334)発動 → 利を伸ばす（理論最大: 127.63）",
+        "chandelier_sl_active": true,
+        "chandelier_note": "Chandelier Exit: 過去22日高値(126.9)-3.0xATR",
+        "spread_session": "NY afternoon",
+        "spread_session_mult": 1.0,
+        "spread_vix_mult": 1.0
       },
       "carry_score": {
         "carry_score": 11.37,
@@ -1219,10 +1225,14 @@
         ],
         "message": "ピボットPP（126.706）に接近 あと0.06% → 反落でのショート候補"
       },
+      "high_confidence_zone": false,
+      "ambush_quality": "注意（シグナルとPOIが逆方向）",
+      "spread_filter_applied": true,
+      "spread_filter_reason": "💸 スプレッド広め: SGDJPY spread=2.5pips (15% of ATR) — 実効RR 1:0.5→1:0.46。★4→★3降格。",
       "cb_meeting_blackout": {
         "active": true,
         "severity": "warn",
-        "reason": "JPY 中銀会合まで 7h（要注意期間）",
+        "reason": "JPY 中銀会合まで 4h（要注意期間）",
         "currency": "JPY"
       },
       "strength_context": {
@@ -1271,7 +1281,7 @@
           "name": "BOJ Interest Rate Decision",
           "currency": "JPY",
           "importance": "critical",
-          "hours_until": 9.6,
+          "hours_until": 7.4,
           "date": "2026-07-30T03:00:00Z"
         }
       ],
@@ -1409,7 +1419,7 @@
       "cb_meeting_blackout": {
         "active": true,
         "severity": "warn",
-        "reason": "JPY 中銀会合まで 7h（要注意期間）",
+        "reason": "JPY 中銀会合まで 4h（要注意期間）",
         "currency": "JPY"
       },
       "strength_context": {
@@ -1460,8 +1470,8 @@
         "recent_news": [
           "\"China (election OR protest OR crisis OR sanction OR \"central bank\" OR geopolitics)\" - Google News",
           "Google News",
-          "Did the White House order up a CIA document to support Trump’s claims on China election interference? - Democracy Docket",
-          "Trump reluctant to pressure China after claiming election interference - PBS"
+          "Trump reluctant to pressure China after claiming election interference - PBS",
+          "Did the White House order up a CIA document to support Trump’s claims on China election interference? - Democracy Docket"
         ],
         "categories": {
           "political_instability": {
@@ -1616,7 +1626,7 @@
       "cb_meeting_blackout": {
         "active": true,
         "severity": "warn",
-        "reason": "JPY 中銀会合まで 7h（要注意期間）",
+        "reason": "JPY 中銀会合まで 4h（要注意期間）",
         "currency": "JPY"
       },
       "strength_context": {
@@ -1667,8 +1677,8 @@
         "recent_news": [
           "\"Mexico (election OR protest OR crisis OR sanction OR \"central bank\" OR geopolitics)\" - Google News",
           "Google News",
-          "National Democratic committee recommends New Mexico move up on the calendar for presidential primary - Source New Mexico",
-          "Mexico’s cattle ranchers fear screwworm crisis could permanently reshape cross-border trade - Texas Public Radio | TPR"
+          "Mexico to unveil sargassum plan as crisis worsens in Caribbean - upi.com",
+          "National Democratic committee recommends New Mexico move up on the calendar for presidential primary - Source New Mexico"
         ],
         "categories": {
           "political_instability": {
@@ -1831,7 +1841,7 @@
       "cb_meeting_blackout": {
         "active": true,
         "severity": "warn",
-        "reason": "JPY 中銀会合まで 7h（要注意期間）",
+        "reason": "JPY 中銀会合まで 4h（要注意期間）",
         "currency": "JPY"
       },
       "strength_context": {
@@ -2047,7 +2057,7 @@
       "cb_meeting_blackout": {
         "active": true,
         "severity": "warn",
-        "reason": "JPY 中銀会合まで 7h（要注意期間）",
+        "reason": "JPY 中銀会合まで 4h（要注意期間）",
         "currency": "JPY"
       },
       "strength_context": {
@@ -2087,53 +2097,16 @@
       "fa_direction": "neutral",
       "fa_rate_diff": 0.0,
       "fa_detail": "BOE(3.75% neutral/stable) vs FRB(3.75% neutral/stable) 差+0.00%",
-      "stars": 1,
-      "verdict": "⏸ イベント前自動見送り",
-      "direction": "WAIT_EVENT",
+      "stars": 2,
+      "verdict": "△ 弱シグナル",
+      "direction": "LIGHT_SHORT",
       "pair_type": "dollar",
-      "original_stars": 2,
-      "event_warning": "重要イベント直前 (FOMC Interest Rate Decision まで 0.6h)",
-      "event_info": {
-        "date": "2026-07-29T18:00:00Z",
-        "country": "US",
-        "currency": "USD",
-        "name": "FOMC Interest Rate Decision",
-        "importance": "critical",
-        "affects_pairs": [
-          "USDJPY",
-          "EURUSD",
-          "GBPUSD",
-          "AUDUSD",
-          "NZDUSD",
-          "USDCAD",
-          "USDCHF",
-          "SGDJPY"
-        ],
-        "source": "manual",
-        "actual": null,
-        "estimate": null,
-        "previous": 4.5
-      },
       "upcoming_events": [
-        {
-          "name": "FOMC Interest Rate Decision",
-          "currency": "USD",
-          "importance": "critical",
-          "hours_until": 0.6,
-          "date": "2026-07-29T18:00:00Z"
-        },
-        {
-          "name": "FOMC Press Conference",
-          "currency": "USD",
-          "importance": "critical",
-          "hours_until": 1.1,
-          "date": "2026-07-29T18:30:00Z"
-        },
         {
           "name": "BOE Interest Rate Decision",
           "currency": "GBP",
           "importance": "critical",
-          "hours_until": 17.6,
+          "hours_until": 15.4,
           "date": "2026-07-30T11:00:00Z"
         }
       ],
@@ -2147,6 +2120,40 @@
         "tp2_multiplier": 4.5,
         "tp3_multiplier": 6.0,
         "note": "ATR比率0.8 → TP=1.5×ATR（Phase1出口改善・到達率向上）"
+      },
+      "staged_tp": {
+        "sl": 1.33297,
+        "tp": 1.324411,
+        "trail_atr_mult": 2.0,
+        "trail_distance": 0.00598,
+        "be_plus_offset": 0.004485,
+        "be_target_after_tp": 1.324411,
+        "max_target": 1.310956,
+        "rr_tp": 0.5,
+        "tp_mode": "single_with_trail",
+        "tp1": 1.324411,
+        "tp2": 1.315441,
+        "tp3": 1.310956,
+        "sl_width": 0.00897,
+        "tp1_width": 0.004485,
+        "rr_tp1": 0.5,
+        "rr_tp2": 1.5,
+        "rr_tp3": 2.0,
+        "spread_price": 0.00015,
+        "spread_pips": 1.5,
+        "spread_atr_ratio": 0.05,
+        "sl_dist_effective": 0.009045,
+        "tp_dist_effective": 0.00441,
+        "rr_effective": 0.49,
+        "spread_is_dynamic": true,
+        "spread_pips_dynamic": 1.5,
+        "regime_label": "通常ボラ相場",
+        "strategy": "TP(1.324411)到達 → SLを BE+0.5R(1.324411) へ移動 → トレーリング(2.0×ATR=0.00598)発動 → 利を伸ばす（理論最大: 1.310956）",
+        "chandelier_sl_active": true,
+        "chandelier_note": "Chandelier Exit: 過去22日安値(1.324)+3.0xATR",
+        "spread_session": "NY afternoon",
+        "spread_session_mult": 1.0,
+        "spread_vix_mult": 1.0
       },
       "carry_score": {
         "carry_score": 0.0,
@@ -2278,53 +2285,16 @@
       "fa_direction": "neutral",
       "fa_rate_diff": 0.6,
       "fa_detail": "RBA(4.35% pause/stable) vs FRB(3.75% neutral/stable) 差+0.60%",
-      "stars": 1,
-      "verdict": "⏸ イベント前自動見送り",
-      "direction": "WAIT_EVENT",
+      "stars": 2,
+      "verdict": "△ 弱シグナル",
+      "direction": "LIGHT_LONG",
       "pair_type": "dollar",
-      "original_stars": 2,
-      "event_warning": "重要イベント直前 (FOMC Interest Rate Decision まで 0.6h)",
-      "event_info": {
-        "date": "2026-07-29T18:00:00Z",
-        "country": "US",
-        "currency": "USD",
-        "name": "FOMC Interest Rate Decision",
-        "importance": "critical",
-        "affects_pairs": [
-          "USDJPY",
-          "EURUSD",
-          "GBPUSD",
-          "AUDUSD",
-          "NZDUSD",
-          "USDCAD",
-          "USDCHF",
-          "SGDJPY"
-        ],
-        "source": "manual",
-        "actual": null,
-        "estimate": null,
-        "previous": 4.5
-      },
       "upcoming_events": [
-        {
-          "name": "FOMC Interest Rate Decision",
-          "currency": "USD",
-          "importance": "critical",
-          "hours_until": 0.6,
-          "date": "2026-07-29T18:00:00Z"
-        },
-        {
-          "name": "FOMC Press Conference",
-          "currency": "USD",
-          "importance": "critical",
-          "hours_until": 1.1,
-          "date": "2026-07-29T18:30:00Z"
-        },
         {
           "name": "RBA Interest Rate Decision",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 129.1,
+          "hours_until": 126.9,
           "date": "2026-08-04T02:30:00Z"
         }
       ],
@@ -2338,6 +2308,40 @@
         "tp2_multiplier": 4.0,
         "tp3_multiplier": 5.0,
         "note": "ATRが90日平均の0.7倍 → SL縮小・TP縮小（Phase1出口改善）"
+      },
+      "staged_tp": {
+        "sl": 0.689579,
+        "tp": 0.696254,
+        "trail_atr_mult": 2.0,
+        "trail_distance": 0.00356,
+        "be_plus_offset": 0.002225,
+        "be_target_after_tp": 0.696254,
+        "max_target": 0.702929,
+        "rr_tp": 0.5,
+        "tp_mode": "single_with_trail",
+        "tp1": 0.696254,
+        "tp2": 0.701149,
+        "tp3": 0.702929,
+        "sl_width": 0.00445,
+        "tp1_width": 0.002225,
+        "rr_tp1": 0.5,
+        "rr_tp2": 1.6,
+        "rr_tp3": 2.0,
+        "spread_price": 0.0001,
+        "spread_pips": 1.0,
+        "spread_atr_ratio": 0.056,
+        "sl_dist_effective": 0.0045,
+        "tp_dist_effective": 0.002175,
+        "rr_effective": 0.48,
+        "spread_is_dynamic": true,
+        "spread_pips_dynamic": 1.0,
+        "regime_label": "低ボラ相場",
+        "strategy": "TP(0.696254)到達 → SLを BE+0.5R(0.696254) へ移動 → トレーリング(2.0×ATR=0.00356)発動 → 利を伸ばす（理論最大: 0.702929）",
+        "chandelier_sl_active": false,
+        "chandelier_note": "",
+        "spread_session": "NY afternoon",
+        "spread_session_mult": 1.0,
+        "spread_vix_mult": 1.0
       },
       "carry_score": {
         "carry_score": 2.34,
@@ -2475,42 +2479,11 @@
       "fa_direction": "neutral",
       "fa_rate_diff": -1.25,
       "fa_detail": "RBNZ(2.50% tighten/accelerating) vs FRB(3.75% neutral/stable) 差-1.25% / NZDサイクル強化(accelerating)",
-      "stars": 1,
-      "verdict": "⏸ イベント前自動見送り",
-      "direction": "WAIT_EVENT",
+      "stars": 2,
+      "verdict": "△ 弱シグナル",
+      "direction": "LIGHT_SHORT",
       "pair_type": "dollar",
-      "original_stars": 2,
-      "event_warning": "重要イベント直前 (FOMC Interest Rate Decision まで 0.6h)",
-      "event_info": {
-        "date": "2026-07-29T18:00:00Z",
-        "country": "US",
-        "currency": "USD",
-        "name": "FOMC Interest Rate Decision",
-        "importance": "critical",
-        "affects_pairs": [
-          "USDJPY",
-          "EURUSD",
-          "GBPUSD",
-          "AUDUSD",
-          "NZDUSD",
-          "USDCAD",
-          "USDCHF",
-          "SGDJPY"
-        ],
-        "source": "manual",
-        "actual": null,
-        "estimate": null,
-        "previous": 4.5
-      },
-      "upcoming_events": [
-        {
-          "name": "FOMC Interest Rate Decision",
-          "currency": "USD",
-          "importance": "critical",
-          "hours_until": 0.6,
-          "date": "2026-07-29T18:00:00Z"
-        }
-      ],
+      "upcoming_events": [],
       "volatility_regime": {
         "regime": "normal",
         "regime_label": "通常ボラ相場",
@@ -2521,6 +2494,40 @@
         "tp2_multiplier": 4.5,
         "tp3_multiplier": 6.0,
         "note": "ATR比率0.7 → TP=1.5×ATR（Phase1出口改善・到達率向上）"
+      },
+      "staged_tp": {
+        "sl": 0.582471,
+        "tp": 0.574866,
+        "trail_atr_mult": 2.0,
+        "trail_distance": 0.00338,
+        "be_plus_offset": 0.002535,
+        "be_target_after_tp": 0.574866,
+        "max_target": 0.567261,
+        "rr_tp": 0.5,
+        "tp_mode": "single_with_trail",
+        "tp1": 0.574866,
+        "tp2": 0.569796,
+        "tp3": 0.567261,
+        "sl_width": 0.00507,
+        "tp1_width": 0.002535,
+        "rr_tp1": 0.5,
+        "rr_tp2": 1.5,
+        "rr_tp3": 2.0,
+        "spread_price": 0.0002,
+        "spread_pips": 2.0,
+        "spread_atr_ratio": 0.118,
+        "sl_dist_effective": 0.00517,
+        "tp_dist_effective": 0.002435,
+        "rr_effective": 0.47,
+        "spread_is_dynamic": true,
+        "spread_pips_dynamic": 2.0,
+        "regime_label": "通常ボラ相場",
+        "strategy": "TP(0.574866)到達 → SLを BE+0.5R(0.574866) へ移動 → トレーリング(2.0×ATR=0.00338)発動 → 利を伸ばす（理論最大: 0.567261）",
+        "chandelier_sl_active": false,
+        "chandelier_note": "",
+        "spread_session": "NY afternoon",
+        "spread_session_mult": 1.0,
+        "spread_vix_mult": 1.0
       },
       "carry_score": {
         "carry_score": 4.27,
@@ -2636,6 +2643,8 @@
         ],
         "message": "ピボットPP（0.57794）に接近 あと0.09% → 反落でのショート候補"
       },
+      "spread_caution": true,
+      "spread_caution_reason": "💸 スプレッド広め: NZDUSD spread=2.0pips (12% of ATR)。実効RR 1:0.47",
       "cb_meeting_blackout": {
         "active": false,
         "severity": "none",
@@ -2679,41 +2688,10 @@
       "fa_rate_diff": 1.0,
       "fa_detail": "FRB(3.75% neutral/stable) vs BOC(2.75% neutral/stable) 差+1.00%",
       "stars": 1,
-      "verdict": "⏸ イベント前自動見送り",
-      "direction": "WAIT_EVENT",
+      "verdict": "△ 弱シグナル",
+      "direction": "LIGHT_LONG",
       "pair_type": "dollar",
-      "original_stars": 2,
-      "event_warning": "重要イベント直前 (FOMC Interest Rate Decision まで 0.6h)",
-      "event_info": {
-        "date": "2026-07-29T18:00:00Z",
-        "country": "US",
-        "currency": "USD",
-        "name": "FOMC Interest Rate Decision",
-        "importance": "critical",
-        "affects_pairs": [
-          "USDJPY",
-          "EURUSD",
-          "GBPUSD",
-          "AUDUSD",
-          "NZDUSD",
-          "USDCAD",
-          "USDCHF",
-          "SGDJPY"
-        ],
-        "source": "manual",
-        "actual": null,
-        "estimate": null,
-        "previous": 4.5
-      },
-      "upcoming_events": [
-        {
-          "name": "FOMC Interest Rate Decision",
-          "currency": "USD",
-          "importance": "critical",
-          "hours_until": 0.6,
-          "date": "2026-07-29T18:00:00Z"
-        }
-      ],
+      "upcoming_events": [],
       "volatility_regime": {
         "regime": "low",
         "regime_label": "低ボラ相場",
@@ -2724,6 +2702,40 @@
         "tp2_multiplier": 4.0,
         "tp3_multiplier": 5.0,
         "note": "ATRが90日平均の0.7倍 → SL縮小・TP縮小（Phase1出口改善）"
+      },
+      "staged_tp": {
+        "sl": 1.406032,
+        "tp": 1.41267,
+        "trail_atr_mult": 2.0,
+        "trail_distance": 0.00354,
+        "be_plus_offset": 0.002213,
+        "be_target_after_tp": 1.41267,
+        "max_target": 1.419307,
+        "rr_tp": 0.5,
+        "tp_mode": "single_with_trail",
+        "tp1": 1.41267,
+        "tp2": 1.417537,
+        "tp3": 1.419307,
+        "sl_width": 0.004425,
+        "tp1_width": 0.002213,
+        "rr_tp1": 0.5,
+        "rr_tp2": 1.6,
+        "rr_tp3": 2.0,
+        "spread_price": 0.00015,
+        "spread_pips": 1.5,
+        "spread_atr_ratio": 0.085,
+        "sl_dist_effective": 0.0045,
+        "tp_dist_effective": 0.002138,
+        "rr_effective": 0.47,
+        "spread_is_dynamic": true,
+        "spread_pips_dynamic": 1.5,
+        "regime_label": "低ボラ相場",
+        "strategy": "TP(1.41267)到達 → SLを BE+0.5R(1.41267) へ移動 → トレーリング(2.0×ATR=0.00354)発動 → 利を伸ばす（理論最大: 1.419307）",
+        "chandelier_sl_active": false,
+        "chandelier_note": "",
+        "spread_session": "NY afternoon",
+        "spread_session_mult": 1.0,
+        "spread_vix_mult": 1.0
       },
       "carry_score": {
         "carry_score": 7.97,
@@ -2842,7 +2854,7 @@
       "cb_meeting_blackout": {
         "active": true,
         "severity": "warn",
-        "reason": "CAD 中銀会合まで 7h（要注意期間）",
+        "reason": "CAD 中銀会合まで 4h（要注意期間）",
         "currency": "CAD"
       },
       "strength_context": {
@@ -2891,7 +2903,7 @@
           "name": "BOE Interest Rate Decision",
           "currency": "GBP",
           "importance": "critical",
-          "hours_until": 17.6,
+          "hours_until": 15.4,
           "date": "2026-07-30T11:00:00Z"
         }
       ],
@@ -3069,7 +3081,7 @@
           "name": "RBA Interest Rate Decision",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 129.1,
+          "hours_until": 126.9,
           "date": "2026-08-04T02:30:00Z"
         }
       ],
@@ -3453,7 +3465,7 @@
       "cb_meeting_blackout": {
         "active": true,
         "severity": "warn",
-        "reason": "JPY 中銀会合まで 7h（要注意期間）",
+        "reason": "JPY 中銀会合まで 4h（要注意期間）",
         "currency": "JPY"
       },
       "strength_context": {
@@ -3618,7 +3630,7 @@
       "cb_meeting_blackout": {
         "active": true,
         "severity": "warn",
-        "reason": "JPY 中銀会合まで 7h（要注意期間）",
+        "reason": "JPY 中銀会合まで 4h（要注意期間）",
         "currency": "JPY"
       },
       "strength_context": {
@@ -3669,8 +3681,8 @@
         "recent_news": [
           "\"Brazil (election OR protest OR crisis OR sanction OR \"central bank\" OR geopolitics)\" - Google News",
           "Google News",
-          "Lula Leads Brazil Election Poll After Shaky Start to Bolsonaro Campaign - Bloomberg.com",
-          "Brazil's Lula holds lead over Bolsonaro in BTG/Nexus election poll - Reuters"
+          "Brazil's Lula holds lead over Bolsonaro in BTG/Nexus election poll - Reuters",
+          "Lula Leads Brazil Election Poll After Shaky Start to Bolsonaro Campaign - Bloomberg.com"
         ],
         "categories": {
           "political_instability": {
@@ -3820,7 +3832,7 @@
       "cb_meeting_blackout": {
         "active": true,
         "severity": "warn",
-        "reason": "JPY 中銀会合まで 7h（要注意期間）",
+        "reason": "JPY 中銀会合まで 4h（要注意期間）",
         "currency": "JPY"
       },
       "strength_context": {
@@ -3973,7 +3985,7 @@
       "cb_meeting_blackout": {
         "active": true,
         "severity": "warn",
-        "reason": "JPY 中銀会合まで 7h（要注意期間）",
+        "reason": "JPY 中銀会合まで 4h（要注意期間）",
         "currency": "JPY"
       },
       "strength_context": {
@@ -4022,14 +4034,14 @@
           "name": "BOE Interest Rate Decision",
           "currency": "GBP",
           "importance": "critical",
-          "hours_until": 17.6,
+          "hours_until": 15.4,
           "date": "2026-07-30T11:00:00Z"
         },
         {
           "name": "RBA Interest Rate Decision",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 129.1,
+          "hours_until": 126.9,
           "date": "2026-08-04T02:30:00Z"
         }
       ],
@@ -4217,7 +4229,7 @@
           "name": "BOE Interest Rate Decision",
           "currency": "GBP",
           "importance": "critical",
-          "hours_until": 17.6,
+          "hours_until": 15.4,
           "date": "2026-07-30T11:00:00Z"
         }
       ],
@@ -4756,7 +4768,7 @@
           "name": "RBA Interest Rate Decision",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 129.1,
+          "hours_until": 126.9,
           "date": "2026-08-04T02:30:00Z"
         }
       ],
@@ -5154,8 +5166,8 @@
         "recent_news": [
           "\"China (election OR protest OR crisis OR sanction OR \"central bank\" OR geopolitics)\" - Google News",
           "Google News",
-          "Did the White House order up a CIA document to support Trump’s claims on China election interference? - Democracy Docket",
-          "Trump reluctant to pressure China after claiming election interference - PBS"
+          "Trump reluctant to pressure China after claiming election interference - PBS",
+          "Did the White House order up a CIA document to support Trump’s claims on China election interference? - Democracy Docket"
         ],
         "categories": {
           "political_instability": {
@@ -5352,25 +5364,25 @@
     }
   ],
   "sentiment": {
-    "vix": 19.5,
+    "vix": 18.64,
     "vix_level": "normal",
     "risk_off_strength": 0,
-    "dxy": 101.41,
-    "dxy_30d_avg": 100.99,
+    "dxy": 100.89,
+    "dxy_30d_avg": 101.03,
     "dxy_trend": "flat",
-    "us10y": 4.651,
+    "us10y": 4.622,
     "bond_pressure": "elevated",
-    "gold": 4100.3,
-    "gold_20d_avg": 4072.06,
-    "gold_trend": "flat",
+    "gold": 4145.6,
+    "gold_20d_avg": 4074.32,
+    "gold_trend": "rising",
     "risk_mode": "normal"
   },
   "us_yields": {
     "short": 4.85,
     "2y": 4.85,
-    "10y": 4.651,
+    "10y": 4.622,
     "30y": 4.55,
-    "spread_10y2y": -0.199,
+    "spread_10y2y": -0.228,
     "source": "fallback (estimated)",
     "avg_note_coupon": 4.35,
     "10y_source": "market yield (^TNX via Yahoo Finance)"
