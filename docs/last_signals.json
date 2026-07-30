@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-07-30T06:33:36.216880+00:00",
+  "timestamp": "2026-07-30T06:34:05.011510+00:00",
   "signals": {
     "USDJPY": 1,
     "EURJPY": 1,
@@ -27,7 +27,7 @@
     "EURCHF": 2,
     "AUDNZD": 2,
     "EURNZD": 2,
-    "USDCNY": 2
+    "USDCNY": 1
   },
   "results": [
     {
@@ -58,7 +58,7 @@
       "direction": "WAIT_BOJ",
       "pair_type": "safe_haven",
       "original_stars": 4,
-      "event_warning": "重要イベント直後 (BOJ Governor Press Conference から 0.0h経過)",
+      "event_warning": "重要イベント直後 (BOJ Governor Press Conference から 0.1h経過)",
       "event_info": {
         "date": "2026-07-30T06:30:00Z",
         "country": "JP",
@@ -245,7 +245,7 @@
       "direction": "WAIT_BOJ",
       "pair_type": "major",
       "original_stars": 4,
-      "event_warning": "重要イベント直後 (BOJ Governor Press Conference から 0.0h経過)",
+      "event_warning": "重要イベント直後 (BOJ Governor Press Conference から 0.1h経過)",
       "event_info": {
         "date": "2026-07-30T06:30:00Z",
         "country": "JP",
@@ -435,7 +435,7 @@
       "direction": "WAIT_BOJ",
       "pair_type": "major",
       "original_stars": 4,
-      "event_warning": "重要イベント直後 (BOJ Governor Press Conference から 0.0h経過)",
+      "event_warning": "重要イベント直後 (BOJ Governor Press Conference から 0.1h経過)",
       "event_info": {
         "date": "2026-07-30T06:30:00Z",
         "country": "JP",
@@ -459,7 +459,7 @@
           "name": "BOE Interest Rate Decision",
           "currency": "GBP",
           "importance": "critical",
-          "hours_until": 4.5,
+          "hours_until": 4.4,
           "date": "2026-07-30T11:00:00Z"
         }
       ],
@@ -599,7 +599,7 @@
       "direction": "WAIT_BOJ",
       "pair_type": "major",
       "original_stars": 4,
-      "event_warning": "重要イベント直後 (BOJ Governor Press Conference から 0.0h経過)",
+      "event_warning": "重要イベント直後 (BOJ Governor Press Conference から 0.1h経過)",
       "event_info": {
         "date": "2026-07-30T06:30:00Z",
         "country": "JP",
@@ -623,7 +623,7 @@
           "name": "RBA Interest Rate Decision",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 116.0,
+          "hours_until": 115.9,
           "date": "2026-08-04T02:30:00Z"
         }
       ],
@@ -957,7 +957,7 @@
       "direction": "WAIT_BOJ",
       "pair_type": "major",
       "original_stars": 4,
-      "event_warning": "重要イベント直後 (BOJ Governor Press Conference から 0.0h経過)",
+      "event_warning": "重要イベント直後 (BOJ Governor Press Conference から 0.1h経過)",
       "event_info": {
         "date": "2026-07-30T06:30:00Z",
         "country": "JP",
@@ -1300,10 +1300,39 @@
       "verdict": "🏦 日銀会合後ブラックアウト（新規禁止）",
       "direction": "WAIT_BOJ",
       "pair_type": "emerging_market",
-      "original_stars": 4,
+      "original_stars": 3,
       "sentiment_notes": [
         "VIX=20.66 警戒・新興国シグナル軽減"
       ],
+      "geopolitical_risk": {
+        "risk_level": "high",
+        "risk_score": 54,
+        "reason": "political_instability: protest / geopolitical: sanction, war",
+        "recent_news": [
+          "\"China (election OR protest OR crisis OR sanction OR \"central bank\" OR geopolitics)\" - Google News",
+          "Google News",
+          "Did the White House order up a CIA document to support Trump’s claims on China election interference? - Democracy Docket",
+          "Trump reluctant to pressure China after claiming election interference - PBS"
+        ],
+        "categories": {
+          "political_instability": {
+            "score": 15,
+            "hits": [
+              "protest"
+            ]
+          },
+          "geopolitical": {
+            "score": 24,
+            "hits": [
+              "sanction",
+              "war"
+            ]
+          }
+        },
+        "country": "China",
+        "news_volume": 8
+      },
+      "risk_adjustment": -54,
       "upcoming_events": [],
       "volatility_regime": {
         "regime": "low",
@@ -1482,10 +1511,39 @@
       "verdict": "🏦 日銀会合後ブラックアウト（新規禁止）",
       "direction": "WAIT_BOJ",
       "pair_type": "emerging_market",
-      "original_stars": 4,
+      "original_stars": 3,
       "sentiment_notes": [
         "VIX=20.66 警戒・新興国シグナル軽減"
       ],
+      "geopolitical_risk": {
+        "risk_level": "high",
+        "risk_score": 54,
+        "reason": "political_instability: protest / geopolitical: sanction, war",
+        "recent_news": [
+          "\"Mexico (election OR protest OR crisis OR sanction OR \"central bank\" OR geopolitics)\" - Google News",
+          "Google News",
+          "New Mexicans protest outside BLM office over proposal to undo Chaco Canyon mining protections - Source New Mexico",
+          "Mexico to unveil sargassum plan as crisis worsens in Caribbean - upi.com"
+        ],
+        "categories": {
+          "political_instability": {
+            "score": 15,
+            "hits": [
+              "protest"
+            ]
+          },
+          "geopolitical": {
+            "score": 24,
+            "hits": [
+              "sanction",
+              "war"
+            ]
+          }
+        },
+        "country": "Mexico",
+        "news_volume": 8
+      },
+      "risk_adjustment": -54,
       "upcoming_events": [],
       "volatility_regime": {
         "regime": "low",
@@ -1622,8 +1680,6 @@
         ],
         "message": "ピボットPP（9.37）に接近 あと0.04% → 反落でのショート候補"
       },
-      "regime_filter_applied": true,
-      "regime_filter_reason": "⚠️ BOJサイクル軽警告: MXN(Banxico ease/decelerating) + JPY(日銀 pause) = LONG方向注意",
       "vix_caution": true,
       "vix_caution_reason": "VIX警戒域: VIX=20.7 — JPYクロスLONGは要注意",
       "cb_meeting_blackout": {
@@ -1674,6 +1730,35 @@
       "verdict": "🏦 日銀会合後ブラックアウト（新規禁止）",
       "direction": "WAIT_BOJ",
       "pair_type": "emerging_market",
+      "geopolitical_risk": {
+        "risk_level": "medium",
+        "risk_score": 42,
+        "reason": "political_instability: protest / geopolitical: sanction",
+        "recent_news": [
+          "\"South Africa (election OR protest OR crisis OR sanction OR \"central bank\" OR geopolitics)\" - Google News",
+          "Google News",
+          "A South African Identity Crisis - The New York Times",
+          "MOFA to protest South African ETA system designation - Taipei Times"
+        ],
+        "categories": {
+          "political_instability": {
+            "score": 15,
+            "hits": [
+              "protest"
+            ]
+          },
+          "geopolitical": {
+            "score": 12,
+            "hits": [
+              "sanction"
+            ]
+          }
+        },
+        "country": "South Africa",
+        "news_volume": 8
+      },
+      "original_stars": 2,
+      "risk_adjustment": -42,
       "upcoming_events": [],
       "volatility_regime": {
         "regime": "normal",
@@ -3448,6 +3533,35 @@
       "verdict": "🏦 日銀会合後ブラックアウト（新規禁止）",
       "direction": "WAIT_BOJ",
       "pair_type": "major",
+      "geopolitical_risk": {
+        "risk_level": "medium",
+        "risk_score": 42,
+        "reason": "political_instability: protest / geopolitical: sanction",
+        "recent_news": [
+          "\"Brazil (election OR protest OR crisis OR sanction OR \"central bank\" OR geopolitics)\" - Google News",
+          "Google News",
+          "Digital avatar of Jair Bolsonaro tests Brazil’s AI election rules - Financial Times",
+          "Brazil's Lula holds lead over Bolsonaro in BTG/Nexus election poll - Reuters"
+        ],
+        "categories": {
+          "political_instability": {
+            "score": 15,
+            "hits": [
+              "protest"
+            ]
+          },
+          "geopolitical": {
+            "score": 12,
+            "hits": [
+              "sanction"
+            ]
+          }
+        },
+        "country": "Brazil",
+        "news_volume": 8
+      },
+      "original_stars": 4,
+      "risk_adjustment": -42,
       "upcoming_events": [],
       "volatility_regime": {
         "regime": "normal",
@@ -3574,8 +3688,6 @@
       "regime_filter_reason": "⚠️ BOJサイクル軽警告: BRL(BCB (Copom) ease/decelerating) + JPY(日銀 pause) = LONG方向注意",
       "vix_caution": true,
       "vix_caution_reason": "VIX警戒域: VIX=20.7 — JPYクロスLONGは要注意",
-      "spread_filter_applied": true,
-      "spread_filter_reason": "💸 スプレッド致命的: BRLJPY spread=3.2pips (31% of ATR) — 実効RR 1:0.5→1:0.43 に劣化。取引非推奨で★3→★2降格。",
       "cb_meeting_blackout": {
         "active": true,
         "severity": "blackout",
@@ -4910,10 +5022,40 @@
       "fa_direction": "neutral",
       "fa_rate_diff": 0.75,
       "fa_detail": "FRB(3.75% neutral/stable) vs PBOC(3.00% ease/stable) 差+0.75%",
-      "stars": 2,
-      "verdict": "△ 弱シグナル",
+      "stars": 1,
+      "verdict": "⚠ 地政学リスク(high)考慮 △ 弱シグナル",
       "direction": "LIGHT_SHORT",
       "pair_type": "dollar",
+      "geopolitical_risk": {
+        "risk_level": "high",
+        "risk_score": 54,
+        "reason": "political_instability: protest / geopolitical: sanction, war",
+        "recent_news": [
+          "\"China (election OR protest OR crisis OR sanction OR \"central bank\" OR geopolitics)\" - Google News",
+          "Google News",
+          "Did the White House order up a CIA document to support Trump’s claims on China election interference? - Democracy Docket",
+          "Trump reluctant to pressure China after claiming election interference - PBS"
+        ],
+        "categories": {
+          "political_instability": {
+            "score": 15,
+            "hits": [
+              "protest"
+            ]
+          },
+          "geopolitical": {
+            "score": 24,
+            "hits": [
+              "sanction",
+              "war"
+            ]
+          }
+        },
+        "country": "China",
+        "news_volume": 8
+      },
+      "original_stars": 2,
+      "risk_adjustment": -54,
       "upcoming_events": [],
       "volatility_regime": {
         "regime": "normal",
@@ -5097,8 +5239,8 @@
     "dxy_trend": "flat",
     "us10y": 4.622,
     "bond_pressure": "elevated",
-    "gold": 4095.6,
-    "gold_20d_avg": 4070.12,
+    "gold": 4095.5,
+    "gold_20d_avg": 4070.13,
     "gold_trend": "flat",
     "risk_mode": "caution"
   },
