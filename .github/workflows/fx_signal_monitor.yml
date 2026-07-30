@@ -5,8 +5,11 @@ on:
     # 毎時05分に実行（UTC）
     - cron: '5 * * * *'
   workflow_dispatch:  # 手動実行を許可
-  push:
-    branches: [main]
+  # 2026-07-31: push トリガーは削除。このワークフロー自身の自動コミット
+  # （"Commit updated state" ステップ）もmainへのpushであるため、push
+  # トリガーが有効だと毎回のスキャンが自分自身を再起動し、schedule実行
+  # と衝突してgit push競合（rebase conflict）を起こしていた。
+  # コード修正後の動作確認はworkflow_dispatchで手動実行すればよい。
 
 # GitHub Pages公式デプロイに必要な権限
 permissions:
