@@ -306,7 +306,31 @@ def http_get_json(url, timeout=15):
         return json.loads(resp.read().decode("utf-8"))
 
 
-def fetch_latest_rates():
+def fetch_latest_rates_yahoo():
+    """
+    Yahoo Financeの分足チャートAPIからリアルタイム（数分遅延）の実勢レートを取得する。
+    2026-07-31追加: Frankfurter(ECB参考レート)は平日1日1回しか更新されないため、
+    日中の急変（SL/TP到達）を検知できない問題が発覚。1ペアずつ取得するため
+    Frankfurterより低速・失敗率は上がるが、個別ペアの失敗は許容し全滅時のみ
+    フォールバックへ回す。
+    """
+    pairs = {}
+    for key in PAIR_API:
+        url = (
+            f"https://query1.finance.yahoo.com/v8/finance/chart/{key}=X"
+            "?interval=1m&range=1d"
+        )
+        try:
+            data = http_get_json(url, timeout=10)
+            price = data["chart"]["result"][0]["meta"]["regularMarketPrice"]
+            if price:
+                pairs[key] = float(price)
+        except Exception as e:
+            print(f"[WARN] Yahoo Finance failed for {key}: {e}")
+    return pairs
+
+
+def fetch_latest_rates_frankfurter():
     for name, url in LATEST_ENDPOINTS:
         try:
             print(f"[INFO] Latest rates: trying {name}")
@@ -322,6 +346,23 @@ def fetch_latest_rates():
         except Exception as e:
             print(f"[WARN] {name} failed: {e}")
     raise RuntimeError("All latest-rate endpoints failed")
+
+
+def fetch_latest_rates():
+    """
+    優先: Yahoo Finance（実勢に近いリアルタイムレート）
+    フォールバック: Frankfurter/ECB（日次参考レート、Yahooが半数以上失敗した場合のみ）
+    """
+    print("[INFO] Latest rates: trying Yahoo Finance (real-time)")
+    yahoo_pairs = fetch_latest_rates_yahoo()
+    if len(yahoo_pairs) >= len(PAIR_API) * 0.5:
+        today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        print(f"[OK] {len(yahoo_pairs)}/{len(PAIR_API)} pairs from Yahoo Finance ({today})")
+        return {"date": today, "pairs": yahoo_pairs}
+
+    print(f"[WARN] Yahoo Finance only returned {len(yahoo_pairs)}/{len(PAIR_API)} pairs, "
+          f"falling back to Frankfurter (daily ECB reference rate)")
+    return fetch_latest_rates_frankfurter()
 
 
 def fetch_history(pair, days=280):
