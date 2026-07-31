@@ -5,7 +5,11 @@ trade_tracker.py
 1シグナル = 1トレードとして正確に追跡する。
 
 状態遷移:
-  ★3以下 → ★4に上昇 = エントリー（open_trades.jsonに記録）
+  ★4以上のシグナル → modules/pending_orders.py 経由で指値待機登録
+    （1日3回）→ 価格到達で約定 = エントリー（open_trades.jsonに記録）
+    ※2026-08-01: 即時オープン経路は廃止。全エントリーは指値約定経由に一本化
+    （即時オープンはMT5への発注経路を持たず、クラウド側だけ「保有中」と
+    なる幽霊ポジションを生む構造的バグだったため）
   ★4以上を維持 = 保有中（重複カウントしない）
   ★4へ再到達（一度4未満に下がってから再上昇） = 追加エントリー
     （2026-07-24追加: 同一ペアで最大MAX_POSITIONS_PER_PAIR件まで同時保有可能。
@@ -331,17 +335,20 @@ def check_exit_condition(trade: dict, current_price: float,
 
 
 def update_trades(results: list, now: datetime,
-                   pair_api: dict = None, latest_pairs: dict = None,
-                   entry_mode: str = "market") -> dict:
+                   pair_api: dict = None, latest_pairs: dict = None) -> dict:
     """
     毎時スキャン時に呼ぶメイン関数。
 
     1. 既存の保有トレードの決済判定
-    2. 新規エントリーの記録
-    3. ファイル保存
+    2. ファイル保存
 
-    entry_mode="limit" の場合、新規エントリーの即時オープンは行わない
-    （modules/pending_orders.py 経由の指値待機フローに委ねる。2026-07-20追加）。
+    新規エントリーはここでは行わない（2026-08-01: 即時オープンの経路を廃止）。
+    全ての新規エントリーは modules/pending_orders.py 経由の指値待機フロー
+    （1日3回の指値登録 → 約定検知でopen_trade_from_pending_fillが呼ばれる）
+    に一本化されている。理由: 即時オープン（旧entry_mode="market"）は
+    open_trades.jsonに記録するだけでMT5への発注経路が存在せず、
+    「クラウド側だけ保有中とされ実口座には存在しない」ポジションを生む
+    構造的バグだったため（SGDJPY/KRWJPYで発覚）。
 
     pair_api / latest_pairs を渡すと、2026-07-20追加のシミュレーション口座
     （data/virtual_account.json）と連動したポジションサイジングを行う:
@@ -442,105 +449,11 @@ def update_trades(results: list, now: datetime,
         else:
             del open_trades[pair]
 
-    pairs_to_close = {c["pair"] for c in newly_closed}
+    # 新規エントリーはここでは行わない（上部docstring参照）。
+    # 全ての新規オープンは modules/pending_orders.py の約定検知
+    # （open_trade_from_pending_fill）経由で行われる。
 
-    # ── 2. 新規エントリーの記録 ──
-    # 同一サイクルで決済したペアは再エントリーしない（決済と同時の即エントリー防止）
-    #
-    # entry_mode（2026-07-20追加）:
-    #   "market"（デフォルト・毎時スキャン）: 従来通り、★4以上を検出したその場で
-    #     現在値エントリーとして即座にopen_tradesへ記録する。
-    #   "limit"（1日3回の指値スキャン専用）: ここでは即座にオープンせず、
-    #     modules/pending_orders.py 側で押し目の指値注文として登録する
-    #     （signal_scanner.py の呼び出し元が別途処理する）。
-    closed_this_cycle = set(pairs_to_close)
-    for r in results:
-        pair = r["pair"]
-        stars = r.get("stars", 0)
-        direction = r.get("direction", "")
-
-        if entry_mode == "limit":
-            continue
-
-        existing = open_trades.get(pair, [])
-
-        # ★4以上 かつ 方向が明確 かつ 今サイクルで決済していない かつ 上限未満
-        if not (stars >= 4
-                and direction.endswith(("LONG", "SHORT"))
-                and pair not in closed_this_cycle
-                and len(existing) < MAX_POSITIONS_PER_PAIR):
-            continue
-
-        # 2026-07-24追加: 既にこのペアを保有中の場合（ピラミッディング）は、
-        # 直近のポジションが「勝ちが確定した状態（TP到達済み＝トレーリング中）」の
-        # 時だけ追加を許可する。含み損・未確定の段階で買い増す「ナンピン」とは
-        # 明確に区別する（勝ってるトレンドを伸ばす時だけ追加する設計）。
-        if existing and not all(t.get("tp_hit") for t in existing):
-            continue
-        # 同一方向への追加のみ許可（既存ポジションと逆方向は別の判断が必要なため対象外）
-        if existing and existing[-1].get("direction") != direction:
-            continue
-
-        staged = r.get("staged_tp", {})
-        entry_price = r.get("price")
-        initial_sl = staged.get("sl")
-        trade = {
-            "pair": pair,
-            "entry_time": now.isoformat(),
-            "entry_date": now.strftime("%Y-%m-%d"),
-            "entry_price": entry_price,
-            "direction": direction,
-            "initial_stars": stars,
-            "sl": initial_sl,
-            "initial_sl": initial_sl,  # トレーリング後も初期SLを保持
-            # ── 新方式: 単一TP + トレーリング ──
-            "tp": staged.get("tp") or staged.get("tp1"),  # 新旧両対応
-            "trail_distance": staged.get("trail_distance", 0),
-            "trail_atr_mult": staged.get("trail_atr_mult", 3.0),
-            "be_target_after_tp": staged.get("be_target_after_tp", entry_price),
-            "max_target": staged.get("max_target") or staged.get("tp3"),  # 参考
-            "tp_mode": staged.get("tp_mode", "single_with_trail"),
-            # ── 状態フラグ（初期値）──
-            "tp_hit": False,
-            "trail_active": False,
-            "extreme_price": entry_price,  # トレーリング基準
-            # ── 後方互換: 既存JSONとの整合性 ──
-            "tp1": staged.get("tp1") or staged.get("tp"),
-            "tp2": staged.get("tp2"),
-            "tp3": staged.get("tp3"),
-            # ── メタデータ ──
-            "ta_score": r.get("ta_score"),
-            "fa_score": r.get("fa_score"),
-            "fa_rate_diff": r.get("fa_rate_diff"),
-            "regime": r.get("volatility_regime", {}).get("regime"),
-            # ── ピラミッディング追跡用（2026-07-24追加）──
-            "pyramid_seq": len(existing) + 1,  # このペアの何本目のポジションか
-        }
-
-        # ポジションサイジング（2026-07-20追加、シミュレーション口座連動）
-        # open_trades（この時点でのメモリ上の状態）を明示的に渡すことで、
-        # 同一スキャンサイクル内で複数ペアが同時に新規シグナルを出した場合でも、
-        # 先に処理されたペアの証拠金を後続ペアの余力計算に正しく反映させる。
-        if pair_api is not None and latest_pairs is not None and initial_sl is not None:
-            # 相関エクスポージャー（2026-07-21追加）: 既存保有ポジションと
-            # 同方向の通貨エクスポージャーが重複していればロットを圧縮する。
-            exp_mult, exp_note = calc_correlated_exposure_multiplier(
-                pair, direction, open_trades, pair_api
-            )
-            if exp_note:
-                print(f"  [SIZING] {pair}: {exp_note}")
-            sizing = calc_position_size(
-                pair, entry_price, initial_sl, pair_api, latest_pairs,
-                open_trades=open_trades, exposure_multiplier=exp_mult,
-            )
-            trade["position_sizing"] = sizing
-            if sizing.get("tradable"):
-                trade["units"] = sizing["units"]
-
-        open_trades.setdefault(pair, []).append(trade)
-        newly_opened.append(trade)
-
-    # ── 3. 保存 ──
+    # ── 2. 保存 ──
     save_open_trades(open_trades)
     prune_closed_trades()
 

@@ -2142,7 +2142,7 @@ def main():
         create_pending_order, pending_order_to_trade,
     )
     entry_mode = os.environ.get("ENTRY_MODE", "market").strip().lower()
-    trade_update = update_trades(results, now, PAIR_API, latest["pairs"], entry_mode=entry_mode)
+    trade_update = update_trades(results, now, PAIR_API, latest["pairs"])
     if trade_update["newly_opened"]:
         print(f"\n[TRADE] 新規エントリー {len(trade_update['newly_opened'])}件:")
         for t in trade_update["newly_opened"]:
