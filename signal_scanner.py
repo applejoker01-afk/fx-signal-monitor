@@ -53,6 +53,7 @@ from modules.performance_intelligence import (
 from modules.ai_commentary import generate_market_commentary, generate_exit_advice, has_ai_key
 from modules.ambush_alert import evaluate_ambush, collect_ambush_alerts
 from modules.geopolitical_risk import apply_geopolitical_filter
+from modules.intervention_news_monitor import apply_intervention_news_filter  # 2026-08-03 為替介入ニュース検知
 from modules.drl_collector import collect_scan_results, get_drl_stats  # 2026-06-11 研究A
 from modules.entry_validator import (                                   # 2026-06-25 エントリー有効性
     validate_entry_for_result, format_entry_block, format_entry_block_short,
@@ -632,6 +633,8 @@ def evaluate_full(pair, price, prices, cb_rates, sentiment, now):
 
     result = apply_sentiment_filter(pair, result, sentiment)
     result = apply_geopolitical_filter(pair, result)
+    frm, to = PAIR_API[pair]
+    result = apply_intervention_news_filter(pair, result, frm, to)
     result["upcoming_events"] = upcoming_events_for(pair, hours_ahead=168)
     return result
 
@@ -2263,11 +2266,15 @@ def main():
 
     # 7. 通知（中長期シグナル変化・決済・ドローダウンで送信）
     #    待ち伏せ・反発監視（短期）はデイトレ画面に集約したため中長期通知では送らない
+    #    2026-08-11: ドローダウンは drawdown["alert"]（今の状態が警告域かどうか）
+    #    ではなく is_new_escalation（前回通知から状況が変化したか）をトリガーに
+    #    変更。決済が止まったまま同じ「3連敗中」を毎時再通知し、無シグナルでも
+    #    メールが1日10通以上届く原因になっていたため。
     has_close = bool(trade_update.get("newly_closed"))
     has_state_change = bool(trade_update.get("state_changes"))
     has_rate_warn = bool(rate_consistency.get("warnings"))
     if (newly or upgraded or (is_first and newly) or has_close
-            or has_state_change or drawdown.get("alert") or has_rate_warn):
+            or has_state_change or drawdown.get("is_new_escalation") or has_rate_warn):
         _wh = os.environ.get("DISCORD_WEBHOOK_URL", "")
         _wh = _wh.replace("discordapp.com", "discord.com")
         send_discord(

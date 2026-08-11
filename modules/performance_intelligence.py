@@ -7,6 +7,8 @@ performance_intelligence.py
 ⑬ 相場局面判定（トレンド/レンジ）
 """
 
+import json
+import os
 from datetime import datetime, timedelta, timezone
 
 
@@ -547,6 +549,34 @@ def apply_performance_weighting(result: dict, perf_map: dict) -> dict:
 # ⑪ ドローダウン監視・連敗クールダウン
 # ============================================================
 
+# 2026-08-11追加: 連敗アラートの重複通知抑制用の状態ファイル。
+# 背景: check_drawdown_alertは決済履歴から毎回「今の連敗状況」を再計算するだけで、
+# 「前回いつ通知したか」を覚えていなかった。そのため決済が止まった状態（新規に
+# 勝っても負けてもいない）が何日続いても、毎時スキャンのたびに同じ「3連敗中」
+# 判定が繰り返され、それだけでメール送信条件を満たしてしまっていた
+# （1日15〜24回の定期スキャン全てでメールが飛ぶ＝「シグナル無しのメールが
+# 10通以上/日」の直接原因）。この状態ファイルで「前回通知した連敗内容」を
+# 覚えておき、状況が変化（連敗が伸びた／レベルが上がった／新しい連敗が
+# 始まった／連敗が解消した）した時だけ再通知する。
+DRAWDOWN_STATE_FILE = "data/drawdown_notify_state.json"
+
+
+def _load_drawdown_state() -> dict:
+    if not os.path.exists(DRAWDOWN_STATE_FILE):
+        return {}
+    try:
+        with open(DRAWDOWN_STATE_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+
+def _save_drawdown_state(state: dict):
+    os.makedirs("data", exist_ok=True)
+    with open(DRAWDOWN_STATE_FILE, "w", encoding="utf-8") as f:
+        json.dump(state, f, ensure_ascii=False, indent=2, default=str)
+
+
 def check_drawdown_alert(closed_trades: list, recent_n: int = 5) -> dict:
     """
     直近の決済トレードから連敗・ドローダウンを検知。
@@ -561,10 +591,19 @@ def check_drawdown_alert(closed_trades: list, recent_n: int = 5) -> dict:
           "recent_pips": -8.5,
           "message": "...",
           "recommendation": "...",
+          "is_new_escalation": True/False,  # 前回通知時から状況が変化したか
         }
+
+    is_new_escalation について:
+        alertがTrueでも、前回通知した内容（レベル・連敗数・起点となった決済
+        時刻）と変わっていなければFalse。呼び出し側はこれをメール送信の
+        トリガーに使うことで、「同じ3連敗を毎時間通知し続ける」事態を防ぐ。
+        alertの値そのもの（ログ出力用）は従来通り常に正しい現状を返す。
     """
     if not closed_trades:
-        return {"alert": False, "level": "none"}
+        if _load_drawdown_state():
+            _save_drawdown_state({})
+        return {"alert": False, "level": "none", "is_new_escalation": False}
 
     # 決済時刻でソート（新しい順）
     sorted_trades = sorted(
@@ -575,7 +614,7 @@ def check_drawdown_alert(closed_trades: list, recent_n: int = 5) -> dict:
 
     recent = sorted_trades[:recent_n]
     if len(recent) < 3:
-        return {"alert": False, "level": "none", "recent_total": len(recent)}
+        return {"alert": False, "level": "none", "recent_total": len(recent), "is_new_escalation": False}
 
     recent_losses = sum(1 for t in recent if t.get("result") == "LOSS")
     recent_pips = sum(t.get("pips", 0) or 0 for t in recent)
@@ -587,6 +626,9 @@ def check_drawdown_alert(closed_trades: list, recent_n: int = 5) -> dict:
             consecutive_losses += 1
         else:
             break
+
+    # 連敗の起点（＝最新の決済時刻）。これが変わらない限り「同じ連敗が続いている」
+    streak_since = sorted_trades[0].get("exit_time") if consecutive_losses > 0 else None
 
     # 判定
     alert = False
@@ -610,6 +652,36 @@ def check_drawdown_alert(closed_trades: list, recent_n: int = 5) -> dict:
         message = f"⚠ 直近{len(recent)}件中{recent_losses}件が損失"
         recommendation = "勝率が低下中。ロットを半減するか一時休止を検討"
 
+    # 経過時間が長い場合、「24時間の見送りを推奨」という文言が陳腐化するのを防ぐ
+    if alert and streak_since:
+        try:
+            since_dt = datetime.fromisoformat(str(streak_since).replace("Z", "+00:00"))
+            elapsed_hours = (datetime.now(timezone.utc) - since_dt).total_seconds() / 3600
+            if elapsed_hours >= 24:
+                message += f"（直近の損失決済から{elapsed_hours / 24:.1f}日経過・新規決済なし）"
+        except Exception:
+            pass
+
+    # --- 重複通知の抑制判定 ---
+    state = _load_drawdown_state()
+    is_new_escalation = False
+    if alert:
+        prev_level = state.get("level")
+        prev_streak_since = state.get("streak_since")
+        prev_consecutive = state.get("consecutive_losses", 0)
+        if (level != prev_level
+                or streak_since != prev_streak_since
+                or consecutive_losses > prev_consecutive):
+            is_new_escalation = True
+            _save_drawdown_state({
+                "level": level,
+                "consecutive_losses": consecutive_losses,
+                "streak_since": streak_since,
+            })
+    elif state:
+        # 連敗が解消した（勝ち決済が入った等）。次回の連敗発生時にまた通知できるようリセット
+        _save_drawdown_state({})
+
     return {
         "alert": alert,
         "level": level,
@@ -619,6 +691,7 @@ def check_drawdown_alert(closed_trades: list, recent_n: int = 5) -> dict:
         "recent_pips": round(recent_pips, 4),
         "message": message,
         "recommendation": recommendation,
+        "is_new_escalation": is_new_escalation,
     }
 
 
