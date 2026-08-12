@@ -261,7 +261,8 @@ def calc_maintenance_ratio(account: dict, open_trades: dict, pair_api: dict,
 def calc_position_size(pair: str, entry_price: float, sl_price: float,
                         pair_api: dict, latest_pairs: dict,
                         account: dict = None, open_trades: dict = None,
-                        exposure_multiplier: float = 1.0) -> dict:
+                        exposure_multiplier: float = 1.0,
+                        confidence_multiplier: float = 1.0) -> dict:
     """
     仮想口座残高・リスク許容度・SL値幅から推奨ロット数を算出する。
 
@@ -274,6 +275,14 @@ def calc_position_size(pair: str, entry_price: float, sl_price: float,
     modules.advanced_analytics.calc_correlated_exposure_multiplier()で算出）。
     1.0未満ならリスク許容額を圧縮し、AUDJPY×NZDJPY同時保有のような
     「別ペアでも同方向の通貨エクスポージャーが積み上がる」組み合わせのロットを抑える。
+    0.0〜1.0にクランプ（圧縮専用、増加はしない）。
+
+    confidence_multiplier: 追加の確信度シグナルによるロット微増倍率（2026-08-11追加、
+    RSIオーバーソールド反発の検証結果に基づく。[[2026-08-11-rsi-reversal-filter]]参照）。
+    exposure_multiplierとは独立した別軸——こちらは「既存ゲートを通過した信号の中で
+    質が高そうなものにだけ少し多めに張る」ための増加専用倍率。1.0〜1.5にクランプ
+    （検証したエッジの規模が不確実なため、控えめな上限に留める。取引を止める
+    ゲートには使わず、常にexposure_multiplierと掛け合わせて使う）。
 
     Returns:
         {
@@ -326,7 +335,8 @@ def calc_position_size(pair: str, entry_price: float, sl_price: float,
         return {"tradable": False, "units": 0, "note": "損失単価の計算に失敗"}
 
     exposure_multiplier = max(0.0, min(1.0, exposure_multiplier))
-    risk_amount_jpy = balance * (risk_pct / 100.0) * exposure_multiplier
+    confidence_multiplier = max(1.0, min(1.5, confidence_multiplier))
+    risk_amount_jpy = balance * (risk_pct / 100.0) * exposure_multiplier * confidence_multiplier
     raw_units_risk = risk_amount_jpy / loss_per_unit_jpy
 
     # 証拠金ベースの上限units（既存ポジション分を差し引いた残り予算で判定）
@@ -365,6 +375,10 @@ def calc_position_size(pair: str, entry_price: float, sl_price: float,
         f" ※相関リスクでロット{exposure_multiplier:.0%}に圧縮"
         if exposure_multiplier < 1.0 else ""
     )
+    confidence_note = (
+        f" ※RSI反発確認でロット{confidence_multiplier:.0%}に増強"
+        if confidence_multiplier > 1.0 else ""
+    )
 
     return {
         "tradable": True,
@@ -374,8 +388,9 @@ def calc_position_size(pair: str, entry_price: float, sl_price: float,
         "estimated_loss_jpy": round(estimated_loss_jpy, 0),
         "existing_margin_jpy": round(existing_margin_jpy, 0),
         "exposure_multiplier": exposure_multiplier,
+        "confidence_multiplier": confidence_multiplier,
         "note": (
             f"{units}{from_ccy}単位（証拠金約¥{margin_required_jpy:.0f}・"
-            f"想定損失¥{estimated_loss_jpy:.0f}）{exposure_note}"
+            f"想定損失¥{estimated_loss_jpy:.0f}）{exposure_note}{confidence_note}"
         ),
     }

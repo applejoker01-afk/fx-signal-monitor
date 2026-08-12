@@ -418,6 +418,41 @@ def rsi(prices, period=14):
     return 100 - 100 / (1 + avg_g / avg_l)
 
 
+def rsi_oversold_reversal_signal(prices, dip_threshold=40, lookback=10):
+    """
+    RSIオーバーソールド反発シグナル（2026-08-11追加）。
+
+    背景: [[2026-08-11-rsi-reversal-filter]]（wiki/finance）でバックテスト検証済み。
+    直近lookback日以内にRSI(14)がdip_threshold以下まで下がり、かつ直近時点の
+    RSIが3日前より上昇している（=底からの反発局面）ことを検知する。
+
+    検証結果の要約（USDJPY, 20年・189件、FRED史実金利で史実FAゲート込み）:
+      訓練期間(2004-2019) ベースラインPF0.89 → RSI確認時PF1.58
+      テスト期間(2020-2026) ベースラインPF1.42 → RSI確認時PF3.01（パラメータ変更なしのout-of-sample）
+    ただし180日・全27ペアでの内訳では、ペアごとのサンプルが0〜4件と薄く、
+    GBPJPYのように好調な既存シグナルが全滅するケースもあった。そのため
+    このシグナルは**エントリー条件（ゲート）としては使わない**——既存の
+    TA+FA一致ゲートを通過した信号に対する「追加の確信度」情報としてのみ
+    扱い、ポジションサイジングの微増（modules/position_sizing.py の
+    confidence_multiplier）に反映する。取引機会を減らさない設計。
+
+    Returns: bool
+    """
+    if len(prices) < 30:
+        return False
+    r_now = rsi(prices, 14)
+    r_prev3 = rsi(prices[:-3], 14) if len(prices) > 3 else None
+    if r_now is None or r_prev3 is None or r_now <= r_prev3:
+        return False
+    min_r = 100
+    for back in range(0, lookback):
+        sub = prices[:len(prices) - back] if back > 0 else prices
+        r = rsi(sub, 14)
+        if r is not None:
+            min_r = min(min_r, r)
+    return min_r <= dip_threshold
+
+
 def macd_now(prices):
     if len(prices) < 35: return None, None
     ema12 = ema_series(prices, 12)
@@ -561,6 +596,8 @@ def compute_ta_score(price, prices):
         "macd": round(macd_v, 5) if macd_v else None,
         "macd_signal": round(macd_sig, 5) if macd_sig else None,
         "atr": round(atr_v, 5) if atr_v else None,
+        # 2026-08-11: ポジションサイジングの確信度ブースト専用（ゲートには使わない）
+        "rsi_reversal_confirmed": rsi_oversold_reversal_signal(prices),
     }
 
 
@@ -1257,7 +1294,8 @@ def send_discord_pending(webhook_url, newly_created, newly_filled, expired, hear
 
 def send_email(smtp_host, smtp_port, smtp_user, smtp_pass,
                from_addr, to_addr, newly, upgraded, is_first,
-               all_results, sentiment, us_yields):
+               all_results, sentiment, us_yields,
+               trade_update=None, drawdown=None, rate_warnings=None):
     """
     シグナル通知メール送信（2026-06-25 モバイル最適化 + エントリー有効性追加）
 
@@ -1265,10 +1303,21 @@ def send_email(smtp_host, smtp_port, smtp_user, smtp_pass,
       - Subject: 即読み可能な1行サマリー（ペア名・方向・星数）
       - Body: エントリー上限価格を各シグナルの先頭に配置
       - HTML版: 重要情報を色分け表示
+
+    2026-08-11追加: trade_update/drawdown/rate_warningsを新規に受け取るように
+    変更した。従来はsend_discord()にはこれらが渡されていたのにsend_email()には
+    渡っておらず、決済・トレーリング更新・連敗警告・レート矛盾警告だけで通知が
+    発火した回（newly/upgradedが両方空のケース）は、メールの本文がほぼ空
+    （市場センチメントだけ）になり、Discordと内容が一致しない状態だった
+    （ユーザー報告により発覚）。
     """
     if not all([smtp_host, smtp_user, smtp_pass, from_addr, to_addr]):
         print("[INFO] Email not configured")
         return False
+
+    _newly_closed = (trade_update or {}).get("newly_closed", [])
+    _state_changes = (trade_update or {}).get("state_changes", [])
+    _dd_alert = bool(drawdown and drawdown.get("alert"))
 
     jst = datetime.now(timezone.utc) + timedelta(hours=9)
     timestamp = jst.strftime("%Y-%m-%d %H:%M JST")
@@ -1281,16 +1330,29 @@ def send_email(smtp_host, smtp_port, smtp_user, smtp_pass,
     # ── Subject: スマホのプッシュ通知で内容がわかる1行 ──────────────────
     if is_first:
         subject = f"[FX] 監視開始 {risk_emoji} ★4以上{len(newly)}件 / {risk_mode}"
-    else:
+    elif newly or upgraded:
         # 新規シグナルの先頭1〜2件を件名に含める
         sig_parts = []
         for r in (newly + upgraded)[:2]:
             dir_short = "↑" if "LONG" in r.get("direction", "") else "↓"
             sig_parts.append(f"{r['pair']}{dir_short}★{r.get('stars','?')}")
-        sig_str = " ".join(sig_parts) if sig_parts else "変化なし"
+        sig_str = " ".join(sig_parts)
         subject = (
             f"[FX] {risk_emoji}{sig_str} / 新規{len(newly)}昇格{len(upgraded)} {timestamp}"
         )
+    elif _newly_closed:
+        # 2026-08-11: シグナル変化なしでも決済で通知が飛ぶケースの件名
+        cl = _newly_closed[0]
+        more = f" 他{len(_newly_closed)-1}件" if len(_newly_closed) > 1 else ""
+        subject = f"[FX] 💼決着 {cl.get('pair','?')} {cl.get('result','?')}{more} {timestamp}"
+    elif _dd_alert:
+        subject = f"[FX] 🛑{drawdown.get('message','連敗警告')} {timestamp}"
+    elif rate_warnings:
+        subject = f"[FX] 🔴金利スタンス要確認 {len(rate_warnings)}件 {timestamp}"
+    elif _state_changes:
+        subject = f"[FX] 🔄ポジション状態変化 {len(_state_changes)}件 {timestamp}"
+    else:
+        subject = f"[FX] {risk_emoji}変化なし {timestamp}"
 
     # ── 各シグナルのテキストブロック ─────────────────────────────────────
     def fmt_signal_block(r, label_prefix=""):
@@ -1383,6 +1445,67 @@ def send_email(smtp_host, smtp_port, smtp_user, smtp_pass,
         for r in upgraded:
             body_lines.append(fmt_signal_block(r, label_prefix="[昇格] "))
             body_lines.append("")
+
+    # ── 決済・状態変化・ドローダウン・レート警告（2026-08-11追加） ──────────
+    # Discord(send_discord)には元々渡っていたがEmailには渡っていなかった情報。
+    # newly/upgradedが空でもこれらの理由だけで通知が発火するケースがあるため、
+    # 本文が実質空になっていた問題の修正。
+    reason_label = {
+        "TP_HIT": "✅TP到達(+トレール開始)", "TRAIL_HIT": "🏆トレーリング決済",
+        "BE_HIT": "⚖️BE+0.5R戻り", "TP3_HIT": "🏆TP3到達", "TP2_HIT": "✅TP2到達",
+        "TP1_HIT": "✅TP1到達", "SL_HIT": "❌SL到達",
+        "SIGNAL_LOST": "➖シグナル消滅", "REVERSED": "🔄方向反転",
+    }
+    if _newly_closed:
+        body_lines.append(f"【💼 シグナル決着（{len(_newly_closed)}件）】")
+        body_lines.append("")
+        for t in _newly_closed[:5]:
+            rl = reason_label.get(t.get("exit_reason"), t.get("exit_reason", "?"))
+            _p = t.get("pair", "")
+            _d = pair_decimals(_p)
+            sign = "+" if t.get("result") == "WIN" else "-"
+            body_lines.append(
+                f"{sign} {_p} {t.get('direction','')} {rl}\n"
+                f"    {fmt_price(_p, t.get('entry_price'))} → {fmt_price(_p, t.get('exit_price'))} "
+                f"({t.get('pips',0):+.{_d}f}) 保有{t.get('hold_hours',0)}h"
+            )
+        body_lines.append("")
+
+    if _state_changes:
+        body_lines.append(f"【🔄 ポジション状態変化（{len(_state_changes)}件）】")
+        body_lines.append("")
+        for sc in _state_changes[:5]:
+            t, upd = sc["trade"], sc["update"]
+            _p = t.get("pair", "")
+            if upd.get("tp_hit"):
+                body_lines.append(
+                    f"🎯 {_p} {t.get('direction','')} TP到達! SLをBE+0.5R"
+                    f"({fmt_price(_p, upd.get('sl'))})へ移動→トレーリング発動"
+                )
+            elif "sl" in upd and "extreme_price" in upd:
+                body_lines.append(
+                    f"📈 {_p} {t.get('direction','')} トレール更新 "
+                    f"高値/安値:{fmt_price(_p, upd.get('extreme_price'))} SL:{fmt_price(_p, upd.get('sl'))}"
+                )
+        body_lines.append("")
+
+    if drawdown and drawdown.get("alert"):
+        body_lines.append("【🛑 ドローダウン警告】")
+        body_lines.append(drawdown.get("message", ""))
+        if drawdown.get("recommendation"):
+            body_lines.append(f"→ {drawdown['recommendation']}")
+        body_lines.append("")
+
+    if rate_warnings:
+        body_lines.append(f"【🔴 金利スタンス見直し要（{len(rate_warnings)}件）】")
+        for w in rate_warnings[:5]:
+            body_lines.append(f"・{w.get('message','')}")
+        body_lines.append("")
+
+    if not (newly or upgraded or _newly_closed or _state_changes
+            or (drawdown and drawdown.get("alert")) or rate_warnings):
+        body_lines.append("（今回の通知理由に該当する詳細情報はありません）")
+        body_lines.append("")
 
     body_lines += [
         "=" * 55,
@@ -2294,7 +2417,9 @@ def main():
             os.environ.get("SMTP_PORT", "465"),
             os.environ.get("SMTP_USER"), os.environ.get("SMTP_PASS"),
             os.environ.get("MAIL_FROM"), os.environ.get("MAIL_TO"),
-            newly, upgraded, is_first, results, sentiment, us_yields
+            newly, upgraded, is_first, results, sentiment, us_yields,
+            trade_update=trade_update, drawdown=drawdown,
+            rate_warnings=rate_consistency.get("warnings"),
         )
     else:
         print("[INFO] No significant changes, skipping notifications")

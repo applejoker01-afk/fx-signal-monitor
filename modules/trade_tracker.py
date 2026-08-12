@@ -501,9 +501,18 @@ def open_trade_from_pending_fill(trade: dict, pair_api: dict = None,
         )
         if exp_note:
             print(f"  [SIZING] {pair}: {exp_note}")
+        # 2026-08-11: RSIオーバーソールド反発が確認されている場合、ロットを
+        # 控えめに増強する（[[2026-08-11-rsi-reversal-filter]]の検証結果に基づく、
+        # ゲートではなくサイジングのみの反映）。LONGのみ対象（このシステムは
+        # SHORTがFA側の構造上ほぼ発生しないため、SHORT時の妥当性は未検証）。
+        conf_mult = 1.0
+        if trade.get("rsi_reversal_confirmed") and "LONG" in trade.get("direction", ""):
+            conf_mult = 1.25
+            print(f"  [SIZING] {pair}: RSIオーバーソールド反発を確認、ロットを{conf_mult:.0%}に増強")
         sizing = calc_position_size(
             pair, trade["entry_price"], trade["sl"], pair_api, latest_pairs,
             open_trades=open_trades, exposure_multiplier=exp_mult,
+            confidence_multiplier=conf_mult,
         )
         trade["position_sizing"] = sizing
         if sizing.get("tradable"):

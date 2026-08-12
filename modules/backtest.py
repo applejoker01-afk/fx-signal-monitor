@@ -270,3 +270,58 @@ def run_full_backtest(
         "best_pairs": best_pairs,
         "worst_pairs": worst_pairs,
     }
+
+
+def summarize_by_direction(by_pair: dict) -> dict:
+    """
+    run_full_backtest()の by_pair 結果を LONG/SHORT 別に再集計する。
+
+    2026-08-11追加: 「MACD等の追加指標をAND条件で積み増すと機会損失にならないか」
+    という検討の中で、"全トレードを一括りにしたPFではLONG/SHORTどちらの
+    エッジが本物か分からない"という指摘を受けて追加。買い方向・売り方向で
+    有意にPFが異なるなら、指標を両方向に一律追加するのではなく、弱い方向
+    だけを絞る／強化する方が機会損失が少ない可能性がある。
+
+    Returns:
+        {
+          "LONG":  {"total":, "wins":, "win_rate":, "profit_factor":, "total_pips":},
+          "SHORT": {...},
+          "by_pair_direction": {pair: {"LONG": {...}, "SHORT": {...}}},
+        }
+    """
+    buckets = {"LONG": [], "SHORT": []}
+    by_pair_direction = {}
+
+    for pair, result in by_pair.items():
+        pair_buckets = {"LONG": [], "SHORT": []}
+        for t in result.get("trades", []):
+            d = t.get("direction")
+            if d in buckets:
+                buckets[d].append(t)
+                pair_buckets[d].append(t)
+        by_pair_direction[pair] = {
+            d: _summarize_backtest(pair, trades)
+            for d, trades in pair_buckets.items() if trades
+        }
+
+    out = {}
+    for d, trades in buckets.items():
+        if not trades:
+            out[d] = {"total": 0}
+            continue
+        total = len(trades)
+        wins = sum(1 for t in trades if t["result"] == "WIN")
+        gross_p = sum(t["pips"] for t in trades if t["pips"] > 0)
+        gross_l = abs(sum(t["pips"] for t in trades if t["pips"] < 0))
+        pf = round(gross_p / gross_l, 2) if gross_l > 0 else 999.0
+        out[d] = {
+            "total": total,
+            "wins": wins,
+            "losses": total - wins,
+            "win_rate": round(wins / total * 100, 1),
+            "profit_factor": pf,
+            "total_pips": round(sum(t["pips"] for t in trades), 4),
+        }
+
+    out["by_pair_direction"] = by_pair_direction
+    return out
