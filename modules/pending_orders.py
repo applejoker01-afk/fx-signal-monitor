@@ -124,9 +124,10 @@ def create_pending_order(r: dict, now: datetime,
         "fa_score": r.get("fa_score"),
         "fa_rate_diff": r.get("fa_rate_diff"),
         "regime": regime.get("regime"),
-        # 2026-08-11: ポジションサイジングの確信度ブースト用。スキャン時点の値を
-        # そのまま保持し、約定時（数時間〜数日後）に再計算しない
+        # 2026-08-11: ポジションサイジングの確信度ブースト/減額用。スキャン時点の
+        # 値をそのまま保持し、約定時（数時間〜数日後）に再計算しない
         "rsi_reversal_confirmed": r.get("rsi_reversal_confirmed", False),
+        "ta_score_overheated": r.get("ta_score_overheated", False),
         "created_time": now.isoformat(),
         "valid_until": next_scan_time_utc(now).isoformat(),
     }
@@ -210,6 +211,7 @@ def pending_order_to_trade(order: dict, now: datetime) -> dict:
         "fa_rate_diff": order.get("fa_rate_diff"),
         "regime": order.get("regime"),
         "rsi_reversal_confirmed": order.get("rsi_reversal_confirmed", False),
+        "ta_score_overheated": order.get("ta_score_overheated", False),
         "entry_source": "pending_limit_order",   # 通常の成行エントリーと区別するためのフラグ
         "pending_created_time": order.get("created_time"),
         "pending_scan_price": order.get("scan_price"),

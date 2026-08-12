@@ -277,12 +277,14 @@ def calc_position_size(pair: str, entry_price: float, sl_price: float,
     「別ペアでも同方向の通貨エクスポージャーが積み上がる」組み合わせのロットを抑える。
     0.0〜1.0にクランプ（圧縮専用、増加はしない）。
 
-    confidence_multiplier: 追加の確信度シグナルによるロット微増倍率（2026-08-11追加、
-    RSIオーバーソールド反発の検証結果に基づく。[[2026-08-11-rsi-reversal-filter]]参照）。
-    exposure_multiplierとは独立した別軸——こちらは「既存ゲートを通過した信号の中で
-    質が高そうなものにだけ少し多めに張る」ための増加専用倍率。1.0〜1.5にクランプ
-    （検証したエッジの規模が不確実なため、控えめな上限に留める。取引を止める
-    ゲートには使わず、常にexposure_multiplierと掛け合わせて使う）。
+    confidence_multiplier: 追加の確信度シグナルによるロット調整倍率（2026-08-11追加）。
+    exposure_multiplierとは独立した別軸——こちらは「既存ゲートを通過した信号の中での
+    質」を反映する。0.5〜1.5にクランプ（検証したエッジの規模が不確実なため、上下とも
+    控えめな範囲に留める。取引を止めるゲートには使わず、常にexposure_multiplierと
+    掛け合わせて使う）。2方向のシグナルを組み合わせて使う想定:
+      - RSIオーバーソールド反発が確認された場合: 増強（[[2026-08-11-rsi-reversal-filter]]参照）
+      - ta_scoreが過熱域（>=90）の場合: 減額（wiki/finance/2026-07-11-fx-signal-monitor-evaluation.md
+        の「逆U字」発見・[[2026-08-11-rsi-reversal-filter]]のGBPJPY個別分析で再確認）
 
     Returns:
         {
@@ -335,7 +337,7 @@ def calc_position_size(pair: str, entry_price: float, sl_price: float,
         return {"tradable": False, "units": 0, "note": "損失単価の計算に失敗"}
 
     exposure_multiplier = max(0.0, min(1.0, exposure_multiplier))
-    confidence_multiplier = max(1.0, min(1.5, confidence_multiplier))
+    confidence_multiplier = max(0.5, min(1.5, confidence_multiplier))
     risk_amount_jpy = balance * (risk_pct / 100.0) * exposure_multiplier * confidence_multiplier
     raw_units_risk = risk_amount_jpy / loss_per_unit_jpy
 
@@ -375,10 +377,12 @@ def calc_position_size(pair: str, entry_price: float, sl_price: float,
         f" ※相関リスクでロット{exposure_multiplier:.0%}に圧縮"
         if exposure_multiplier < 1.0 else ""
     )
-    confidence_note = (
-        f" ※RSI反発確認でロット{confidence_multiplier:.0%}に増強"
-        if confidence_multiplier > 1.0 else ""
-    )
+    if confidence_multiplier > 1.0:
+        confidence_note = f" ※RSI反発確認でロット{confidence_multiplier:.0%}に増強"
+    elif confidence_multiplier < 1.0:
+        confidence_note = f" ※ta_score過熱域のためロット{confidence_multiplier:.0%}に減額"
+    else:
+        confidence_note = ""
 
     return {
         "tradable": True,

@@ -418,6 +418,31 @@ def rsi(prices, period=14):
     return 100 - 100 / (1 + avg_g / avg_l)
 
 
+def ta_score_overheated_signal(ta_score, threshold=90):
+    """
+    ta_score過熱シグナル（2026-08-11追加）。
+
+    背景: wiki/finance/2026-07-11-fx-signal-monitor-evaluation.md（実績71件）で
+    発見された「ta_scoreと成績の逆U字関係」——スコアが高いほど「強いトレンド」
+    ではなく「伸びきって反転間際の過熱状態」を捉えている——の追加検証・実装。
+    Q4(83.0-98)は勝率20.0%・-245.1p（Q2の68.0-78.3は勝率45.2%・+112.4pと対照的）。
+    NZDJPY除外後の62件でも同型のパターンが再現し、特定ペアの偏りではないことを確認済み。
+
+    2026-08-11、GBPJPY個別分析（n=9、参考程度）でも同じ傾向を再確認
+    （負け3件中2件がta_score理論上限98.0）。さらに直近250日・10ペア横断
+    （WIN 50件/LOSS 51件）でも、LOSS群の平均ta_score(87.4)がWIN群(84.4)より
+    高く、ta_score>=90の比率もLOSS群で明確に高い（57% vs 40%）ことを確認。
+
+    本番コードは既にta_score>=83で★5→★4への降格を行っている（過熱スコア
+    キャップ）が、これは表示上の星評価のみでポジションサイジングには一切
+    反映されていなかった。本関数はサイジング側の追加対応として、より高い
+    閾値(90)でのみ発火する（既存の星降格より保守的・厳しめの閾値）。
+
+    Returns: bool
+    """
+    return ta_score is not None and ta_score >= threshold
+
+
 def rsi_oversold_reversal_signal(prices, dip_threshold=40, lookback=10):
     """
     RSIオーバーソールド反発シグナル（2026-08-11追加）。
@@ -598,6 +623,9 @@ def compute_ta_score(price, prices):
         "atr": round(atr_v, 5) if atr_v else None,
         # 2026-08-11: ポジションサイジングの確信度ブースト専用（ゲートには使わない）
         "rsi_reversal_confirmed": rsi_oversold_reversal_signal(prices),
+        # 2026-08-11: ポジションサイジングの減額専用（ゲートには使わない。
+        # 既存の★5→★4降格ロジックとは独立、サイジング側の追加対応）
+        "ta_score_overheated": ta_score_overheated_signal(ta_score),
     }
 
 

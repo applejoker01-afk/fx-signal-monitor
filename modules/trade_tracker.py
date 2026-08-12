@@ -501,14 +501,25 @@ def open_trade_from_pending_fill(trade: dict, pair_api: dict = None,
         )
         if exp_note:
             print(f"  [SIZING] {pair}: {exp_note}")
-        # 2026-08-11: RSIオーバーソールド反発が確認されている場合、ロットを
-        # 控えめに増強する（[[2026-08-11-rsi-reversal-filter]]の検証結果に基づく、
-        # ゲートではなくサイジングのみの反映）。LONGのみ対象（このシステムは
-        # SHORTがFA側の構造上ほぼ発生しないため、SHORT時の妥当性は未検証）。
+        # 2026-08-11: 2種類の確信度シグナルをロットサイジングにのみ反映する
+        # （どちらもエントリーを止めるゲートには使わない）。LONGのみ対象——
+        # このシステムはFA側の構造上SHORTがほぼ発生しないため、SHORT時の
+        # 妥当性はどちらも未検証。
         conf_mult = 1.0
-        if trade.get("rsi_reversal_confirmed") and "LONG" in trade.get("direction", ""):
-            conf_mult = 1.25
-            print(f"  [SIZING] {pair}: RSIオーバーソールド反発を確認、ロットを{conf_mult:.0%}に増強")
+        is_long = "LONG" in trade.get("direction", "")
+        if trade.get("rsi_reversal_confirmed") and is_long:
+            # RSIオーバーソールド反発を確認 → 増強
+            # 検証: [[2026-08-11-rsi-reversal-filter]]（20年train/test、本物のFA+TAゲート込みで頑健に再現）
+            conf_mult *= 1.25
+            print(f"  [SIZING] {pair}: RSIオーバーソールド反発を確認、ロットを増強")
+        if trade.get("ta_score_overheated") and is_long:
+            # ta_scoreが過熱域（>=90） → 減額
+            # 検証: wiki/finance/2026-07-11-fx-signal-monitor-evaluation.md（71件実績、逆U字発見）
+            #       + [[2026-08-11-rsi-reversal-filter]]のGBPJPY個別分析・直近101件横断で再確認
+            conf_mult *= 0.75
+            print(f"  [SIZING] {pair}: ta_score過熱域を検知、ロットを減額")
+        if conf_mult != 1.0:
+            print(f"  [SIZING] {pair}: 確信度調整の結果ロットを{conf_mult:.0%}に設定")
         sizing = calc_position_size(
             pair, trade["entry_price"], trade["sl"], pair_api, latest_pairs,
             open_trades=open_trades, exposure_multiplier=exp_mult,
