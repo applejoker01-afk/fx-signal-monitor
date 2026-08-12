@@ -167,9 +167,28 @@ def main() -> int:
                   f"（上限{MAX_POSITIONS_PER_PAIR}）のため発注しません")
             continue
 
+        # 2026-08-12: confidence_multiplier（RSIオーバーソールド反発の増強・
+        # ta_score過熱域の減額）を実発注経路にも反映する。この2つのシグナルは
+        # data/pending_orders.json 作成時（クラウド側スキャン時点）に
+        # rsi_reversal_confirmed / ta_score_overheated として既に埋め込まれて
+        # いたが、本スクリプトのcalc_position_size呼び出しには従来渡していな
+        # かったため、実発注のロットには反映されず、modules/trade_tracker.py
+        # の open_trade_from_pending_fill（クラウド側の仮想口座記録用パス）
+        # だけに効いていた——つまり今日実装した確信度サイジングは、これまで
+        # 実口座の発注には一切効いていなかった（ユーザー指摘により発覚）。
+        conf_mult = 1.0
+        is_long = "LONG" in order.get("direction", "")
+        if order.get("rsi_reversal_confirmed") and is_long:
+            conf_mult *= 1.25
+            print(f"  [SIZING] RSIオーバーソールド反発を確認、ロットを増強")
+        if order.get("ta_score_overheated") and is_long:
+            conf_mult *= 0.75
+            print(f"  [SIZING] ta_score過熱域を検知、ロットを減額")
+
         sizing = calc_position_size(
             pair, order.get("limit_price"), order.get("sl"),
             PAIR_API, latest_pairs, account=account, open_trades=open_trades,
+            confidence_multiplier=conf_mult,
         )
         if not sizing.get("tradable"):
             print(f"  ⚠ サイジング不可のため発注しません: {sizing.get('note')}")
