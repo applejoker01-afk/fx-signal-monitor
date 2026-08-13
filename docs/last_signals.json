@@ -1,18 +1,20 @@
 {
-  "timestamp": "2026-08-13T16:12:18.650901+00:00",
+  "timestamp": "2026-08-13T18:05:44.544611+00:00",
   "signals": {
-    "USDJPY": 1,
-    "EURJPY": 1,
-    "GBPJPY": 1,
-    "AUDJPY": 2,
-    "CHFJPY": 2,
     "SGDJPY": 1,
     "HKDJPY": 1,
     "CNYJPY": 1,
-    "NZDUSD": 2,
+    "MXNJPY": 1,
+    "ZARJPY": 1,
+    "GBPUSD": 2,
     "EURGBP": 2,
+    "EURAUD": 2,
+    "SEKJPY": 1,
     "NOKJPY": 1,
+    "BRLJPY": 1,
+    "KRWJPY": 2,
     "GBPAUD": 2,
+    "GBPCHF": 3,
     "AUDCHF": 3,
     "EURCHF": 3,
     "AUDNZD": 2,
@@ -21,1085 +23,9 @@
   },
   "results": [
     {
-      "pair": "USDJPY",
-      "label": "USD/JPY",
-      "price": 159.356,
-      "ta_score": 51.0,
-      "dma_score": 85,
-      "macd_score": 15,
-      "rsi_score": 35,
-      "trend_strength": 18,
-      "atr_quality": 0,
-      "breakout_bonus": 0,
-      "divergence_adj": 0,
-      "ema_short_bonus": -12,
-      "dma200": 158.174,
-      "dma50": 161.166,
-      "rsi": 42.86,
-      "macd": -0.818,
-      "macd_signal": -0.701,
-      "atr": 0.516,
-      "rsi_reversal_confirmed": true,
-      "ta_score_overheated": false,
-      "fa_score": 76.6,
-      "fa_direction": "buy",
-      "fa_rate_diff": 2.75,
-      "fa_detail": "FRB(3.75% neutral/stable) vs 日銀(1.00% pause/peak) 差+2.75% / USDサイクル強化(stable)",
-      "stars": 1,
-      "verdict": "△ 弱シグナル ⚠介入観測報道HIGH(55)",
-      "direction": "LIGHT_LONG",
-      "pair_type": "safe_haven",
-      "sentiment_warning": "リスクオフ・円買い圧力警戒",
-      "sentiment_notes": [
-        "米10y=4.641% ドル買い圧力",
-        "リスクオフ・円買い圧力警戒",
-        "金価格=4422.7 急騰・有事の安全資産需要"
-      ],
-      "original_stars": 2,
-      "intervention_news": {
-        "USD": {
-          "score": 0,
-          "level": "none",
-          "hits": [],
-          "reason": "キーワード該当なし",
-          "headlines": [
-            "US Treasury faces limits on currency intervention capacity, JPMorgan warns - Crypto Briefing"
-          ],
-          "cached": false,
-          "timestamp": "2026-08-13T16:05:40.685040+00:00"
-        },
-        "JPY": {
-          "score": 55,
-          "level": "HIGH",
-          "hits": [
-            "yen intervention"
-          ],
-          "reason": "検知キーワード: yen intervention",
-          "headlines": [
-            "Yen Intervention Wears Off, Oil Jumps and Intel Rakes in More | Markets P.M. for Aug. 11 - wsj.com",
-            "Goldman says Japan's $1 trillion of reserves leaves 'plenty of capacity' for further yen interventions - CNBC",
-            "Yen Intervention Buys Time, But The BOJ Holds The Key - Seeking Alpha",
-            "US-Japan Yen Intervention Reveals a Trillion-Dollar Dilemma - themedialine.org",
-            "Why Japan Is Struggling to Prop Up the Yen, Even With US Help - Bloomberg"
-          ],
-          "cached": false,
-          "timestamp": "2026-08-13T16:05:41.135550+00:00"
-        }
-      },
-      "upcoming_events": [],
-      "volatility_regime": {
-        "regime": "normal",
-        "regime_label": "通常ボラ相場",
-        "atr_ratio": 1.26,
-        "atr_90d": 0.40862,
-        "sl_multiplier": 3.0,
-        "tp1_multiplier": 1.5,
-        "tp2_multiplier": 4.5,
-        "tp3_multiplier": 6.0,
-        "note": "ATR比率1.3 → TP=1.5×ATR（Phase1出口改善・到達率向上）"
-      },
-      "staged_tp": {
-        "sl": 157.808,
-        "tp": 160.13,
-        "trail_atr_mult": 2.0,
-        "trail_distance": 1.032,
-        "be_plus_offset": 0.774,
-        "be_target_after_tp": 160.13,
-        "max_target": 162.452,
-        "rr_tp": 0.5,
-        "tp_mode": "single_with_trail",
-        "tp1": 160.13,
-        "tp2": 161.678,
-        "tp3": 162.452,
-        "sl_width": 1.548,
-        "tp1_width": 0.774,
-        "rr_tp1": 0.5,
-        "rr_tp2": 1.5,
-        "rr_tp3": 2.0,
-        "spread_price": 0.001,
-        "spread_pips": 0.1,
-        "spread_atr_ratio": 0.003,
-        "sl_dist_effective": 1.549,
-        "tp_dist_effective": 0.773,
-        "rr_effective": 0.5,
-        "spread_is_dynamic": true,
-        "spread_pips_dynamic": 0.14,
-        "regime_label": "通常ボラ相場",
-        "strategy": "TP(160.13)到達 → SLを BE+0.5R(160.13) へ移動 → トレーリング(2.0×ATR=1.032)発動 → 利を伸ばす（理論最大: 162.452）",
-        "chandelier_sl_active": false,
-        "chandelier_note": "",
-        "spread_session": "London/NY overlap",
-        "spread_session_mult": 0.8,
-        "spread_vix_mult": 0.9
-      },
-      "carry_score": {
-        "carry_score": 8.49,
-        "label": "非常に優れたキャリー",
-        "annual_swap_pct": 2.75,
-        "daily_volatility_pct": 0.32,
-        "breakeven_days": 107,
-        "note": "SL幅をスワップで回収: 約107日"
-      },
-      "support_resistance": {
-        "resistance": [
-          {
-            "price": 159.75,
-            "strength": 3,
-            "label": "レジスタンス",
-            "distance_pct": 0.25
-          },
-          {
-            "price": 162.71,
-            "strength": 1,
-            "label": "弱いレジスタンス",
-            "distance_pct": 2.1
-          },
-          {
-            "price": 163.91,
-            "strength": 1,
-            "label": "弱いレジスタンス",
-            "distance_pct": 2.86
-          }
-        ],
-        "support": [
-          {
-            "price": 154.69,
-            "strength": 2,
-            "label": "サポート",
-            "distance_pct": 2.93
-          },
-          {
-            "price": 152.63,
-            "strength": 1,
-            "label": "弱いサポート",
-            "distance_pct": 4.22
-          },
-          {
-            "price": 153.1,
-            "strength": 1,
-            "label": "弱いサポート",
-            "distance_pct": 3.93
-          },
-          {
-            "price": 156.21,
-            "strength": 1,
-            "label": "弱いサポート",
-            "distance_pct": 1.97
-          }
-        ],
-        "nearest_resistance": {
-          "price": 159.75,
-          "strength": 3,
-          "label": "レジスタンス",
-          "distance_pct": 0.25
-        },
-        "nearest_support": {
-          "price": 156.21,
-          "strength": 1,
-          "label": "弱いサポート",
-          "distance_pct": 1.97
-        },
-        "context": "レジスタンス(159.75)まで0.25%（非常に近い・注意） / サポート(156.21)まで1.97%"
-      },
-      "intervention_risk": {
-        "risk_score": 27,
-        "risk_level": "LOW",
-        "risk_label": "介入リスク 低い",
-        "components": {
-          "price": {
-            "score": 27,
-            "note": "158円超（高警戒ゾーン）"
-          },
-          "speed": {
-            "score": 0,
-            "note": "30日変化: -3.0円（横ばいまたは下落）"
-          },
-          "volatility": {
-            "score": 0,
-            "note": "ボラ安定（比率0.6倍）"
-          },
-          "dxy": {
-            "score": 0,
-            "note": "DXYトレンド: flat"
-          }
-        },
-        "nearest_historical_level": "2024年4月29日 介入実績",
-        "recommendation": "通常通りシグナル評価"
-      },
-      "market_regime": {
-        "adx": 41.2,
-        "plus_di": 29.4,
-        "minus_di": 70.6,
-        "regime": "trending",
-        "regime_label": "トレンド相場",
-        "trend_direction": "down",
-        "note": "順張りシグナル有効"
-      },
-      "performance": {
-        "win_rate": 62.5,
-        "total_trades": 8,
-        "adjustment": 0.5,
-        "note": "実績良好"
-      },
-      "ambush": {
-        "has_alert": false,
-        "approaching": []
-      },
-      "cb_meeting_blackout": {
-        "active": false,
-        "severity": "none",
-        "reason": ""
-      },
-      "strength_context": {
-        "base_currency": "USD",
-        "quote_currency": "JPY",
-        "base_score": -78.1,
-        "base_label": "弱い",
-        "base_rank": 9,
-        "quote_score": 39.3,
-        "quote_label": "やや強い",
-        "quote_rank": 3,
-        "spread": -117.4,
-        "context": "弱い通貨 vs 強い通貨（ショート有利）",
-        "bias": "short"
-      }
-    },
-    {
-      "pair": "EURJPY",
-      "label": "EUR/JPY",
-      "price": 183.752,
-      "ta_score": 16.3,
-      "dma_score": 30,
-      "macd_score": 65,
-      "rsi_score": 50,
-      "trend_strength": -20,
-      "atr_quality": 0,
-      "breakout_bonus": 0,
-      "divergence_adj": 0,
-      "ema_short_bonus": -12,
-      "dma200": 183.877,
-      "dma50": 184.749,
-      "rsi": 46.83,
-      "macd": -0.512,
-      "macd_signal": -0.514,
-      "atr": 0.521,
-      "rsi_reversal_confirmed": true,
-      "ta_score_overheated": false,
-      "fa_score": 72.5,
-      "fa_direction": "buy",
-      "fa_rate_diff": 1.4,
-      "fa_detail": "ECB(2.40% neutral/trough) vs 日銀(1.00% pause/peak) 差+1.40% / EURサイクル強化(trough)",
-      "stars": 1,
-      "verdict": "⚠ 見送り（FA/TA不一致）",
-      "direction": "NO_TRADE",
-      "pair_type": "major",
-      "sentiment_notes": [
-        "金価格=4422.7 急騰・有事の安全資産需要"
-      ],
-      "intervention_news": {
-        "EUR": {
-          "score": 0,
-          "level": "none",
-          "hits": [],
-          "reason": "関連報道なし",
-          "headlines": [],
-          "cached": false,
-          "timestamp": "2026-08-13T16:05:44.806151+00:00"
-        },
-        "JPY": {
-          "score": 55,
-          "level": "HIGH",
-          "hits": [
-            "yen intervention"
-          ],
-          "reason": "検知キーワード: yen intervention",
-          "headlines": [
-            "Yen Intervention Wears Off, Oil Jumps and Intel Rakes in More | Markets P.M. for Aug. 11 - wsj.com",
-            "Goldman says Japan's $1 trillion of reserves leaves 'plenty of capacity' for further yen interventions - CNBC",
-            "Yen Intervention Buys Time, But The BOJ Holds The Key - Seeking Alpha",
-            "US-Japan Yen Intervention Reveals a Trillion-Dollar Dilemma - themedialine.org",
-            "Why Japan Is Struggling to Prop Up the Yen, Even With US Help - Bloomberg"
-          ],
-          "cached": true,
-          "timestamp": "2026-08-13T16:05:41.135550+00:00"
-        }
-      },
-      "upcoming_events": [],
-      "volatility_regime": {
-        "regime": "normal",
-        "regime_label": "通常ボラ相場",
-        "atr_ratio": 1.08,
-        "atr_90d": 0.48031,
-        "sl_multiplier": 3.0,
-        "tp1_multiplier": 1.5,
-        "tp2_multiplier": 4.5,
-        "tp3_multiplier": 6.0,
-        "note": "ATR比率1.1 → TP=1.5×ATR（Phase1出口改善・到達率向上）"
-      },
-      "carry_score": {
-        "carry_score": 4.94,
-        "label": "非常に優れたキャリー",
-        "annual_swap_pct": 1.4,
-        "daily_volatility_pct": 0.28,
-        "breakeven_days": 184,
-        "note": "SL幅をスワップで回収: 約184日"
-      },
-      "support_resistance": {
-        "resistance": [
-          {
-            "price": 185.89,
-            "strength": 4,
-            "label": "強いレジスタンス",
-            "distance_pct": 1.16
-          },
-          {
-            "price": 184.817,
-            "strength": 3,
-            "label": "レジスタンス",
-            "distance_pct": 0.58
-          },
-          {
-            "price": 184.27,
-            "strength": 1,
-            "label": "弱いレジスタンス",
-            "distance_pct": 0.28
-          },
-          {
-            "price": 186.99,
-            "strength": 1,
-            "label": "弱いレジスタンス",
-            "distance_pct": 1.76
-          }
-        ],
-        "support": [
-          {
-            "price": 182.877,
-            "strength": 7,
-            "label": "強いサポート",
-            "distance_pct": 0.48
-          },
-          {
-            "price": 180.895,
-            "strength": 2,
-            "label": "サポート",
-            "distance_pct": 1.55
-          },
-          {
-            "price": 180.28,
-            "strength": 1,
-            "label": "弱いサポート",
-            "distance_pct": 1.89
-          }
-        ],
-        "nearest_resistance": {
-          "price": 184.27,
-          "strength": 1,
-          "label": "弱いレジスタンス",
-          "distance_pct": 0.28
-        },
-        "nearest_support": {
-          "price": 182.877,
-          "strength": 7,
-          "label": "強いサポート",
-          "distance_pct": 0.48
-        },
-        "context": "レジスタンス(184.27)まで0.28%（非常に近い・注意） / サポート(182.877)まで0.48%（非常に近い・注意）"
-      },
-      "market_regime": {
-        "adx": 25.6,
-        "plus_di": 37.2,
-        "minus_di": 62.8,
-        "regime": "weak_trend",
-        "regime_label": "弱トレンド相場",
-        "trend_direction": "down",
-        "note": "順張りやや有効"
-      },
-      "performance": {
-        "win_rate": 33.3,
-        "total_trades": 6,
-        "adjustment": -2,
-        "note": "実績低調・要注意"
-      },
-      "ambush": {
-        "has_alert": false,
-        "approaching": []
-      },
-      "cb_meeting_blackout": {
-        "active": false,
-        "severity": "none",
-        "reason": ""
-      },
-      "strength_context": {
-        "base_currency": "EUR",
-        "quote_currency": "JPY",
-        "base_score": -8.8,
-        "base_label": "中立",
-        "base_rank": 6,
-        "quote_score": 39.3,
-        "quote_label": "やや強い",
-        "quote_rank": 3,
-        "spread": -48.1,
-        "context": "弱い通貨 vs 強い通貨（ショート有利）",
-        "bias": "short"
-      }
-    },
-    {
-      "pair": "GBPJPY",
-      "label": "GBP/JPY",
-      "price": 215.043,
-      "ta_score": 48.0,
-      "dma_score": 85,
-      "macd_score": 15,
-      "rsi_score": 50,
-      "trend_strength": 10,
-      "atr_quality": 0,
-      "breakout_bonus": 0,
-      "divergence_adj": 0,
-      "ema_short_bonus": -12,
-      "dma200": 212.107,
-      "dma50": 215.445,
-      "rsi": 48.86,
-      "macd": -0.498,
-      "macd_signal": -0.479,
-      "atr": 0.675,
-      "rsi_reversal_confirmed": true,
-      "ta_score_overheated": false,
-      "fa_score": 76.6,
-      "fa_direction": "buy",
-      "fa_rate_diff": 2.75,
-      "fa_detail": "BOE(3.75% neutral/stable) vs 日銀(1.00% pause/peak) 差+2.75% / GBPサイクル強化(stable)",
-      "stars": 1,
-      "verdict": "⚠ 見送り（FA/TA不一致）",
-      "direction": "NO_TRADE",
-      "pair_type": "major",
-      "sentiment_notes": [
-        "金価格=4422.7 急騰・有事の安全資産需要"
-      ],
-      "intervention_news": {
-        "GBP": {
-          "score": 0,
-          "level": "none",
-          "hits": [],
-          "reason": "キーワード該当なし",
-          "headlines": [
-            "Sterling provides innovative solution to increase healthcare access, says Ighodalo - The Guardian Nigeria News"
-          ],
-          "cached": false,
-          "timestamp": "2026-08-13T16:05:48.042468+00:00"
-        },
-        "JPY": {
-          "score": 55,
-          "level": "HIGH",
-          "hits": [
-            "yen intervention"
-          ],
-          "reason": "検知キーワード: yen intervention",
-          "headlines": [
-            "Yen Intervention Wears Off, Oil Jumps and Intel Rakes in More | Markets P.M. for Aug. 11 - wsj.com",
-            "Goldman says Japan's $1 trillion of reserves leaves 'plenty of capacity' for further yen interventions - CNBC",
-            "Yen Intervention Buys Time, But The BOJ Holds The Key - Seeking Alpha",
-            "US-Japan Yen Intervention Reveals a Trillion-Dollar Dilemma - themedialine.org",
-            "Why Japan Is Struggling to Prop Up the Yen, Even With US Help - Bloomberg"
-          ],
-          "cached": true,
-          "timestamp": "2026-08-13T16:05:41.135550+00:00"
-        }
-      },
-      "upcoming_events": [],
-      "volatility_regime": {
-        "regime": "normal",
-        "regime_label": "通常ボラ相場",
-        "atr_ratio": 1.09,
-        "atr_90d": 0.61737,
-        "sl_multiplier": 3.0,
-        "tp1_multiplier": 1.5,
-        "tp2_multiplier": 4.5,
-        "tp3_multiplier": 6.0,
-        "note": "ATR比率1.1 → TP=1.5×ATR（Phase1出口改善・到達率向上）"
-      },
-      "carry_score": {
-        "carry_score": 8.76,
-        "label": "非常に優れたキャリー",
-        "annual_swap_pct": 2.75,
-        "daily_volatility_pct": 0.31,
-        "breakeven_days": 104,
-        "note": "SL幅をスワップで回収: 約104日"
-      },
-      "support_resistance": {
-        "resistance": [
-          {
-            "price": 215.43,
-            "strength": 2,
-            "label": "レジスタンス",
-            "distance_pct": 0.18
-          },
-          {
-            "price": 216.05,
-            "strength": 1,
-            "label": "弱いレジスタンス",
-            "distance_pct": 0.47
-          },
-          {
-            "price": 219.14,
-            "strength": 1,
-            "label": "弱いレジスタンス",
-            "distance_pct": 1.91
-          }
-        ],
-        "support": [
-          {
-            "price": 211.056,
-            "strength": 7,
-            "label": "強いサポート",
-            "distance_pct": 1.85
-          },
-          {
-            "price": 207.465,
-            "strength": 2,
-            "label": "サポート",
-            "distance_pct": 3.52
-          },
-          {
-            "price": 209.91,
-            "strength": 1,
-            "label": "弱いサポート",
-            "distance_pct": 2.39
-          },
-          {
-            "price": 212.79,
-            "strength": 1,
-            "label": "弱いサポート",
-            "distance_pct": 1.05
-          }
-        ],
-        "nearest_resistance": {
-          "price": 215.43,
-          "strength": 2,
-          "label": "レジスタンス",
-          "distance_pct": 0.18
-        },
-        "nearest_support": {
-          "price": 212.79,
-          "strength": 1,
-          "label": "弱いサポート",
-          "distance_pct": 1.05
-        },
-        "context": "レジスタンス(215.43)まで0.18%（非常に近い・注意） / サポート(212.79)まで1.05%"
-      },
-      "market_regime": {
-        "adx": 22.9,
-        "plus_di": 38.5,
-        "minus_di": 61.5,
-        "regime": "weak_trend",
-        "regime_label": "弱トレンド相場",
-        "trend_direction": "down",
-        "note": "順張りやや有効"
-      },
-      "performance": {
-        "win_rate": 41.7,
-        "total_trades": 12,
-        "adjustment": 0,
-        "note": "実績不振 / 好成績(実証69.2%)"
-      },
-      "ambush": {
-        "has_alert": true,
-        "nearest": {
-          "type": "50EMA",
-          "price": 215.204,
-          "role": "戻り候補(50EMA)",
-          "kind": "resistance",
-          "distance": 0.161,
-          "distance_pct": 0.075
-        },
-        "approaching": [
-          {
-            "type": "50EMA",
-            "price": 215.204,
-            "role": "戻り候補(50EMA)",
-            "kind": "resistance",
-            "distance": 0.161,
-            "distance_pct": 0.075
-          }
-        ],
-        "message": "戻り候補(50EMA)（215.204）に接近 あと0.07% → 反落でのショート候補"
-      },
-      "cb_meeting_blackout": {
-        "active": false,
-        "severity": "none",
-        "reason": ""
-      },
-      "strength_context": {
-        "base_currency": "GBP",
-        "quote_currency": "JPY",
-        "base_score": -17.9,
-        "base_label": "中立",
-        "base_rank": 7,
-        "quote_score": 39.3,
-        "quote_label": "やや強い",
-        "quote_rank": 3,
-        "spread": -57.2,
-        "context": "弱い通貨 vs 強い通貨（ショート有利）",
-        "bias": "short"
-      }
-    },
-    {
-      "pair": "AUDJPY",
-      "label": "AUD/JPY",
-      "price": 112.471,
-      "ta_score": 76.7,
-      "dma_score": 85,
-      "macd_score": 65,
-      "rsi_score": 50,
-      "trend_strength": 18,
-      "atr_quality": 0,
-      "breakout_bonus": 0,
-      "divergence_adj": 0,
-      "ema_short_bonus": -8,
-      "dma200": 109.679,
-      "dma50": 112.635,
-      "rsi": 49.64,
-      "macd": -0.237,
-      "macd_signal": -0.251,
-      "atr": 0.424,
-      "rsi_reversal_confirmed": true,
-      "ta_score_overheated": false,
-      "fa_score": 81.1,
-      "fa_direction": "buy",
-      "fa_rate_diff": 3.35,
-      "fa_detail": "RBA(4.35% pause/stable) vs 日銀(1.00% pause/peak) 差+3.35% / AUDサイクル強化(stable)",
-      "stars": 2,
-      "verdict": "○ ロング条件成立 ⚠介入観測報道HIGH(55)",
-      "direction": "LONG",
-      "pair_type": "major",
-      "sentiment_warning": "リスクオフ・円買い圧力警戒",
-      "sentiment_notes": [
-        "リスクオフ・円買い圧力警戒",
-        "金価格=4422.7 急騰・有事の安全資産需要"
-      ],
-      "original_stars": 4,
-      "intervention_news": {
-        "JPY": {
-          "score": 55,
-          "level": "HIGH",
-          "hits": [
-            "yen intervention"
-          ],
-          "reason": "検知キーワード: yen intervention",
-          "headlines": [
-            "Yen Intervention Wears Off, Oil Jumps and Intel Rakes in More | Markets P.M. for Aug. 11 - wsj.com",
-            "Goldman says Japan's $1 trillion of reserves leaves 'plenty of capacity' for further yen interventions - CNBC",
-            "Yen Intervention Buys Time, But The BOJ Holds The Key - Seeking Alpha",
-            "US-Japan Yen Intervention Reveals a Trillion-Dollar Dilemma - themedialine.org",
-            "Why Japan Is Struggling to Prop Up the Yen, Even With US Help - Bloomberg"
-          ],
-          "cached": true,
-          "timestamp": "2026-08-13T16:05:41.135550+00:00"
-        }
-      },
-      "upcoming_events": [],
-      "volatility_regime": {
-        "regime": "normal",
-        "regime_label": "通常ボラ相場",
-        "atr_ratio": 1.08,
-        "atr_90d": 0.39423,
-        "sl_multiplier": 3.0,
-        "tp1_multiplier": 1.5,
-        "tp2_multiplier": 4.5,
-        "tp3_multiplier": 6.0,
-        "note": "ATR比率1.1 → TP=1.5×ATR（Phase1出口改善・到達率向上）"
-      },
-      "staged_tp": {
-        "sl": 111.199,
-        "tp": 113.107,
-        "trail_atr_mult": 2.0,
-        "trail_distance": 0.848,
-        "be_plus_offset": 0.636,
-        "be_target_after_tp": 113.107,
-        "max_target": 115.015,
-        "rr_tp": 0.5,
-        "tp_mode": "single_with_trail",
-        "tp1": 113.107,
-        "tp2": 114.379,
-        "tp3": 115.015,
-        "sl_width": 1.272,
-        "tp1_width": 0.636,
-        "rr_tp1": 0.5,
-        "rr_tp2": 1.5,
-        "rr_tp3": 2.0,
-        "spread_price": 0.011,
-        "spread_pips": 1.1,
-        "spread_atr_ratio": 0.025,
-        "sl_dist_effective": 1.277,
-        "tp_dist_effective": 0.631,
-        "rr_effective": 0.49,
-        "spread_is_dynamic": true,
-        "spread_pips_dynamic": 1.08,
-        "regime_label": "通常ボラ相場",
-        "strategy": "TP(113.107)到達 → SLを BE+0.5R(113.107) へ移動 → トレーリング(2.0×ATR=0.848)発動 → 利を伸ばす（理論最大: 115.015）",
-        "chandelier_sl_active": false,
-        "chandelier_note": "",
-        "spread_session": "London/NY overlap",
-        "spread_session_mult": 0.8,
-        "spread_vix_mult": 0.9
-      },
-      "carry_score": {
-        "carry_score": 8.89,
-        "label": "非常に優れたキャリー",
-        "annual_swap_pct": 3.35,
-        "daily_volatility_pct": 0.38,
-        "breakeven_days": 102,
-        "note": "SL幅をスワップで回収: 約102日"
-      },
-      "support_resistance": {
-        "resistance": [
-          {
-            "price": 114.47,
-            "strength": 5,
-            "label": "強いレジスタンス",
-            "distance_pct": 1.78
-          },
-          {
-            "price": 113.385,
-            "strength": 2,
-            "label": "レジスタンス",
-            "distance_pct": 0.81
-          }
-        ],
-        "support": [
-          {
-            "price": 111.435,
-            "strength": 2,
-            "label": "サポート",
-            "distance_pct": 0.92
-          },
-          {
-            "price": 100.92,
-            "strength": 1,
-            "label": "弱いサポート",
-            "distance_pct": 10.27
-          },
-          {
-            "price": 102.65,
-            "strength": 1,
-            "label": "弱いサポート",
-            "distance_pct": 8.73
-          },
-          {
-            "price": 107.93,
-            "strength": 1,
-            "label": "弱いサポート",
-            "distance_pct": 4.04
-          }
-        ],
-        "nearest_resistance": {
-          "price": 113.385,
-          "strength": 2,
-          "label": "レジスタンス",
-          "distance_pct": 0.81
-        },
-        "nearest_support": {
-          "price": 111.435,
-          "strength": 2,
-          "label": "サポート",
-          "distance_pct": 0.92
-        },
-        "context": "レジスタンス(113.385)まで0.81% / サポート(111.435)まで0.92%"
-      },
-      "market_regime": {
-        "adx": 25.8,
-        "plus_di": 37.1,
-        "minus_di": 62.9,
-        "regime": "weak_trend",
-        "regime_label": "弱トレンド相場",
-        "trend_direction": "down",
-        "note": "順張りやや有効"
-      },
-      "performance": {
-        "win_rate": 20.0,
-        "total_trades": 5,
-        "adjustment": -1.5,
-        "note": "実績低調・要注意 / バックテスト72.2%だが実運用71件は20%(1W/3L/1E)に乖離・要監視"
-      },
-      "ambush": {
-        "has_alert": true,
-        "nearest": {
-          "type": "50EMA",
-          "price": 112.632,
-          "role": "戻り候補(50EMA)",
-          "kind": "resistance",
-          "distance": 0.161,
-          "distance_pct": 0.143
-        },
-        "approaching": [
-          {
-            "type": "50EMA",
-            "price": 112.632,
-            "role": "戻り候補(50EMA)",
-            "kind": "resistance",
-            "distance": 0.161,
-            "distance_pct": 0.143
-          }
-        ],
-        "message": "戻り候補(50EMA)（112.632）に接近 あと0.14% → 反落でのショート候補"
-      },
-      "vix_filter_applied": true,
-      "vix_filter_reason": "VIXリスクオフフィルタ: VIX=14.7 — JPYクロスLONG -1★降格",
-      "seasonal_caution": true,
-      "seasonal_caution_reason": "📅 AUDJPY 8月は季節的に弱含みやすい時期（過去20-24年で下落率70%）",
-      "cb_meeting_blackout": {
-        "active": false,
-        "severity": "none",
-        "reason": ""
-      },
-      "strength_context": {
-        "base_currency": "AUD",
-        "quote_currency": "JPY",
-        "base_score": 22.6,
-        "base_label": "やや強い",
-        "base_rank": 4,
-        "quote_score": 39.3,
-        "quote_label": "やや強い",
-        "quote_rank": 3,
-        "spread": -16.7,
-        "context": "やや弱い通貨 vs 強め（ショート寄り）",
-        "bias": "slight_short"
-      }
-    },
-    {
-      "pair": "CHFJPY",
-      "label": "CHF/JPY",
-      "price": 195.978,
-      "ta_score": 5,
-      "dma_score": 30,
-      "macd_score": 15,
-      "rsi_score": 35,
-      "trend_strength": -20,
-      "atr_quality": 0,
-      "breakout_bonus": 0,
-      "divergence_adj": 0,
-      "ema_short_bonus": -12,
-      "dma200": 199.403,
-      "dma50": 199.481,
-      "rsi": 37.53,
-      "macd": -1.261,
-      "macd_signal": -1.206,
-      "atr": 0.585,
-      "rsi_reversal_confirmed": false,
-      "ta_score_overheated": false,
-      "fa_score": 56.4,
-      "fa_direction": "neutral",
-      "fa_rate_diff": -0.75,
-      "fa_detail": "SNB(0.25% ease/trough) vs 日銀(1.00% pause/peak) 差-0.75% / CHFサイクル強化(trough)",
-      "stars": 2,
-      "verdict": "△ 弱シグナル",
-      "direction": "LIGHT_SHORT",
-      "pair_type": "safe_haven",
-      "sentiment_notes": [
-        "金価格=4422.7 急騰・有事の安全資産需要"
-      ],
-      "intervention_news": {
-        "CHF": {
-          "score": 80,
-          "level": "CRITICAL",
-          "hits": [
-            "snb intervention",
-            "franc intervention"
-          ],
-          "reason": "検知キーワード: snb intervention, franc intervention",
-          "headlines": [
-            "Swiss Franc: Intervention risk keeps Franc lagging – OCBC - FXStreet",
-            "Swiss Franc’s Haven Run Seen Nearing SNB Intervention Threshold - Bloomberg",
-            "Switzerland risks the ire of the White House as it flags potential currency intervention - CNBC",
-            "Swiss Franc: Intervention stance offsets safe-haven appeal – Rabobank - FXStreet",
-            "UBS lowers Swiss franc forecast as SNB intervention falls short - Investing.com"
-          ],
-          "cached": false,
-          "timestamp": "2026-08-13T16:05:52.981899+00:00"
-        },
-        "JPY": {
-          "score": 55,
-          "level": "HIGH",
-          "hits": [
-            "yen intervention"
-          ],
-          "reason": "検知キーワード: yen intervention",
-          "headlines": [
-            "Yen Intervention Wears Off, Oil Jumps and Intel Rakes in More | Markets P.M. for Aug. 11 - wsj.com",
-            "Goldman says Japan's $1 trillion of reserves leaves 'plenty of capacity' for further yen interventions - CNBC",
-            "Yen Intervention Buys Time, But The BOJ Holds The Key - Seeking Alpha",
-            "US-Japan Yen Intervention Reveals a Trillion-Dollar Dilemma - themedialine.org",
-            "Why Japan Is Struggling to Prop Up the Yen, Even With US Help - Bloomberg"
-          ],
-          "cached": true,
-          "timestamp": "2026-08-13T16:05:41.135550+00:00"
-        }
-      },
-      "intervention_watch_warning": [
-        "CHF介入示唆報道 score80(CRITICAL): 検知キーワード: snb intervention, franc intervention"
-      ],
-      "upcoming_events": [],
-      "volatility_regime": {
-        "regime": "normal",
-        "regime_label": "通常ボラ相場",
-        "atr_ratio": 1.03,
-        "atr_90d": 0.56836,
-        "sl_multiplier": 3.0,
-        "tp1_multiplier": 1.5,
-        "tp2_multiplier": 4.5,
-        "tp3_multiplier": 6.0,
-        "note": "ATR比率1.0 → TP=1.5×ATR（Phase1出口改善・到達率向上）"
-      },
-      "staged_tp": {
-        "sl": 197.733,
-        "tp": 195.101,
-        "trail_atr_mult": 2.0,
-        "trail_distance": 1.17,
-        "be_plus_offset": 0.877,
-        "be_target_after_tp": 195.101,
-        "max_target": 192.468,
-        "rr_tp": 0.5,
-        "tp_mode": "single_with_trail",
-        "tp1": 195.101,
-        "tp2": 193.346,
-        "tp3": 192.468,
-        "sl_width": 1.755,
-        "tp1_width": 0.877,
-        "rr_tp1": 0.5,
-        "rr_tp2": 1.5,
-        "rr_tp3": 2.0,
-        "spread_price": 0.014,
-        "spread_pips": 1.4,
-        "spread_atr_ratio": 0.025,
-        "sl_dist_effective": 1.762,
-        "tp_dist_effective": 0.87,
-        "rr_effective": 0.49,
-        "spread_is_dynamic": true,
-        "spread_pips_dynamic": 1.44,
-        "regime_label": "通常ボラ相場",
-        "strategy": "TP(195.101)到達 → SLを BE+0.5R(195.101) へ移動 → トレーリング(2.0×ATR=1.17)発動 → 利を伸ばす（理論最大: 192.468）",
-        "chandelier_sl_active": false,
-        "chandelier_note": "",
-        "spread_session": "London/NY overlap",
-        "spread_session_mult": 0.8,
-        "spread_vix_mult": 0.9
-      },
-      "carry_score": {
-        "carry_score": 2.51,
-        "label": "良好なキャリー",
-        "annual_swap_pct": 0.75,
-        "daily_volatility_pct": 0.3,
-        "breakeven_days": 363,
-        "note": "SL幅をスワップで回収: 約363日"
-      },
-      "support_resistance": {
-        "resistance": [
-          {
-            "price": 201.29,
-            "strength": 2,
-            "label": "レジスタンス",
-            "distance_pct": 2.71
-          },
-          {
-            "price": 202.215,
-            "strength": 2,
-            "label": "レジスタンス",
-            "distance_pct": 3.18
-          },
-          {
-            "price": 203.51,
-            "strength": 2,
-            "label": "レジスタンス",
-            "distance_pct": 3.84
-          },
-          {
-            "price": 198.34,
-            "strength": 1,
-            "label": "弱いレジスタンス",
-            "distance_pct": 1.21
-          }
-        ],
-        "support": [
-          {
-            "price": 193.045,
-            "strength": 2,
-            "label": "サポート",
-            "distance_pct": 1.5
-          },
-          {
-            "price": 193.92,
-            "strength": 1,
-            "label": "弱いサポート",
-            "distance_pct": 1.05
-          }
-        ],
-        "nearest_resistance": {
-          "price": 198.34,
-          "strength": 1,
-          "label": "弱いレジスタンス",
-          "distance_pct": 1.21
-        },
-        "nearest_support": {
-          "price": 193.92,
-          "strength": 1,
-          "label": "弱いサポート",
-          "distance_pct": 1.05
-        },
-        "context": "レジスタンス(198.34)まで1.21% / サポート(193.92)まで1.05%"
-      },
-      "market_regime": {
-        "adx": 40.5,
-        "plus_di": 29.8,
-        "minus_di": 70.2,
-        "regime": "trending",
-        "regime_label": "トレンド相場",
-        "trend_direction": "down",
-        "note": "順張りシグナル有効"
-      },
-      "ambush": {
-        "has_alert": true,
-        "nearest": {
-          "type": "ピボットPP",
-          "price": 195.949,
-          "role": "ピボットPP",
-          "kind": "support",
-          "distance": 0.029,
-          "distance_pct": 0.015
-        },
-        "approaching": [
-          {
-            "type": "ピボットPP",
-            "price": 195.949,
-            "role": "ピボットPP",
-            "kind": "support",
-            "distance": 0.029,
-            "distance_pct": 0.015
-          }
-        ],
-        "message": "ピボットPP（195.949）に接近 あと0.01% → 反発でのロング候補"
-      },
-      "cb_meeting_blackout": {
-        "active": false,
-        "severity": "none",
-        "reason": ""
-      },
-      "strength_context": {
-        "base_currency": "CHF",
-        "quote_currency": "JPY",
-        "base_score": -100.0,
-        "base_label": "弱い",
-        "base_rank": 11,
-        "quote_score": 39.3,
-        "quote_label": "やや強い",
-        "quote_rank": 3,
-        "spread": -139.3,
-        "context": "弱い通貨 vs 強い通貨（ショート有利）",
-        "bias": "short"
-      }
-    },
-    {
       "pair": "SGDJPY",
       "label": "SGD/JPY",
-      "price": 124.446,
+      "price": 124.54,
       "ta_score": 48.0,
       "dma_score": 85,
       "macd_score": 15,
@@ -1109,12 +35,12 @@
       "breakout_bonus": 0,
       "divergence_adj": 0,
       "ema_short_bonus": -12,
-      "dma200": 123.274,
-      "dma50": 125.043,
-      "rsi": 46.71,
-      "macd": -0.36,
-      "macd_signal": -0.332,
-      "atr": 0.338,
+      "dma200": 123.275,
+      "dma50": 125.045,
+      "rsi": 47.74,
+      "macd": -0.353,
+      "macd_signal": -0.331,
+      "atr": 0.342,
       "rsi_reversal_confirmed": true,
       "ta_score_overheated": false,
       "fa_score": 67.2,
@@ -1126,7 +52,7 @@
       "direction": "NO_TRADE",
       "pair_type": "major",
       "sentiment_notes": [
-        "金価格=4422.7 急騰・有事の安全資産需要"
+        "金価格=4415.6 急騰・有事の安全資産需要"
       ],
       "intervention_news": {
         "JPY": {
@@ -1137,22 +63,22 @@
           ],
           "reason": "検知キーワード: yen intervention",
           "headlines": [
-            "Yen Intervention Wears Off, Oil Jumps and Intel Rakes in More | Markets P.M. for Aug. 11 - wsj.com",
+            "Japan’s Yen Intervention Bought Time. Not a Fix - finance.yahoo.com",
+            "Yen Intervention Wears Off, Oil Jumps and Intel Rakes in More | Markets P.M. for Aug. 11 - WSJ",
             "Goldman says Japan's $1 trillion of reserves leaves 'plenty of capacity' for further yen interventions - CNBC",
             "Yen Intervention Buys Time, But The BOJ Holds The Key - Seeking Alpha",
-            "US-Japan Yen Intervention Reveals a Trillion-Dollar Dilemma - themedialine.org",
-            "Why Japan Is Struggling to Prop Up the Yen, Even With US Help - Bloomberg"
+            "US-Japan Yen Intervention Reveals a Trillion-Dollar Dilemma - The Media Line"
           ],
-          "cached": true,
-          "timestamp": "2026-08-13T16:05:41.135550+00:00"
+          "cached": false,
+          "timestamp": "2026-08-13T18:03:00.877955+00:00"
         }
       },
       "upcoming_events": [],
       "volatility_regime": {
         "regime": "normal",
         "regime_label": "通常ボラ相場",
-        "atr_ratio": 1.35,
-        "atr_90d": 0.25027,
+        "atr_ratio": 1.36,
+        "atr_90d": 0.251,
         "sl_multiplier": 3.0,
         "tp1_multiplier": 1.5,
         "tp2_multiplier": 4.5,
@@ -1160,12 +86,12 @@
         "note": "ATR比率1.4 → TP=1.5×ATR（Phase1出口改善・到達率向上）"
       },
       "carry_score": {
-        "carry_score": 5.52,
+        "carry_score": 5.46,
         "label": "非常に優れたキャリー",
         "annual_swap_pct": 1.5,
         "daily_volatility_pct": 0.27,
-        "breakeven_days": 165,
-        "note": "SL幅をスワップで回収: 約165日"
+        "breakeven_days": 167,
+        "note": "SL幅をスワップで回収: 約167日"
       },
       "support_resistance": {
         "resistance": [
@@ -1173,19 +99,19 @@
             "price": 125.104,
             "strength": 5,
             "label": "強いレジスタンス",
-            "distance_pct": 0.53
+            "distance_pct": 0.45
           },
           {
             "price": 124.56,
             "strength": 1,
             "label": "弱いレジスタンス",
-            "distance_pct": 0.09
+            "distance_pct": 0.02
           },
           {
             "price": 126.9,
             "strength": 1,
             "label": "弱いレジスタンス",
-            "distance_pct": 1.97
+            "distance_pct": 1.89
           }
         ],
         "support": [
@@ -1193,45 +119,45 @@
             "price": 121.055,
             "strength": 2,
             "label": "サポート",
-            "distance_pct": 2.72
+            "distance_pct": 2.8
           },
           {
             "price": 123.635,
             "strength": 2,
             "label": "サポート",
-            "distance_pct": 0.65
+            "distance_pct": 0.73
           },
           {
             "price": 119.45,
             "strength": 1,
             "label": "弱いサポート",
-            "distance_pct": 4.01
+            "distance_pct": 4.09
           },
           {
             "price": 119.97,
             "strength": 1,
             "label": "弱いサポート",
-            "distance_pct": 3.6
+            "distance_pct": 3.67
           }
         ],
         "nearest_resistance": {
           "price": 124.56,
           "strength": 1,
           "label": "弱いレジスタンス",
-          "distance_pct": 0.09
+          "distance_pct": 0.02
         },
         "nearest_support": {
           "price": 123.635,
           "strength": 2,
           "label": "サポート",
-          "distance_pct": 0.65
+          "distance_pct": 0.73
         },
-        "context": "レジスタンス(124.56)まで0.09%（非常に近い・注意） / サポート(123.635)まで0.65%"
+        "context": "レジスタンス(124.56)まで0.02%（非常に近い・注意） / サポート(123.635)まで0.73%"
       },
       "market_regime": {
-        "adx": 35.0,
-        "plus_di": 32.5,
-        "minus_di": 67.5,
+        "adx": 33.3,
+        "plus_di": 33.3,
+        "minus_di": 66.7,
         "regime": "trending",
         "regime_label": "トレンド相場",
         "trend_direction": "down",
@@ -1250,8 +176,8 @@
           "price": 124.56,
           "role": "弱いレジスタンス",
           "kind": "resistance",
-          "distance": 0.114,
-          "distance_pct": 0.092
+          "distance": 0.02,
+          "distance_pct": 0.016
         },
         "approaching": [
           {
@@ -1259,11 +185,11 @@
             "price": 124.56,
             "role": "弱いレジスタンス",
             "kind": "resistance",
-            "distance": 0.114,
-            "distance_pct": 0.092
+            "distance": 0.02,
+            "distance_pct": 0.016
           }
         ],
-        "message": "弱いレジスタンス（124.56）に接近 あと0.09% → 反落でのショート候補"
+        "message": "弱いレジスタンス（124.56）に接近 あと0.02% → 反落でのショート候補"
       },
       "cb_meeting_blackout": {
         "active": false,
@@ -1273,21 +199,21 @@
       "strength_context": {
         "base_currency": "SGD",
         "quote_currency": "JPY",
-        "base_score": -35.1,
-        "base_label": "やや弱い",
-        "base_rank": 8,
-        "quote_score": 39.3,
-        "quote_label": "やや強い",
-        "quote_rank": 3,
-        "spread": -74.4,
-        "context": "弱い通貨 vs 強い通貨（ショート有利）",
-        "bias": "short"
+        "base_score": -12.9,
+        "base_label": "中立",
+        "base_rank": 10,
+        "quote_score": 0.6,
+        "quote_label": "中立",
+        "quote_rank": 7,
+        "spread": -13.5,
+        "context": "通貨強弱が拮抗（中立）",
+        "bias": "neutral"
       }
     },
     {
       "pair": "HKDJPY",
       "label": "HKD/JPY",
-      "price": 20.307,
+      "price": 20.329,
       "ta_score": 43.0,
       "dma_score": 85,
       "macd_score": 15,
@@ -1299,10 +225,10 @@
       "ema_short_bonus": -12,
       "dma200": 20.23,
       "dma50": 20.555,
-      "rsi": 42.18,
-      "macd": -0.109,
+      "rsi": 43.53,
+      "macd": -0.107,
       "macd_signal": -0.093,
-      "atr": 0.065,
+      "atr": 0.067,
       "rsi_reversal_confirmed": true,
       "ta_score_overheated": false,
       "fa_score": 76.6,
@@ -1314,7 +240,7 @@
       "direction": "NO_TRADE",
       "pair_type": "major",
       "sentiment_notes": [
-        "金価格=4422.7 急騰・有事の安全資産需要"
+        "金価格=4415.6 急騰・有事の安全資産需要"
       ],
       "intervention_news": {
         "JPY": {
@@ -1325,22 +251,22 @@
           ],
           "reason": "検知キーワード: yen intervention",
           "headlines": [
-            "Yen Intervention Wears Off, Oil Jumps and Intel Rakes in More | Markets P.M. for Aug. 11 - wsj.com",
+            "Japan’s Yen Intervention Bought Time. Not a Fix - finance.yahoo.com",
+            "Yen Intervention Wears Off, Oil Jumps and Intel Rakes in More | Markets P.M. for Aug. 11 - WSJ",
             "Goldman says Japan's $1 trillion of reserves leaves 'plenty of capacity' for further yen interventions - CNBC",
             "Yen Intervention Buys Time, But The BOJ Holds The Key - Seeking Alpha",
-            "US-Japan Yen Intervention Reveals a Trillion-Dollar Dilemma - themedialine.org",
-            "Why Japan Is Struggling to Prop Up the Yen, Even With US Help - Bloomberg"
+            "US-Japan Yen Intervention Reveals a Trillion-Dollar Dilemma - The Media Line"
           ],
           "cached": true,
-          "timestamp": "2026-08-13T16:05:41.135550+00:00"
+          "timestamp": "2026-08-13T18:03:00.877955+00:00"
         }
       },
       "upcoming_events": [],
       "volatility_regime": {
         "regime": "normal",
         "regime_label": "通常ボラ相場",
-        "atr_ratio": 1.26,
-        "atr_90d": 0.05163,
+        "atr_ratio": 1.29,
+        "atr_90d": 0.05188,
         "sl_multiplier": 3.0,
         "tp1_multiplier": 1.5,
         "tp2_multiplier": 4.5,
@@ -1348,12 +274,12 @@
         "note": "ATR比率1.3 → TP=1.5×ATR（Phase1出口改善・到達率向上）"
       },
       "carry_score": {
-        "carry_score": 8.59,
+        "carry_score": 8.34,
         "label": "非常に優れたキャリー",
         "annual_swap_pct": 2.75,
-        "daily_volatility_pct": 0.32,
-        "breakeven_days": 106,
-        "note": "SL幅をスワップで回収: 約106日"
+        "daily_volatility_pct": 0.33,
+        "breakeven_days": 109,
+        "note": "SL幅をスワップで回収: 約109日"
       },
       "support_resistance": {
         "resistance": [
@@ -1361,19 +287,19 @@
             "price": 20.382,
             "strength": 6,
             "label": "強いレジスタンス",
-            "distance_pct": 0.37
+            "distance_pct": 0.26
           },
           {
             "price": 20.743,
             "strength": 1,
             "label": "弱いレジスタンス",
-            "distance_pct": 2.15
+            "distance_pct": 2.04
           },
           {
             "price": 20.903,
             "strength": 1,
             "label": "弱いレジスタンス",
-            "distance_pct": 2.93
+            "distance_pct": 2.82
           }
         ],
         "support": [
@@ -1381,45 +307,45 @@
             "price": 19.577,
             "strength": 2,
             "label": "サポート",
-            "distance_pct": 3.59
+            "distance_pct": 3.7
           },
           {
             "price": 19.875,
             "strength": 2,
             "label": "サポート",
-            "distance_pct": 2.13
+            "distance_pct": 2.23
           },
           {
             "price": 19.957,
             "strength": 2,
             "label": "サポート",
-            "distance_pct": 1.72
+            "distance_pct": 1.83
           },
           {
             "price": 20.05,
             "strength": 1,
             "label": "弱いサポート",
-            "distance_pct": 1.27
+            "distance_pct": 1.37
           }
         ],
         "nearest_resistance": {
           "price": 20.382,
           "strength": 6,
           "label": "強いレジスタンス",
-          "distance_pct": 0.37
+          "distance_pct": 0.26
         },
         "nearest_support": {
           "price": 20.05,
           "strength": 1,
           "label": "弱いサポート",
-          "distance_pct": 1.27
+          "distance_pct": 1.37
         },
-        "context": "レジスタンス(20.382)まで0.37%（非常に近い・注意） / サポート(20.05)まで1.27%"
+        "context": "レジスタンス(20.382)まで0.26%（非常に近い・注意） / サポート(20.05)まで1.37%"
       },
       "market_regime": {
-        "adx": 42.3,
-        "plus_di": 28.8,
-        "minus_di": 71.2,
+        "adx": 40.0,
+        "plus_di": 30.0,
+        "minus_di": 70.0,
         "regime": "trending",
         "regime_label": "トレンド相場",
         "trend_direction": "down",
@@ -1432,8 +358,26 @@
         "note": "実績良好"
       },
       "ambush": {
-        "has_alert": false,
-        "approaching": []
+        "has_alert": true,
+        "nearest": {
+          "type": "ピボットR1",
+          "price": 20.362,
+          "role": "ピボットR1",
+          "kind": "resistance",
+          "distance": 0.033,
+          "distance_pct": 0.162
+        },
+        "approaching": [
+          {
+            "type": "ピボットR1",
+            "price": 20.362,
+            "role": "ピボットR1",
+            "kind": "resistance",
+            "distance": 0.033,
+            "distance_pct": 0.162
+          }
+        ],
+        "message": "ピボットR1（20.362）に接近 あと0.16% → 反落でのショート候補"
       },
       "cb_meeting_blackout": {
         "active": false,
@@ -1443,21 +387,21 @@
       "strength_context": {
         "base_currency": "HKD",
         "quote_currency": "JPY",
-        "base_score": -78.4,
-        "base_label": "弱い",
-        "base_rank": 10,
-        "quote_score": 39.3,
-        "quote_label": "やや強い",
-        "quote_rank": 3,
-        "spread": -117.7,
-        "context": "弱い通貨 vs 強い通貨（ショート有利）",
-        "bias": "short"
+        "base_score": -29.8,
+        "base_label": "やや弱い",
+        "base_rank": 14,
+        "quote_score": 0.6,
+        "quote_label": "中立",
+        "quote_rank": 7,
+        "spread": -30.4,
+        "context": "やや弱い通貨 vs 強め（ショート寄り）",
+        "bias": "slight_short"
       }
     },
     {
       "pair": "CNYJPY",
       "label": "CNY/JPY",
-      "price": 23.598,
+      "price": 23.616,
       "ta_score": 51.0,
       "dma_score": 85,
       "macd_score": 15,
@@ -1468,11 +412,11 @@
       "divergence_adj": 0,
       "ema_short_bonus": -12,
       "dma200": 22.975,
-      "dma50": 23.8,
-      "rsi": 43.97,
-      "macd": -0.091,
+      "dma50": 23.801,
+      "rsi": 44.75,
+      "macd": -0.089,
       "macd_signal": -0.074,
-      "atr": 0.074,
+      "atr": 0.073,
       "rsi_reversal_confirmed": true,
       "ta_score_overheated": false,
       "fa_score": 61.0,
@@ -1488,7 +432,7 @@
       "sentiment_notes": [
         "VIX=14.7 リスクオフ・新興国ロング抑制",
         "リスクオフ・円買い圧力警戒",
-        "金価格=4422.7 急騰・有事の安全資産需要"
+        "金価格=4415.6 急騰・有事の安全資産需要"
       ],
       "geopolitical_risk": {
         "risk_level": "medium",
@@ -1527,22 +471,22 @@
           ],
           "reason": "検知キーワード: yen intervention",
           "headlines": [
-            "Yen Intervention Wears Off, Oil Jumps and Intel Rakes in More | Markets P.M. for Aug. 11 - wsj.com",
+            "Japan’s Yen Intervention Bought Time. Not a Fix - finance.yahoo.com",
+            "Yen Intervention Wears Off, Oil Jumps and Intel Rakes in More | Markets P.M. for Aug. 11 - WSJ",
             "Goldman says Japan's $1 trillion of reserves leaves 'plenty of capacity' for further yen interventions - CNBC",
             "Yen Intervention Buys Time, But The BOJ Holds The Key - Seeking Alpha",
-            "US-Japan Yen Intervention Reveals a Trillion-Dollar Dilemma - themedialine.org",
-            "Why Japan Is Struggling to Prop Up the Yen, Even With US Help - Bloomberg"
+            "US-Japan Yen Intervention Reveals a Trillion-Dollar Dilemma - The Media Line"
           ],
           "cached": true,
-          "timestamp": "2026-08-13T16:05:41.135550+00:00"
+          "timestamp": "2026-08-13T18:03:00.877955+00:00"
         }
       },
       "upcoming_events": [],
       "volatility_regime": {
         "regime": "normal",
         "regime_label": "通常ボラ相場",
-        "atr_ratio": 1.33,
-        "atr_90d": 0.05576,
+        "atr_ratio": 1.31,
+        "atr_90d": 0.05556,
         "sl_multiplier": 3.0,
         "tp1_multiplier": 1.5,
         "tp2_multiplier": 4.5,
@@ -1550,46 +494,46 @@
         "note": "ATR比率1.3 → TP=1.5×ATR（Phase1出口改善・到達率向上）"
       },
       "staged_tp": {
-        "sl": 23.376,
-        "tp": 23.709,
+        "sl": 23.397,
+        "tp": 23.726,
         "trail_atr_mult": 2.0,
-        "trail_distance": 0.148,
-        "be_plus_offset": 0.111,
-        "be_target_after_tp": 23.709,
-        "max_target": 24.042,
+        "trail_distance": 0.146,
+        "be_plus_offset": 0.109,
+        "be_target_after_tp": 23.726,
+        "max_target": 24.054,
         "rr_tp": 0.5,
         "tp_mode": "single_with_trail",
-        "tp1": 23.709,
-        "tp2": 23.931,
-        "tp3": 24.042,
-        "sl_width": 0.222,
-        "tp1_width": 0.111,
+        "tp1": 23.726,
+        "tp2": 23.944,
+        "tp3": 24.054,
+        "sl_width": 0.219,
+        "tp1_width": 0.109,
         "rr_tp1": 0.5,
         "rr_tp2": 1.5,
         "rr_tp3": 2.0,
-        "spread_price": 0.036,
-        "spread_pips": 3.6,
-        "spread_atr_ratio": 0.486,
-        "sl_dist_effective": 0.24,
-        "tp_dist_effective": 0.093,
-        "rr_effective": 0.39,
+        "spread_price": 0.045,
+        "spread_pips": 4.5,
+        "spread_atr_ratio": 0.616,
+        "sl_dist_effective": 0.241,
+        "tp_dist_effective": 0.087,
+        "rr_effective": 0.36,
         "spread_is_dynamic": true,
-        "spread_pips_dynamic": 3.6,
+        "spread_pips_dynamic": 4.5,
         "regime_label": "通常ボラ相場",
-        "strategy": "TP(23.709)到達 → SLを BE+0.5R(23.709) へ移動 → トレーリング(2.0×ATR=0.148)発動 → 利を伸ばす（理論最大: 24.042）",
+        "strategy": "TP(23.726)到達 → SLを BE+0.5R(23.726) へ移動 → トレーリング(2.0×ATR=0.146)発動 → 利を伸ばす（理論最大: 24.054）",
         "chandelier_sl_active": false,
         "chandelier_note": "",
-        "spread_session": "London/NY overlap",
-        "spread_session_mult": 0.8,
+        "spread_session": "NY afternoon",
+        "spread_session_mult": 1.0,
         "spread_vix_mult": 0.9
       },
       "carry_score": {
-        "carry_score": 6.38,
+        "carry_score": 6.47,
         "label": "非常に優れたキャリー",
         "annual_swap_pct": 2.0,
         "daily_volatility_pct": 0.31,
-        "breakeven_days": 143,
-        "note": "SL幅をスワップで回収: 約143日"
+        "breakeven_days": 141,
+        "note": "SL幅をスワップで回収: 約141日"
       },
       "support_resistance": {
         "resistance": [
@@ -1597,19 +541,19 @@
             "price": 23.879,
             "strength": 1,
             "label": "弱いレジスタンス",
-            "distance_pct": 1.19
+            "distance_pct": 1.11
           },
           {
             "price": 23.947,
             "strength": 1,
             "label": "弱いレジスタンス",
-            "distance_pct": 1.48
+            "distance_pct": 1.4
           },
           {
             "price": 24.207,
             "strength": 1,
             "label": "弱いレジスタンス",
-            "distance_pct": 2.58
+            "distance_pct": 2.5
           }
         ],
         "support": [
@@ -1617,45 +561,45 @@
             "price": 21.964,
             "strength": 2,
             "label": "サポート",
-            "distance_pct": 6.92
+            "distance_pct": 7.0
           },
           {
             "price": 23.02,
             "strength": 2,
             "label": "サポート",
-            "distance_pct": 2.45
+            "distance_pct": 2.52
           },
           {
             "price": 21.885,
             "strength": 1,
             "label": "弱いサポート",
-            "distance_pct": 7.26
+            "distance_pct": 7.33
           },
           {
             "price": 22.161,
             "strength": 1,
             "label": "弱いサポート",
-            "distance_pct": 6.09
+            "distance_pct": 6.16
           }
         ],
         "nearest_resistance": {
           "price": 23.879,
           "strength": 1,
           "label": "弱いレジスタンス",
-          "distance_pct": 1.19
+          "distance_pct": 1.11
         },
         "nearest_support": {
           "price": 23.02,
           "strength": 2,
           "label": "サポート",
-          "distance_pct": 2.45
+          "distance_pct": 2.52
         },
-        "context": "レジスタンス(23.879)まで1.19% / サポート(23.02)まで2.45%"
+        "context": "レジスタンス(23.879)まで1.11% / サポート(23.02)まで2.52%"
       },
       "market_regime": {
-        "adx": 39.1,
-        "plus_di": 30.4,
-        "minus_di": 69.6,
+        "adx": 38.4,
+        "plus_di": 30.8,
+        "minus_di": 69.2,
         "regime": "trending",
         "regime_label": "トレンド相場",
         "trend_direction": "down",
@@ -1668,26 +612,8 @@
         "note": "サンプル不足(1件)"
       },
       "ambush": {
-        "has_alert": true,
-        "nearest": {
-          "type": "ピボットPP",
-          "price": 23.564,
-          "role": "ピボットPP",
-          "kind": "support",
-          "distance": 0.034,
-          "distance_pct": 0.144
-        },
-        "approaching": [
-          {
-            "type": "ピボットPP",
-            "price": 23.564,
-            "role": "ピボットPP",
-            "kind": "support",
-            "distance": 0.034,
-            "distance_pct": 0.144
-          }
-        ],
-        "message": "ピボットPP（23.564）に接近 あと0.14% → 反発でのロング候補"
+        "has_alert": false,
+        "approaching": []
       },
       "regime_filter_applied": true,
       "regime_filter_reason": "⚠️ BOJサイクルフィルタ: CNY(PBOC ease/stable) + JPY(日銀 pause) = LONGはダブル逆風",
@@ -1699,394 +625,213 @@
       "strength_context": {
         "base_currency": "CNY",
         "quote_currency": "JPY",
-        "base_score": -5.7,
+        "base_score": -1.8,
         "base_label": "中立",
-        "base_rank": 5,
-        "quote_score": 39.3,
-        "quote_label": "やや強い",
-        "quote_rank": 3,
-        "spread": -45.0,
-        "context": "弱い通貨 vs 強い通貨（ショート有利）",
-        "bias": "short"
+        "base_rank": 8,
+        "quote_score": 0.6,
+        "quote_label": "中立",
+        "quote_rank": 7,
+        "spread": -2.4,
+        "context": "通貨強弱が拮抗（中立）",
+        "bias": "neutral"
       }
     },
     {
-      "pair": "NZDUSD",
-      "label": "NZD/USD",
-      "price": 0.5849,
-      "ta_score": 58.7,
-      "dma_score": 55,
-      "macd_score": 35,
-      "rsi_score": 50,
-      "trend_strength": 0,
+      "pair": "MXNJPY",
+      "label": "MXN/JPY",
+      "price": 9.332,
+      "ta_score": 98,
+      "dma_score": 85,
+      "macd_score": 85,
+      "rsi_score": 65,
+      "trend_strength": 18,
       "atr_quality": 0,
       "breakout_bonus": 0,
       "divergence_adj": 0,
       "ema_short_bonus": 12,
-      "dma200": 0.58316,
-      "dma50": 0.57858,
-      "rsi": 53.73,
-      "macd": 0.00222,
-      "macd_signal": 0.00241,
-      "atr": 0.00173,
-      "rsi_reversal_confirmed": false,
-      "ta_score_overheated": false,
-      "fa_score": 58.6,
-      "fa_direction": "neutral",
-      "fa_rate_diff": -1.25,
-      "fa_detail": "RBNZ(2.50% tighten/accelerating) vs FRB(3.75% neutral/stable) 差-1.25% / NZDサイクル強化(accelerating)",
-      "stars": 2,
-      "verdict": "△ 弱シグナル",
-      "direction": "LIGHT_LONG",
-      "pair_type": "dollar",
+      "dma200": 8.993,
+      "dma50": 9.27,
+      "rsi": 56.36,
+      "macd": 0.006,
+      "macd_signal": -0.005,
+      "atr": 0.037,
+      "rsi_reversal_confirmed": true,
+      "ta_score_overheated": true,
+      "fa_score": 80.0,
+      "fa_direction": "buy",
+      "fa_rate_diff": 8.0,
+      "fa_detail": "Banxico(9.00% ease/decelerating) vs 日銀(1.00% pause/peak) 差+8.00% / MXNサイクル強化(decelerating)",
+      "stars": 1,
+      "verdict": "⚠ 地政学リスク(medium)考慮 ◎ 高信頼ロング（過熱スコア降格: ta_score逆U字の実績データに基づく） ⚠介入観測報道HIGH(55)",
+      "direction": "LONG",
+      "pair_type": "emerging_market",
+      "original_stars": 2,
+      "sentiment_warning": "リスクオフ・円買い圧力警戒",
       "sentiment_notes": [
-        "金価格=4422.7 急騰・有事の安全資産需要"
+        "VIX=14.7 リスクオフ・新興国ロング抑制",
+        "リスクオフ・円買い圧力警戒",
+        "金価格=4415.6 急騰・有事の安全資産需要"
       ],
+      "geopolitical_risk": {
+        "risk_level": "medium",
+        "risk_score": 42,
+        "reason": "political_instability: protest / geopolitical: sanction",
+        "recent_news": [
+          "\"Mexico (election OR protest OR crisis OR sanction OR \"central bank\" OR geopolitics)\" - Google News",
+          "Google News",
+          "Student filmmakers document Mexico City water crisis - Clark University",
+          "New Mexicans protest outside BLM office over proposal to undo Chaco Canyon mining protections - Source New Mexico"
+        ],
+        "categories": {
+          "political_instability": {
+            "score": 15,
+            "hits": [
+              "protest"
+            ]
+          },
+          "geopolitical": {
+            "score": 12,
+            "hits": [
+              "sanction"
+            ]
+          }
+        },
+        "country": "Mexico",
+        "news_volume": 8
+      },
+      "risk_adjustment": -42,
       "intervention_news": {
-        "USD": {
-          "score": 0,
-          "level": "none",
-          "hits": [],
-          "reason": "キーワード該当なし",
+        "JPY": {
+          "score": 55,
+          "level": "HIGH",
+          "hits": [
+            "yen intervention"
+          ],
+          "reason": "検知キーワード: yen intervention",
           "headlines": [
-            "US Treasury faces limits on currency intervention capacity, JPMorgan warns - Crypto Briefing"
+            "Japan’s Yen Intervention Bought Time. Not a Fix - finance.yahoo.com",
+            "Yen Intervention Wears Off, Oil Jumps and Intel Rakes in More | Markets P.M. for Aug. 11 - WSJ",
+            "Goldman says Japan's $1 trillion of reserves leaves 'plenty of capacity' for further yen interventions - CNBC",
+            "Yen Intervention Buys Time, But The BOJ Holds The Key - Seeking Alpha",
+            "US-Japan Yen Intervention Reveals a Trillion-Dollar Dilemma - The Media Line"
           ],
           "cached": true,
-          "timestamp": "2026-08-13T16:05:40.685040+00:00"
+          "timestamp": "2026-08-13T18:03:00.877955+00:00"
         }
       },
       "upcoming_events": [],
       "volatility_regime": {
         "regime": "normal",
         "regime_label": "通常ボラ相場",
-        "atr_ratio": 0.81,
-        "atr_90d": 0.00214,
+        "atr_ratio": 1.1,
+        "atr_90d": 0.03353,
         "sl_multiplier": 3.0,
         "tp1_multiplier": 1.5,
         "tp2_multiplier": 4.5,
         "tp3_multiplier": 6.0,
-        "note": "ATR比率0.8 → TP=1.5×ATR（Phase1出口改善・到達率向上）"
+        "note": "ATR比率1.1 → TP=1.5×ATR（Phase1出口改善・到達率向上）"
       },
       "staged_tp": {
-        "sl": 0.58396,
-        "tp": 0.587495,
+        "sl": 9.269,
+        "tp": 9.388,
         "trail_atr_mult": 2.0,
-        "trail_distance": 0.00346,
-        "be_plus_offset": 0.002595,
-        "be_target_after_tp": 0.587495,
-        "max_target": 0.59528,
+        "trail_distance": 0.074,
+        "be_plus_offset": 0.055,
+        "be_target_after_tp": 9.388,
+        "max_target": 9.554,
         "rr_tp": 0.5,
         "tp_mode": "single_with_trail",
-        "tp1": 0.587495,
-        "tp2": 0.592685,
-        "tp3": 0.59528,
-        "sl_width": 0.00519,
-        "tp1_width": 0.002595,
+        "tp1": 9.388,
+        "tp2": 9.498,
+        "tp3": 9.554,
+        "sl_width": 0.111,
+        "tp1_width": 0.055,
         "rr_tp1": 0.5,
         "rr_tp2": 1.5,
         "rr_tp3": 2.0,
-        "spread_price": 0.000144,
-        "spread_pips": 1.4,
-        "spread_atr_ratio": 0.083,
-        "sl_dist_effective": 0.005262,
-        "tp_dist_effective": 0.002523,
-        "rr_effective": 0.48,
+        "spread_price": 0.045,
+        "spread_pips": 4.5,
+        "spread_atr_ratio": 1.216,
+        "sl_dist_effective": 0.133,
+        "tp_dist_effective": 0.033,
+        "rr_effective": 0.25,
         "spread_is_dynamic": true,
-        "spread_pips_dynamic": 1.44,
+        "spread_pips_dynamic": 4.5,
         "regime_label": "通常ボラ相場",
-        "strategy": "TP(0.587495)到達 → SLを BE+0.5R(0.587495) へ移動 → トレーリング(2.0×ATR=0.00346)発動 → 利を伸ばす（理論最大: 0.59528）",
+        "strategy": "TP(9.388)到達 → SLを BE+0.5R(9.388) へ移動 → トレーリング(2.0×ATR=0.074)発動 → 利を伸ばす（理論最大: 9.554）",
         "chandelier_sl_active": true,
-        "chandelier_note": "Chandelier Exit: 過去22日高値(0.58915)-3.0xATR",
-        "spread_session": "London/NY overlap",
-        "spread_session_mult": 0.8,
+        "chandelier_note": "Chandelier Exit: 過去22日高値(9.38)-3.0xATR",
+        "spread_session": "NY afternoon",
+        "spread_session_mult": 1.0,
         "spread_vix_mult": 0.9
       },
       "carry_score": {
-        "carry_score": 4.23,
+        "carry_score": 20.18,
         "label": "非常に優れたキャリー",
-        "annual_swap_pct": 1.25,
-        "daily_volatility_pct": 0.3,
-        "breakeven_days": 215,
-        "note": "SL幅をスワップで回収: 約215日"
+        "annual_swap_pct": 8.0,
+        "daily_volatility_pct": 0.4,
+        "breakeven_days": 45,
+        "note": "SL幅をスワップで回収: 約45日"
       },
       "support_resistance": {
         "resistance": [
           {
-            "price": 0.58571,
-            "strength": 2,
-            "label": "レジスタンス",
-            "distance_pct": 0.14
-          },
-          {
-            "price": 0.597645,
-            "strength": 2,
-            "label": "レジスタンス",
-            "distance_pct": 2.18
-          },
-          {
-            "price": 0.59186,
+            "price": 9.334,
             "strength": 1,
             "label": "弱いレジスタンス",
-            "distance_pct": 1.19
+            "distance_pct": 0.02
           },
           {
-            "price": 0.59405,
+            "price": 9.38,
             "strength": 1,
             "label": "弱いレジスタンス",
-            "distance_pct": 1.56
+            "distance_pct": 0.51
           }
         ],
         "support": [
           {
-            "price": 0.584,
-            "strength": 2,
-            "label": "サポート",
-            "distance_pct": 0.15
+            "price": 8.875,
+            "strength": 4,
+            "label": "強いサポート",
+            "distance_pct": 4.9
           },
           {
-            "price": 0.56031,
-            "strength": 1,
-            "label": "弱いサポート",
-            "distance_pct": 4.2
+            "price": 9.172,
+            "strength": 4,
+            "label": "強いサポート",
+            "distance_pct": 1.71
           },
           {
-            "price": 0.56386,
+            "price": 8.687,
             "strength": 1,
             "label": "弱いサポート",
-            "distance_pct": 3.6
+            "distance_pct": 6.91
           },
           {
-            "price": 0.57024,
+            "price": 8.813,
             "strength": 1,
             "label": "弱いサポート",
-            "distance_pct": 2.51
+            "distance_pct": 5.56
           }
         ],
         "nearest_resistance": {
-          "price": 0.58571,
-          "strength": 2,
-          "label": "レジスタンス",
-          "distance_pct": 0.14
-        },
-        "nearest_support": {
-          "price": 0.584,
-          "strength": 2,
-          "label": "サポート",
-          "distance_pct": 0.15
-        },
-        "context": "レジスタンス(0.58571)まで0.14%（非常に近い・注意） / サポート(0.584)まで0.15%（非常に近い・注意）"
-      },
-      "market_regime": {
-        "adx": 23.5,
-        "plus_di": 61.8,
-        "minus_di": 38.2,
-        "regime": "weak_trend",
-        "regime_label": "弱トレンド相場",
-        "trend_direction": "up",
-        "note": "順張りやや有効"
-      },
-      "ambush": {
-        "has_alert": true,
-        "nearest": {
-          "type": "レジスタンス",
-          "price": 0.58571,
-          "role": "レジスタンス",
-          "kind": "resistance",
-          "distance": 0.00081,
-          "distance_pct": 0.138
-        },
-        "approaching": [
-          {
-            "type": "レジスタンス",
-            "price": 0.58571,
-            "role": "レジスタンス",
-            "kind": "resistance",
-            "distance": 0.00081,
-            "distance_pct": 0.138
-          }
-        ],
-        "message": "レジスタンス（0.58571）に接近 あと0.14% → 反落でのショート候補"
-      },
-      "cb_meeting_blackout": {
-        "active": false,
-        "severity": "none",
-        "reason": ""
-      },
-      "strength_context": {
-        "base_currency": "NZD",
-        "quote_currency": "USD",
-        "base_score": 79.1,
-        "base_label": "強い",
-        "base_rank": 1,
-        "quote_score": -78.1,
-        "quote_label": "弱い",
-        "quote_rank": 9,
-        "spread": 157.2,
-        "context": "強い通貨 vs 弱い通貨（ロング有利）",
-        "bias": "long"
-      }
-    },
-    {
-      "pair": "EURGBP",
-      "label": "EUR/GBP",
-      "price": 0.8545,
-      "ta_score": 31.3,
-      "dma_score": 15,
-      "macd_score": 65,
-      "rsi_score": 50,
-      "trend_strength": 0,
-      "atr_quality": 0,
-      "breakout_bonus": 0,
-      "divergence_adj": 0,
-      "ema_short_bonus": -12,
-      "dma200": 0.86702,
-      "dma50": 0.85755,
-      "rsi": 45.48,
-      "macd": -0.00041,
-      "macd_signal": -0.00049,
-      "atr": 0.00103,
-      "rsi_reversal_confirmed": false,
-      "ta_score_overheated": false,
-      "fa_score": 45.9,
-      "fa_direction": "neutral",
-      "fa_rate_diff": -1.35,
-      "fa_detail": "ECB(2.40% neutral/trough) vs BOE(3.75% neutral/stable) 差-1.35% / EURサイクル強化(trough)",
-      "stars": 2,
-      "verdict": "△ 弱シグナル",
-      "direction": "LIGHT_SHORT",
-      "pair_type": "major",
-      "sentiment_notes": [
-        "金価格=4422.7 急騰・有事の安全資産需要"
-      ],
-      "intervention_news": {
-        "EUR": {
-          "score": 0,
-          "level": "none",
-          "hits": [],
-          "reason": "関連報道なし",
-          "headlines": [],
-          "cached": true,
-          "timestamp": "2026-08-13T16:05:44.806151+00:00"
-        },
-        "GBP": {
-          "score": 0,
-          "level": "none",
-          "hits": [],
-          "reason": "キーワード該当なし",
-          "headlines": [
-            "Sterling provides innovative solution to increase healthcare access, says Ighodalo - The Guardian Nigeria News"
-          ],
-          "cached": true,
-          "timestamp": "2026-08-13T16:05:48.042468+00:00"
-        }
-      },
-      "upcoming_events": [],
-      "volatility_regime": {
-        "regime": "normal",
-        "regime_label": "通常ボラ相場",
-        "atr_ratio": 0.9,
-        "atr_90d": 0.00115,
-        "sl_multiplier": 3.0,
-        "tp1_multiplier": 1.5,
-        "tp2_multiplier": 4.5,
-        "tp3_multiplier": 6.0,
-        "note": "ATR比率0.9 → TP=1.5×ATR（Phase1出口改善・到達率向上）"
-      },
-      "staged_tp": {
-        "sl": 0.85759,
-        "tp": 0.852955,
-        "trail_atr_mult": 2.0,
-        "trail_distance": 0.00206,
-        "be_plus_offset": 0.001545,
-        "be_target_after_tp": 0.852955,
-        "max_target": 0.84832,
-        "rr_tp": 0.5,
-        "tp_mode": "single_with_trail",
-        "tp1": 0.852955,
-        "tp2": 0.849865,
-        "tp3": 0.84832,
-        "sl_width": 0.00309,
-        "tp1_width": 0.001545,
-        "rr_tp1": 0.5,
-        "rr_tp2": 1.5,
-        "rr_tp3": 2.0,
-        "spread_price": 0.000108,
-        "spread_pips": 1.1,
-        "spread_atr_ratio": 0.105,
-        "sl_dist_effective": 0.003144,
-        "tp_dist_effective": 0.001491,
-        "rr_effective": 0.47,
-        "spread_is_dynamic": true,
-        "spread_pips_dynamic": 1.08,
-        "regime_label": "通常ボラ相場",
-        "strategy": "TP(0.852955)到達 → SLを BE+0.5R(0.852955) へ移動 → トレーリング(2.0×ATR=0.00206)発動 → 利を伸ばす（理論最大: 0.84832）",
-        "chandelier_sl_active": false,
-        "chandelier_note": "",
-        "spread_session": "London/NY overlap",
-        "spread_session_mult": 0.8,
-        "spread_vix_mult": 0.9
-      },
-      "carry_score": {
-        "carry_score": 11.2,
-        "label": "非常に優れたキャリー",
-        "annual_swap_pct": 1.35,
-        "daily_volatility_pct": 0.12,
-        "breakeven_days": 81,
-        "note": "SL幅をスワップで回収: 約81日"
-      },
-      "support_resistance": {
-        "resistance": [
-          {
-            "price": 0.85765,
-            "strength": 1,
-            "label": "弱いレジスタンス",
-            "distance_pct": 0.37
-          },
-          {
-            "price": 0.86653,
-            "strength": 1,
-            "label": "弱いレジスタンス",
-            "distance_pct": 1.41
-          },
-          {
-            "price": 0.86723,
-            "strength": 1,
-            "label": "弱いレジスタンス",
-            "distance_pct": 1.49
-          },
-          {
-            "price": 0.8705,
-            "strength": 1,
-            "label": "弱いレジスタンス",
-            "distance_pct": 1.87
-          }
-        ],
-        "support": [
-          {
-            "price": 0.849,
-            "strength": 1,
-            "label": "弱いサポート",
-            "distance_pct": 0.64
-          }
-        ],
-        "nearest_resistance": {
-          "price": 0.85765,
+          "price": 9.334,
           "strength": 1,
           "label": "弱いレジスタンス",
-          "distance_pct": 0.37
+          "distance_pct": 0.02
         },
         "nearest_support": {
-          "price": 0.849,
-          "strength": 1,
-          "label": "弱いサポート",
-          "distance_pct": 0.64
+          "price": 9.172,
+          "strength": 4,
+          "label": "強いサポート",
+          "distance_pct": 1.71
         },
-        "context": "レジスタンス(0.85765)まで0.37%（非常に近い・注意） / サポート(0.849)まで0.64%"
+        "context": "レジスタンス(9.334)まで0.02%（非常に近い・注意） / サポート(9.172)まで1.71%"
       },
       "market_regime": {
-        "adx": 6.5,
-        "plus_di": 46.7,
-        "minus_di": 53.3,
+        "adx": 6.3,
+        "plus_di": 46.8,
+        "minus_di": 53.2,
         "regime": "ranging",
         "regime_label": "レンジ相場",
         "trend_direction": "down",
@@ -2099,11 +844,737 @@
         "note": "サンプル不足(3件)"
       },
       "ambush": {
-        "has_alert": false,
-        "approaching": []
+        "has_alert": true,
+        "nearest": {
+          "type": "レジスタンス",
+          "price": 9.334,
+          "role": "弱いレジスタンス",
+          "kind": "resistance",
+          "distance": 0.002,
+          "distance_pct": 0.021
+        },
+        "approaching": [
+          {
+            "type": "レジスタンス",
+            "price": 9.334,
+            "role": "弱いレジスタンス",
+            "kind": "resistance",
+            "distance": 0.002,
+            "distance_pct": 0.021
+          }
+        ],
+        "message": "弱いレジスタンス（9.334）に接近 あと0.02% → 反落でのショート候補"
+      },
+      "cb_meeting_blackout": {
+        "active": false,
+        "severity": "none",
+        "reason": ""
+      },
+      "strength_context": {
+        "base_currency": "MXN",
+        "quote_currency": "JPY",
+        "base_score": 8.5,
+        "base_label": "中立",
+        "base_rank": 6,
+        "quote_score": 0.6,
+        "quote_label": "中立",
+        "quote_rank": 7,
+        "spread": 7.9,
+        "context": "通貨強弱が拮抗（中立）",
+        "bias": "neutral"
+      }
+    },
+    {
+      "pair": "ZARJPY",
+      "label": "ZAR/JPY",
+      "price": 9.822,
+      "ta_score": 96.7,
+      "dma_score": 85,
+      "macd_score": 65,
+      "rsi_score": 50,
+      "trend_strength": 18,
+      "atr_quality": 0,
+      "breakout_bonus": 0,
+      "divergence_adj": 0,
+      "ema_short_bonus": 12,
+      "dma200": 9.578,
+      "dma50": 9.821,
+      "rsi": 52.07,
+      "macd": -0.003,
+      "macd_signal": -0.021,
+      "atr": 0.054,
+      "rsi_reversal_confirmed": false,
+      "ta_score_overheated": true,
+      "fa_score": 86.0,
+      "fa_direction": "buy",
+      "fa_rate_diff": 6.25,
+      "fa_detail": "SARB(7.25% neutral/stable) vs 日銀(1.00% pause/peak) 差+6.25% / ZARサイクル強化(stable)",
+      "stars": 1,
+      "verdict": "⚠ 地政学リスク(medium)考慮 ◎ 高信頼ロング（過熱スコア降格: ta_score逆U字の実績データに基づく） ⚠介入観測報道HIGH(55)",
+      "direction": "LONG",
+      "pair_type": "emerging_market",
+      "original_stars": 2,
+      "sentiment_warning": "リスクオフ・円買い圧力警戒",
+      "sentiment_notes": [
+        "VIX=14.7 リスクオフ・新興国ロング抑制",
+        "リスクオフ・円買い圧力警戒",
+        "金価格=4415.6 急騰・有事の安全資産需要"
+      ],
+      "geopolitical_risk": {
+        "risk_level": "medium",
+        "risk_score": 42,
+        "reason": "political_instability: protest / geopolitical: sanction",
+        "recent_news": [
+          "\"South Africa (election OR protest OR crisis OR sanction OR \"central bank\" OR geopolitics)\" - Google News",
+          "Google News",
+          "Johannesburg's water crisis angers voters, drives rich off-grid - Reuters",
+          "Special Report: Election 2026 — The Latest Polling - The Common Sense"
+        ],
+        "categories": {
+          "political_instability": {
+            "score": 15,
+            "hits": [
+              "protest"
+            ]
+          },
+          "geopolitical": {
+            "score": 12,
+            "hits": [
+              "sanction"
+            ]
+          }
+        },
+        "country": "South Africa",
+        "news_volume": 8
+      },
+      "risk_adjustment": -42,
+      "intervention_news": {
+        "JPY": {
+          "score": 55,
+          "level": "HIGH",
+          "hits": [
+            "yen intervention"
+          ],
+          "reason": "検知キーワード: yen intervention",
+          "headlines": [
+            "Japan’s Yen Intervention Bought Time. Not a Fix - finance.yahoo.com",
+            "Yen Intervention Wears Off, Oil Jumps and Intel Rakes in More | Markets P.M. for Aug. 11 - WSJ",
+            "Goldman says Japan's $1 trillion of reserves leaves 'plenty of capacity' for further yen interventions - CNBC",
+            "Yen Intervention Buys Time, But The BOJ Holds The Key - Seeking Alpha",
+            "US-Japan Yen Intervention Reveals a Trillion-Dollar Dilemma - The Media Line"
+          ],
+          "cached": true,
+          "timestamp": "2026-08-13T18:03:00.877955+00:00"
+        }
+      },
+      "upcoming_events": [],
+      "volatility_regime": {
+        "regime": "normal",
+        "regime_label": "通常ボラ相場",
+        "atr_ratio": 1.11,
+        "atr_90d": 0.0486,
+        "sl_multiplier": 3.0,
+        "tp1_multiplier": 1.5,
+        "tp2_multiplier": 4.5,
+        "tp3_multiplier": 6.0,
+        "note": "ATR比率1.1 → TP=1.5×ATR（Phase1出口改善・到達率向上）"
+      },
+      "staged_tp": {
+        "sl": 9.782,
+        "tp": 9.903,
+        "trail_atr_mult": 2.0,
+        "trail_distance": 0.108,
+        "be_plus_offset": 0.081,
+        "be_target_after_tp": 9.903,
+        "max_target": 10.146,
+        "rr_tp": 0.5,
+        "tp_mode": "single_with_trail",
+        "tp1": 9.903,
+        "tp2": 10.065,
+        "tp3": 10.146,
+        "sl_width": 0.162,
+        "tp1_width": 0.081,
+        "rr_tp1": 0.5,
+        "rr_tp2": 1.5,
+        "rr_tp3": 2.0,
+        "spread_price": 0.09,
+        "spread_pips": 9.0,
+        "spread_atr_ratio": 1.667,
+        "sl_dist_effective": 0.207,
+        "tp_dist_effective": 0.036,
+        "rr_effective": 0.17,
+        "spread_is_dynamic": true,
+        "spread_pips_dynamic": 9.0,
+        "regime_label": "通常ボラ相場",
+        "strategy": "TP(9.903)到達 → SLを BE+0.5R(9.903) へ移動 → トレーリング(2.0×ATR=0.108)発動 → 利を伸ばす（理論最大: 10.146）",
+        "chandelier_sl_active": true,
+        "chandelier_note": "Chandelier Exit: 過去22日高値(9.944)-3.0xATR",
+        "spread_session": "NY afternoon",
+        "spread_session_mult": 1.0,
+        "spread_vix_mult": 0.9
+      },
+      "carry_score": {
+        "carry_score": 11.37,
+        "label": "非常に優れたキャリー",
+        "annual_swap_pct": 6.25,
+        "daily_volatility_pct": 0.55,
+        "breakeven_days": 80,
+        "note": "SL幅をスワップで回収: 約80日"
+      },
+      "support_resistance": {
+        "resistance": [
+          {
+            "price": 9.882,
+            "strength": 3,
+            "label": "レジスタンス",
+            "distance_pct": 0.61
+          },
+          {
+            "price": 9.829,
+            "strength": 1,
+            "label": "弱いレジスタンス",
+            "distance_pct": 0.07
+          },
+          {
+            "price": 9.944,
+            "strength": 1,
+            "label": "弱いレジスタンス",
+            "distance_pct": 1.24
+          },
+          {
+            "price": 10.0,
+            "strength": 1,
+            "label": "弱いレジスタンス",
+            "distance_pct": 1.81
+          }
+        ],
+        "support": [
+          {
+            "price": 9.514,
+            "strength": 3,
+            "label": "サポート",
+            "distance_pct": 3.14
+          },
+          {
+            "price": 9.066,
+            "strength": 1,
+            "label": "弱いサポート",
+            "distance_pct": 7.7
+          },
+          {
+            "price": 9.279,
+            "strength": 1,
+            "label": "弱いサポート",
+            "distance_pct": 5.53
+          },
+          {
+            "price": 9.325,
+            "strength": 1,
+            "label": "弱いサポート",
+            "distance_pct": 5.06
+          }
+        ],
+        "nearest_resistance": {
+          "price": 9.829,
+          "strength": 1,
+          "label": "弱いレジスタンス",
+          "distance_pct": 0.07
+        },
+        "nearest_support": {
+          "price": 9.514,
+          "strength": 3,
+          "label": "サポート",
+          "distance_pct": 3.14
+        },
+        "context": "レジスタンス(9.829)まで0.07%（非常に近い・注意） / サポート(9.514)まで3.14%"
+      },
+      "market_regime": {
+        "adx": 5.8,
+        "plus_di": 52.9,
+        "minus_di": 47.1,
+        "regime": "ranging",
+        "regime_label": "レンジ相場",
+        "trend_direction": "up",
+        "note": "順張りは機能しにくい・逆張り向き"
+      },
+      "performance": {
+        "win_rate": 50.0,
+        "total_trades": 2,
+        "adjustment": 0,
+        "note": "サンプル不足(2件)"
+      },
+      "ambush": {
+        "has_alert": true,
+        "nearest": {
+          "type": "ピボットPP",
+          "price": 9.822,
+          "role": "ピボットPP",
+          "kind": "resistance",
+          "distance": 0.0,
+          "distance_pct": 0.0
+        },
+        "approaching": [
+          {
+            "type": "ピボットPP",
+            "price": 9.822,
+            "role": "ピボットPP",
+            "kind": "resistance",
+            "distance": 0.0,
+            "distance_pct": 0.0
+          },
+          {
+            "type": "レジスタンス",
+            "price": 9.829,
+            "role": "弱いレジスタンス",
+            "kind": "resistance",
+            "distance": 0.007,
+            "distance_pct": 0.071
+          }
+        ],
+        "message": "ピボットPP（9.822）に接近 あと0.00% → 反落でのショート候補"
+      },
+      "cb_meeting_blackout": {
+        "active": false,
+        "severity": "none",
+        "reason": ""
+      },
+      "strength_context": {
+        "base_currency": "ZAR",
+        "quote_currency": "JPY",
+        "base_score": -29.6,
+        "base_label": "やや弱い",
+        "base_rank": 13,
+        "quote_score": 0.6,
+        "quote_label": "中立",
+        "quote_rank": 7,
+        "spread": -30.2,
+        "context": "やや弱い通貨 vs 強め（ショート寄り）",
+        "bias": "slight_short"
+      }
+    },
+    {
+      "pair": "GBPUSD",
+      "label": "GBP/USD",
+      "price": 1.3483,
+      "ta_score": 65.3,
+      "dma_score": 70,
+      "macd_score": 85,
+      "rsi_score": 65,
+      "trend_strength": -20,
+      "atr_quality": 0,
+      "breakout_bonus": 0,
+      "divergence_adj": 0,
+      "ema_short_bonus": 12,
+      "dma200": 1.34102,
+      "dma50": 1.33683,
+      "rsi": 57.16,
+      "macd": 0.00364,
+      "macd_signal": 0.00287,
+      "atr": 0.00305,
+      "rsi_reversal_confirmed": false,
+      "ta_score_overheated": false,
+      "fa_score": 50.0,
+      "fa_direction": "neutral",
+      "fa_rate_diff": 0.0,
+      "fa_detail": "BOE(3.75% neutral/stable) vs FRB(3.75% neutral/stable) 差+0.00%",
+      "stars": 2,
+      "verdict": "△ 弱シグナル",
+      "direction": "LIGHT_LONG",
+      "pair_type": "dollar",
+      "sentiment_notes": [
+        "金価格=4415.6 急騰・有事の安全資産需要"
+      ],
+      "intervention_news": {
+        "GBP": {
+          "score": 0,
+          "level": "none",
+          "hits": [],
+          "reason": "キーワード該当なし",
+          "headlines": [
+            "Sterling provides innovative solution to increase healthcare access, says Ighodalo - The Guardian Nigeria News"
+          ],
+          "cached": false,
+          "timestamp": "2026-08-13T18:03:24.656750+00:00"
+        },
+        "USD": {
+          "score": 0,
+          "level": "none",
+          "hits": [],
+          "reason": "キーワード該当なし",
+          "headlines": [
+            "US Treasury faces limits on currency intervention capacity, JPMorgan warns - Crypto Briefing"
+          ],
+          "cached": false,
+          "timestamp": "2026-08-13T18:03:24.890024+00:00"
+        }
+      },
+      "upcoming_events": [],
+      "volatility_regime": {
+        "regime": "normal",
+        "regime_label": "通常ボラ相場",
+        "atr_ratio": 0.9,
+        "atr_90d": 0.00338,
+        "sl_multiplier": 3.0,
+        "tp1_multiplier": 1.5,
+        "tp2_multiplier": 4.5,
+        "tp3_multiplier": 6.0,
+        "note": "ATR比率0.9 → TP=1.5×ATR（Phase1出口改善・到達率向上）"
+      },
+      "staged_tp": {
+        "sl": 1.34335,
+        "tp": 1.352875,
+        "trail_atr_mult": 2.0,
+        "trail_distance": 0.0061,
+        "be_plus_offset": 0.004575,
+        "be_target_after_tp": 1.352875,
+        "max_target": 1.3666,
+        "rr_tp": 0.5,
+        "tp_mode": "single_with_trail",
+        "tp1": 1.352875,
+        "tp2": 1.362025,
+        "tp3": 1.3666,
+        "sl_width": 0.00915,
+        "tp1_width": 0.004575,
+        "rr_tp1": 0.5,
+        "rr_tp2": 1.5,
+        "rr_tp3": 2.0,
+        "spread_price": 0.000135,
+        "spread_pips": 1.4,
+        "spread_atr_ratio": 0.044,
+        "sl_dist_effective": 0.009217,
+        "tp_dist_effective": 0.004508,
+        "rr_effective": 0.49,
+        "spread_is_dynamic": true,
+        "spread_pips_dynamic": 1.35,
+        "regime_label": "通常ボラ相場",
+        "strategy": "TP(1.352875)到達 → SLを BE+0.5R(1.352875) へ移動 → トレーリング(2.0×ATR=0.0061)発動 → 利を伸ばす（理論最大: 1.3666）",
+        "chandelier_sl_active": true,
+        "chandelier_note": "Chandelier Exit: 過去22日高値(1.3525)-3.0xATR",
+        "spread_session": "NY afternoon",
+        "spread_session_mult": 1.0,
+        "spread_vix_mult": 0.9
+      },
+      "carry_score": {
+        "carry_score": 0.0,
+        "label": "キャリー不向き",
+        "annual_swap_pct": 0.0,
+        "daily_volatility_pct": 0.23,
+        "breakeven_days": 9999,
+        "note": "SL幅をスワップで回収: 約9999日"
+      },
+      "support_resistance": {
+        "resistance": [
+          {
+            "price": 1.35065,
+            "strength": 4,
+            "label": "強いレジスタンス",
+            "distance_pct": 0.17
+          },
+          {
+            "price": 1.35695,
+            "strength": 2,
+            "label": "レジスタンス",
+            "distance_pct": 0.64
+          },
+          {
+            "price": 1.355,
+            "strength": 1,
+            "label": "弱いレジスタンス",
+            "distance_pct": 0.5
+          },
+          {
+            "price": 1.3621,
+            "strength": 1,
+            "label": "弱いレジスタンス",
+            "distance_pct": 1.02
+          }
+        ],
+        "support": [
+          {
+            "price": 1.3312,
+            "strength": 2,
+            "label": "サポート",
+            "distance_pct": 1.27
+          },
+          {
+            "price": 1.33605,
+            "strength": 2,
+            "label": "サポート",
+            "distance_pct": 0.91
+          },
+          {
+            "price": 1.34015,
+            "strength": 2,
+            "label": "サポート",
+            "distance_pct": 0.6
+          },
+          {
+            "price": 1.3062,
+            "strength": 1,
+            "label": "弱いサポート",
+            "distance_pct": 3.12
+          }
+        ],
+        "nearest_resistance": {
+          "price": 1.35065,
+          "strength": 4,
+          "label": "強いレジスタンス",
+          "distance_pct": 0.17
+        },
+        "nearest_support": {
+          "price": 1.34015,
+          "strength": 2,
+          "label": "サポート",
+          "distance_pct": 0.6
+        },
+        "context": "レジスタンス(1.35065)まで0.17%（非常に近い・注意） / サポート(1.34015)まで0.60%"
+      },
+      "market_regime": {
+        "adx": 39.2,
+        "plus_di": 69.6,
+        "minus_di": 30.4,
+        "regime": "trending",
+        "regime_label": "トレンド相場",
+        "trend_direction": "up",
+        "note": "順張りシグナル有効"
+      },
+      "ambush": {
+        "has_alert": true,
+        "nearest": {
+          "type": "ピボットPP",
+          "price": 1.3486,
+          "role": "ピボットPP",
+          "kind": "resistance",
+          "distance": 0.0003,
+          "distance_pct": 0.022
+        },
+        "approaching": [
+          {
+            "type": "ピボットPP",
+            "price": 1.3486,
+            "role": "ピボットPP",
+            "kind": "resistance",
+            "distance": 0.0003,
+            "distance_pct": 0.022
+          }
+        ],
+        "message": "ピボットPP（1.3486）に接近 あと0.02% → 反落でのショート候補"
+      },
+      "cb_meeting_blackout": {
+        "active": false,
+        "severity": "none",
+        "reason": ""
+      },
+      "strength_context": {
+        "base_currency": "GBP",
+        "quote_currency": "USD",
+        "base_score": 9.6,
+        "base_label": "中立",
+        "base_rank": 5,
+        "quote_score": -16.3,
+        "quote_label": "中立",
+        "quote_rank": 12,
+        "spread": 25.9,
+        "context": "やや強い通貨 vs 弱め（ロング寄り）",
+        "bias": "slight_long"
+      }
+    },
+    {
+      "pair": "EURGBP",
+      "label": "EUR/GBP",
+      "price": 0.855,
+      "ta_score": 31.3,
+      "dma_score": 15,
+      "macd_score": 65,
+      "rsi_score": 50,
+      "trend_strength": 0,
+      "atr_quality": 0,
+      "breakout_bonus": 0,
+      "divergence_adj": 0,
+      "ema_short_bonus": -12,
+      "dma200": 0.86702,
+      "dma50": 0.85756,
+      "rsi": 47.16,
+      "macd": -0.00037,
+      "macd_signal": -0.00049,
+      "atr": 0.00101,
+      "rsi_reversal_confirmed": false,
+      "ta_score_overheated": false,
+      "fa_score": 45.9,
+      "fa_direction": "neutral",
+      "fa_rate_diff": -1.35,
+      "fa_detail": "ECB(2.40% neutral/trough) vs BOE(3.75% neutral/stable) 差-1.35% / EURサイクル強化(trough)",
+      "stars": 2,
+      "verdict": "△ 弱シグナル",
+      "direction": "LIGHT_SHORT",
+      "pair_type": "major",
+      "sentiment_notes": [
+        "金価格=4415.6 急騰・有事の安全資産需要"
+      ],
+      "intervention_news": {
+        "EUR": {
+          "score": 0,
+          "level": "none",
+          "hits": [],
+          "reason": "関連報道なし",
+          "headlines": [],
+          "cached": false,
+          "timestamp": "2026-08-13T18:04:57.244182+00:00"
+        },
+        "GBP": {
+          "score": 0,
+          "level": "none",
+          "hits": [],
+          "reason": "キーワード該当なし",
+          "headlines": [
+            "Sterling provides innovative solution to increase healthcare access, says Ighodalo - The Guardian Nigeria News"
+          ],
+          "cached": true,
+          "timestamp": "2026-08-13T18:03:24.656750+00:00"
+        }
+      },
+      "upcoming_events": [],
+      "volatility_regime": {
+        "regime": "normal",
+        "regime_label": "通常ボラ相場",
+        "atr_ratio": 0.88,
+        "atr_90d": 0.00115,
+        "sl_multiplier": 3.0,
+        "tp1_multiplier": 1.5,
+        "tp2_multiplier": 4.5,
+        "tp3_multiplier": 6.0,
+        "note": "ATR比率0.9 → TP=1.5×ATR（Phase1出口改善・到達率向上）"
+      },
+      "staged_tp": {
+        "sl": 0.85803,
+        "tp": 0.853485,
+        "trail_atr_mult": 2.0,
+        "trail_distance": 0.00202,
+        "be_plus_offset": 0.001515,
+        "be_target_after_tp": 0.853485,
+        "max_target": 0.84894,
+        "rr_tp": 0.5,
+        "tp_mode": "single_with_trail",
+        "tp1": 0.853485,
+        "tp2": 0.850455,
+        "tp3": 0.84894,
+        "sl_width": 0.00303,
+        "tp1_width": 0.001515,
+        "rr_tp1": 0.5,
+        "rr_tp2": 1.5,
+        "rr_tp3": 2.0,
+        "spread_price": 0.000135,
+        "spread_pips": 1.4,
+        "spread_atr_ratio": 0.134,
+        "sl_dist_effective": 0.003097,
+        "tp_dist_effective": 0.001448,
+        "rr_effective": 0.47,
+        "spread_is_dynamic": true,
+        "spread_pips_dynamic": 1.35,
+        "regime_label": "通常ボラ相場",
+        "strategy": "TP(0.853485)到達 → SLを BE+0.5R(0.853485) へ移動 → トレーリング(2.0×ATR=0.00202)発動 → 利を伸ばす（理論最大: 0.84894）",
+        "chandelier_sl_active": false,
+        "chandelier_note": "",
+        "spread_session": "NY afternoon",
+        "spread_session_mult": 1.0,
+        "spread_vix_mult": 0.9
+      },
+      "carry_score": {
+        "carry_score": 11.43,
+        "label": "非常に優れたキャリー",
+        "annual_swap_pct": 1.35,
+        "daily_volatility_pct": 0.12,
+        "breakeven_days": 79,
+        "note": "SL幅をスワップで回収: 約79日"
+      },
+      "support_resistance": {
+        "resistance": [
+          {
+            "price": 0.85765,
+            "strength": 1,
+            "label": "弱いレジスタンス",
+            "distance_pct": 0.31
+          },
+          {
+            "price": 0.86653,
+            "strength": 1,
+            "label": "弱いレジスタンス",
+            "distance_pct": 1.35
+          },
+          {
+            "price": 0.86723,
+            "strength": 1,
+            "label": "弱いレジスタンス",
+            "distance_pct": 1.43
+          },
+          {
+            "price": 0.8705,
+            "strength": 1,
+            "label": "弱いレジスタンス",
+            "distance_pct": 1.81
+          }
+        ],
+        "support": [
+          {
+            "price": 0.849,
+            "strength": 1,
+            "label": "弱いサポート",
+            "distance_pct": 0.7
+          }
+        ],
+        "nearest_resistance": {
+          "price": 0.85765,
+          "strength": 1,
+          "label": "弱いレジスタンス",
+          "distance_pct": 0.31
+        },
+        "nearest_support": {
+          "price": 0.849,
+          "strength": 1,
+          "label": "弱いサポート",
+          "distance_pct": 0.7
+        },
+        "context": "レジスタンス(0.85765)まで0.31%（非常に近い・注意） / サポート(0.849)まで0.70%"
+      },
+      "market_regime": {
+        "adx": 2.2,
+        "plus_di": 48.9,
+        "minus_di": 51.1,
+        "regime": "ranging",
+        "regime_label": "レンジ相場",
+        "trend_direction": "neutral",
+        "note": "順張りは機能しにくい・逆張り向き"
+      },
+      "performance": {
+        "win_rate": 33.3,
+        "total_trades": 3,
+        "adjustment": 0,
+        "note": "サンプル不足(3件)"
+      },
+      "ambush": {
+        "has_alert": true,
+        "nearest": {
+          "type": "ピボットPP",
+          "price": 0.85541,
+          "role": "ピボットPP",
+          "kind": "resistance",
+          "distance": 0.00041,
+          "distance_pct": 0.048
+        },
+        "approaching": [
+          {
+            "type": "ピボットPP",
+            "price": 0.85541,
+            "role": "ピボットPP",
+            "kind": "resistance",
+            "distance": 0.00041,
+            "distance_pct": 0.048
+          }
+        ],
+        "message": "ピボットPP（0.85541）に接近 あと0.05% → 反落でのショート候補"
       },
       "spread_caution": true,
-      "spread_caution_reason": "💸 スプレッド広め: EURGBP spread=1.1pips (10% of ATR)。実効RR 1:0.47",
+      "spread_caution_reason": "💸 スプレッド広め: EURGBP spread=1.4pips (13% of ATR)。実効RR 1:0.47",
       "cb_meeting_blackout": {
         "active": false,
         "severity": "none",
@@ -2112,21 +1583,435 @@
       "strength_context": {
         "base_currency": "EUR",
         "quote_currency": "GBP",
-        "base_score": -8.8,
+        "base_score": -3.0,
         "base_label": "中立",
-        "base_rank": 6,
-        "quote_score": -17.9,
+        "base_rank": 9,
+        "quote_score": 9.6,
         "quote_label": "中立",
-        "quote_rank": 7,
-        "spread": 9.1,
+        "quote_rank": 5,
+        "spread": -12.6,
         "context": "通貨強弱が拮抗（中立）",
         "bias": "neutral"
       }
     },
     {
+      "pair": "EURAUD",
+      "label": "EUR/AUD",
+      "price": 1.6336,
+      "ta_score": 32.7,
+      "dma_score": 15,
+      "macd_score": 15,
+      "rsi_score": 50,
+      "trend_strength": 18,
+      "atr_quality": 0,
+      "breakout_bonus": 0,
+      "divergence_adj": 0,
+      "ema_short_bonus": -12,
+      "dma200": 1.6786,
+      "dma50": 1.64027,
+      "rsi": 45.97,
+      "macd": -0.00113,
+      "macd_signal": -0.00093,
+      "atr": 0.00327,
+      "rsi_reversal_confirmed": false,
+      "ta_score_overheated": false,
+      "fa_score": 41.4,
+      "fa_direction": "neutral",
+      "fa_rate_diff": -1.95,
+      "fa_detail": "ECB(2.40% neutral/trough) vs RBA(4.35% pause/stable) 差-1.95% / EURサイクル強化(trough)",
+      "stars": 2,
+      "verdict": "△ 弱シグナル",
+      "direction": "LIGHT_SHORT",
+      "pair_type": "major",
+      "sentiment_notes": [
+        "金価格=4415.6 急騰・有事の安全資産需要"
+      ],
+      "intervention_news": {
+        "EUR": {
+          "score": 0,
+          "level": "none",
+          "hits": [],
+          "reason": "関連報道なし",
+          "headlines": [],
+          "cached": true,
+          "timestamp": "2026-08-13T18:04:57.244182+00:00"
+        }
+      },
+      "upcoming_events": [],
+      "volatility_regime": {
+        "regime": "normal",
+        "regime_label": "通常ボラ相場",
+        "atr_ratio": 0.95,
+        "atr_90d": 0.00343,
+        "sl_multiplier": 3.0,
+        "tp1_multiplier": 1.5,
+        "tp2_multiplier": 4.5,
+        "tp3_multiplier": 6.0,
+        "note": "ATR比率1.0 → TP=1.5×ATR（Phase1出口改善・到達率向上）"
+      },
+      "staged_tp": {
+        "sl": 1.63691,
+        "tp": 1.628695,
+        "trail_atr_mult": 2.0,
+        "trail_distance": 0.00654,
+        "be_plus_offset": 0.004905,
+        "be_target_after_tp": 1.628695,
+        "max_target": 1.61398,
+        "rr_tp": 0.5,
+        "tp_mode": "single_with_trail",
+        "tp1": 1.628695,
+        "tp2": 1.618885,
+        "tp3": 1.61398,
+        "sl_width": 0.00981,
+        "tp1_width": 0.004905,
+        "rr_tp1": 0.5,
+        "rr_tp2": 1.5,
+        "rr_tp3": 2.0,
+        "spread_price": 0.00027,
+        "spread_pips": 2.7,
+        "spread_atr_ratio": 0.083,
+        "sl_dist_effective": 0.009945,
+        "tp_dist_effective": 0.00477,
+        "rr_effective": 0.48,
+        "spread_is_dynamic": true,
+        "spread_pips_dynamic": 2.7,
+        "regime_label": "通常ボラ相場",
+        "strategy": "TP(1.628695)到達 → SLを BE+0.5R(1.628695) へ移動 → トレーリング(2.0×ATR=0.00654)発動 → 利を伸ばす（理論最大: 1.61398）",
+        "chandelier_sl_active": true,
+        "chandelier_note": "Chandelier Exit: 過去22日安値(1.6271)+3.0xATR",
+        "spread_session": "NY afternoon",
+        "spread_session_mult": 1.0,
+        "spread_vix_mult": 0.9
+      },
+      "carry_score": {
+        "carry_score": 9.74,
+        "label": "非常に優れたキャリー",
+        "annual_swap_pct": 1.95,
+        "daily_volatility_pct": 0.2,
+        "breakeven_days": 93,
+        "note": "SL幅をスワップで回収: 約93日"
+      },
+      "support_resistance": {
+        "resistance": [
+          {
+            "price": 1.6463,
+            "strength": 1,
+            "label": "弱いレジスタンス",
+            "distance_pct": 0.78
+          },
+          {
+            "price": 1.6487,
+            "strength": 1,
+            "label": "弱いレジスタンス",
+            "distance_pct": 0.92
+          },
+          {
+            "price": 1.6546,
+            "strength": 1,
+            "label": "弱いレジスタンス",
+            "distance_pct": 1.29
+          },
+          {
+            "price": 1.6771,
+            "strength": 1,
+            "label": "弱いレジスタンス",
+            "distance_pct": 2.66
+          }
+        ],
+        "support": [
+          {
+            "price": 1.6158,
+            "strength": 1,
+            "label": "弱いサポート",
+            "distance_pct": 1.09
+          },
+          {
+            "price": 1.619,
+            "strength": 1,
+            "label": "弱いサポート",
+            "distance_pct": 0.89
+          },
+          {
+            "price": 1.6218,
+            "strength": 1,
+            "label": "弱いサポート",
+            "distance_pct": 0.72
+          },
+          {
+            "price": 1.627,
+            "strength": 1,
+            "label": "弱いサポート",
+            "distance_pct": 0.4
+          }
+        ],
+        "nearest_resistance": {
+          "price": 1.6463,
+          "strength": 1,
+          "label": "弱いレジスタンス",
+          "distance_pct": 0.78
+        },
+        "nearest_support": {
+          "price": 1.627,
+          "strength": 1,
+          "label": "弱いサポート",
+          "distance_pct": 0.4
+        },
+        "context": "レジスタンス(1.6463)まで0.78% / サポート(1.627)まで0.40%（非常に近い・注意）"
+      },
+      "market_regime": {
+        "adx": 11.8,
+        "plus_di": 55.9,
+        "minus_di": 44.1,
+        "regime": "ranging",
+        "regime_label": "レンジ相場",
+        "trend_direction": "up",
+        "note": "順張りは機能しにくい・逆張り向き"
+      },
+      "performance": {
+        "win_rate": 50.0,
+        "total_trades": 4,
+        "adjustment": 1,
+        "note": "サンプル不足(4件) / 主力ペア(実証76.9%)"
+      },
+      "ambush": {
+        "has_alert": true,
+        "nearest": {
+          "type": "ピボットPP",
+          "price": 1.6349,
+          "role": "ピボットPP",
+          "kind": "resistance",
+          "distance": 0.0013,
+          "distance_pct": 0.08
+        },
+        "approaching": [
+          {
+            "type": "ピボットPP",
+            "price": 1.6349,
+            "role": "ピボットPP",
+            "kind": "resistance",
+            "distance": 0.0013,
+            "distance_pct": 0.08
+          }
+        ],
+        "message": "ピボットPP（1.6349）に接近 あと0.08% → 反落でのショート候補"
+      },
+      "cb_meeting_blackout": {
+        "active": false,
+        "severity": "none",
+        "reason": ""
+      },
+      "strength_context": {
+        "base_currency": "EUR",
+        "quote_currency": "AUD",
+        "base_score": -3.0,
+        "base_label": "中立",
+        "base_rank": 9,
+        "quote_score": 13.1,
+        "quote_label": "中立",
+        "quote_rank": 4,
+        "spread": -16.1,
+        "context": "やや弱い通貨 vs 強め（ショート寄り）",
+        "bias": "slight_short"
+      }
+    },
+    {
+      "pair": "SEKJPY",
+      "label": "SEK/JPY",
+      "price": 16.667,
+      "ta_score": 14.7,
+      "dma_score": 15,
+      "macd_score": 15,
+      "rsi_score": 50,
+      "trend_strength": 0,
+      "atr_quality": 0,
+      "breakout_bonus": 0,
+      "divergence_adj": 0,
+      "ema_short_bonus": -12,
+      "dma200": 16.937,
+      "dma50": 16.777,
+      "rsi": 45.52,
+      "macd": -0.036,
+      "macd_signal": -0.035,
+      "atr": 0.06,
+      "rsi_reversal_confirmed": false,
+      "ta_score_overheated": false,
+      "fa_score": 76.5,
+      "fa_direction": "buy",
+      "fa_rate_diff": 1.0,
+      "fa_detail": "Riksbank(2.00% tighten/accelerating) vs 日銀(1.00% pause/peak) 差+1.00% / SEKサイクル強化(accelerating)",
+      "stars": 1,
+      "verdict": "⚠ 見送り（FA/TA不一致）",
+      "direction": "NO_TRADE",
+      "pair_type": "major",
+      "sentiment_notes": [
+        "金価格=4415.6 急騰・有事の安全資産需要"
+      ],
+      "intervention_news": {
+        "JPY": {
+          "score": 55,
+          "level": "HIGH",
+          "hits": [
+            "yen intervention"
+          ],
+          "reason": "検知キーワード: yen intervention",
+          "headlines": [
+            "Japan’s Yen Intervention Bought Time. Not a Fix - finance.yahoo.com",
+            "Yen Intervention Wears Off, Oil Jumps and Intel Rakes in More | Markets P.M. for Aug. 11 - WSJ",
+            "Goldman says Japan's $1 trillion of reserves leaves 'plenty of capacity' for further yen interventions - CNBC",
+            "Yen Intervention Buys Time, But The BOJ Holds The Key - Seeking Alpha",
+            "US-Japan Yen Intervention Reveals a Trillion-Dollar Dilemma - The Media Line"
+          ],
+          "cached": true,
+          "timestamp": "2026-08-13T18:03:00.877955+00:00"
+        }
+      },
+      "upcoming_events": [],
+      "volatility_regime": {
+        "regime": "normal",
+        "regime_label": "通常ボラ相場",
+        "atr_ratio": 0.9,
+        "atr_90d": 0.06689,
+        "sl_multiplier": 3.0,
+        "tp1_multiplier": 1.5,
+        "tp2_multiplier": 4.5,
+        "tp3_multiplier": 6.0,
+        "note": "ATR比率0.9 → TP=1.5×ATR（Phase1出口改善・到達率向上）"
+      },
+      "carry_score": {
+        "carry_score": 2.78,
+        "label": "良好なキャリー",
+        "annual_swap_pct": 1.0,
+        "daily_volatility_pct": 0.36,
+        "breakeven_days": 328,
+        "note": "SL幅をスワップで回収: 約328日"
+      },
+      "support_resistance": {
+        "resistance": [
+          {
+            "price": 17.002,
+            "strength": 2,
+            "label": "レジスタンス",
+            "distance_pct": 2.01
+          },
+          {
+            "price": 17.309,
+            "strength": 2,
+            "label": "レジスタンス",
+            "distance_pct": 3.85
+          },
+          {
+            "price": 16.823,
+            "strength": 1,
+            "label": "弱いレジスタンス",
+            "distance_pct": 0.94
+          },
+          {
+            "price": 16.864,
+            "strength": 1,
+            "label": "弱いレジスタンス",
+            "distance_pct": 1.18
+          }
+        ],
+        "support": [
+          {
+            "price": 16.331,
+            "strength": 1,
+            "label": "弱いサポート",
+            "distance_pct": 2.02
+          },
+          {
+            "price": 16.453,
+            "strength": 1,
+            "label": "弱いサポート",
+            "distance_pct": 1.28
+          },
+          {
+            "price": 16.54,
+            "strength": 1,
+            "label": "弱いサポート",
+            "distance_pct": 0.76
+          },
+          {
+            "price": 16.64,
+            "strength": 1,
+            "label": "弱いサポート",
+            "distance_pct": 0.16
+          }
+        ],
+        "nearest_resistance": {
+          "price": 16.823,
+          "strength": 1,
+          "label": "弱いレジスタンス",
+          "distance_pct": 0.94
+        },
+        "nearest_support": {
+          "price": 16.64,
+          "strength": 1,
+          "label": "弱いサポート",
+          "distance_pct": 0.16
+        },
+        "context": "レジスタンス(16.823)まで0.94% / サポート(16.64)まで0.16%（非常に近い・注意）"
+      },
+      "market_regime": {
+        "adx": 18.8,
+        "plus_di": 40.6,
+        "minus_di": 59.4,
+        "regime": "ranging",
+        "regime_label": "レンジ相場",
+        "trend_direction": "down",
+        "note": "順張りは機能しにくい・逆張り向き"
+      },
+      "performance": {
+        "win_rate": null,
+        "total_trades": 0,
+        "adjustment": -1,
+        "note": "新規ペア不振(180日窓37.5%/PF0.6)・要監視 (静的ベースライン)"
+      },
+      "ambush": {
+        "has_alert": true,
+        "nearest": {
+          "type": "ピボットPP",
+          "price": 16.696,
+          "role": "ピボットPP",
+          "kind": "resistance",
+          "distance": 0.029,
+          "distance_pct": 0.174
+        },
+        "approaching": [
+          {
+            "type": "ピボットPP",
+            "price": 16.696,
+            "role": "ピボットPP",
+            "kind": "resistance",
+            "distance": 0.029,
+            "distance_pct": 0.174
+          }
+        ],
+        "message": "ピボットPP（16.696）に接近 あと0.17% → 反落でのショート候補"
+      },
+      "cb_meeting_blackout": {
+        "active": false,
+        "severity": "none",
+        "reason": ""
+      },
+      "strength_context": {
+        "base_currency": "SEK",
+        "quote_currency": "JPY",
+        "base_score": -15.5,
+        "base_label": "中立",
+        "base_rank": 11,
+        "quote_score": 0.6,
+        "quote_label": "中立",
+        "quote_rank": 7,
+        "spread": -16.1,
+        "context": "やや弱い通貨 vs 強め（ショート寄り）",
+        "bias": "slight_short"
+      }
+    },
+    {
       "pair": "NOKJPY",
       "label": "NOK/JPY",
-      "price": 16.759,
+      "price": 16.768,
       "ta_score": 60.0,
       "dma_score": 85,
       "macd_score": 15,
@@ -2137,11 +2022,11 @@
       "divergence_adj": 0,
       "ema_short_bonus": -8,
       "dma200": 16.331,
-      "dma50": 16.695,
-      "rsi": 51.14,
+      "dma50": 16.696,
+      "rsi": 51.52,
       "macd": -0.008,
       "macd_signal": -0.006,
-      "atr": 0.077,
+      "atr": 0.078,
       "rsi_reversal_confirmed": true,
       "ta_score_overheated": false,
       "fa_score": 80.4,
@@ -2155,7 +2040,7 @@
       "sentiment_warning": "リスクオフ・円買い圧力警戒",
       "sentiment_notes": [
         "リスクオフ・円買い圧力警戒",
-        "金価格=4422.7 急騰・有事の安全資産需要"
+        "金価格=4415.6 急騰・有事の安全資産需要"
       ],
       "original_stars": 2,
       "intervention_news": {
@@ -2167,22 +2052,22 @@
           ],
           "reason": "検知キーワード: yen intervention",
           "headlines": [
-            "Yen Intervention Wears Off, Oil Jumps and Intel Rakes in More | Markets P.M. for Aug. 11 - wsj.com",
+            "Japan’s Yen Intervention Bought Time. Not a Fix - finance.yahoo.com",
+            "Yen Intervention Wears Off, Oil Jumps and Intel Rakes in More | Markets P.M. for Aug. 11 - WSJ",
             "Goldman says Japan's $1 trillion of reserves leaves 'plenty of capacity' for further yen interventions - CNBC",
             "Yen Intervention Buys Time, But The BOJ Holds The Key - Seeking Alpha",
-            "US-Japan Yen Intervention Reveals a Trillion-Dollar Dilemma - themedialine.org",
-            "Why Japan Is Struggling to Prop Up the Yen, Even With US Help - Bloomberg"
+            "US-Japan Yen Intervention Reveals a Trillion-Dollar Dilemma - The Media Line"
           ],
           "cached": true,
-          "timestamp": "2026-08-13T16:05:41.135550+00:00"
+          "timestamp": "2026-08-13T18:03:00.877955+00:00"
         }
       },
       "upcoming_events": [],
       "volatility_regime": {
         "regime": "normal",
         "regime_label": "通常ボラ相場",
-        "atr_ratio": 1.02,
-        "atr_90d": 0.07527,
+        "atr_ratio": 1.03,
+        "atr_90d": 0.07537,
         "sl_multiplier": 3.0,
         "tp1_multiplier": 1.5,
         "tp2_multiplier": 4.5,
@@ -2190,46 +2075,46 @@
         "note": "ATR比率1.0 → TP=1.5×ATR（Phase1出口改善・到達率向上）"
       },
       "staged_tp": {
-        "sl": 16.528,
-        "tp": 16.875,
+        "sl": 16.534,
+        "tp": 16.885,
         "trail_atr_mult": 2.0,
-        "trail_distance": 0.154,
-        "be_plus_offset": 0.115,
-        "be_target_after_tp": 16.875,
-        "max_target": 17.221,
+        "trail_distance": 0.156,
+        "be_plus_offset": 0.117,
+        "be_target_after_tp": 16.885,
+        "max_target": 17.236,
         "rr_tp": 0.5,
         "tp_mode": "single_with_trail",
-        "tp1": 16.875,
-        "tp2": 17.105,
-        "tp3": 17.221,
-        "sl_width": 0.231,
-        "tp1_width": 0.115,
+        "tp1": 16.885,
+        "tp2": 17.119,
+        "tp3": 17.236,
+        "sl_width": 0.234,
+        "tp1_width": 0.117,
         "rr_tp1": 0.5,
         "rr_tp2": 1.5,
         "rr_tp3": 2.0,
-        "spread_price": 0.022,
-        "spread_pips": 2.2,
-        "spread_atr_ratio": 0.281,
-        "sl_dist_effective": 0.242,
-        "tp_dist_effective": 0.105,
-        "rr_effective": 0.43,
+        "spread_price": 0.027,
+        "spread_pips": 2.7,
+        "spread_atr_ratio": 0.346,
+        "sl_dist_effective": 0.247,
+        "tp_dist_effective": 0.103,
+        "rr_effective": 0.42,
         "spread_is_dynamic": true,
-        "spread_pips_dynamic": 2.16,
+        "spread_pips_dynamic": 2.7,
         "regime_label": "通常ボラ相場",
-        "strategy": "TP(16.875)到達 → SLを BE+0.5R(16.875) へ移動 → トレーリング(2.0×ATR=0.154)発動 → 利を伸ばす（理論最大: 17.221）",
+        "strategy": "TP(16.885)到達 → SLを BE+0.5R(16.885) へ移動 → トレーリング(2.0×ATR=0.156)発動 → 利を伸ばす（理論最大: 17.236）",
         "chandelier_sl_active": false,
         "chandelier_note": "",
-        "spread_session": "London/NY overlap",
-        "spread_session_mult": 0.8,
+        "spread_session": "NY afternoon",
+        "spread_session_mult": 1.0,
         "spread_vix_mult": 0.9
       },
       "carry_score": {
-        "carry_score": 7.07,
+        "carry_score": 6.99,
         "label": "非常に優れたキャリー",
         "annual_swap_pct": 3.25,
-        "daily_volatility_pct": 0.46,
-        "breakeven_days": 129,
-        "note": "SL幅をスワップで回収: 約129日"
+        "daily_volatility_pct": 0.47,
+        "breakeven_days": 130,
+        "note": "SL幅をスワップで回収: 約130日"
       },
       "support_resistance": {
         "resistance": [
@@ -2237,13 +2122,13 @@
             "price": 17.224,
             "strength": 4,
             "label": "強いレジスタンス",
-            "distance_pct": 2.77
+            "distance_pct": 2.72
           },
           {
             "price": 17.118,
             "strength": 1,
             "label": "弱いレジスタンス",
-            "distance_pct": 2.14
+            "distance_pct": 2.09
           }
         ],
         "support": [
@@ -2251,45 +2136,45 @@
             "price": 16.285,
             "strength": 3,
             "label": "サポート",
-            "distance_pct": 2.83
+            "distance_pct": 2.88
           },
           {
             "price": 15.21,
             "strength": 2,
             "label": "サポート",
-            "distance_pct": 9.24
+            "distance_pct": 9.29
           },
           {
             "price": 15.514,
             "strength": 1,
             "label": "弱いサポート",
-            "distance_pct": 7.43
+            "distance_pct": 7.48
           },
           {
             "price": 15.661,
             "strength": 1,
             "label": "弱いサポート",
-            "distance_pct": 6.55
+            "distance_pct": 6.6
           }
         ],
         "nearest_resistance": {
           "price": 17.118,
           "strength": 1,
           "label": "弱いレジスタンス",
-          "distance_pct": 2.14
+          "distance_pct": 2.09
         },
         "nearest_support": {
           "price": 16.285,
           "strength": 3,
           "label": "サポート",
-          "distance_pct": 2.83
+          "distance_pct": 2.88
         },
-        "context": "レジスタンス(17.118)まで2.14% / サポート(16.285)まで2.83%"
+        "context": "レジスタンス(17.118)まで2.09% / サポート(16.285)まで2.88%"
       },
       "market_regime": {
-        "adx": 16.8,
-        "plus_di": 41.6,
-        "minus_di": 58.4,
+        "adx": 15.9,
+        "plus_di": 42.0,
+        "minus_di": 58.0,
         "regime": "ranging",
         "regime_label": "レンジ相場",
         "trend_direction": "down",
@@ -2302,8 +2187,8 @@
           "price": 16.747,
           "role": "押し目候補(50EMA)",
           "kind": "support",
-          "distance": 0.012,
-          "distance_pct": 0.072
+          "distance": 0.021,
+          "distance_pct": 0.125
         },
         "approaching": [
           {
@@ -2311,47 +2196,491 @@
             "price": 16.747,
             "role": "押し目候補(50EMA)",
             "kind": "support",
-            "distance": 0.012,
-            "distance_pct": 0.072
+            "distance": 0.021,
+            "distance_pct": 0.125
           },
           {
             "type": "ピボットPP",
-            "price": 16.732,
+            "price": 16.735,
             "role": "ピボットPP",
             "kind": "support",
-            "distance": 0.027,
-            "distance_pct": 0.161
+            "distance": 0.033,
+            "distance_pct": 0.197
           }
         ],
-        "message": "押し目候補(50EMA)（16.747）に接近 あと0.07% → 反発でのロング候補"
+        "message": "押し目候補(50EMA)（16.747）に接近 あと0.12% → 反発でのロング候補"
       },
-      "spread_caution": true,
-      "spread_caution_reason": "💸 スプレッド広め: NOKJPY spread=2.2pips (28% of ATR)。実効RR 1:0.43",
       "cb_meeting_blackout": {
         "active": true,
         "severity": "blackout",
-        "reason": "NOK 中銀会合後 16h（ブラックアウト 36h）",
+        "reason": "NOK 中銀会合後 18h（ブラックアウト 36h）",
         "currency": "NOK"
       },
       "blackout_degraded": true,
       "strength_context": {
         "base_currency": "NOK",
         "quote_currency": "JPY",
-        "base_score": 66.2,
-        "base_label": "強い",
+        "base_score": 27.5,
+        "base_label": "やや強い",
         "base_rank": 2,
-        "quote_score": 39.3,
-        "quote_label": "やや強い",
-        "quote_rank": 3,
+        "quote_score": 0.6,
+        "quote_label": "中立",
+        "quote_rank": 7,
         "spread": 26.9,
         "context": "やや強い通貨 vs 弱め（ロング寄り）",
         "bias": "slight_long"
       }
     },
     {
+      "pair": "BRLJPY",
+      "label": "BRL/JPY",
+      "price": 30.693,
+      "ta_score": 66.0,
+      "dma_score": 85,
+      "macd_score": 15,
+      "rsi_score": 35,
+      "trend_strength": 18,
+      "atr_quality": 0,
+      "breakout_bonus": 15,
+      "divergence_adj": 0,
+      "ema_short_bonus": -12,
+      "dma200": 30.477,
+      "dma50": 31.423,
+      "rsi": 33.29,
+      "macd": -0.228,
+      "macd_signal": -0.134,
+      "atr": 0.145,
+      "rsi_reversal_confirmed": false,
+      "ta_score_overheated": false,
+      "fa_score": 80.0,
+      "fa_direction": "buy",
+      "fa_rate_diff": 13.25,
+      "fa_detail": "BCB (Copom)(14.25% ease/decelerating) vs 日銀(1.00% pause/peak) 差+13.25% / BRLサイクル強化(decelerating)",
+      "stars": 1,
+      "verdict": "⚠ 地政学リスク(medium)考慮 ○ ロング条件成立 ⚠介入観測報道HIGH(55)",
+      "direction": "LONG",
+      "pair_type": "major",
+      "sentiment_warning": "リスクオフ・円買い圧力警戒",
+      "sentiment_notes": [
+        "リスクオフ・円買い圧力警戒",
+        "金価格=4415.6 急騰・有事の安全資産需要"
+      ],
+      "geopolitical_risk": {
+        "risk_level": "medium",
+        "risk_score": 42,
+        "reason": "political_instability: protest / geopolitical: sanction",
+        "recent_news": [
+          "\"Brazil (election OR protest OR crisis OR sanction OR \"central bank\" OR geopolitics)\" - Google News",
+          "Google News",
+          "Brazil election poll tracker: Who will be the next president? - The Economist",
+          "The US is now using the ‘terrorist’ label to interfere in Brazil’s election - Al Jazeera"
+        ],
+        "categories": {
+          "political_instability": {
+            "score": 15,
+            "hits": [
+              "protest"
+            ]
+          },
+          "geopolitical": {
+            "score": 12,
+            "hits": [
+              "sanction"
+            ]
+          }
+        },
+        "country": "Brazil",
+        "news_volume": 8
+      },
+      "original_stars": 4,
+      "risk_adjustment": -42,
+      "intervention_news": {
+        "JPY": {
+          "score": 55,
+          "level": "HIGH",
+          "hits": [
+            "yen intervention"
+          ],
+          "reason": "検知キーワード: yen intervention",
+          "headlines": [
+            "Japan’s Yen Intervention Bought Time. Not a Fix - finance.yahoo.com",
+            "Yen Intervention Wears Off, Oil Jumps and Intel Rakes in More | Markets P.M. for Aug. 11 - WSJ",
+            "Goldman says Japan's $1 trillion of reserves leaves 'plenty of capacity' for further yen interventions - CNBC",
+            "Yen Intervention Buys Time, But The BOJ Holds The Key - Seeking Alpha",
+            "US-Japan Yen Intervention Reveals a Trillion-Dollar Dilemma - The Media Line"
+          ],
+          "cached": true,
+          "timestamp": "2026-08-13T18:03:00.877955+00:00"
+        }
+      },
+      "upcoming_events": [],
+      "volatility_regime": {
+        "regime": "normal",
+        "regime_label": "通常ボラ相場",
+        "atr_ratio": 1.01,
+        "atr_90d": 0.14403,
+        "sl_multiplier": 3.0,
+        "tp1_multiplier": 1.5,
+        "tp2_multiplier": 4.5,
+        "tp3_multiplier": 6.0,
+        "note": "ATR比率1.0 → TP=1.5×ATR（Phase1出口改善・到達率向上）"
+      },
+      "staged_tp": {
+        "sl": 30.258,
+        "tp": 30.911,
+        "trail_atr_mult": 2.0,
+        "trail_distance": 0.29,
+        "be_plus_offset": 0.217,
+        "be_target_after_tp": 30.911,
+        "max_target": 31.563,
+        "rr_tp": 0.5,
+        "tp_mode": "single_with_trail",
+        "tp1": 30.911,
+        "tp2": 31.346,
+        "tp3": 31.563,
+        "sl_width": 0.435,
+        "tp1_width": 0.217,
+        "rr_tp1": 0.5,
+        "rr_tp2": 1.5,
+        "rr_tp3": 2.0,
+        "spread_price": 0.027,
+        "spread_pips": 2.7,
+        "spread_atr_ratio": 0.186,
+        "sl_dist_effective": 0.448,
+        "tp_dist_effective": 0.204,
+        "rr_effective": 0.45,
+        "spread_is_dynamic": true,
+        "spread_pips_dynamic": 2.7,
+        "regime_label": "通常ボラ相場",
+        "strategy": "TP(30.911)到達 → SLを BE+0.5R(30.911) へ移動 → トレーリング(2.0×ATR=0.29)発動 → 利を伸ばす（理論最大: 31.563）",
+        "chandelier_sl_active": false,
+        "chandelier_note": "",
+        "spread_session": "NY afternoon",
+        "spread_session_mult": 1.0,
+        "spread_vix_mult": 0.9
+      },
+      "carry_score": {
+        "carry_score": 28.05,
+        "label": "非常に優れたキャリー",
+        "annual_swap_pct": 13.25,
+        "daily_volatility_pct": 0.47,
+        "breakeven_days": 32,
+        "note": "SL幅をスワップで回収: 約32日"
+      },
+      "support_resistance": {
+        "resistance": [
+          {
+            "price": 32.181,
+            "strength": 3,
+            "label": "レジスタンス",
+            "distance_pct": 4.85
+          },
+          {
+            "price": 31.745,
+            "strength": 2,
+            "label": "レジスタンス",
+            "distance_pct": 3.43
+          },
+          {
+            "price": 30.773,
+            "strength": 1,
+            "label": "弱いレジスタンス",
+            "distance_pct": 0.26
+          },
+          {
+            "price": 31.914,
+            "strength": 1,
+            "label": "弱いレジスタンス",
+            "distance_pct": 3.98
+          }
+        ],
+        "support": [
+          {
+            "price": 29.95,
+            "strength": 2,
+            "label": "サポート",
+            "distance_pct": 2.42
+          },
+          {
+            "price": 27.925,
+            "strength": 1,
+            "label": "弱いサポート",
+            "distance_pct": 9.02
+          },
+          {
+            "price": 29.171,
+            "strength": 1,
+            "label": "弱いサポート",
+            "distance_pct": 4.96
+          },
+          {
+            "price": 29.303,
+            "strength": 1,
+            "label": "弱いサポート",
+            "distance_pct": 4.53
+          }
+        ],
+        "nearest_resistance": {
+          "price": 30.773,
+          "strength": 1,
+          "label": "弱いレジスタンス",
+          "distance_pct": 0.26
+        },
+        "nearest_support": {
+          "price": 29.95,
+          "strength": 2,
+          "label": "サポート",
+          "distance_pct": 2.42
+        },
+        "context": "レジスタンス(30.773)まで0.26%（非常に近い・注意） / サポート(29.95)まで2.42%"
+      },
+      "market_regime": {
+        "adx": 62.3,
+        "plus_di": 18.8,
+        "minus_di": 81.2,
+        "regime": "trending",
+        "regime_label": "トレンド相場",
+        "trend_direction": "down",
+        "note": "順張りシグナル有効"
+      },
+      "ambush": {
+        "has_alert": false,
+        "approaching": []
+      },
+      "spread_caution": true,
+      "spread_caution_reason": "💸 スプレッド広め: BRLJPY spread=2.7pips (19% of ATR)。実効RR 1:0.45",
+      "cb_meeting_blackout": {
+        "active": false,
+        "severity": "none",
+        "reason": ""
+      },
+      "strength_context": {
+        "base_currency": "BRL",
+        "quote_currency": "JPY",
+        "base_score": -34.3,
+        "base_label": "やや弱い",
+        "base_rank": 15,
+        "quote_score": 0.6,
+        "quote_label": "中立",
+        "quote_rank": 7,
+        "spread": -34.9,
+        "context": "やや弱い通貨 vs 強め（ショート寄り）",
+        "bias": "slight_short"
+      }
+    },
+    {
+      "pair": "KRWJPY",
+      "label": "KRW/JPY",
+      "price": 0.1124,
+      "ta_score": 73.7,
+      "dma_score": 85,
+      "macd_score": 35,
+      "rsi_score": 65,
+      "trend_strength": 0,
+      "atr_quality": 0,
+      "breakout_bonus": 0,
+      "divergence_adj": 0,
+      "ema_short_bonus": 12,
+      "dma200": 0.10706,
+      "dma50": 0.10822,
+      "rsi": 62.2,
+      "macd": 0.0011,
+      "macd_signal": 0.00117,
+      "atr": 0.00059,
+      "rsi_reversal_confirmed": false,
+      "ta_score_overheated": false,
+      "fa_score": 82.1,
+      "fa_direction": "buy",
+      "fa_rate_diff": 1.75,
+      "fa_detail": "Bank of Korea(2.75% tighten/accelerating) vs 日銀(1.00% pause/peak) 差+1.75% / KRWサイクル強化(accelerating)",
+      "stars": 2,
+      "verdict": "○ ロング条件成立 ⚠介入観測報道HIGH(55)",
+      "direction": "LONG",
+      "pair_type": "major",
+      "sentiment_warning": "リスクオフ・円買い圧力警戒",
+      "sentiment_notes": [
+        "リスクオフ・円買い圧力警戒",
+        "金価格=4415.6 急騰・有事の安全資産需要"
+      ],
+      "original_stars": 4,
+      "intervention_news": {
+        "JPY": {
+          "score": 55,
+          "level": "HIGH",
+          "hits": [
+            "yen intervention"
+          ],
+          "reason": "検知キーワード: yen intervention",
+          "headlines": [
+            "Japan’s Yen Intervention Bought Time. Not a Fix - finance.yahoo.com",
+            "Yen Intervention Wears Off, Oil Jumps and Intel Rakes in More | Markets P.M. for Aug. 11 - WSJ",
+            "Goldman says Japan's $1 trillion of reserves leaves 'plenty of capacity' for further yen interventions - CNBC",
+            "Yen Intervention Buys Time, But The BOJ Holds The Key - Seeking Alpha",
+            "US-Japan Yen Intervention Reveals a Trillion-Dollar Dilemma - The Media Line"
+          ],
+          "cached": true,
+          "timestamp": "2026-08-13T18:03:00.877955+00:00"
+        }
+      },
+      "upcoming_events": [],
+      "volatility_regime": {
+        "regime": "normal",
+        "regime_label": "通常ボラ相場",
+        "atr_ratio": 1.24,
+        "atr_90d": 0.00048,
+        "sl_multiplier": 3.0,
+        "tp1_multiplier": 1.5,
+        "tp2_multiplier": 4.5,
+        "tp3_multiplier": 6.0,
+        "note": "ATR比率1.2 → TP=1.5×ATR（Phase1出口改善・到達率向上）"
+      },
+      "staged_tp": {
+        "sl": 0.11188,
+        "tp": 0.11328,
+        "trail_atr_mult": 2.0,
+        "trail_distance": 0.00118,
+        "be_plus_offset": 0.00089,
+        "be_target_after_tp": 0.11328,
+        "max_target": 0.11594,
+        "rr_tp": 0.5,
+        "tp_mode": "single_with_trail",
+        "tp1": 0.11328,
+        "tp2": 0.11506,
+        "tp3": 0.11594,
+        "sl_width": 0.00177,
+        "tp1_width": 0.00089,
+        "rr_tp1": 0.5,
+        "rr_tp2": 1.5,
+        "rr_tp3": 2.0,
+        "spread_price": 0.027,
+        "spread_pips": 2.7,
+        "spread_atr_ratio": 45.763,
+        "sl_dist_effective": 0.01527,
+        "tp_dist_effective": 0.0,
+        "rr_effective": 0.0,
+        "spread_is_dynamic": true,
+        "spread_pips_dynamic": 2.7,
+        "regime_label": "通常ボラ相場",
+        "strategy": "TP(0.11328)到達 → SLを BE+0.5R(0.11328) へ移動 → トレーリング(2.0×ATR=0.00118)発動 → 利を伸ばす（理論最大: 0.11594）",
+        "chandelier_sl_active": true,
+        "chandelier_note": "Chandelier Exit: 過去22日高値(0.11365)-3.0xATR",
+        "spread_session": "NY afternoon",
+        "spread_session_mult": 1.0,
+        "spread_vix_mult": 0.9
+      },
+      "carry_score": {
+        "carry_score": 3.33,
+        "label": "非常に優れたキャリー",
+        "annual_swap_pct": 1.75,
+        "daily_volatility_pct": 0.52,
+        "breakeven_days": 273,
+        "note": "SL幅をスワップで回収: 約273日"
+      },
+      "support_resistance": {
+        "resistance": [
+          {
+            "price": 0.114,
+            "strength": 1,
+            "label": "弱いレジスタンス",
+            "distance_pct": 1.42
+          }
+        ],
+        "support": [
+          {
+            "price": 0.10478,
+            "strength": 5,
+            "label": "強いサポート",
+            "distance_pct": 6.78
+          },
+          {
+            "price": 0.10606,
+            "strength": 5,
+            "label": "強いサポート",
+            "distance_pct": 5.64
+          },
+          {
+            "price": 0.10374,
+            "strength": 1,
+            "label": "弱いサポート",
+            "distance_pct": 7.7
+          },
+          {
+            "price": 0.11,
+            "strength": 1,
+            "label": "弱いサポート",
+            "distance_pct": 2.14
+          }
+        ],
+        "nearest_resistance": {
+          "price": 0.114,
+          "strength": 1,
+          "label": "弱いレジスタンス",
+          "distance_pct": 1.42
+        },
+        "nearest_support": {
+          "price": 0.11,
+          "strength": 1,
+          "label": "弱いサポート",
+          "distance_pct": 2.14
+        },
+        "context": "レジスタンス(0.114)まで1.42% / サポート(0.11)まで2.14%"
+      },
+      "market_regime": {
+        "adx": 11.0,
+        "plus_di": 55.5,
+        "minus_di": 44.5,
+        "regime": "ranging",
+        "regime_label": "レンジ相場",
+        "trend_direction": "up",
+        "note": "順張りは機能しにくい・逆張り向き"
+      },
+      "ambush": {
+        "has_alert": true,
+        "nearest": {
+          "type": "ピボットPP",
+          "price": 0.11232,
+          "role": "ピボットPP",
+          "kind": "support",
+          "distance": 8e-05,
+          "distance_pct": 0.071
+        },
+        "approaching": [
+          {
+            "type": "ピボットPP",
+            "price": 0.11232,
+            "role": "ピボットPP",
+            "kind": "support",
+            "distance": 8e-05,
+            "distance_pct": 0.071
+          }
+        ],
+        "message": "ピボットPP（0.11232）に接近 あと0.07% → 反発でのロング候補"
+      },
+      "vix_filter_applied": true,
+      "vix_filter_reason": "VIXリスクオフフィルタ: VIX=14.7 — JPYクロスLONG -1★降格",
+      "cb_meeting_blackout": {
+        "active": false,
+        "severity": "none",
+        "reason": ""
+      },
+      "strength_context": {
+        "base_currency": "KRW",
+        "quote_currency": "JPY",
+        "base_score": 100.0,
+        "base_label": "強い",
+        "base_rank": 1,
+        "quote_score": 0.6,
+        "quote_label": "中立",
+        "quote_rank": 7,
+        "spread": 99.4,
+        "context": "強い通貨 vs 弱い通貨（ロング有利）",
+        "bias": "long"
+      }
+    },
+    {
       "pair": "GBPAUD",
       "label": "GBP/AUD",
-      "price": 1.9118,
+      "price": 1.9105,
       "ta_score": 18.7,
       "dma_score": 15,
       "macd_score": 15,
@@ -2361,12 +2690,12 @@
       "breakout_bonus": 0,
       "divergence_adj": 0,
       "ema_short_bonus": -8,
-      "dma200": 1.93581,
-      "dma50": 1.91278,
-      "rsi": 48.54,
-      "macd": -0.00042,
-      "macd_signal": -1e-05,
-      "atr": 0.00339,
+      "dma200": 1.9358,
+      "dma50": 1.91276,
+      "rsi": 47.25,
+      "macd": -0.00053,
+      "macd_signal": -3e-05,
+      "atr": 0.00349,
       "rsi_reversal_confirmed": false,
       "ta_score_overheated": false,
       "fa_score": 45.5,
@@ -2378,7 +2707,7 @@
       "direction": "LIGHT_SHORT",
       "pair_type": "major",
       "sentiment_notes": [
-        "金価格=4422.7 急騰・有事の安全資産需要"
+        "金価格=4415.6 急騰・有事の安全資産需要"
       ],
       "intervention_news": {
         "GBP": {
@@ -2390,62 +2719,62 @@
             "Sterling provides innovative solution to increase healthcare access, says Ighodalo - The Guardian Nigeria News"
           ],
           "cached": true,
-          "timestamp": "2026-08-13T16:05:48.042468+00:00"
+          "timestamp": "2026-08-13T18:03:24.656750+00:00"
         }
       },
       "upcoming_events": [],
       "volatility_regime": {
         "regime": "normal",
         "regime_label": "通常ボラ相場",
-        "atr_ratio": 0.84,
-        "atr_90d": 0.00404,
+        "atr_ratio": 0.86,
+        "atr_90d": 0.00405,
         "sl_multiplier": 3.0,
         "tp1_multiplier": 1.5,
         "tp2_multiplier": 4.5,
         "tp3_multiplier": 6.0,
-        "note": "ATR比率0.8 → TP=1.5×ATR（Phase1出口改善・到達率向上）"
+        "note": "ATR比率0.9 → TP=1.5×ATR（Phase1出口改善・到達率向上）"
       },
       "staged_tp": {
-        "sl": 1.91267,
-        "tp": 1.906715,
+        "sl": 1.91297,
+        "tp": 1.905265,
         "trail_atr_mult": 2.0,
-        "trail_distance": 0.00678,
-        "be_plus_offset": 0.005085,
-        "be_target_after_tp": 1.906715,
-        "max_target": 1.89146,
+        "trail_distance": 0.00698,
+        "be_plus_offset": 0.005235,
+        "be_target_after_tp": 1.905265,
+        "max_target": 1.88956,
         "rr_tp": 0.5,
         "tp_mode": "single_with_trail",
-        "tp1": 1.906715,
-        "tp2": 1.896545,
-        "tp3": 1.89146,
-        "sl_width": 0.01017,
-        "tp1_width": 0.005085,
+        "tp1": 1.905265,
+        "tp2": 1.894795,
+        "tp3": 1.88956,
+        "sl_width": 0.01047,
+        "tp1_width": 0.005235,
         "rr_tp1": 0.5,
         "rr_tp2": 1.5,
         "rr_tp3": 2.0,
-        "spread_price": 0.000216,
-        "spread_pips": 2.2,
-        "spread_atr_ratio": 0.064,
-        "sl_dist_effective": 0.010278,
-        "tp_dist_effective": 0.004977,
+        "spread_price": 0.00027,
+        "spread_pips": 2.7,
+        "spread_atr_ratio": 0.077,
+        "sl_dist_effective": 0.010605,
+        "tp_dist_effective": 0.0051,
         "rr_effective": 0.48,
         "spread_is_dynamic": true,
-        "spread_pips_dynamic": 2.16,
+        "spread_pips_dynamic": 2.7,
         "regime_label": "通常ボラ相場",
-        "strategy": "TP(1.906715)到達 → SLを BE+0.5R(1.906715) へ移動 → トレーリング(2.0×ATR=0.00678)発動 → 利を伸ばす（理論最大: 1.89146）",
+        "strategy": "TP(1.905265)到達 → SLを BE+0.5R(1.905265) へ移動 → トレーリング(2.0×ATR=0.00698)発動 → 利を伸ばす（理論最大: 1.88956）",
         "chandelier_sl_active": true,
         "chandelier_note": "Chandelier Exit: 過去22日安値(1.9025)+3.0xATR",
-        "spread_session": "London/NY overlap",
-        "spread_session_mult": 0.8,
+        "spread_session": "NY afternoon",
+        "spread_session_mult": 1.0,
         "spread_vix_mult": 0.9
       },
       "carry_score": {
-        "carry_score": 3.38,
+        "carry_score": 3.28,
         "label": "非常に優れたキャリー",
         "annual_swap_pct": 0.6,
         "daily_volatility_pct": 0.18,
-        "breakeven_days": 269,
-        "note": "SL幅をスワップで回収: 約269日"
+        "breakeven_days": 277,
+        "note": "SL幅をスワップで回収: 約277日"
       },
       "support_resistance": {
         "resistance": [
@@ -2453,25 +2782,25 @@
             "price": 1.93145,
             "strength": 2,
             "label": "レジスタンス",
-            "distance_pct": 1.03
+            "distance_pct": 1.1
+          },
+          {
+            "price": 1.9106,
+            "strength": 1,
+            "label": "弱いレジスタンス",
+            "distance_pct": 0.01
           },
           {
             "price": 1.9225,
             "strength": 1,
             "label": "弱いレジスタンス",
-            "distance_pct": 0.56
+            "distance_pct": 0.63
           },
           {
             "price": 1.9295,
             "strength": 1,
             "label": "弱いレジスタンス",
-            "distance_pct": 0.93
-          },
-          {
-            "price": 2.0132,
-            "strength": 1,
-            "label": "弱いレジスタンス",
-            "distance_pct": 5.3
+            "distance_pct": 0.99
           }
         ],
         "support": [
@@ -2479,45 +2808,45 @@
             "price": 1.8862,
             "strength": 2,
             "label": "サポート",
-            "distance_pct": 1.34
+            "distance_pct": 1.27
           },
           {
             "price": 1.8634,
             "strength": 1,
             "label": "弱いサポート",
-            "distance_pct": 2.53
+            "distance_pct": 2.47
           },
           {
             "price": 1.8724,
             "strength": 1,
             "label": "弱いサポート",
-            "distance_pct": 2.06
+            "distance_pct": 1.99
           },
           {
             "price": 1.8752,
             "strength": 1,
             "label": "弱いサポート",
-            "distance_pct": 1.91
+            "distance_pct": 1.85
           }
         ],
         "nearest_resistance": {
-          "price": 1.9225,
+          "price": 1.9106,
           "strength": 1,
           "label": "弱いレジスタンス",
-          "distance_pct": 0.56
+          "distance_pct": 0.01
         },
         "nearest_support": {
           "price": 1.8862,
           "strength": 2,
           "label": "サポート",
-          "distance_pct": 1.34
+          "distance_pct": 1.27
         },
-        "context": "レジスタンス(1.9225)まで0.56% / サポート(1.8862)まで1.34%"
+        "context": "レジスタンス(1.9106)まで0.01%（非常に近い・注意） / サポート(1.8862)まで1.27%"
       },
       "market_regime": {
-        "adx": 18.2,
-        "plus_di": 59.1,
-        "minus_di": 40.9,
+        "adx": 15.3,
+        "plus_di": 57.6,
+        "minus_di": 42.4,
         "regime": "ranging",
         "regime_label": "レンジ相場",
         "trend_direction": "up",
@@ -2526,48 +2855,48 @@
       "ambush": {
         "has_alert": true,
         "nearest": {
-          "type": "ピボットPP",
-          "price": 1.911767,
-          "role": "ピボットPP",
-          "kind": "support",
-          "distance": 3.3e-05,
-          "distance_pct": 0.002
+          "type": "レジスタンス",
+          "price": 1.9106,
+          "role": "弱いレジスタンス",
+          "kind": "resistance",
+          "distance": 0.0001,
+          "distance_pct": 0.005
         },
         "approaching": [
           {
-            "type": "ピボットPP",
-            "price": 1.911767,
-            "role": "ピボットPP",
-            "kind": "support",
-            "distance": 3.3e-05,
-            "distance_pct": 0.002
+            "type": "レジスタンス",
+            "price": 1.9106,
+            "role": "弱いレジスタンス",
+            "kind": "resistance",
+            "distance": 0.0001,
+            "distance_pct": 0.005
           },
           {
             "type": "50EMA",
-            "price": 1.910746,
-            "role": "押し目候補(50EMA)",
-            "kind": "support",
-            "distance": 0.001054,
-            "distance_pct": 0.055
+            "price": 1.910695,
+            "role": "戻り候補(50EMA)",
+            "kind": "resistance",
+            "distance": 0.000195,
+            "distance_pct": 0.01
           },
           {
-            "type": "ピボットR1",
-            "price": 1.913233,
-            "role": "ピボットR1",
+            "type": "ピボットPP",
+            "price": 1.911333,
+            "role": "ピボットPP",
             "kind": "resistance",
-            "distance": 0.001433,
-            "distance_pct": 0.075
+            "distance": 0.000833,
+            "distance_pct": 0.044
           },
           {
             "type": "ピボットS1",
-            "price": 1.910333,
+            "price": 1.909467,
             "role": "ピボットS1",
             "kind": "support",
-            "distance": 0.001467,
-            "distance_pct": 0.077
+            "distance": 0.001033,
+            "distance_pct": 0.054
           }
         ],
-        "message": "ピボットPP（1.911767）に接近 あと0.00% → 反発でのロング候補"
+        "message": "弱いレジスタンス（1.9106）に接近 あと0.01% → 反落でのショート候補"
       },
       "cb_meeting_blackout": {
         "active": false,
@@ -2577,21 +2906,212 @@
       "strength_context": {
         "base_currency": "GBP",
         "quote_currency": "AUD",
-        "base_score": -17.9,
+        "base_score": 9.6,
         "base_label": "中立",
-        "base_rank": 7,
-        "quote_score": 22.6,
-        "quote_label": "やや強い",
+        "base_rank": 5,
+        "quote_score": 13.1,
+        "quote_label": "中立",
         "quote_rank": 4,
-        "spread": -40.5,
-        "context": "弱い通貨 vs 強い通貨（ショート有利）",
-        "bias": "short"
+        "spread": -3.5,
+        "context": "通貨強弱が拮抗（中立）",
+        "bias": "neutral"
+      }
+    },
+    {
+      "pair": "GBPCHF",
+      "label": "GBP/CHF",
+      "price": 1.0967,
+      "ta_score": 98,
+      "dma_score": 85,
+      "macd_score": 85,
+      "rsi_score": 20,
+      "trend_strength": 10,
+      "atr_quality": 0,
+      "breakout_bonus": 15,
+      "divergence_adj": 0,
+      "ema_short_bonus": 12,
+      "dma200": 1.06377,
+      "dma50": 1.0801,
+      "rsi": 70.71,
+      "macd": 0.00435,
+      "macd_signal": 0.00416,
+      "atr": 0.00165,
+      "rsi_reversal_confirmed": false,
+      "ta_score_overheated": true,
+      "fa_score": 70.2,
+      "fa_direction": "buy",
+      "fa_rate_diff": 3.5,
+      "fa_detail": "BOE(3.75% neutral/stable) vs SNB(0.25% ease/trough) 差+3.50% / CHFサイクル強化(trough)",
+      "stars": 3,
+      "verdict": "◎ 高信頼ロング（過熱スコア降格: ta_score逆U字の実績データに基づく）",
+      "direction": "LONG",
+      "pair_type": "major",
+      "sentiment_notes": [
+        "金価格=4415.6 急騰・有事の安全資産需要"
+      ],
+      "intervention_news": {
+        "GBP": {
+          "score": 0,
+          "level": "none",
+          "hits": [],
+          "reason": "キーワード該当なし",
+          "headlines": [
+            "Sterling provides innovative solution to increase healthcare access, says Ighodalo - The Guardian Nigeria News"
+          ],
+          "cached": true,
+          "timestamp": "2026-08-13T18:03:24.656750+00:00"
+        },
+        "CHF": {
+          "score": 80,
+          "level": "CRITICAL",
+          "hits": [
+            "snb intervention",
+            "franc intervention"
+          ],
+          "reason": "検知キーワード: snb intervention, franc intervention",
+          "headlines": [
+            "Swiss Franc: Intervention risk keeps Franc lagging – OCBC - FXStreet",
+            "Swiss Franc’s Haven Run Seen Nearing SNB Intervention Threshold - Bloomberg.com",
+            "Switzerland risks the ire of the White House as it flags potential currency intervention - CNBC",
+            "Swiss Franc: Intervention stance offsets safe-haven appeal – Rabobank - FXStreet",
+            "UBS lowers Swiss franc forecast as SNB intervention falls short - Investing.com"
+          ],
+          "cached": false,
+          "timestamp": "2026-08-13T18:05:40.825627+00:00"
+        }
+      },
+      "intervention_watch_warning": [
+        "CHF介入示唆報道 score80(CRITICAL): 検知キーワード: snb intervention, franc intervention"
+      ],
+      "upcoming_events": [],
+      "volatility_regime": {
+        "regime": "normal",
+        "regime_label": "通常ボラ相場",
+        "atr_ratio": 0.86,
+        "atr_90d": 0.00192,
+        "sl_multiplier": 3.0,
+        "tp1_multiplier": 1.5,
+        "tp2_multiplier": 4.5,
+        "tp3_multiplier": 6.0,
+        "note": "ATR比率0.9 → TP=1.5×ATR（Phase1出口改善・到達率向上）"
+      },
+      "staged_tp": {
+        "sl": 1.09235,
+        "tp": 1.099175,
+        "trail_atr_mult": 2.0,
+        "trail_distance": 0.0033,
+        "be_plus_offset": 0.002475,
+        "be_target_after_tp": 1.099175,
+        "max_target": 1.1066,
+        "rr_tp": 0.5,
+        "tp_mode": "single_with_trail",
+        "tp1": 1.099175,
+        "tp2": 1.104125,
+        "tp3": 1.1066,
+        "sl_width": 0.00495,
+        "tp1_width": 0.002475,
+        "rr_tp1": 0.5,
+        "rr_tp2": 1.5,
+        "rr_tp3": 2.0,
+        "spread_price": 0.00027,
+        "spread_pips": 2.7,
+        "spread_atr_ratio": 0.164,
+        "sl_dist_effective": 0.005085,
+        "tp_dist_effective": 0.00234,
+        "rr_effective": 0.46,
+        "spread_is_dynamic": true,
+        "spread_pips_dynamic": 2.7,
+        "regime_label": "通常ボラ相場",
+        "strategy": "TP(1.099175)到達 → SLを BE+0.5R(1.099175) へ移動 → トレーリング(2.0×ATR=0.0033)発動 → 利を伸ばす（理論最大: 1.1066）",
+        "chandelier_sl_active": true,
+        "chandelier_note": "Chandelier Exit: 過去22日高値(1.0973)-3.0xATR",
+        "spread_session": "NY afternoon",
+        "spread_session_mult": 1.0,
+        "spread_vix_mult": 0.9
+      },
+      "carry_score": {
+        "carry_score": 23.26,
+        "label": "非常に優れたキャリー",
+        "annual_swap_pct": 3.5,
+        "daily_volatility_pct": 0.15,
+        "breakeven_days": 39,
+        "note": "SL幅をスワップで回収: 約39日"
+      },
+      "support_resistance": {
+        "resistance": [],
+        "support": [
+          {
+            "price": 1.0386,
+            "strength": 2,
+            "label": "サポート",
+            "distance_pct": 5.3
+          },
+          {
+            "price": 1.0505,
+            "strength": 2,
+            "label": "サポート",
+            "distance_pct": 4.21
+          },
+          {
+            "price": 1.041,
+            "strength": 1,
+            "label": "弱いサポート",
+            "distance_pct": 5.08
+          },
+          {
+            "price": 1.0436,
+            "strength": 1,
+            "label": "弱いサポート",
+            "distance_pct": 4.84
+          }
+        ],
+        "nearest_resistance": null,
+        "nearest_support": {
+          "price": 1.0505,
+          "strength": 2,
+          "label": "サポート",
+          "distance_pct": 4.21
+        },
+        "context": "サポート(1.0505)まで4.21%"
+      },
+      "market_regime": {
+        "adx": 57.1,
+        "plus_di": 78.6,
+        "minus_di": 21.4,
+        "regime": "trending",
+        "regime_label": "トレンド相場",
+        "trend_direction": "up",
+        "note": "順張りシグナル有効"
+      },
+      "ambush": {
+        "has_alert": false,
+        "approaching": []
+      },
+      "spread_filter_applied": true,
+      "spread_filter_reason": "💸 スプレッド広め: GBPCHF spread=2.7pips (16% of ATR) — 実効RR 1:0.5→1:0.46。★4→★3降格。",
+      "cb_meeting_blackout": {
+        "active": false,
+        "severity": "none",
+        "reason": ""
+      },
+      "strength_context": {
+        "base_currency": "GBP",
+        "quote_currency": "CHF",
+        "base_score": 9.6,
+        "base_label": "中立",
+        "base_rank": 5,
+        "quote_score": -36.4,
+        "quote_label": "やや弱い",
+        "quote_rank": 16,
+        "spread": 46.0,
+        "context": "強い通貨 vs 弱い通貨（ロング有利）",
+        "bias": "long"
       }
     },
     {
       "pair": "AUDCHF",
       "label": "AUD/CHF",
-      "price": 0.5738,
+      "price": 0.574,
       "ta_score": 98,
       "dma_score": 85,
       "macd_score": 85,
@@ -2603,10 +3123,10 @@
       "ema_short_bonus": 12,
       "dma200": 0.54989,
       "dma50": 0.56468,
-      "rsi": 65.36,
-      "macd": 0.00241,
+      "rsi": 65.74,
+      "macd": 0.00243,
       "macd_signal": 0.00218,
-      "atr": 0.0013,
+      "atr": 0.00131,
       "rsi_reversal_confirmed": false,
       "ta_score_overheated": true,
       "fa_score": 74.0,
@@ -2618,7 +3138,7 @@
       "direction": "LONG",
       "pair_type": "major",
       "sentiment_notes": [
-        "金価格=4422.7 急騰・有事の安全資産需要"
+        "金価格=4415.6 急騰・有事の安全資産需要"
       ],
       "intervention_news": {
         "CHF": {
@@ -2631,13 +3151,13 @@
           "reason": "検知キーワード: snb intervention, franc intervention",
           "headlines": [
             "Swiss Franc: Intervention risk keeps Franc lagging – OCBC - FXStreet",
-            "Swiss Franc’s Haven Run Seen Nearing SNB Intervention Threshold - Bloomberg",
+            "Swiss Franc’s Haven Run Seen Nearing SNB Intervention Threshold - Bloomberg.com",
             "Switzerland risks the ire of the White House as it flags potential currency intervention - CNBC",
             "Swiss Franc: Intervention stance offsets safe-haven appeal – Rabobank - FXStreet",
             "UBS lowers Swiss franc forecast as SNB intervention falls short - Investing.com"
           ],
           "cached": true,
-          "timestamp": "2026-08-13T16:05:52.981899+00:00"
+          "timestamp": "2026-08-13T18:05:40.825627+00:00"
         }
       },
       "intervention_watch_warning": [
@@ -2647,7 +3167,7 @@
       "volatility_regime": {
         "regime": "normal",
         "regime_label": "通常ボラ相場",
-        "atr_ratio": 0.88,
+        "atr_ratio": 0.89,
         "atr_90d": 0.00147,
         "sl_multiplier": 3.0,
         "tp1_multiplier": 1.5,
@@ -2656,41 +3176,41 @@
         "note": "ATR比率0.9 → TP=1.5×ATR（Phase1出口改善・到達率向上）"
       },
       "staged_tp": {
-        "sl": 0.5699,
-        "tp": 0.57575,
+        "sl": 0.57007,
+        "tp": 0.575965,
         "trail_atr_mult": 2.0,
-        "trail_distance": 0.0026,
-        "be_plus_offset": 0.00195,
-        "be_target_after_tp": 0.57575,
-        "max_target": 0.5816,
+        "trail_distance": 0.00262,
+        "be_plus_offset": 0.001965,
+        "be_target_after_tp": 0.575965,
+        "max_target": 0.58186,
         "rr_tp": 0.5,
         "tp_mode": "single_with_trail",
-        "tp1": 0.57575,
-        "tp2": 0.57965,
-        "tp3": 0.5816,
-        "sl_width": 0.0039,
-        "tp1_width": 0.00195,
+        "tp1": 0.575965,
+        "tp2": 0.579895,
+        "tp3": 0.58186,
+        "sl_width": 0.00393,
+        "tp1_width": 0.001965,
         "rr_tp1": 0.5,
         "rr_tp2": 1.5,
         "rr_tp3": 2.0,
-        "spread_price": 0.000216,
-        "spread_pips": 2.2,
-        "spread_atr_ratio": 0.166,
-        "sl_dist_effective": 0.004008,
-        "tp_dist_effective": 0.001842,
-        "rr_effective": 0.46,
+        "spread_price": 0.00027,
+        "spread_pips": 2.7,
+        "spread_atr_ratio": 0.206,
+        "sl_dist_effective": 0.004065,
+        "tp_dist_effective": 0.00183,
+        "rr_effective": 0.45,
         "spread_is_dynamic": true,
-        "spread_pips_dynamic": 2.16,
+        "spread_pips_dynamic": 2.7,
         "regime_label": "通常ボラ相場",
-        "strategy": "TP(0.57575)到達 → SLを BE+0.5R(0.57575) へ移動 → トレーリング(2.0×ATR=0.0026)発動 → 利を伸ばす（理論最大: 0.5816）",
+        "strategy": "TP(0.575965)到達 → SLを BE+0.5R(0.575965) へ移動 → トレーリング(2.0×ATR=0.00262)発動 → 利を伸ばす（理論最大: 0.58186）",
         "chandelier_sl_active": false,
         "chandelier_note": "",
-        "spread_session": "London/NY overlap",
-        "spread_session_mult": 0.8,
+        "spread_session": "NY afternoon",
+        "spread_session_mult": 1.0,
         "spread_vix_mult": 0.9
       },
       "carry_score": {
-        "carry_score": 18.1,
+        "carry_score": 17.96,
         "label": "非常に優れたキャリー",
         "annual_swap_pct": 4.1,
         "daily_volatility_pct": 0.23,
@@ -2704,25 +3224,25 @@
             "price": 0.51465,
             "strength": 1,
             "label": "弱いサポート",
-            "distance_pct": 10.31
+            "distance_pct": 10.34
           },
           {
             "price": 0.52528,
             "strength": 1,
             "label": "弱いサポート",
-            "distance_pct": 8.46
+            "distance_pct": 8.49
           },
           {
             "price": 0.53203,
             "strength": 1,
             "label": "弱いサポート",
-            "distance_pct": 7.28
+            "distance_pct": 7.31
           },
           {
             "price": 0.5471,
             "strength": 1,
             "label": "弱いサポート",
-            "distance_pct": 4.65
+            "distance_pct": 4.69
           }
         ],
         "nearest_resistance": null,
@@ -2730,14 +3250,14 @@
           "price": 0.5471,
           "strength": 1,
           "label": "弱いサポート",
-          "distance_pct": 4.65
+          "distance_pct": 4.69
         },
-        "context": "サポート(0.5471)まで4.65%"
+        "context": "サポート(0.5471)まで4.69%"
       },
       "market_regime": {
-        "adx": 18.2,
-        "plus_di": 59.1,
-        "minus_di": 40.9,
+        "adx": 19.1,
+        "plus_di": 59.6,
+        "minus_di": 40.4,
         "regime": "ranging",
         "regime_label": "レンジ相場",
         "trend_direction": "up",
@@ -2748,7 +3268,7 @@
         "approaching": []
       },
       "spread_filter_applied": true,
-      "spread_filter_reason": "💸 スプレッド広め: AUDCHF spread=2.2pips (17% of ATR) — 実効RR 1:0.5→1:0.46。★4→★3降格。",
+      "spread_filter_reason": "💸 スプレッド広め: AUDCHF spread=2.7pips (21% of ATR) — 実効RR 1:0.5→1:0.45。★4→★3降格。",
       "cb_meeting_blackout": {
         "active": false,
         "severity": "none",
@@ -2757,13 +3277,13 @@
       "strength_context": {
         "base_currency": "AUD",
         "quote_currency": "CHF",
-        "base_score": 22.6,
-        "base_label": "やや強い",
+        "base_score": 13.1,
+        "base_label": "中立",
         "base_rank": 4,
-        "quote_score": -100.0,
-        "quote_label": "弱い",
-        "quote_rank": 11,
-        "spread": 122.6,
+        "quote_score": -36.4,
+        "quote_label": "やや弱い",
+        "quote_rank": 16,
+        "spread": 49.5,
         "context": "強い通貨 vs 弱い通貨（ロング有利）",
         "bias": "long"
       }
@@ -2771,7 +3291,7 @@
     {
       "pair": "EURCHF",
       "label": "EUR/CHF",
-      "price": 0.9375,
+      "price": 0.9377,
       "ta_score": 65.3,
       "dma_score": 70,
       "macd_score": 85,
@@ -2782,11 +3302,11 @@
       "divergence_adj": 0,
       "ema_short_bonus": 12,
       "dma200": 0.92224,
-      "dma50": 0.92619,
-      "rsi": 72.45,
-      "macd": 0.00332,
+      "dma50": 0.9262,
+      "rsi": 72.8,
+      "macd": 0.00333,
       "macd_signal": 0.00305,
-      "atr": 0.00114,
+      "atr": 0.00115,
       "rsi_reversal_confirmed": false,
       "ta_score_overheated": false,
       "fa_score": 66.1,
@@ -2798,7 +3318,7 @@
       "direction": "LONG",
       "pair_type": "safe_haven",
       "sentiment_notes": [
-        "金価格=4422.7 急騰・有事の安全資産需要"
+        "金価格=4415.6 急騰・有事の安全資産需要"
       ],
       "intervention_news": {
         "EUR": {
@@ -2808,7 +3328,7 @@
           "reason": "関連報道なし",
           "headlines": [],
           "cached": true,
-          "timestamp": "2026-08-13T16:05:44.806151+00:00"
+          "timestamp": "2026-08-13T18:04:57.244182+00:00"
         },
         "CHF": {
           "score": 80,
@@ -2820,13 +3340,13 @@
           "reason": "検知キーワード: snb intervention, franc intervention",
           "headlines": [
             "Swiss Franc: Intervention risk keeps Franc lagging – OCBC - FXStreet",
-            "Swiss Franc’s Haven Run Seen Nearing SNB Intervention Threshold - Bloomberg",
+            "Swiss Franc’s Haven Run Seen Nearing SNB Intervention Threshold - Bloomberg.com",
             "Switzerland risks the ire of the White House as it flags potential currency intervention - CNBC",
             "Swiss Franc: Intervention stance offsets safe-haven appeal – Rabobank - FXStreet",
             "UBS lowers Swiss franc forecast as SNB intervention falls short - Investing.com"
           ],
           "cached": true,
-          "timestamp": "2026-08-13T16:05:52.981899+00:00"
+          "timestamp": "2026-08-13T18:05:40.825627+00:00"
         }
       },
       "intervention_watch_warning": [
@@ -2836,7 +3356,7 @@
       "volatility_regime": {
         "regime": "normal",
         "regime_label": "通常ボラ相場",
-        "atr_ratio": 0.84,
+        "atr_ratio": 0.85,
         "atr_90d": 0.00135,
         "sl_multiplier": 3.0,
         "tp1_multiplier": 1.5,
@@ -2845,46 +3365,46 @@
         "note": "ATR比率0.8 → TP=1.5×ATR（Phase1出口改善・到達率向上）"
       },
       "staged_tp": {
-        "sl": 0.93408,
-        "tp": 0.93921,
+        "sl": 0.93425,
+        "tp": 0.939425,
         "trail_atr_mult": 2.0,
-        "trail_distance": 0.00228,
-        "be_plus_offset": 0.00171,
-        "be_target_after_tp": 0.93921,
-        "max_target": 0.94434,
+        "trail_distance": 0.0023,
+        "be_plus_offset": 0.001725,
+        "be_target_after_tp": 0.939425,
+        "max_target": 0.9446,
         "rr_tp": 0.5,
         "tp_mode": "single_with_trail",
-        "tp1": 0.93921,
-        "tp2": 0.94263,
-        "tp3": 0.94434,
-        "sl_width": 0.00342,
-        "tp1_width": 0.00171,
+        "tp1": 0.939425,
+        "tp2": 0.942875,
+        "tp3": 0.9446,
+        "sl_width": 0.00345,
+        "tp1_width": 0.001725,
         "rr_tp1": 0.5,
         "rr_tp2": 1.5,
         "rr_tp3": 2.0,
-        "spread_price": 0.000216,
-        "spread_pips": 2.2,
-        "spread_atr_ratio": 0.189,
-        "sl_dist_effective": 0.003528,
-        "tp_dist_effective": 0.001602,
-        "rr_effective": 0.45,
+        "spread_price": 0.00027,
+        "spread_pips": 2.7,
+        "spread_atr_ratio": 0.235,
+        "sl_dist_effective": 0.003585,
+        "tp_dist_effective": 0.00159,
+        "rr_effective": 0.44,
         "spread_is_dynamic": true,
-        "spread_pips_dynamic": 2.16,
+        "spread_pips_dynamic": 2.7,
         "regime_label": "通常ボラ相場",
-        "strategy": "TP(0.93921)到達 → SLを BE+0.5R(0.93921) へ移動 → トレーリング(2.0×ATR=0.00228)発動 → 利を伸ばす（理論最大: 0.94434）",
+        "strategy": "TP(0.939425)到達 → SLを BE+0.5R(0.939425) へ移動 → トレーリング(2.0×ATR=0.0023)発動 → 利を伸ばす（理論最大: 0.9446）",
         "chandelier_sl_active": false,
         "chandelier_note": "",
-        "spread_session": "London/NY overlap",
-        "spread_session_mult": 0.8,
+        "spread_session": "NY afternoon",
+        "spread_session_mult": 1.0,
         "spread_vix_mult": 0.9
       },
       "carry_score": {
-        "carry_score": 17.68,
+        "carry_score": 17.53,
         "label": "非常に優れたキャリー",
         "annual_swap_pct": 2.15,
         "daily_volatility_pct": 0.12,
-        "breakeven_days": 51,
-        "note": "SL幅をスワップで回収: 約51日"
+        "breakeven_days": 52,
+        "note": "SL幅をスワップで回収: 約52日"
       },
       "support_resistance": {
         "resistance": [
@@ -2892,7 +3412,7 @@
             "price": 0.939,
             "strength": 1,
             "label": "弱いレジスタンス",
-            "distance_pct": 0.16
+            "distance_pct": 0.14
           }
         ],
         "support": [
@@ -2900,45 +3420,45 @@
             "price": 0.918933,
             "strength": 3,
             "label": "サポート",
-            "distance_pct": 1.98
+            "distance_pct": 2.0
           },
           {
             "price": 0.929,
             "strength": 2,
             "label": "サポート",
-            "distance_pct": 0.91
+            "distance_pct": 0.93
           },
           {
             "price": 0.9008,
             "strength": 1,
             "label": "弱いサポート",
-            "distance_pct": 3.91
+            "distance_pct": 3.94
           },
           {
             "price": 0.9099,
             "strength": 1,
             "label": "弱いサポート",
-            "distance_pct": 2.94
+            "distance_pct": 2.96
           }
         ],
         "nearest_resistance": {
           "price": 0.939,
           "strength": 1,
           "label": "弱いレジスタンス",
-          "distance_pct": 0.16
+          "distance_pct": 0.14
         },
         "nearest_support": {
           "price": 0.929,
           "strength": 2,
           "label": "サポート",
-          "distance_pct": 0.91
+          "distance_pct": 0.93
         },
-        "context": "レジスタンス(0.939)まで0.16%（非常に近い・注意） / サポート(0.929)まで0.91%"
+        "context": "レジスタンス(0.939)まで0.14%（非常に近い・注意） / サポート(0.929)まで0.93%"
       },
       "market_regime": {
-        "adx": 55.8,
-        "plus_di": 77.9,
-        "minus_di": 22.1,
+        "adx": 56.4,
+        "plus_di": 78.2,
+        "minus_di": 21.8,
         "regime": "trending",
         "regime_label": "トレンド相場",
         "trend_direction": "up",
@@ -2956,7 +3476,7 @@
         "approaching": []
       },
       "spread_caution": true,
-      "spread_caution_reason": "💸 スプレッド広め: EURCHF spread=2.2pips (19% of ATR)。実効RR 1:0.45",
+      "spread_caution_reason": "💸 スプレッド広め: EURCHF spread=2.7pips (24% of ATR)。実効RR 1:0.44",
       "cb_meeting_blackout": {
         "active": false,
         "severity": "none",
@@ -2965,15 +3485,15 @@
       "strength_context": {
         "base_currency": "EUR",
         "quote_currency": "CHF",
-        "base_score": -8.8,
+        "base_score": -3.0,
         "base_label": "中立",
-        "base_rank": 6,
-        "quote_score": -100.0,
-        "quote_label": "弱い",
-        "quote_rank": 11,
-        "spread": 91.2,
-        "context": "強い通貨 vs 弱い通貨（ロング有利）",
-        "bias": "long"
+        "base_rank": 9,
+        "quote_score": -36.4,
+        "quote_label": "やや弱い",
+        "quote_rank": 16,
+        "spread": 33.4,
+        "context": "やや強い通貨 vs 弱め（ロング寄り）",
+        "bias": "slight_long"
       }
     },
     {
@@ -3006,7 +3526,7 @@
       "direction": "LIGHT_LONG",
       "pair_type": "major",
       "sentiment_notes": [
-        "金価格=4422.7 急騰・有事の安全資産需要"
+        "金価格=4415.6 急騰・有事の安全資産需要"
       ],
       "upcoming_events": [],
       "volatility_regime": {
@@ -3038,20 +3558,20 @@
         "rr_tp1": 0.5,
         "rr_tp2": 1.5,
         "rr_tp3": 2.0,
-        "spread_price": 0.000216,
-        "spread_pips": 2.2,
-        "spread_atr_ratio": 0.079,
-        "sl_dist_effective": 0.008328,
-        "tp_dist_effective": 0.004002,
+        "spread_price": 0.00027,
+        "spread_pips": 2.7,
+        "spread_atr_ratio": 0.099,
+        "sl_dist_effective": 0.008355,
+        "tp_dist_effective": 0.003975,
         "rr_effective": 0.48,
         "spread_is_dynamic": true,
-        "spread_pips_dynamic": 2.16,
+        "spread_pips_dynamic": 2.7,
         "regime_label": "通常ボラ相場",
         "strategy": "TP(1.21101)到達 → SLを BE+0.5R(1.21101) へ移動 → トレーリング(2.0×ATR=0.00548)発動 → 利を伸ばす（理論最大: 1.22334）",
         "chandelier_sl_active": true,
         "chandelier_note": "Chandelier Exit: 過去22日高値(1.2086)-3.0xATR",
-        "spread_session": "London/NY overlap",
-        "spread_session_mult": 0.8,
+        "spread_session": "NY afternoon",
+        "spread_session_mult": 1.0,
         "spread_vix_mult": 0.9
       },
       "carry_score": {
@@ -3168,21 +3688,21 @@
       "strength_context": {
         "base_currency": "AUD",
         "quote_currency": "NZD",
-        "base_score": 22.6,
-        "base_label": "やや強い",
+        "base_score": 13.1,
+        "base_label": "中立",
         "base_rank": 4,
-        "quote_score": 79.1,
-        "quote_label": "強い",
-        "quote_rank": 1,
-        "spread": -56.5,
-        "context": "弱い通貨 vs 強い通貨（ショート有利）",
-        "bias": "short"
+        "quote_score": 23.8,
+        "quote_label": "やや強い",
+        "quote_rank": 3,
+        "spread": -10.7,
+        "context": "通貨強弱が拮抗（中立）",
+        "bias": "neutral"
       }
     },
     {
       "pair": "EURNZD",
       "label": "EUR/NZD",
-      "price": 1.9718,
+      "price": 1.9715,
       "ta_score": 58.3,
       "dma_score": 15,
       "macd_score": 65,
@@ -3193,11 +3713,11 @@
       "divergence_adj": 0,
       "ema_short_bonus": 0,
       "dma200": 1.99415,
-      "dma50": 1.98164,
-      "rsi": 51.34,
-      "macd": -0.00302,
+      "dma50": 1.98163,
+      "rsi": 51.11,
+      "macd": -0.00304,
       "macd_signal": -0.00512,
-      "atr": 0.00473,
+      "atr": 0.00475,
       "rsi_reversal_confirmed": true,
       "ta_score_overheated": false,
       "fa_score": 47.2,
@@ -3209,7 +3729,7 @@
       "direction": "LIGHT_LONG",
       "pair_type": "major",
       "sentiment_notes": [
-        "金価格=4422.7 急騰・有事の安全資産需要"
+        "金価格=4415.6 急騰・有事の安全資産需要"
       ],
       "intervention_news": {
         "EUR": {
@@ -3219,7 +3739,7 @@
           "reason": "関連報道なし",
           "headlines": [],
           "cached": true,
-          "timestamp": "2026-08-13T16:05:44.806151+00:00"
+          "timestamp": "2026-08-13T18:04:57.244182+00:00"
         }
       },
       "upcoming_events": [],
@@ -3235,37 +3755,37 @@
         "note": "ATR比率0.9 → TP=1.5×ATR（Phase1出口改善・到達率向上）"
       },
       "staged_tp": {
-        "sl": 1.95931,
-        "tp": 1.978895,
+        "sl": 1.95925,
+        "tp": 1.978625,
         "trail_atr_mult": 2.0,
-        "trail_distance": 0.00946,
-        "be_plus_offset": 0.007095,
-        "be_target_after_tp": 1.978895,
-        "max_target": 2.00018,
+        "trail_distance": 0.0095,
+        "be_plus_offset": 0.007125,
+        "be_target_after_tp": 1.978625,
+        "max_target": 2.0,
         "rr_tp": 0.5,
         "tp_mode": "single_with_trail",
-        "tp1": 1.978895,
-        "tp2": 1.993085,
-        "tp3": 2.00018,
-        "sl_width": 0.01419,
-        "tp1_width": 0.007095,
+        "tp1": 1.978625,
+        "tp2": 1.992875,
+        "tp3": 2.0,
+        "sl_width": 0.01425,
+        "tp1_width": 0.007125,
         "rr_tp1": 0.5,
         "rr_tp2": 1.5,
         "rr_tp3": 2.0,
-        "spread_price": 0.000216,
-        "spread_pips": 2.2,
-        "spread_atr_ratio": 0.046,
-        "sl_dist_effective": 0.014298,
-        "tp_dist_effective": 0.006987,
+        "spread_price": 0.00027,
+        "spread_pips": 2.7,
+        "spread_atr_ratio": 0.057,
+        "sl_dist_effective": 0.014385,
+        "tp_dist_effective": 0.00699,
         "rr_effective": 0.49,
         "spread_is_dynamic": true,
-        "spread_pips_dynamic": 2.16,
+        "spread_pips_dynamic": 2.7,
         "regime_label": "通常ボラ相場",
-        "strategy": "TP(1.978895)到達 → SLを BE+0.5R(1.978895) へ移動 → トレーリング(2.0×ATR=0.00946)発動 → 利を伸ばす（理論最大: 2.00018）",
+        "strategy": "TP(1.978625)到達 → SLを BE+0.5R(1.978625) へ移動 → トレーリング(2.0×ATR=0.0095)発動 → 利を伸ばす（理論最大: 2.0）",
         "chandelier_sl_active": true,
         "chandelier_note": "Chandelier Exit: 過去22日高値(1.9735)-3.0xATR",
-        "spread_session": "London/NY overlap",
-        "spread_session_mult": 0.8,
+        "spread_session": "NY afternoon",
+        "spread_session_mult": 1.0,
         "spread_vix_mult": 0.9
       },
       "carry_score": {
@@ -3273,8 +3793,8 @@
         "label": "キャリー効率が低い",
         "annual_swap_pct": 0.1,
         "daily_volatility_pct": 0.24,
-        "breakeven_days": 2188,
-        "note": "SL幅をスワップで回収: 約2188日"
+        "breakeven_days": 2198,
+        "note": "SL幅をスワップで回収: 約2198日"
       },
       "support_resistance": {
         "resistance": [
@@ -3282,25 +3802,25 @@
             "price": 1.99105,
             "strength": 2,
             "label": "レジスタンス",
-            "distance_pct": 0.98
+            "distance_pct": 0.99
           },
           {
             "price": 1.9783,
             "strength": 1,
             "label": "弱いレジスタンス",
-            "distance_pct": 0.33
+            "distance_pct": 0.34
           },
           {
             "price": 1.9981,
             "strength": 1,
             "label": "弱いレジスタンス",
-            "distance_pct": 1.33
+            "distance_pct": 1.35
           },
           {
             "price": 2.0181,
             "strength": 1,
             "label": "弱いレジスタンス",
-            "distance_pct": 2.35
+            "distance_pct": 2.36
           }
         ],
         "support": [
@@ -3308,45 +3828,45 @@
             "price": 1.9573,
             "strength": 3,
             "label": "サポート",
-            "distance_pct": 0.74
+            "distance_pct": 0.72
           },
           {
             "price": 1.9526,
             "strength": 2,
             "label": "サポート",
-            "distance_pct": 0.97
+            "distance_pct": 0.96
           },
           {
             "price": 1.9491,
             "strength": 1,
             "label": "弱いサポート",
-            "distance_pct": 1.15
+            "distance_pct": 1.14
           },
           {
             "price": 1.969,
             "strength": 1,
             "label": "弱いサポート",
-            "distance_pct": 0.14
+            "distance_pct": 0.13
           }
         ],
         "nearest_resistance": {
           "price": 1.9783,
           "strength": 1,
           "label": "弱いレジスタンス",
-          "distance_pct": 0.33
+          "distance_pct": 0.34
         },
         "nearest_support": {
           "price": 1.969,
           "strength": 1,
           "label": "弱いサポート",
-          "distance_pct": 0.14
+          "distance_pct": 0.13
         },
-        "context": "レジスタンス(1.9783)まで0.33%（非常に近い・注意） / サポート(1.969)まで0.14%（非常に近い・注意）"
+        "context": "レジスタンス(1.9783)まで0.34%（非常に近い・注意） / サポート(1.969)まで0.13%（非常に近い・注意）"
       },
       "market_regime": {
-        "adx": 8.4,
-        "plus_di": 54.2,
-        "minus_di": 45.8,
+        "adx": 7.9,
+        "plus_di": 54.0,
+        "minus_di": 46.0,
         "regime": "ranging",
         "regime_label": "レンジ相場",
         "trend_direction": "up",
@@ -3364,21 +3884,21 @@
       "strength_context": {
         "base_currency": "EUR",
         "quote_currency": "NZD",
-        "base_score": -8.8,
+        "base_score": -3.0,
         "base_label": "中立",
-        "base_rank": 6,
-        "quote_score": 79.1,
-        "quote_label": "強い",
-        "quote_rank": 1,
-        "spread": -87.9,
-        "context": "弱い通貨 vs 強い通貨（ショート有利）",
-        "bias": "short"
+        "base_rank": 9,
+        "quote_score": 23.8,
+        "quote_label": "やや強い",
+        "quote_rank": 3,
+        "spread": -26.8,
+        "context": "やや弱い通貨 vs 強め（ショート寄り）",
+        "bias": "slight_short"
       }
     },
     {
       "pair": "USDCNY",
       "label": "USD/CNY",
-      "price": 6.7319,
+      "price": 6.733,
       "ta_score": 49.7,
       "dma_score": 15,
       "macd_score": 15,
@@ -3388,12 +3908,12 @@
       "breakout_bonus": 15,
       "divergence_adj": 0,
       "ema_short_bonus": -12,
-      "dma200": 6.88756,
-      "dma50": 6.77111,
-      "rsi": 27.76,
-      "macd": -0.01026,
-      "macd_signal": -0.0088,
-      "atr": 0.00463,
+      "dma200": 6.88757,
+      "dma50": 6.77113,
+      "rsi": 28.24,
+      "macd": -0.01017,
+      "macd_signal": -0.00878,
+      "atr": 0.00455,
       "rsi_reversal_confirmed": false,
       "ta_score_overheated": false,
       "fa_score": 55.6,
@@ -3405,7 +3925,7 @@
       "direction": "LIGHT_SHORT",
       "pair_type": "dollar",
       "sentiment_notes": [
-        "金価格=4422.7 急騰・有事の安全資産需要"
+        "金価格=4415.6 急騰・有事の安全資産需要"
       ],
       "geopolitical_risk": {
         "risk_level": "medium",
@@ -3415,7 +3935,7 @@
           "\"China (election OR protest OR crisis OR sanction OR \"central bank\" OR geopolitics)\" - Google News",
           "Google News",
           "The Next Global Economic Crisis Could Be Made in China - Foreign Affairs",
-          "China's Maritime Militia in a Taiwan Crisis: The Logistical and Regulatory Foundations behind a Maritime Quarantine - Global Taiwan Institute"
+          "China's central bank pledges timely new policy rollout - Reuters"
         ],
         "categories": {
           "political_instability": {
@@ -3446,15 +3966,15 @@
             "US Treasury faces limits on currency intervention capacity, JPMorgan warns - Crypto Briefing"
           ],
           "cached": true,
-          "timestamp": "2026-08-13T16:05:40.685040+00:00"
+          "timestamp": "2026-08-13T18:03:24.890024+00:00"
         }
       },
       "upcoming_events": [],
       "volatility_regime": {
         "regime": "normal",
         "regime_label": "通常ボラ相場",
-        "atr_ratio": 0.72,
-        "atr_90d": 0.00641,
+        "atr_ratio": 0.71,
+        "atr_90d": 0.0064,
         "sl_multiplier": 3.0,
         "tp1_multiplier": 1.5,
         "tp2_multiplier": 4.5,
@@ -3462,46 +3982,46 @@
         "note": "ATR比率0.7 → TP=1.5×ATR（Phase1出口改善・到達率向上）"
       },
       "staged_tp": {
-        "sl": 6.74579,
-        "tp": 6.724955,
+        "sl": 6.74665,
+        "tp": 6.726175,
         "trail_atr_mult": 2.0,
-        "trail_distance": 0.00926,
-        "be_plus_offset": 0.006945,
-        "be_target_after_tp": 6.724955,
-        "max_target": 6.70412,
+        "trail_distance": 0.0091,
+        "be_plus_offset": 0.006825,
+        "be_target_after_tp": 6.726175,
+        "max_target": 6.7057,
         "rr_tp": 0.5,
         "tp_mode": "single_with_trail",
-        "tp1": 6.724955,
-        "tp2": 6.711065,
-        "tp3": 6.70412,
-        "sl_width": 0.01389,
-        "tp1_width": 0.006945,
+        "tp1": 6.726175,
+        "tp2": 6.712525,
+        "tp3": 6.7057,
+        "sl_width": 0.01365,
+        "tp1_width": 0.006825,
         "rr_tp1": 0.5,
         "rr_tp2": 1.5,
         "rr_tp3": 2.0,
-        "spread_price": 0.000216,
-        "spread_pips": 2.2,
-        "spread_atr_ratio": 0.047,
-        "sl_dist_effective": 0.013998,
-        "tp_dist_effective": 0.006837,
+        "spread_price": 0.00027,
+        "spread_pips": 2.7,
+        "spread_atr_ratio": 0.059,
+        "sl_dist_effective": 0.013785,
+        "tp_dist_effective": 0.00669,
         "rr_effective": 0.49,
         "spread_is_dynamic": true,
-        "spread_pips_dynamic": 2.16,
+        "spread_pips_dynamic": 2.7,
         "regime_label": "通常ボラ相場",
-        "strategy": "TP(6.724955)到達 → SLを BE+0.5R(6.724955) へ移動 → トレーリング(2.0×ATR=0.00926)発動 → 利を伸ばす（理論最大: 6.70412）",
+        "strategy": "TP(6.726175)到達 → SLを BE+0.5R(6.726175) へ移動 → トレーリング(2.0×ATR=0.0091)発動 → 利を伸ばす（理論最大: 6.7057）",
         "chandelier_sl_active": false,
         "chandelier_note": "",
-        "spread_session": "London/NY overlap",
-        "spread_session_mult": 0.8,
+        "spread_session": "NY afternoon",
+        "spread_session_mult": 1.0,
         "spread_vix_mult": 0.9
       },
       "carry_score": {
-        "carry_score": 10.9,
+        "carry_score": 11.1,
         "label": "非常に優れたキャリー",
         "annual_swap_pct": 0.75,
         "daily_volatility_pct": 0.07,
-        "breakeven_days": 83,
-        "note": "SL幅をスワップで回収: 約83日"
+        "breakeven_days": 82,
+        "note": "SL幅をスワップで回収: 約82日"
       },
       "support_resistance": {
         "resistance": [
@@ -3509,25 +4029,25 @@
             "price": 6.81075,
             "strength": 2,
             "label": "レジスタンス",
-            "distance_pct": 1.17
+            "distance_pct": 1.15
           },
           {
             "price": 6.7819,
             "strength": 1,
             "label": "弱いレジスタンス",
-            "distance_pct": 0.74
+            "distance_pct": 0.73
           },
           {
             "price": 6.8002,
             "strength": 1,
             "label": "弱いレジスタンス",
-            "distance_pct": 1.01
+            "distance_pct": 1.0
           },
           {
             "price": 6.8388,
             "strength": 1,
             "label": "弱いレジスタンス",
-            "distance_pct": 1.59
+            "distance_pct": 1.57
           }
         ],
         "support": [],
@@ -3535,15 +4055,15 @@
           "price": 6.7819,
           "strength": 1,
           "label": "弱いレジスタンス",
-          "distance_pct": 0.74
+          "distance_pct": 0.73
         },
         "nearest_support": null,
-        "context": "レジスタンス(6.7819)まで0.74%"
+        "context": "レジスタンス(6.7819)まで0.73%"
       },
       "market_regime": {
-        "adx": 67.3,
-        "plus_di": 16.3,
-        "minus_di": 83.7,
+        "adx": 66.6,
+        "plus_di": 16.7,
+        "minus_di": 83.3,
         "regime": "trending",
         "regime_label": "トレンド相場",
         "trend_direction": "down",
@@ -3553,23 +4073,23 @@
         "has_alert": true,
         "nearest": {
           "type": "ピボットS1",
-          "price": 6.734067,
+          "price": 6.7348,
           "role": "ピボットS1",
           "kind": "resistance",
-          "distance": 0.002167,
-          "distance_pct": 0.032
+          "distance": 0.0018,
+          "distance_pct": 0.027
         },
         "approaching": [
           {
             "type": "ピボットS1",
-            "price": 6.734067,
+            "price": 6.7348,
             "role": "ピボットS1",
             "kind": "resistance",
-            "distance": 0.002167,
-            "distance_pct": 0.032
+            "distance": 0.0018,
+            "distance_pct": 0.027
           }
         ],
-        "message": "ピボットS1（6.734067）に接近 あと0.03% → 反落でのショート候補"
+        "message": "ピボットS1（6.7348）に接近 あと0.03% → 反落でのショート候補"
       },
       "cb_meeting_blackout": {
         "active": false,
@@ -3579,15 +4099,15 @@
       "strength_context": {
         "base_currency": "USD",
         "quote_currency": "CNY",
-        "base_score": -78.1,
-        "base_label": "弱い",
-        "base_rank": 9,
-        "quote_score": -5.7,
+        "base_score": -16.3,
+        "base_label": "中立",
+        "base_rank": 12,
+        "quote_score": -1.8,
         "quote_label": "中立",
-        "quote_rank": 5,
-        "spread": -72.4,
-        "context": "弱い通貨 vs 強い通貨（ショート有利）",
-        "bias": "short"
+        "quote_rank": 8,
+        "spread": -14.5,
+        "context": "通貨強弱が拮抗（中立）",
+        "bias": "neutral"
       }
     }
   ],
@@ -3595,22 +4115,22 @@
     "vix": 14.7,
     "vix_level": "normal",
     "risk_off_strength": 0,
-    "dxy": 99.93,
+    "dxy": 99.97,
     "dxy_30d_avg": 100.61,
     "dxy_trend": "flat",
-    "us10y": 4.641,
+    "us10y": 4.645,
     "bond_pressure": "elevated",
-    "gold": 4422.7,
-    "gold_20d_avg": 4159.2,
+    "gold": 4415.6,
+    "gold_20d_avg": 4158.85,
     "gold_trend": "surging",
     "risk_mode": "risk_off"
   },
   "us_yields": {
     "short": 3.758,
     "2y": 3.608,
-    "10y": 4.641,
+    "10y": 4.645,
     "30y": 3.442,
-    "spread_10y2y": 1.033,
+    "spread_10y2y": 1.037,
     "source": "U.S. Treasury Fiscal Data API",
     "avg_note_coupon": 3.309,
     "10y_source": "market yield (^TNX via Yahoo Finance)"
@@ -3792,60 +4312,85 @@
     "lessons_count": 0
   },
   "currency_strength": {
-    "USD": {
-      "score": -78.1,
-      "label": "弱い",
-      "rank": 9
+    "SGD": {
+      "score": -12.9,
+      "label": "中立",
+      "rank": 10
     },
     "JPY": {
-      "score": 39.3,
-      "label": "やや強い",
-      "rank": 3
-    },
-    "EUR": {
-      "score": -8.8,
-      "label": "中立",
-      "rank": 6
-    },
-    "GBP": {
-      "score": -17.9,
+      "score": 0.6,
       "label": "中立",
       "rank": 7
     },
-    "AUD": {
-      "score": 22.6,
-      "label": "やや強い",
-      "rank": 4
-    },
-    "CHF": {
-      "score": -100.0,
-      "label": "弱い",
-      "rank": 11
-    },
-    "SGD": {
-      "score": -35.1,
-      "label": "やや弱い",
-      "rank": 8
-    },
     "HKD": {
-      "score": -78.4,
-      "label": "弱い",
-      "rank": 10
+      "score": -29.8,
+      "label": "やや弱い",
+      "rank": 14
     },
     "CNY": {
-      "score": -5.7,
+      "score": -1.8,
+      "label": "中立",
+      "rank": 8
+    },
+    "MXN": {
+      "score": 8.5,
+      "label": "中立",
+      "rank": 6
+    },
+    "ZAR": {
+      "score": -29.6,
+      "label": "やや弱い",
+      "rank": 13
+    },
+    "GBP": {
+      "score": 9.6,
       "label": "中立",
       "rank": 5
     },
-    "NZD": {
-      "score": 79.1,
+    "USD": {
+      "score": -16.3,
+      "label": "中立",
+      "rank": 12
+    },
+    "EUR": {
+      "score": -3.0,
+      "label": "中立",
+      "rank": 9
+    },
+    "AUD": {
+      "score": 13.1,
+      "label": "中立",
+      "rank": 4
+    },
+    "SEK": {
+      "score": -15.5,
+      "label": "中立",
+      "rank": 11
+    },
+    "NOK": {
+      "score": 27.5,
+      "label": "やや強い",
+      "rank": 2
+    },
+    "BRL": {
+      "score": -34.3,
+      "label": "やや弱い",
+      "rank": 15
+    },
+    "KRW": {
+      "score": 100.0,
       "label": "強い",
       "rank": 1
     },
-    "NOK": {
-      "score": 66.2,
-      "label": "強い",
-      "rank": 2
+    "CHF": {
+      "score": -36.4,
+      "label": "やや弱い",
+      "rank": 16
+    },
+    "NZD": {
+      "score": 23.8,
+      "label": "やや強い",
+      "rank": 3
     }
   },
   "portfolio_risk": {
