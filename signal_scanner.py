@@ -1603,8 +1603,77 @@ def send_email(smtp_host, smtp_port, smtp_user, smtp_pass,
           <div style="font-size:0.85em;color:#555;margin-top:6px;">{r.get('fa_detail','')}</div>
         </div>"""
 
+    # ── 決済・状態変化・ドローダウン・レート警告（2026-08-13追加） ──────────
+    # plain_body側（body_lines）には2026-08-11に追加済みだったが、Gmail等
+    # 大半のクライアントはmultipart/alternativeのHTML版を優先表示するため、
+    # HTML版に同じ内容が無いと実質空のメールに見えてしまっていた
+    # （ユーザーのスクリーンショットで実際に空表示になっているのを確認して発覚）。
+    def _html_closed_card(t):
+        rl = reason_label.get(t.get("exit_reason"), t.get("exit_reason", "?"))
+        _p = t.get("pair", "")
+        _d = pair_decimals(_p)
+        is_win = t.get("result") == "WIN"
+        color = "#27ae60" if is_win else "#c0392b"
+        return f"""
+        <div style="border-left:4px solid {color};background:#fff;border:1px solid #ddd;
+                    border-radius:0 8px 8px 0;padding:10px 12px;margin:8px 0;">
+          <div style="font-weight:bold;color:{color};">
+            {'+' if is_win else '−'} {_p} {t.get('direction','')} {rl}
+          </div>
+          <div style="font-size:0.9em;color:#555;">
+            {fmt_price(_p, t.get('entry_price'))} → {fmt_price(_p, t.get('exit_price'))}
+            （{t.get('pips',0):+.{_d}f}pips） 保有{t.get('hold_hours',0)}h
+          </div>
+        </div>"""
+
+    def _html_state_card(sc):
+        t, upd = sc["trade"], sc["update"]
+        _p = t.get("pair", "")
+        if upd.get("tp_hit"):
+            text = (f"🎯 {_p} {t.get('direction','')} TP到達! SLをBE+0.5R"
+                    f"（{fmt_price(_p, upd.get('sl'))}）へ移動→トレーリング発動")
+        elif "sl" in upd and "extreme_price" in upd:
+            text = (f"📈 {_p} {t.get('direction','')} トレール更新 "
+                    f"高値/安値:{fmt_price(_p, upd.get('extreme_price'))} SL:{fmt_price(_p, upd.get('sl'))}")
+        else:
+            return ""
+        return f"""
+        <div style="border-left:4px solid #2980b9;background:#fff;border:1px solid #ddd;
+                    border-radius:0 8px 8px 0;padding:8px 12px;margin:6px 0;font-size:0.9em;">
+          {text}
+        </div>"""
+
+    closed_html = "".join(_html_closed_card(t) for t in _newly_closed[:5])
+    state_html = "".join(_html_state_card(sc) for sc in _state_changes[:5])
+
+    drawdown_html = ""
+    if drawdown and drawdown.get("alert"):
+        rec = drawdown.get("recommendation", "")
+        drawdown_html = f"""
+        <div style="border-left:4px solid #c0392b;background:#fdf0f0;border:1px solid #f0c4c4;
+                    border-radius:0 8px 8px 0;padding:10px 12px;margin:10px 0;">
+          <div style="font-weight:bold;color:#c0392b;">🛑 ドローダウン警告</div>
+          <div style="margin-top:4px;">{drawdown.get('message','')}</div>
+          {"<div style='font-size:0.9em;color:#555;margin-top:4px;'>→ " + rec + "</div>" if rec else ""}
+        </div>"""
+
+    rate_warn_html = ""
+    if rate_warnings:
+        items = "".join(f"<li>{w.get('message','')}</li>" for w in rate_warnings[:5])
+        rate_warn_html = f"""
+        <div style="border-left:4px solid #e67e22;background:#fff8f0;border:1px solid #f0dcc4;
+                    border-radius:0 8px 8px 0;padding:10px 12px;margin:10px 0;">
+          <div style="font-weight:bold;color:#e67e22;">🔴 金利スタンス見直し要（{len(rate_warnings)}件）</div>
+          <ul style="margin:4px 0 0 20px;padding:0;font-size:0.9em;">{items}</ul>
+        </div>"""
+
+    no_detail_html = ""
+    if not (newly or upgraded or _newly_closed or _state_changes
+            or (drawdown and drawdown.get("alert")) or rate_warnings):
+        no_detail_html = ("<div style='color:#888;font-size:0.9em;margin:12px 0;'>"
+                           "（今回の通知理由に該当する詳細情報はありません）</div>")
+
     risk_bg = {"panic": "#ffe0e0", "risk_off": "#fff3e0"}.get(risk_mode, "#f0fff4")
-    html_signals = "".join(_html_signal_card(r) for r in newly + upgraded)
     html_body = f"""<!DOCTYPE html>
 <html><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -1629,6 +1698,16 @@ def send_email(smtp_host, smtp_port, smtp_user, smtp_pass,
 
   {"<h3 style='margin:16px 0 4px;'>★4→★5 昇格</h3>" if upgraded else ""}
   {"".join(_html_signal_card(r) for r in upgraded)}
+
+  {"<h3 style='margin:16px 0 4px;'>💼 シグナル決着</h3>" if _newly_closed else ""}
+  {closed_html}
+
+  {"<h3 style='margin:16px 0 4px;'>🔄 ポジション状態変化</h3>" if state_html else ""}
+  {state_html}
+
+  {drawdown_html}
+  {rate_warn_html}
+  {no_detail_html}
 
   <div class="footer">
     <a href="{PAGES_URL}">📊 ダッシュボードを開く</a><br>
