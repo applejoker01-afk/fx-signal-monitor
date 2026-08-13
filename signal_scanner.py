@@ -1323,7 +1323,9 @@ def send_discord_pending(webhook_url, newly_created, newly_filled, expired, hear
 def send_email(smtp_host, smtp_port, smtp_user, smtp_pass,
                from_addr, to_addr, newly, upgraded, is_first,
                all_results, sentiment, us_yields,
-               trade_update=None, drawdown=None, rate_warnings=None):
+               trade_update=None, drawdown=None, rate_warnings=None,
+               currency_strength=None, portfolio_risk=None,
+               open_trades=None, ai_commentary=None, latest_pairs=None):
     """
     シグナル通知メール送信（2026-06-25 モバイル最適化 + エントリー有効性追加）
 
@@ -1338,6 +1340,15 @@ def send_email(smtp_host, smtp_port, smtp_user, smtp_pass,
     発火した回（newly/upgradedが両方空のケース）は、メールの本文がほぼ空
     （市場センチメントだけ）になり、Discordと内容が一致しない状態だった
     （ユーザー報告により発覚）。
+
+    2026-08-13追加: さらにcurrency_strength/portfolio_risk/open_trades/
+    ai_commentary/latest_pairsを受け取るように拡張した。上記2026-08-11の
+    修正後もDiscordには表示される「通貨強弱」「保有中ポジション一覧＋証拠金
+    維持率」「相関リスク警告」「AIコメンタリー」「金価格」「連敗の実損益」
+    がメールには存在せず、実際に届いたメールとDiscordのスクリーンショットを
+    ユーザーに見比べてもらって発覚した（「明らかに違うのですが、統一して
+    ください」）。send_discord()の該当セクションと表示内容・並び順をできる
+    限り揃えている。
     """
     if not all([smtp_host, smtp_user, smtp_pass, from_addr, to_addr]):
         print("[INFO] Email not configured")
@@ -1456,9 +1467,35 @@ def send_email(smtp_host, smtp_port, smtp_user, smtp_pass,
         vix = sentiment.get("vix", "?")
         dxy = sentiment.get("dxy", "?")
         body_lines += [
-            f"VIX: {vix} / DXY: {dxy} / 米10y: {sentiment.get('us10y','?')}%",
+            f"VIX: {vix} / DXY: {dxy} / 米10y: {sentiment.get('us10y','?')}% / "
+            f"金: {sentiment.get('gold','?')}",
             "",
         ]
+
+    # 🤖 AIコメンタリー（2026-08-13追加、Discordとの内容統一）
+    if ai_commentary:
+        body_lines.append("【🤖 AI市況コメンタリー】")
+        body_lines.append(ai_commentary)
+        body_lines.append("")
+
+    # 💪 通貨強弱（2026-08-13追加、Discordとの内容統一）
+    if currency_strength:
+        _sorted_ccys = sorted(currency_strength.items(), key=lambda x: -x[1]["score"])
+        _strong = [f"{c}({v['score']:+.0f})" for c, v in _sorted_ccys[:3]]
+        _weak = [f"{c}({v['score']:+.0f})" for c, v in _sorted_ccys[-3:]]
+        body_lines.append("【💪 通貨強弱】")
+        body_lines.append(f"強: {' > '.join(_strong)}")
+        body_lines.append(f"弱: {' < '.join(reversed(_weak))}")
+        body_lines.append("")
+
+    # ⚠ 相関リスク警告（2026-08-13追加、Discordとの内容統一）
+    if portfolio_risk and portfolio_risk.get("warnings"):
+        body_lines.append(f"【⚠ ポジション相関リスク [{portfolio_risk.get('risk_level','').upper()}]】")
+        for w in portfolio_risk["warnings"][:3]:
+            body_lines.append(f"・{w}")
+        if portfolio_risk.get("recommendation"):
+            body_lines.append(f"→ {portfolio_risk['recommendation']}")
+        body_lines.append("")
 
     if newly:
         body_lines.append("【★4以上 新規シグナル】")
@@ -1517,9 +1554,59 @@ def send_email(smtp_host, smtp_port, smtp_user, smtp_pass,
                 )
         body_lines.append("")
 
+    # 📋 保有中ポジション一覧＋証拠金維持率（2026-08-13追加、Discordとの内容統一）
+    _open_trades_dict = (trade_update or {}).get("open_trades", {}) or open_trades or {}
+    _flat_trades = [
+        (pair, t)
+        for pair, trades in _open_trades_dict.items()
+        for t in (trades if isinstance(trades, list) else [trades])
+    ]
+    if _flat_trades:
+        body_lines.append(f"【📋 保有中ポジション（{len(_flat_trades)}件）】")
+        for pair, t in _flat_trades[:10]:
+            cur_price = t.get("current_price") or t.get("entry_price")
+            entry = t.get("entry_price")
+            direction = t.get("direction", "")
+            is_long = direction.endswith("LONG")
+            unreal = (cur_price - entry) if is_long else (entry - cur_price)
+            phase = "トレール中" if t.get("tp_hit") else "保有中"
+            icon = "🎯" if t.get("tp_hit") else "💼"
+            sl = t.get("sl")
+            sl_str = f" 逆指値{fmt_price(pair, sl)}" if sl is not None else ""
+            try:
+                hold_h = _hours_between_iso(t.get("entry_time", ""), datetime.now(timezone.utc))
+                hold_str = f" {hold_h:.0f}h" if hold_h else ""
+            except Exception:
+                hold_str = ""
+            sign = "+" if unreal >= 0 else ""
+            _d = pair_decimals(pair)
+            seq = t.get("pyramid_seq")
+            pair_label = f"{pair}#{seq}" if seq and seq > 1 else pair
+            body_lines.append(
+                f"{icon} {pair_label} {direction[:5]} {phase} | "
+                f"@{fmt_price(pair, entry)}→{fmt_price(pair, cur_price)} "
+                f"({sign}{unreal:+.{_d}f}){sl_str}{hold_str}"
+            )
+        if latest_pairs is not None:
+            _mr = calc_maintenance_ratio(
+                load_virtual_account(), _open_trades_dict, PAIR_API, latest_pairs
+            )
+            _ratio = _mr.get("maintenance_ratio")
+            if _ratio is not None:
+                _alert_icon = "🚨" if _ratio < LOSS_CUT_MAINTENANCE_RATIO * 1.5 else "✅"
+                body_lines.append(
+                    f"{_alert_icon} 証拠金維持率: {_ratio:.0f}%"
+                    f"（資産評価額¥{_mr['equity_jpy']:.0f} / 必要証拠金¥{_mr['total_margin_jpy']:.0f}、"
+                    f"ロスカット基準50%）"
+                )
+        body_lines.append("")
+
     if drawdown and drawdown.get("alert"):
-        body_lines.append("【🛑 ドローダウン警告】")
+        body_lines.append(f"【🛑 ドローダウン警告 [{drawdown.get('level','warning').upper()}]】")
         body_lines.append(drawdown.get("message", ""))
+        body_lines.append(
+            f"直近{drawdown.get('recent_total',0)}件の損益: {drawdown.get('recent_pips',0):+.4f}"
+        )
         if drawdown.get("recommendation"):
             body_lines.append(f"→ {drawdown['recommendation']}")
         body_lines.append("")
@@ -1649,12 +1736,111 @@ def send_email(smtp_host, smtp_port, smtp_user, smtp_pass,
     drawdown_html = ""
     if drawdown and drawdown.get("alert"):
         rec = drawdown.get("recommendation", "")
+        lv = drawdown.get("level", "warning")
         drawdown_html = f"""
         <div style="border-left:4px solid #c0392b;background:#fdf0f0;border:1px solid #f0c4c4;
                     border-radius:0 8px 8px 0;padding:10px 12px;margin:10px 0;">
-          <div style="font-weight:bold;color:#c0392b;">🛑 ドローダウン警告</div>
+          <div style="font-weight:bold;color:#c0392b;">🛑 ドローダウン警告 [{lv.upper()}]</div>
           <div style="margin-top:4px;">{drawdown.get('message','')}</div>
+          <div style="font-size:0.9em;color:#555;margin-top:4px;">
+            直近{drawdown.get('recent_total',0)}件の損益: {drawdown.get('recent_pips',0):+.4f}
+          </div>
           {"<div style='font-size:0.9em;color:#555;margin-top:4px;'>→ " + rec + "</div>" if rec else ""}
+        </div>"""
+
+    # 🤖 AIコメンタリー / 💪 通貨強弱 / ⚠ 相関リスク警告（2026-08-13追加、Discordとの内容統一）
+    ai_commentary_html = ""
+    if ai_commentary:
+        ai_commentary_html = f"""
+        <div style="border-left:4px solid #8e44ad;background:#faf5ff;border:1px solid #e0c8f0;
+                    border-radius:0 8px 8px 0;padding:10px 12px;margin:10px 0;font-size:0.9em;">
+          <div style="font-weight:bold;color:#8e44ad;">🤖 AI市況コメンタリー</div>
+          <div style="margin-top:4px;white-space:pre-wrap;">{ai_commentary}</div>
+        </div>"""
+
+    currency_strength_html = ""
+    if currency_strength:
+        _sorted_ccys = sorted(currency_strength.items(), key=lambda x: -x[1]["score"])
+        _strong = " &gt; ".join(f"{c}({v['score']:+.0f})" for c, v in _sorted_ccys[:3])
+        _weak = " &lt; ".join(f"{c}({v['score']:+.0f})" for c, v in reversed(_sorted_ccys[-3:]))
+        currency_strength_html = f"""
+        <div style="border-left:4px solid #16a085;background:#f0fbf8;border:1px solid #c8ede4;
+                    border-radius:0 8px 8px 0;padding:10px 12px;margin:10px 0;font-size:0.9em;">
+          <div style="font-weight:bold;color:#16a085;">💪 通貨強弱</div>
+          <div style="margin-top:4px;">強: {_strong}</div>
+          <div>弱: {_weak}</div>
+        </div>"""
+
+    portfolio_risk_html = ""
+    if portfolio_risk and portfolio_risk.get("warnings"):
+        _pr_items = "".join(f"<li>{w}</li>" for w in portfolio_risk["warnings"][:3])
+        _pr_rec = portfolio_risk.get("recommendation", "")
+        portfolio_risk_html = f"""
+        <div style="border-left:4px solid #d35400;background:#fff5ee;border:1px solid #f0d4be;
+                    border-radius:0 8px 8px 0;padding:10px 12px;margin:10px 0;font-size:0.9em;">
+          <div style="font-weight:bold;color:#d35400;">
+            ⚠ ポジション相関リスク [{portfolio_risk.get('risk_level','').upper()}]
+          </div>
+          <ul style="margin:4px 0 0 20px;padding:0;">{_pr_items}</ul>
+          {"<div style='margin-top:4px;'>→ " + _pr_rec + "</div>" if _pr_rec else ""}
+        </div>"""
+
+    # 📋 保有中ポジション一覧＋証拠金維持率（2026-08-13追加、Discordとの内容統一）
+    def _html_open_trade_line(pair, t):
+        cur_price = t.get("current_price") or t.get("entry_price")
+        entry = t.get("entry_price")
+        direction = t.get("direction", "")
+        is_long = direction.endswith("LONG")
+        unreal = (cur_price - entry) if is_long else (entry - cur_price)
+        phase = "トレール中" if t.get("tp_hit") else "保有中"
+        icon = "🎯" if t.get("tp_hit") else "💼"
+        sl = t.get("sl")
+        sl_str = f" 逆指値{fmt_price(pair, sl)}" if sl is not None else ""
+        try:
+            hold_h = _hours_between_iso(t.get("entry_time", ""), datetime.now(timezone.utc))
+            hold_str = f" {hold_h:.0f}h" if hold_h else ""
+        except Exception:
+            hold_str = ""
+        sign = "+" if unreal >= 0 else ""
+        _d = pair_decimals(pair)
+        seq = t.get("pyramid_seq")
+        pair_label = f"{pair}#{seq}" if seq and seq > 1 else pair
+        color = "#27ae60" if unreal >= 0 else "#c0392b"
+        return (
+            f'<div style="margin:2px 0;">{icon} <strong>{pair_label}</strong> {direction[:5]} {phase} | '
+            f'@{fmt_price(pair, entry)}→{fmt_price(pair, cur_price)} '
+            f'(<span style="color:{color};">{sign}{unreal:+.{_d}f}</span>){sl_str}{hold_str}</div>'
+        )
+
+    open_positions_html = ""
+    _open_trades_dict = (trade_update or {}).get("open_trades", {}) or open_trades or {}
+    _flat_trades = [
+        (pair, t)
+        for pair, trades in _open_trades_dict.items()
+        for t in (trades if isinstance(trades, list) else [trades])
+    ]
+    if _flat_trades:
+        _lines_html = "".join(_html_open_trade_line(p, t) for p, t in _flat_trades[:10])
+        _margin_html = ""
+        if latest_pairs is not None:
+            _mr = calc_maintenance_ratio(
+                load_virtual_account(), _open_trades_dict, PAIR_API, latest_pairs
+            )
+            _ratio = _mr.get("maintenance_ratio")
+            if _ratio is not None:
+                _alert_icon = "🚨" if _ratio < LOSS_CUT_MAINTENANCE_RATIO * 1.5 else "✅"
+                _margin_html = (
+                    f'<div style="margin-top:6px;font-size:0.85em;color:#555;">'
+                    f"{_alert_icon} 証拠金維持率: {_ratio:.0f}%"
+                    f"（資産評価額¥{_mr['equity_jpy']:.0f} / 必要証拠金¥{_mr['total_margin_jpy']:.0f}、"
+                    f"ロスカット基準50%）</div>"
+                )
+        open_positions_html = f"""
+        <div style="border:1px solid #ddd;border-radius:8px;padding:10px 12px;
+                    margin:10px 0;background:#fff;font-size:0.9em;">
+          <div style="font-weight:bold;">📋 保有中ポジション（{len(_flat_trades)}件）</div>
+          <div style="margin-top:4px;">{_lines_html}</div>
+          {_margin_html}
         </div>"""
 
     rate_warn_html = ""
@@ -1689,9 +1875,14 @@ def send_email(smtp_host, smtp_port, smtp_user, smtp_pass,
   <div class="header">
     <div style="font-size:1.3em;font-weight:bold;">{risk_emoji} FXシグナル通知</div>
     <div style="color:#555;">{timestamp} / 市場: {risk_mode.upper()}</div>
-    {"<div>VIX: " + str(sentiment.get('vix','?')) + " / DXY: " + str(sentiment.get('dxy','?')) + "</div>"
+    {"<div>VIX: " + str(sentiment.get('vix','?')) + " / DXY: " + str(sentiment.get('dxy','?'))
+     + " / 米10y: " + str(sentiment.get('us10y','?')) + "% / 金: " + str(sentiment.get('gold','?')) + "</div>"
      if sentiment else ""}
   </div>
+
+  {ai_commentary_html}
+  {currency_strength_html}
+  {portfolio_risk_html}
 
   {"<h3 style='margin:16px 0 4px;'>★4以上 新規シグナル</h3>" if newly else ""}
   {"".join(_html_signal_card(r) for r in newly)}
@@ -1705,6 +1896,7 @@ def send_email(smtp_host, smtp_port, smtp_user, smtp_pass,
   {"<h3 style='margin:16px 0 4px;'>🔄 ポジション状態変化</h3>" if state_html else ""}
   {state_html}
 
+  {open_positions_html}
   {drawdown_html}
   {rate_warn_html}
   {no_detail_html}
@@ -2527,6 +2719,11 @@ def main():
             newly, upgraded, is_first, results, sentiment, us_yields,
             trade_update=trade_update, drawdown=drawdown,
             rate_warnings=rate_consistency.get("warnings"),
+            currency_strength=currency_strength,
+            portfolio_risk=portfolio_risk,
+            open_trades=open_trades,
+            ai_commentary=ai_commentary,
+            latest_pairs=latest["pairs"],
         )
     else:
         print("[INFO] No significant changes, skipping notifications")
