@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-08-09",
+  "last_updated": "2026-08-16",
   "notes": "中央銀行会合のたびに手動更新する。stance は tighten/neutral/ease のいずれか。rate_momentum は accelerating/decelerating/peak/trough/stable のいずれか（金利サイクルの勢い）。FRED API + Finnhub API 設定済みなら週次自動更新される。 2026-07-20: SBI証券取扱ペア拡張に伴いSEK/NOK/BRL/PLN/KRWを追加（Web検証、各中銀公式発表ベース）。FRED自動取得の対象外のため、定期autoresearchでの更新運用に切り替え予定。 2026-07-20: AUD/NZDのstance誤り(ease→正しくはpause/tighten)を訂正。旧データは実際には発生していない利下げを前提としていた。既存ロジック(apply_boj_cycle_directional_filter, compute_fa_score)への影響はwiki側に記録。",
   "data_source": "BIS + 各国中央銀行公式発表 + Web検証 (2026-06-11)",
   "verification_source": {
@@ -179,5 +179,5 @@
     }
   },
   "warning": "JPYは2026-06-17の日銀会合で利上げ確実視。会合後に rate=1.0, rate_momentum='peak'? に更新すること。",
-  "last_auto_run": "2026-08-09T01:18:53.337313+00:00"
+  "last_auto_run": "2026-08-16T01:01:07.369065+00:00"
 }
