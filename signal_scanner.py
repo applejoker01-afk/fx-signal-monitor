@@ -1927,6 +1927,51 @@ def send_email(smtp_host, smtp_port, smtp_user, smtp_pass,
         return False
 
 
+def _load_json_meta(path, *keys):
+    """JSONファイルのトップレベルの特定キーだけ軽量に読む（存在しない/壊れていれば空dict）。"""
+    if not os.path.exists(path):
+        return {}
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return {k: data.get(k) for k in keys}
+    except Exception:
+        return {}
+
+
+def _parse_date_flex(s):
+    """'2026-08-16' や ISO日時文字列をtimezone-aware datetimeへ。失敗時None。"""
+    if not s:
+        return None
+    try:
+        d = datetime.fromisoformat(s)
+        if d.tzinfo is None:
+            d = d.replace(tzinfo=timezone.utc)
+        return d
+    except Exception:
+        return None
+
+
+def _freshness_badge(label, dt, max_age_days, extra_note=""):
+    """
+    2026-08-18追加: L3ダッシュボードの中央銀行政策金利・経済指標カレンダーが
+    データ取得元の障害（例: Finnhub無料枠でのeconomic calendar 403エラー）で
+    何週間も更新されないまま「成功」表示になっていた実害があったため、
+    最終更新日時を人の目で毎回確認できるようバッジとして必ず表示する。
+    """
+    now = datetime.now(timezone.utc)
+    if dt is None:
+        return (f'<span style="color:var(--sell);font-family:var(--mono);font-size:0.72rem;'
+                f'margin-left:0.75rem">⚠ {label}: 取得失敗{extra_note}</span>')
+    age_days = (now - dt).total_seconds() / 86400
+    stale = age_days >= max_age_days
+    color = "var(--sell)" if stale else "var(--text-muted)"
+    icon = "⚠ " if stale else ""
+    ts = dt.strftime("%Y-%m-%d %H:%M UTC") if dt.hour or dt.minute else dt.strftime("%Y-%m-%d")
+    return (f'<span style="color:{color};font-family:var(--mono);font-size:0.72rem;'
+            f'margin-left:0.75rem">{icon}{label}: {ts}（{age_days:.1f}日前）{extra_note}</span>')
+
+
 def generate_html_report(results, sentiment, us_yields, cb_rates,
                          generated_at, currency_strength=None, portfolio_risk=None):
     jst = generated_at + timedelta(hours=9)
@@ -2141,6 +2186,20 @@ def generate_html_report(results, sentiment, us_yields, cb_rates,
             if key not in upcoming_events or upcoming_events[key]["hours_until"] > ev["hours_until"]:
                 upcoming_events[key] = ev
     event_list = sorted(upcoming_events.values(), key=lambda e: e["hours_until"])
+    # データ鮮度バッジ（2026-08-18追加）: 中央銀行政策金利45日/経済カレンダー8日を
+    # しきい値とし、これを超えたら赤字警告。cb_ratesは45日超で自前の警告済み
+    # （check_central_bank_data_staleness）なので同じ基準に合わせる。カレンダーは
+    # 「今後7日間」を表示する性質上、8日以上更新が止まっていれば表示内容自体が
+    # 信頼できないため短め。
+    _cb_meta = _load_json_meta("data/central_bank_rates.json", "last_updated", "data_source")
+    _cb_dt = _parse_date_flex(_cb_meta.get("last_updated"))
+    cb_freshness_badge = _freshness_badge("最終更新", _cb_dt, max_age_days=45)
+
+    _cal_meta = _load_json_meta("data/economic_calendar.json", "last_updated", "last_auto_run")
+    _cal_dt = _parse_date_flex(_cal_meta.get("last_auto_run") or _cal_meta.get("last_updated"))
+    _cal_note = "" if event_list else "（表示イベント0件）"
+    cal_freshness_badge = _freshness_badge("最終自動取得", _cal_dt, max_age_days=8, extra_note=_cal_note)
+
     event_rows_html = []
     for ev in event_list[:20]:
         dt = datetime.fromisoformat(ev["date"].replace("Z", "+00:00"))
@@ -2273,14 +2332,14 @@ body{{background:var(--bg-deep);color:var(--text-primary);font-family:var(--jp);
     <thead><tr><th>シグナル</th><th>通貨ペア / 分析</th><th>価格</th><th>TA</th><th>FA</th><th>金利差</th><th>RSI</th><th>判定</th><th>ファンダ詳細</th></tr></thead>
     <tbody>{''.join(rows_html)}</tbody>
   </table>
-  <div class="section-head"><div class="section-num">Ⅲ.</div><h2 class="section-title">中央銀行政策金利</h2><span class="section-sub">Central Bank Rates</span></div>
+  <div class="section-head"><div class="section-num">Ⅲ.</div><h2 class="section-title">中央銀行政策金利</h2><span class="section-sub">Central Bank Rates</span>{cb_freshness_badge}</div>
   <table class="data-table">
     <thead><tr><th>通貨</th><th>中央銀行</th><th>政策金利</th><th>スタンス</th><th>次回会合</th></tr></thead>
     <tbody>{''.join(cb_rows_html)}</tbody>
   </table>
-  <div class="section-head"><div class="section-num">Ⅳ.</div><h2 class="section-title">今後7日間の重要イベント</h2><span class="section-sub">Economic Calendar</span></div>
+  <div class="section-head"><div class="section-num">Ⅳ.</div><h2 class="section-title">今後7日間の重要イベント</h2><span class="section-sub">Economic Calendar</span>{cal_freshness_badge}</div>
   <div style="margin-top:1rem">
-    {''.join(event_rows_html) if event_rows_html else '<div style="color:var(--text-muted);font-family:var(--mono);font-size:0.85rem;padding:1rem">今後7日間の重要イベントはありません</div>'}
+    {''.join(event_rows_html) if event_rows_html else '<div style="color:var(--sell);font-family:var(--mono);font-size:0.85rem;padding:1rem">今後7日間の重要イベントはありません（またはカレンダー取得元の障害で0件表示になっている可能性 — 上のバッジで最終取得日時を確認）</div>'}
   </div>
   <footer class="app-footer">
     <em>Currents</em> · FX Signal Monitor L3 Advanced · <a href="{PAGES_URL}" style="color:var(--gold)">{PAGES_URL}</a>
