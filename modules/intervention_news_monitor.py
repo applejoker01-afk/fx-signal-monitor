@@ -14,6 +14,7 @@
                     スコアは算出するが★の自動操作はせず警告のみに留める。
 """
 
+import email.utils
 import json
 import os
 import urllib.request
@@ -26,6 +27,13 @@ import yaml
 CACHE_FILE = "data/intervention_news_cache.json"
 DIARY_PATH = "docs/intervention_news_diary.jsonl"
 CACHE_TTL_MINUTES = 45  # ニュースは数分単位で変わらないため、実行の都度RSSを叩かない
+# 2026-08-18判明: Google News RSSは「円 介入リスク」のような常時話題になっている
+# トピックだと、発行日に関係なく評論記事を毎回上位に返し続ける。スコアリングが
+# 記事の鮮度を見ていなかったため、同じ見出し集合でJPYロングにHIGH判定(-1★)が
+# 8/3の本モジュール導入以降ほぼ恒常的にかかり続け、指値待機シグナルが2週間以上
+# ゼロになる実害が出た。ここでは「直近FRESHNESS_HOURS時間以内に発行された記事」
+# のみをスコア対象にし、古い定常的な解説記事による恒久的な高スコア化を防ぐ。
+FRESHNESS_HOURS = 72
 
 IS_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 OBSIDIAN_DIARY_DIR = "docs/diary_output" if IS_GITHUB_ACTIONS else "docs/intervention_news"
@@ -124,11 +132,25 @@ def _cache_is_fresh(entry):
     return datetime.now(timezone.utc) - cached_at < timedelta(minutes=CACHE_TTL_MINUTES)
 
 
-def fetch_news_from_google(query, timeout=12):
+def _parse_pubdate(raw: str):
+    """RFC822形式のpubDate（例: 'Mon, 17 Aug 2026 12:00:00 GMT'）をdatetimeへ。失敗時None。"""
+    if not raw:
+        return None
+    try:
+        dt = email.utils.parsedate_to_datetime(raw)
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        return dt
+    except Exception:
+        return None
+
+
+def fetch_news_from_google(query, timeout=12, freshness_hours=FRESHNESS_HOURS):
     """
-    <item><title> のみを拾う（channel直下のフィード自身の<title>はクエリ文言の
-    エコーであり、キーワードスコアリングに混ぜると自己一致で常に高スコアに
-    なってしまうため除外する）。
+    <item><title>のうち、直近freshness_hours時間以内に発行されたものだけを拾う
+    （channel直下のフィード自身の<title>はクエリ文言のエコーであり、キーワード
+    スコアリングに混ぜると自己一致で常に高スコアになってしまうため除外する）。
+    pubDateが取得できない記事は鮮度判定できないため保守的に除外する。
     """
     encoded = urllib.parse.quote(query)
     url = f"https://news.google.com/rss/search?q={encoded}&hl=en-US&gl=US&ceid=US:en"
@@ -137,20 +159,56 @@ def fetch_news_from_google(query, timeout=12):
         with urllib.request.urlopen(req, timeout=timeout) as resp:
             content = resp.read()
             root = ET.fromstring(content)
-            titles = [
-                item.findtext("title", default="")
-                for item in root.findall(".//item")
-            ]
-            return [t for t in titles if t and len(t) > 10][:10]
+            cutoff = datetime.now(timezone.utc) - timedelta(hours=freshness_hours)
+            titles = []
+            for item in root.findall(".//item"):
+                title = item.findtext("title", default="")
+                if not title or len(title) <= 10:
+                    continue
+                pub_dt = _parse_pubdate(item.findtext("pubDate", default=""))
+                if pub_dt is None or pub_dt < cutoff:
+                    continue
+                titles.append(title)
+            return titles[:10]
     except Exception as e:
         print(f"[WARN] Intervention news fetch failed for query={query[:40]}...: {str(e)[:60]}")
         return []
 
 
+# 2026-08-18判明: USDJPYが心理的節目（160円近辺）にいる間、金融メディアは
+# 「介入リスク」を毎日のように論説・分析記事で取り上げ続ける。これは実際の
+# 介入実施や当局の公式発言（一次情報）とは性質が違う「ambient chatter」であり、
+# 同じ重みで数えると鮮度フィルターだけでは高スコアが下がらない（直近72時間だけ
+# でも10本前後は常時ヒットする）。見出しの言い回しから一次情報/観測記事を粗く
+# 分類し、観測記事は減衰させる一方、実施を示す一次情報は即座に高スコアへ引き上げる。
+PRIMARY_ACTION_MARKERS = [
+    "intervenes", "intervened", "confirms intervention", "confirmed intervention",
+    "buys yen", "sells yen", "buying yen", "selling yen", "steps into the market",
+    "verbal intervention", "actual intervention", "spent ¥", "spent $",
+]
+SPECULATIVE_MARKERS = [
+    "risk of", "risk near", "risks cap", " may ", " could ", "likely to",
+    "case for", "myth of", "explained", "narrative", "signals growing concern",
+    "questions", "precedent for future", "warns", "flags", "threat", "expects",
+    "highlighted", "keeps up", "wears off", "fizzles", "never about", "seen nearing",
+]
+
+
+def _headline_weight(title: str) -> float:
+    """見出し1本の重み。一次情報=1.0、観測・論説記事=0.3、判別不能=0.6。"""
+    t = title.lower()
+    if any(m in t for m in PRIMARY_ACTION_MARKERS):
+        return 1.0
+    if any(m in t for m in SPECULATIVE_MARKERS):
+        return 0.3
+    return 0.6
+
+
 def score_news(titles, keywords):
     """
-    ヒットしたキーワード数と、報道量から0〜100点のスコアを算出。
-    geopolitical_risk.calculate_risk_score と同じ考え方（キーワード＋出現量）。
+    ヒットしたキーワード数と、報道量（一次情報/観測記事で重み付け）から0〜100点を算出。
+    geopolitical_risk.calculate_risk_score と同じ考え方（キーワード＋出現量）だが、
+    観測記事の連投だけではCRITICAL/HIGHに到達しないよう重みを分ける。
     """
     if not titles:
         return {"score": 0, "level": "none", "hits": [], "reason": "関連報道なし"}
@@ -160,9 +218,16 @@ def score_news(titles, keywords):
     if not hits:
         return {"score": 0, "level": "none", "hits": [], "reason": "キーワード該当なし"}
 
+    weights = [_headline_weight(t) for t in titles]
+    has_primary = any(w >= 1.0 for w in weights)
+
     hit_score = min(70, len(hits) * 25)
-    volume_bonus = min(30, len(titles) * 4)
+    volume_bonus = min(30, round(sum(weights) * 4))
     score = min(100, hit_score + volume_bonus)
+    if has_primary:
+        # 一次情報（実施確認・当局の実際の行動を示す見出し）が1本でもあれば
+        # 観測記事の量に関わらず無条件でCRITICAL相当まで引き上げる。
+        score = max(score, 70)
 
     if score >= 70:
         level = "CRITICAL"
@@ -173,11 +238,15 @@ def score_news(titles, keywords):
     else:
         level = "LOW"
 
+    reason = f"検知キーワード: {', '.join(hits[:3])}"
+    if has_primary:
+        reason += "（一次情報あり）"
+
     return {
         "score": score,
         "level": level,
         "hits": hits,
-        "reason": f"検知キーワード: {', '.join(hits[:3])}",
+        "reason": reason,
     }
 
 
