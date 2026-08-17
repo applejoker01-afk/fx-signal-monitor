@@ -46,6 +46,20 @@ $logFile = Join-Path $logDir "${scriptTag}_$stamp.log"
 "=== $stamp 開始 ($TargetScript) ===" | Out-File -FilePath $logFile -Encoding utf8
 
 try {
+    # 2026-08-18判明: core.autocrlf=true環境ではdata/pending_orders.json等の
+    # 改行コード正規化やローカルの副作用でワーキングツリーが「変更あり」判定になり、
+    # git pull --rebase が unstaged changes で失敗し続けるケースがあった（実行ログの
+    # 約1/3で発生）。失敗するとローカルのpending_orders.jsonがクラウド最新版に
+    # 追随できず、指値発注の候補を取りこぼす。ここではpull前にワーキングツリーの
+    # ローカル変更（トラッキング対象ファイルのみ、.gitignore対象のmt5_*.jsonや
+    # logs/は対象外）を破棄してから最新を取り込む。ローカルの一時的な差分より
+    # クラウド側の状態を常に正とする運用のため安全。
+    $statusOutput = git status --porcelain
+    if ($statusOutput) {
+        "ワーキングツリーに変更あり。pull前にreset --hardで破棄します:" | Out-File -FilePath $logFile -Append -Encoding utf8
+        $statusOutput | Out-File -FilePath $logFile -Append -Encoding utf8
+        git reset --hard HEAD 2>&1 | Out-File -FilePath $logFile -Append -Encoding utf8
+    }
     $pullOutput = git pull --rebase origin main 2>&1
     $pullOutput | Out-File -FilePath $logFile -Append -Encoding utf8
 } catch {
