@@ -11,10 +11,19 @@ import json
 import os
 import urllib.request
 import urllib.error
+import xml.etree.ElementTree as ET
 from datetime import datetime, timezone, timedelta
 
 CALENDAR_FILE = "data/economic_calendar.json"
 USER_AGENT = "fx-signal-monitor/1.0"
+
+# 2026-08-18追加: FinnhubのEconomic Calendar APIが無料枠で403 Forbiddenを返す
+# ようになり、2026-07-12週以降5週間サイレントに更新が止まっていたことが判明
+# （ユーザー報告→L3ダッシュボードに鮮度バッジを追加して発覚）。APIキー不要の
+# ForexFactory公開フィードをフォールバック先として追加する。
+# フィードの時刻はUTC基準（Unemployment Claimsの発表時刻を米東部標準の
+# 8:30am(夏時間)と突き合わせてUTC 12:30pm一致を確認済み）。
+FOREXFACTORY_CALENDAR_URL = "https://nfs.faireconomy.media/ff_calendar_thisweek.xml"
 
 # Finnhubのeventタイプ名を、L3 importanceにマッピング
 # 重要度3=critical, 2=high, 1=medium
@@ -198,6 +207,81 @@ def fetch_finnhub_calendar(days_ahead=21):
     return converted
 
 
+def _parse_ff_datetime(date_str, time_str):
+    """ForexFactoryの 'MM-DD-YYYY' + '10:30pm'/'All Day'/'Tentative' をUTC datetimeへ。"""
+    try:
+        base = datetime.strptime(date_str.strip(), "%m-%d-%Y")
+    except (ValueError, AttributeError):
+        return None
+    t = (time_str or "").strip()
+    if not t or t.lower() in ("all day", "tentative"):
+        dt = base.replace(hour=12, minute=0)  # 精度なし・正午UTCで埋める
+    else:
+        try:
+            parsed_time = datetime.strptime(t, "%I:%M%p")
+            dt = base.replace(hour=parsed_time.hour, minute=parsed_time.minute)
+        except ValueError:
+            dt = base.replace(hour=12, minute=0)
+    return dt.replace(tzinfo=timezone.utc)
+
+
+def fetch_forexfactory_calendar():
+    """
+    ForexFactory公開カレンダーフィード（APIキー不要）から今週の高重要度イベントを取得。
+    Finnhub Economic Calendar APIが使えない場合のフォールバック。
+    """
+    try:
+        text = http_get(FOREXFACTORY_CALENDAR_URL, timeout=20)
+    except Exception as e:
+        print(f"[ERROR] ForexFactory fetch failed: {e}")
+        return None
+
+    try:
+        root = ET.fromstring(text)
+    except ET.ParseError as e:
+        print(f"[ERROR] ForexFactory XML parse failed: {e}")
+        return None
+
+    converted = []
+    for ev in root.findall(".//event"):
+        impact = (ev.findtext("impact") or "").strip()
+        if impact != "High":
+            continue  # Medium/Lowはカレンダー肥大化防止のため除外(Finnhub側と同方針)
+
+        currency = (ev.findtext("country") or "").strip()  # FFのcountryは実質通貨コード
+        affects = CURRENCY_TO_PAIRS.get(currency, [])
+        if not affects:
+            continue
+
+        name = (ev.findtext("title") or "").strip()
+        if not name:
+            continue
+
+        dt = _parse_ff_datetime(ev.findtext("date") or "", ev.findtext("time") or "")
+        if dt is None:
+            continue
+
+        # FFは3段階(High/Medium/Low)しかなくFinnhubのcritical相当がないため、
+        # 名前ベースのキーワード判定でcritical/highを振り分ける（finnhub_impact=2扱い）。
+        importance = estimate_importance(name, finnhub_impact=2)
+
+        converted.append({
+            "date": dt.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            "country": currency,
+            "currency": currency,
+            "name": name,
+            "importance": importance,
+            "affects_pairs": affects,
+            "source": "forexfactory",
+            "actual": None,
+            "estimate": (ev.findtext("forecast") or "").strip() or None,
+            "previous": (ev.findtext("previous") or "").strip() or None,
+        })
+
+    print(f"[OK] ForexFactory: {len(converted)} high-impact events fetched")
+    return converted
+
+
 def merge_with_manual_events(auto_events, current_events):
     """
     手動で追加されたイベント（source != 'finnhub'）と統合。
@@ -214,7 +298,7 @@ def merge_with_manual_events(auto_events, current_events):
 
     # 既存の手動分で重複していないものを追加
     for ev in current_events:
-        if ev.get("source") == "finnhub":
+        if ev.get("source") in ("finnhub", "forexfactory"):
             continue  # 自動取得分は捨てる（古いため）
         key = f"{ev.get('date', '')}|{ev.get('currency', '')}|{ev.get('name', '').lower()}"
         if key not in seen_keys:
@@ -243,12 +327,19 @@ def update_economic_calendar(dry_run=False):
         except Exception as e:
             print(f"[WARN] Could not load existing calendar: {e}")
 
-    # 自動取得
+    # 自動取得（Finnhub優先、失敗時はForexFactoryへフォールバック）
+    errors = []
     auto_events = fetch_finnhub_calendar(days_ahead=21)
+    source_used = "finnhub"
+    if auto_events is None:
+        errors.append("Finnhub fetch failed or skipped")
+        print("[INFO] Finnhub unavailable, falling back to ForexFactory")
+        auto_events = fetch_forexfactory_calendar()
+        source_used = "forexfactory"
 
     if auto_events is None:
-        return {"fetched_count": 0, "merged_count": 0,
-                "errors": ["Finnhub fetch failed or skipped"]}
+        errors.append("ForexFactory fetch also failed")
+        return {"fetched_count": 0, "merged_count": 0, "errors": errors}
 
     # マージ
     merged = merge_with_manual_events(auto_events, current_data.get("events", []))
@@ -270,13 +361,15 @@ def update_economic_calendar(dry_run=False):
     new_data = {
         "last_updated": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
         "last_auto_run": datetime.now(timezone.utc).isoformat(),
+        "last_auto_source": source_used,
         "notes": current_data.get("notes", "自動取得+手動編集の統合カレンダー"),
         "importance_guide": {
             "critical": "中央銀行会合・雇用統計・CPI（48h前から取引控え）",
             "high": "GDP・PMI・小売売上・要人発言（24h前から警戒）",
             "medium": "二次指標（自動取得では除外）",
         },
-        "data_source": "Finnhub API (auto) + 手動編集",
+        "data_source": ("Finnhub API (auto) + 手動編集" if source_used == "finnhub"
+                         else "ForexFactory (auto, Finnhub 403のためフォールバック中) + 手動編集"),
         "events": fresh,
     }
 
@@ -284,12 +377,13 @@ def update_economic_calendar(dry_run=False):
         os.makedirs(os.path.dirname(CALENDAR_FILE), exist_ok=True)
         with open(CALENDAR_FILE, "w", encoding="utf-8") as f:
             json.dump(new_data, f, ensure_ascii=False, indent=2)
-        print(f"[OK] {CALENDAR_FILE} updated. {len(fresh)} events stored.")
+        print(f"[OK] {CALENDAR_FILE} updated via {source_used}. {len(fresh)} events stored.")
 
     return {
         "fetched_count": len(auto_events),
         "merged_count": len(fresh),
-        "errors": [],
+        "source": source_used,
+        "errors": errors,
     }
 
 
