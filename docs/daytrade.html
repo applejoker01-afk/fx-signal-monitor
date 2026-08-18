@@ -752,11 +752,10 @@ async function scanAll() {
       if (plan) {
         const now = Date.now();
         if (now - st.lastSignalTime > 3600 * 1000 || st.phase !== "fired") {
-          if (mapEntry.alert_eligible) {
-            fireSignal(pair, plan, price, atrVal, e50, e200, stratName, regime);
-          } else {
-            log(`PAPER候補 ${pair.label} ${plan.direction} [${plan.label}] — 長期検証前のため通知しません`);
-          }
+          // Day-trade monitoring is Discord-only.  Paper status is included
+          // in the label; it does not suppress a real-time signal alert.
+          const alertLabel = mapEntry.status === "paper" ? `PAPER ${stratName}` : stratName;
+          fireSignal(pair, plan, price, atrVal, e50, e200, alertLabel, regime);
           st.phase = "fired";
           st.lastSignalTime = now;
         }
@@ -796,12 +795,8 @@ function fireSignal(pair, plan, price, atrVal, e50, e200, stratName, regime) {
 
   log(`🎯 発火 ${pair.label} ${plan.direction} @ ${price.toFixed(d)} [${label}]`, "fire");
 
-  if (Notification.permission === "granted") {
-    new Notification(`🎯 ${pair.label} ${plan.direction} [${label}]`, {
-      body: `@ ${price.toFixed(d)}\nSL:${plan.sl.toFixed(d)} TP:${plan.tp1.toFixed(d)}`,
-    });
-  }
-  if (soundOn) playBeep();
+  // Do not create browser or audio notifications.  Signal delivery is Discord
+  // only, and this page never calls the email notification path.
   sendDiscord(pair, plan, price, stratName, regime);
 }
 
@@ -930,7 +925,6 @@ function start() {
   document.getElementById("stopBtn").disabled = false;
   document.getElementById("liveStatus").className = "live on";
   document.getElementById("liveStatus").textContent = "● 監視中";
-  if (Notification.permission === "default") Notification.requestPermission();
   log(`監視開始（${sec/60}分間隔）`);
   scanAll();
   timer = setInterval(scanAll, sec * 1000);
@@ -964,7 +958,6 @@ document.getElementById("testBtn").onclick = function() {
   const plan = { direction: "LONG", poi: { type: "200EMA", price: 158.40 },
     entry: 159.20, sl: 157.78, tp1: 159.83, tp2: 160.46, tp3: 161.30 };
   log("通知テスト実行");
-  if (Notification.permission === "default") Notification.requestPermission();
   fireSignal(testPair, plan, 159.20, 0.42, 158.9, 158.4);
 };
 
