@@ -423,6 +423,12 @@ def notify_order_placed(pair: str, direction: str, order: dict, lots: float,
 
     Returns: 送信できたかどうか（SMTP未設定時はFalseを返すだけで例外にしない）
     """
+    # Signal-only notification policy: execution confirmations are not market
+    # signals and must not create separate email traffic.
+    if os.environ.get("NOTIFY_EXECUTION_EVENTS", "").strip().lower() != "true":
+        print("[INFO] MT5 execution email suppressed (signal-only policy)")
+        return False
+
     smtp_host = os.environ.get("SMTP_HOST", "smtp.gmail.com")
     smtp_port = os.environ.get("SMTP_PORT", "465")
     smtp_user = os.environ.get("SMTP_USER")
@@ -510,6 +516,10 @@ def get_order_final_state(ticket: int) -> dict | None:
 
 def notify_position_closed(pair: str, trade: dict, exit_result: dict, close_result: dict) -> bool:
     """保有中ポジションの決済（TP/SL/トレール/シグナル反転等）をメールで通知する。"""
+    if os.environ.get("NOTIFY_EXECUTION_EVENTS", "").strip().lower() != "true":
+        print("[INFO] MT5 close email suppressed (signal-only policy)")
+        return False
+
     smtp_host = os.environ.get("SMTP_HOST", "smtp.gmail.com")
     smtp_port = os.environ.get("SMTP_PORT", "465")
     smtp_user = os.environ.get("SMTP_USER")

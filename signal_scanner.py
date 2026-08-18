@@ -1350,6 +1350,12 @@ def send_email(smtp_host, smtp_port, smtp_user, smtp_pass,
     ください」）。send_discord()の該当セクションと表示内容・並び順をできる
     限り揃えている。
     """
+    # Defence in depth: this function must not send mail unless a new actionable
+    # signal exists, even if a future caller accidentally invokes it for status.
+    if not (newly or upgraded):
+        print("[INFO] Email skipped: no new or upgraded signal")
+        return False
+
     if not all([smtp_host, smtp_user, smtp_pass, from_addr, to_addr]):
         print("[INFO] Email not configured")
         return False
@@ -2776,8 +2782,9 @@ def main():
     has_close = bool(trade_update.get("newly_closed"))
     has_state_change = bool(trade_update.get("state_changes"))
     has_rate_warn = bool(rate_consistency.get("warnings"))
-    if (newly or upgraded or (is_first and newly) or has_close
-            or has_state_change or drawdown.get("is_new_escalation") or has_rate_warn):
+    # Email and Discord are signal-only. Dashboard/log state is retained but
+    # never generates an hourly notification by itself.
+    if newly or upgraded:
         _wh = os.environ.get("DISCORD_WEBHOOK_URL", "")
         _wh = _wh.replace("discordapp.com", "discord.com")
         send_discord(
@@ -2807,14 +2814,15 @@ def main():
             latest_pairs=latest["pairs"],
         )
     else:
-        print("[INFO] No significant changes, skipping notifications")
+        print("[INFO] No new or upgraded signals, skipping email and Discord")
 
     # 📌 指値待機シグナルの通知（新規登録・約定・失効があれば、上のnewly/upgraded判定とは無関係に送信）
     has_pending_update = bool(newly_created_orders or newly_filled_trades or expired_orders)
+    # Pending-order creation/fill/expiry and the scheduled heartbeat are state
+    # updates, not fresh trading signals. Keep them in logs only.
     if has_pending_update:
-        _wh_pending = os.environ.get("DISCORD_WEBHOOK_URL", "").replace("discordapp.com", "discord.com")
-        send_discord_pending(_wh_pending, newly_created_orders, newly_filled_trades, expired_orders)
-    elif entry_mode == "limit":
+        print("[INFO] Pending-order state changed; notification suppressed (signal-only mode)")
+    elif False and entry_mode == "limit":
         # 変化が0件でも、1日3回の指値スキャンでは「稼働中で変化なし」を短く通知する。
         # 沈黙のままだとワークフロー停止と見分けがつかないため（2026-07-21対応）。
         _wh_pending = os.environ.get("DISCORD_WEBHOOK_URL", "").replace("discordapp.com", "discord.com")
