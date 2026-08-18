@@ -206,7 +206,7 @@ def apply_boj_cycle_directional_filter(result: dict, cb_rates: dict) -> dict:
 # ============================================================
 # VIXレジームフィルタ（2026-06-22追加）
 # autoresearch: wiki/finance/vix-fx-signal-filter.md
-# VIX×JPY安全資産 — キャリー崩壊リスクをセンチメントモードで判定
+# VIX×JPY安全資産 — キャリー崩壊リスクをVIX実数値で判定
 # 参考: 2024年8月5日 VIX日中~65・USD/JPY -14%・日経 -12.4%
 # ============================================================
 
@@ -214,18 +214,19 @@ def apply_vix_regime_filter(result: dict, sentiment: dict) -> dict:
     """
     VIXレジームフィルタ: 高VIX局面でJPYクロスのLONGをブロック/降格する。
 
-    sentiment["risk_mode"] の値 (sentiment_monitor.py で定義):
-      panic     → VIX > 30 : JPYクロスLONG 完全ブロック（NO_TRADE, ★≤2）
-      risk_off  → VIX > 25 : JPYクロスLONG ★1段降格
-      caution   → VIX > 20 : 警告のみ（★変更なし）
-      normal / complacent : フィルタなし
+    VIXの実数値だけで判定する。risk_mode は金・債券など複数の材料からも
+    risk_off になり得るため、このフィルタの発動条件には使わない。
+
+      VIX > 30 : JPYクロスLONG 完全ブロック（NO_TRADE, ★≤2）
+      VIX > 25 : JPYクロスLONG ★1段降格
+      VIX > 20 : 警告のみ（★変更なし）
+      VIX <= 20 または未取得 : フィルタなし
 
     SHORTシグナルは対象外（キャリー崩壊時のJPY急騰はSHORTに追い風）。
     """
     if not sentiment:
         return result
 
-    risk_mode = sentiment.get("risk_mode", "normal")
     vix_value = sentiment.get("vix")
     pair = result.get("pair", "")
     direction = result.get("direction", "")
@@ -238,9 +239,15 @@ def apply_vix_regime_filter(result: dict, sentiment: dict) -> dict:
     if "JPY" not in pair:
         return result
 
-    vix_str = f"VIX={vix_value:.1f}" if vix_value else "VIX高水準"
+    # VIX未取得・不正値では保守的にフィルタを掛けず、観測値が閾値を超える時だけ作用させる。
+    try:
+        vix_value = float(vix_value)
+    except (TypeError, ValueError):
+        return result
 
-    if risk_mode == "panic":
+    vix_str = f"VIX={vix_value:.1f}"
+
+    if vix_value > 30:
         # VIX > 30 = 2024年8月型キャリー崩壊リスク → ハードブロック
         result["stars"] = min(2, result.get("stars", 1))
         result["direction"] = "NO_TRADE"
@@ -250,7 +257,7 @@ def apply_vix_regime_filter(result: dict, sentiment: dict) -> dict:
             f"キャリー崩壊リスク: JPYクロスLONG禁止"
         )
 
-    elif risk_mode == "risk_off":
+    elif vix_value > 25:
         # VIX > 25 = キャリー不安定化 → ★1段降格
         original_stars = result.get("stars", 1)
         new_stars = max(1, original_stars - 1)
@@ -262,7 +269,7 @@ def apply_vix_regime_filter(result: dict, sentiment: dict) -> dict:
                 f"JPYクロスLONG -{original_stars - new_stars}★降格"
             )
 
-    elif risk_mode == "caution":
+    elif vix_value > 20:
         # VIX > 20 = 警告のみ（★変更なし、情報付与のみ）
         result["vix_caution"] = True
         result["vix_caution_reason"] = (
