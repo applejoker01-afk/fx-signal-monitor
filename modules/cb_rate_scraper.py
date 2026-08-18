@@ -21,7 +21,17 @@ import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
 
 CB_RATES_FILE = "data/central_bank_rates.json"
+CALENDAR_FILE = "data/economic_calendar.json"
 USER_AGENT = "fx-signal-monitor/1.0"
+
+# 経済カレンダー上で政策決定会合を識別するための語。議事要旨・講演は除く。
+MEETING_EVENT_TERMS = (
+    "interest rate decision",
+    "rate decision",
+    "monetary policy decision",
+    "cash rate target",
+)
+NON_DECISION_EVENT_TERMS = ("minutes", "speech", "testimony", "report")
 
 
 def http_get(url, timeout=20, headers=None):
@@ -202,6 +212,104 @@ FETCH_FUNCTIONS = {
 }
 
 
+def _parse_datetime(value):
+    """ISO日付または日時をUTCのdatetimeに変換する。失敗時はNone。"""
+    if not value:
+        return None
+    try:
+        text = str(value)
+        if text.endswith("Z"):
+            text = text[:-1] + "+00:00"
+        dt = datetime.fromisoformat(text)
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        return dt.astimezone(timezone.utc)
+    except (TypeError, ValueError):
+        return None
+
+
+def _is_policy_meeting_event(event, known_currencies):
+    """カレンダーイベントが通貨別の政策決定会合かを安全側で判定する。"""
+    ccy = event.get("currency")
+    if ccy not in known_currencies:
+        return False
+    name = str(event.get("name", "")).lower()
+    if any(term in name for term in NON_DECISION_EVENT_TERMS):
+        return False
+    return any(term in name for term in MEETING_EVENT_TERMS)
+
+
+def reconcile_next_meetings(rates_section, events, now=None):
+    """カレンダーの将来イベントを次回会合へ反映し、過去日付を無効化する。
+
+    カレンダーに無い将来日を推測で埋めない。期限切れの予定を残して会合前後の
+    ブラックアウトを誤発火させるより、未取得として明示する方が安全である。
+    """
+    now = now or datetime.now(timezone.utc)
+    today = now.astimezone(timezone.utc).date()
+    future = {}
+
+    for event in events or []:
+        if not _is_policy_meeting_event(event, rates_section):
+            continue
+        event_dt = _parse_datetime(event.get("date"))
+        if not event_dt or event_dt.date() < today:
+            continue
+        ccy = event["currency"]
+        current = future.get(ccy)
+        if current is None or event_dt < current[0]:
+            future[ccy] = (event_dt, event.get("source", "calendar"))
+
+    updated = []
+    expired = []
+    for ccy, info in rates_section.items():
+        scheduled = future.get(ccy)
+        previous = info.get("next_meeting")
+        if scheduled:
+            next_date = scheduled[0].date().isoformat()
+            if previous != next_date:
+                updated.append({"currency": ccy, "old": previous, "new": next_date})
+            info["next_meeting"] = next_date
+            info["next_meeting_source"] = scheduled[1]
+            info["next_meeting_status"] = "scheduled"
+            continue
+
+        previous_dt = _parse_datetime(previous)
+        if previous_dt and previous_dt.date() < today:
+            info["next_meeting"] = None
+            info["next_meeting_source"] = "unavailable"
+            info["next_meeting_status"] = "expired"
+            expired.append({"currency": ccy, "old": previous})
+
+    return {"updated": updated, "expired": expired}
+
+
+def sync_next_meetings_from_calendar(dry_run=False, now=None):
+    """最新の経済カレンダーを使い、中央銀行JSONの次回会合だけを同期する。"""
+    if not os.path.exists(CB_RATES_FILE):
+        return {"updated": [], "expired": [], "errors": ["rates file not found"]}
+    if not os.path.exists(CALENDAR_FILE):
+        return {"updated": [], "expired": [], "errors": ["calendar file not found"]}
+
+    with open(CB_RATES_FILE, "r", encoding="utf-8") as f:
+        current = json.load(f)
+    with open(CALENDAR_FILE, "r", encoding="utf-8") as f:
+        calendar = json.load(f)
+
+    result = reconcile_next_meetings(
+        current.get("rates", {}), calendar.get("events", []), now=now,
+    )
+    current["last_meeting_schedule_sync"] = (now or datetime.now(timezone.utc)).isoformat()
+    current["meeting_schedule_source"] = calendar.get("last_auto_source", "calendar")
+
+    if not dry_run:
+        with open(CB_RATES_FILE, "w", encoding="utf-8") as f:
+            json.dump(current, f, ensure_ascii=False, indent=2)
+
+    result["errors"] = []
+    return result
+
+
 def update_central_bank_rates(dry_run=False):
     """
     既存JSONを読み込み、自動取得可能な通貨だけ更新する。
@@ -240,11 +348,12 @@ def update_central_bank_rates(dry_run=False):
 
         new_rate = round(result["rate"], 4)
         old_rate = rates_section.get(ccy, {}).get("rate")
+        rates_section[ccy]["last_auto_check"] = datetime.now(timezone.utc).isoformat()
+        rates_section[ccy]["auto_source"] = result.get("source", "unknown")
 
         if old_rate is None or abs(new_rate - old_rate) >= 0.001:
             rates_section[ccy]["rate"] = new_rate
             rates_section[ccy]["last_auto_update"] = result.get("date") or datetime.now(timezone.utc).isoformat()[:10]
-            rates_section[ccy]["auto_source"] = result.get("source", "unknown")
             updated.append({
                 "currency": ccy,
                 "old_rate": old_rate,

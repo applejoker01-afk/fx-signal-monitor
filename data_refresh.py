@@ -18,7 +18,7 @@ import traceback
 from datetime import datetime, timezone
 
 # モジュール読込
-from modules.cb_rate_scraper import update_central_bank_rates
+from modules.cb_rate_scraper import update_central_bank_rates, sync_next_meetings_from_calendar
 from modules.calendar_updater import update_economic_calendar
 
 
@@ -34,8 +34,24 @@ def main():
         "errors": [],
     }
 
-    # === 1. 中央銀行金利の更新 ===
-    print("\n--- Phase 1: Central Bank Rates ---")
+    # === 1. 経済指標カレンダーの更新 ===
+    # 次回の政策会合を中央銀行データへ同期するため、先にカレンダーを更新する。
+    print("\n--- Phase 1: Economic Calendar ---")
+    try:
+        cal_result = update_economic_calendar()
+        summary["calendar"] = cal_result
+        print(f"  Fetched: {cal_result['fetched_count']} events")
+        print(f"  Total:   {cal_result['merged_count']} in calendar")
+        if cal_result.get("errors"):
+            for e in cal_result["errors"]:
+                print(f"    {e}")
+    except Exception as e:
+        print(f"[ERROR] Calendar update failed: {e}")
+        traceback.print_exc()
+        summary["errors"].append(f"calendar: {e}")
+
+    # === 2. 中央銀行金利の更新 ===
+    print("\n--- Phase 2: Central Bank Rates ---")
     try:
         cb_result = update_central_bank_rates()
         summary["cb_rates"] = {
@@ -55,20 +71,17 @@ def main():
         traceback.print_exc()
         summary["errors"].append(f"cb_rates: {e}")
 
-    # === 2. 経済指標カレンダーの更新 ===
-    print("\n--- Phase 2: Economic Calendar ---")
+    # === 3. 次回の政策会合をカレンダーから同期 ===
+    print("\n--- Phase 3: Central Bank Meeting Schedule ---")
     try:
-        cal_result = update_economic_calendar()
-        summary["calendar"] = cal_result
-        print(f"  Fetched: {cal_result['fetched_count']} events")
-        print(f"  Total:   {cal_result['merged_count']} in calendar")
-        if cal_result.get("errors"):
-            for e in cal_result["errors"]:
-                print(f"  Warning: {e}")
+        meeting_result = sync_next_meetings_from_calendar()
+        summary["meeting_schedule"] = meeting_result
+        print(f"  Scheduled: {len(meeting_result['updated'])} changed")
+        print(f"  Expired:   {len(meeting_result['expired'])} cleared")
     except Exception as e:
-        print(f"[ERROR] Calendar update failed: {e}")
+        print(f"[ERROR] Meeting schedule sync failed: {e}")
         traceback.print_exc()
-        summary["errors"].append(f"calendar: {e}")
+        summary["errors"].append(f"meeting_schedule: {e}")
 
     # === 3. サマリーを保存 ===
     os.makedirs("data", exist_ok=True)

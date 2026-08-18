@@ -2168,6 +2168,15 @@ def generate_html_report(results, sentiment, us_yields, cb_rates,
     cb_rows_html = []
     for ccy, info in (cb_rates or {}).items():
         icon, color, label = stance_map.get(info.get("stance", "neutral"), ("?", "#94a3b8", "?"))
+        next_meeting = info.get("next_meeting")
+        meeting_dt = _parse_date_flex(next_meeting)
+        if not next_meeting:
+            meeting_html = '<span style="color:var(--text-muted)">未取得</span>'
+        elif meeting_dt and meeting_dt.date() < datetime.now(timezone.utc).date():
+            # 同期失敗時でも過去の日付を「次回会合」として見せない。
+            meeting_html = '<span style="color:var(--accent-red)">期限切れ（要取得）</span>'
+        else:
+            meeting_html = str(next_meeting)
         # キャリースコアを表示（いずれかのJPYペアから取得）
         cb_rows_html.append(f"""
         <tr>
@@ -2175,7 +2184,7 @@ def generate_html_report(results, sentiment, us_yields, cb_rates,
           <td>{info.get('cb_name', '—')}</td>
           <td class="num-cell">{info.get('rate', '—')}%</td>
           <td style="color:{color};font-family:var(--mono)">{icon} {label}</td>
-          <td class="meta-cell">{info.get('next_meeting', '—')}</td>
+          <td class="meta-cell">{meeting_html}</td>
         </tr>""")
 
     # 経済指標
