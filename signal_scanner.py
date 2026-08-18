@@ -2168,6 +2168,18 @@ def generate_html_report(results, sentiment, us_yields, cb_rates,
     cb_rows_html = []
     for ccy, info in (cb_rates or {}).items():
         icon, color, label = stance_map.get(info.get("stance", "neutral"), ("?", "#94a3b8", "?"))
+        # 通貨ごとの政策金利を最後に検証・変更した日。全体の更新日時を流用せず、
+        # 個別に裏付けのある日付だけを表示する。
+        rate_check = (
+            info.get("last_auto_check")
+            or info.get("last_manual_update")
+            or info.get("last_auto_update")
+        )
+        rate_check_html = (
+            str(rate_check)[:10]
+            if rate_check
+            else '<span style="color:var(--text-muted)">未確認</span>'
+        )
         next_meeting = info.get("next_meeting")
         meeting_dt = _parse_date_flex(next_meeting)
         if not next_meeting:
@@ -2184,6 +2196,7 @@ def generate_html_report(results, sentiment, us_yields, cb_rates,
           <td>{info.get('cb_name', '—')}</td>
           <td class="num-cell">{info.get('rate', '—')}%</td>
           <td style="color:{color};font-family:var(--mono)">{icon} {label}</td>
+          <td class="meta-cell">{rate_check_html}</td>
           <td class="meta-cell">{meeting_html}</td>
         </tr>""")
 
@@ -2343,7 +2356,7 @@ body{{background:var(--bg-deep);color:var(--text-primary);font-family:var(--jp);
   </table>
   <div class="section-head"><div class="section-num">Ⅲ.</div><h2 class="section-title">中央銀行政策金利</h2><span class="section-sub">Central Bank Rates</span>{cb_freshness_badge}</div>
   <table class="data-table">
-    <thead><tr><th>通貨</th><th>中央銀行</th><th>政策金利</th><th>スタンス</th><th>次回会合</th></tr></thead>
+    <thead><tr><th>通貨</th><th>中央銀行</th><th>政策金利</th><th>スタンス</th><th>最終更新日</th><th>次回会合</th></tr></thead>
     <tbody>{''.join(cb_rows_html)}</tbody>
   </table>
   <div class="section-head"><div class="section-num">Ⅳ.</div><h2 class="section-title">今後7日間の重要イベント</h2><span class="section-sub">Economic Calendar</span>{cal_freshness_badge}</div>
