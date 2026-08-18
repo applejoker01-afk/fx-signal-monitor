@@ -22,6 +22,36 @@ from modules.cb_rate_scraper import update_central_bank_rates, sync_next_meeting
 from modules.calendar_updater import update_economic_calendar
 
 
+def export_daytrade_calendar():
+    """Publish only actionable event data to GitHub Pages for the M15 monitor."""
+    source_path = "data/economic_calendar.json"
+    target_path = "docs/daytrade_calendar.json"
+    if not os.path.exists(source_path):
+        return {"exported": 0, "reason": "calendar missing"}
+    with open(source_path, "r", encoding="utf-8") as handle:
+        source = json.load(handle)
+    now = datetime.now(timezone.utc)
+    events = []
+    for event in source.get("events", []):
+        if event.get("importance") not in {"critical", "high"}:
+            continue
+        try:
+            event_time = datetime.fromisoformat(event["date"].replace("Z", "+00:00"))
+        except (KeyError, ValueError):
+            continue
+        # Keep a short past window so the browser can enforce post-news blocks.
+        if -1 <= (event_time - now).total_seconds() / 3600 <= 168:
+            events.append(event)
+    os.makedirs("docs", exist_ok=True)
+    with open(target_path, "w", encoding="utf-8") as handle:
+        json.dump({
+            "generated_at": now.isoformat(),
+            "source_last_updated": source.get("last_updated"),
+            "events": events,
+        }, handle, ensure_ascii=False, indent=2)
+    return {"exported": len(events)}
+
+
 def main():
     print("=" * 64)
     print(f"Data Auto-Refresh - {datetime.now(timezone.utc).isoformat()}")
@@ -49,6 +79,15 @@ def main():
         print(f"[ERROR] Calendar update failed: {e}")
         traceback.print_exc()
         summary["errors"].append(f"calendar: {e}")
+
+    # The day-trade page is static GitHub Pages, so it needs a small public
+    # calendar export rather than access to the repository's data directory.
+    try:
+        summary["daytrade_calendar"] = export_daytrade_calendar()
+        print(f"  Daytrade events: {summary['daytrade_calendar']['exported']}")
+    except Exception as e:
+        print(f"[ERROR] Daytrade calendar export failed: {e}")
+        summary["errors"].append(f"daytrade_calendar: {e}")
 
     # === 2. 中央銀行金利の更新 ===
     print("\n--- Phase 2: Central Bank Rates ---")

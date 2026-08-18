@@ -38,7 +38,7 @@ jobs:
         run: |
           git config --local user.email "fx-monitor-bot@github-actions"
           git config --local user.name  "FX Monitor Bot"
-          git add data/central_bank_rates.json data/economic_calendar.json data/auto_refresh_log.json 2>/dev/null || true
+          git add data/central_bank_rates.json data/economic_calendar.json data/auto_refresh_log.json docs/daytrade_calendar.json 2>/dev/null || true
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else

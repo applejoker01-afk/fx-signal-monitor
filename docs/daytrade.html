@@ -226,6 +226,7 @@ let fireCount = 0;
 const pairState = {}; // key -> { phase, lastSignalTime }
 let strategyMap = {}; // pair -> { strategy_key, regime, ... } 適応的戦略マップ
 let strategyMapTime = null;
+let daytradeEvents = [];
 
 // 戦略マップを読む（毎週GitHub Actionsが更新）
 // 同一ドメイン(github.io)上にあるので相対パスで直接読む（CORS不要）。
@@ -260,6 +261,36 @@ async function loadStrategyMap() {
     } catch (e) {}
   }
   return false;
+}
+
+async function loadDaytradeCalendar() {
+  for (const url of ["./daytrade_calendar.json", "daytrade_calendar.json"]) {
+    try {
+      const response = await fetch(url + "?t=" + Date.now(), { cache: "no-store" });
+      if (!response.ok) continue;
+      const payload = await response.json();
+      daytradeEvents = payload.events || [];
+      return true;
+    } catch (error) {}
+  }
+  daytradeEvents = [];
+  return false;
+}
+
+function daytradeEventGuard(pairKey) {
+  const now = Date.now();
+  for (const event of daytradeEvents) {
+    if (!(event.affects_pairs || []).includes(pairKey)) continue;
+    const eventTime = Date.parse(event.date);
+    if (Number.isNaN(eventTime)) continue;
+    const minutes = (eventTime - now) / 60000;
+    const before = event.importance === "critical" ? 30 : 15;
+    const after = event.importance === "critical" ? 20 : 10;
+    if (minutes >= -after && minutes <= before) {
+      return { blocked: true, message: `重要指標停止: ${event.name} (${minutes >= 0 ? "あと" : "後"}${Math.abs(minutes).toFixed(0)}分)` };
+    }
+  }
+  return { blocked: false, message: "" };
 }
 
 // ============================================================
@@ -450,8 +481,59 @@ function planRR(direction, entry, slDist, rr = 2.0) {
   }
 }
 
+function evalTrendBreakout(m, atrVal) {
+  const { closes, highs, lows } = m;
+  const n = closes.length;
+  if (!atrVal || n < 130) return null;
+  const e20 = ema(closes, 20), e60 = ema(closes, 60);
+  const priorE20 = ema(closes.slice(0, -4), 20);
+  const priorAtr = atr(highs.slice(0, -4), lows.slice(0, -4), closes.slice(0, -4));
+  if (!e20 || !e60 || !priorE20 || !priorAtr) return null;
+  const price = closes[n - 1];
+  const rangeHigh = Math.max(...highs.slice(-21, -1));
+  const rangeLow = Math.min(...lows.slice(-21, -1));
+  const expanded = atrVal >= priorAtr * 1.05;
+  if (e20 > e60 && e20 > priorE20 && price > rangeHigh && expanded) {
+    const stop = Math.min(rangeHigh, ...lows.slice(-4)) - atrVal * 0.25;
+    const risk = price - stop;
+    return risk >= atrVal * 0.45 ? { ...planRR("LONG", price, risk, 1.5), label: "トレンド継続ブレイク" } : null;
+  }
+  if (e20 < e60 && e20 < priorE20 && price < rangeLow && expanded) {
+    const stop = Math.max(rangeLow, ...highs.slice(-4)) + atrVal * 0.25;
+    const risk = stop - price;
+    return risk >= atrVal * 0.45 ? { ...planRR("SHORT", price, risk, 1.5), label: "トレンド継続ブレイク" } : null;
+  }
+  return null;
+}
+
+function evalRangeReversion(m, atrVal) {
+  const { closes, highs, lows } = m;
+  const n = closes.length;
+  if (!atrVal || n < 40) return null;
+  const strength = adx(highs, lows, closes);
+  if (strength == null || strength >= 18) return null;
+  const history = closes.slice(-21, -1);
+  const basis = history.reduce((sum, value) => sum + value, 0) / history.length;
+  const deviation = Math.sqrt(history.reduce((sum, value) => sum + (value - basis) ** 2, 0) / history.length);
+  if (!deviation) return null;
+  const price = closes[n - 1], upper = basis + 2 * deviation, lower = basis - 2 * deviation;
+  if (lows[n - 1] <= lower && price > lower) {
+    const stop = Math.min(lows[n - 1], lower) - atrVal * 0.25;
+    return (basis - price) / (price - stop) >= 1.1
+      ? { direction: "LONG", entry: price, sl: stop, tp1: basis, tp2: basis, tp3: basis, label: "レンジ反転" } : null;
+  }
+  if (highs[n - 1] >= upper && price < upper) {
+    const stop = Math.max(highs[n - 1], upper) + atrVal * 0.25;
+    return (price - basis) / (stop - price) >= 1.1
+      ? { direction: "SHORT", entry: price, sl: stop, tp1: basis, tp2: basis, tp3: basis, label: "レンジ反転" } : null;
+  }
+  return null;
+}
+
 // 各戦略の判定。最新足でエントリー条件が成立したらプランを返す
 function evalStrategy(key, m, atrVal) {
+  if (key === "trend_breakout") return evalTrendBreakout(m, atrVal);
+  if (key === "range_reversion") return evalRangeReversion(m, atrVal);
   const { closes, highs, lows } = m;
   const n = closes.length;
   const price = closes[n - 1];
@@ -608,6 +690,7 @@ async function scanAll() {
   log("スキャン開始...");
   // 戦略マップを更新（毎回読む）
   const mapOk = await loadStrategyMap();
+  await loadDaytradeCalendar();
   if (mapOk) {
     log(`戦略マップ取得: ${strategyMapTime ? new Date(strategyMapTime).toLocaleDateString("ja-JP") : ""}更新`);
   } else {
@@ -634,6 +717,25 @@ async function scanAll() {
 
       const st = pairState[pair.key] || { phase: "idle", lastSignalTime: 0 };
 
+      const eventGuard = daytradeEventGuard(pair.key);
+      if (eventGuard.blocked) {
+        st.phase = "blocked";
+        setPairCard(pair, { price, atrVal, e50, e200, eventBlock: eventGuard.message,
+          stratName, regime, regimeComment });
+        pairState[pair.key] = st;
+        await new Promise(r => setTimeout(r, 300));
+        continue;
+      }
+
+      if (new Date().getUTCHours() >= 21) {
+        st.phase = "blocked";
+        setPairCard(pair, { price, atrVal, e50, e200, eventBlock: "流動性が薄い時間帯（21:00-00:00 UTC）は監視停止",
+          stratName, regime, regimeComment });
+        pairState[pair.key] = st;
+        await new Promise(r => setTimeout(r, 300));
+        continue;
+      }
+
       // 戦略が割り当てられていない（見送り）ペアは判定しない
       if (!stratKey) {
         st.phase = "idle";
@@ -650,7 +752,11 @@ async function scanAll() {
       if (plan) {
         const now = Date.now();
         if (now - st.lastSignalTime > 3600 * 1000 || st.phase !== "fired") {
-          fireSignal(pair, plan, price, atrVal, e50, e200, stratName, regime);
+          if (mapEntry.alert_eligible) {
+            fireSignal(pair, plan, price, atrVal, e50, e200, stratName, regime);
+          } else {
+            log(`PAPER候補 ${pair.label} ${plan.direction} [${plan.label}] — 長期検証前のため通知しません`);
+          }
           st.phase = "fired";
           st.lastSignalTime = now;
         }
@@ -758,6 +864,9 @@ function setPairCard(pair, info) {
 
   if (info.error) {
     stateHtml = `<span class="state-tag tag-idle">取得失敗</span>`;
+  } else if (info.eventBlock) {
+    cls += " skipped";
+    stateHtml = `<span class="state-tag tag-watch">EVT 停止</span><div class="plan-line">${info.eventBlock}</div>`;
   } else if (info.skip) {
     cls += " skipped";
     stateHtml = `<span class="state-tag tag-idle">⏸ 見送り</span>
