@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-08-16",
+  "last_updated": "2026-08-18",
   "notes": "中央銀行会合のたびに手動更新する。stance は tighten/neutral/ease のいずれか。rate_momentum は accelerating/decelerating/peak/trough/stable のいずれか（金利サイクルの勢い）。FRED API + Finnhub API 設定済みなら週次自動更新される。 2026-07-20: SBI証券取扱ペア拡張に伴いSEK/NOK/BRL/PLN/KRWを追加（Web検証、各中銀公式発表ベース）。FRED自動取得の対象外のため、定期autoresearchでの更新運用に切り替え予定。 2026-07-20: AUD/NZDのstance誤り(ease→正しくはpause/tighten)を訂正。旧データは実際には発生していない利下げを前提としていた。既存ロジック(apply_boj_cycle_directional_filter, compute_fa_score)への影響はwiki側に記録。",
   "data_source": "BIS + 各国中央銀行公式発表 + Web検証 (2026-06-11)",
   "verification_source": {
@@ -12,50 +12,64 @@
   "rates": {
     "USD": {
       "rate": 3.63,
-      "next_meeting": "2026-06-18",
+      "next_meeting": null,
       "stance": "neutral",
       "rate_momentum": "stable",
       "cb_name": "FRB",
       "cb_note": "higher-for-longer pause。FF金利 3.5-4.0% 上限 3.75% を維持。利下げは2026H2以降の見通し。",
       "last_auto_update": "2026-05-01",
-      "auto_source": "FRED FEDFUNDS"
+      "auto_source": "FRED FEDFUNDS",
+      "last_auto_check": "2026-08-18T13:23:25.447659+00:00",
+      "next_meeting_source": "unavailable",
+      "next_meeting_status": "expired"
     },
     "EUR": {
       "rate": 2.4,
-      "next_meeting": "2026-07-24",
+      "next_meeting": null,
       "stance": "neutral",
       "rate_momentum": "trough",
       "cb_name": "ECB",
       "cb_note": "MRO 2.15%→2.4%へ上昇(2026-06)。利下げサイクルは事実上終了とみられ、利上げ転換の可能性。7/24会合で方針確認まで neutral へ。",
       "last_auto_update": "2026-06-21",
-      "auto_source": "ECB SDMX (MRR_FR)"
+      "auto_source": "ECB SDMX (MRR_FR)",
+      "last_auto_check": "2026-08-18T13:23:26.199241+00:00",
+      "next_meeting_source": "unavailable",
+      "next_meeting_status": "expired"
     },
     "JPY": {
       "rate": 1.0,
-      "next_meeting": "2026-07-30",
+      "next_meeting": null,
       "stance": "pause",
       "rate_momentum": "peak",
       "cb_name": "日銀",
       "cb_note": "2026-06-17 利上げ決定(0.75%→1.0%)。次回は様子見。ピーク到達の可能性。JPYキャリー巻き戻しリスクに注意。",
       "next_expected_move": "hold",
       "next_expected_date": "2026-09-17",
-      "last_meeting": "2026-06-17"
+      "last_meeting": "2026-06-17",
+      "next_meeting_source": "unavailable",
+      "next_meeting_status": "expired"
     },
     "GBP": {
       "rate": 3.75,
-      "next_meeting": "2026-06-19",
+      "next_meeting": null,
       "stance": "neutral",
       "rate_momentum": "stable",
       "cb_name": "BOE",
-      "cb_note": "MPC データ依存。インフレ鈍化でeaseへの転換を検討中だが確認できず中立維持。"
+      "cb_note": "MPC データ依存。インフレ鈍化でeaseへの転換を検討中だが確認できず中立維持。",
+      "last_auto_check": "2026-08-18T13:23:26.753774+00:00",
+      "auto_source": "BOE IADB (IUDBEDR)",
+      "next_meeting_source": "unavailable",
+      "next_meeting_status": "expired"
     },
     "AUD": {
       "rate": 4.35,
-      "next_meeting": "2026-08-11",
+      "next_meeting": null,
       "stance": "pause",
       "rate_momentum": "stable",
       "cb_name": "RBA",
-      "cb_note": "2026-07-20訂正: 旧データは「6/3に4.35%→4.10%へ利下げ・ease転換」と誤記されていた（実際にはそのような利下げは発生していない）。正しくは2026年H1に3回連続利上げで4.35%に到達し、6月会合(6/16)で据え置き決定。3回連続利上げ後の一時停止であり、追加利上げの可能性を否定する材料は確認できていないため stance=pause（tightenではなくease方向でもない）とする。次回会合2026-08-11。"
+      "cb_note": "2026-07-20訂正: 旧データは「6/3に4.35%→4.10%へ利下げ・ease転換」と誤記されていた（実際にはそのような利下げは発生していない）。正しくは2026年H1に3回連続利上げで4.35%に到達し、6月会合(6/16)で据え置き決定。3回連続利上げ後の一時停止であり、追加利上げの可能性を否定する材料は確認できていないため stance=pause（tightenではなくease方向でもない）とする。次回会合2026-08-11。",
+      "next_meeting_source": "unavailable",
+      "next_meeting_status": "expired"
     },
     "NZD": {
       "rate": 2.5,
@@ -67,75 +81,93 @@
     },
     "CAD": {
       "rate": 2.75,
-      "next_meeting": "2026-07-30",
+      "next_meeting": null,
       "stance": "neutral",
       "rate_momentum": "stable",
       "cb_name": "BOC",
-      "cb_note": "2026年は据え置き予想。インフレ落ち着きで中立。"
+      "cb_note": "2026年は据え置き予想。インフレ落ち着きで中立。",
+      "next_meeting_source": "unavailable",
+      "next_meeting_status": "expired"
     },
     "CHF": {
       "rate": 0.25,
-      "next_meeting": "2026-06-19",
+      "next_meeting": null,
       "stance": "ease",
       "rate_momentum": "trough",
       "cb_name": "SNB",
-      "cb_note": "0.25%まで引き下げ済み。ゼロ金利近づいておりこれ以上の引き下げ余地は限定的。サイクル底打ち近し。"
+      "cb_note": "0.25%まで引き下げ済み。ゼロ金利近づいておりこれ以上の引き下げ余地は限定的。サイクル底打ち近し。",
+      "next_meeting_source": "unavailable",
+      "next_meeting_status": "expired"
     },
     "SGD": {
       "rate": 2.5,
-      "next_meeting": "2026-07-15",
+      "next_meeting": null,
       "stance": "neutral",
       "rate_momentum": "stable",
       "cb_name": "MAS",
-      "cb_note": "為替バンド政策。中立維持。"
+      "cb_note": "為替バンド政策。中立維持。",
+      "next_meeting_source": "unavailable",
+      "next_meeting_status": "expired"
     },
     "HKD": {
       "rate": 3.75,
-      "next_meeting": "2026-06-18",
+      "next_meeting": null,
       "stance": "neutral",
       "rate_momentum": "stable",
       "cb_name": "HKMA(米ドルペッグ)",
-      "cb_note": "USDペッグのため実質FRBに連動。"
+      "cb_note": "USDペッグのため実質FRBに連動。",
+      "next_meeting_source": "unavailable",
+      "next_meeting_status": "expired"
     },
     "CNY": {
       "rate": 3.0,
-      "next_meeting": "2026-06-20",
+      "next_meeting": null,
       "stance": "ease",
       "rate_momentum": "stable",
       "cb_name": "PBOC",
-      "cb_note": "景気刺激のため緩和バイアス継続。"
+      "cb_note": "景気刺激のため緩和バイアス継続。",
+      "next_meeting_source": "unavailable",
+      "next_meeting_status": "expired"
     },
     "MXN": {
       "rate": 9.0,
-      "next_meeting": "2026-06-26",
+      "next_meeting": null,
       "stance": "ease",
       "rate_momentum": "decelerating",
       "cb_name": "Banxico",
-      "cb_note": "インフレ鈍化を受けて利下げサイクル継続。ペース鈍化傾向。"
+      "cb_note": "インフレ鈍化を受けて利下げサイクル継続。ペース鈍化傾向。",
+      "next_meeting_source": "unavailable",
+      "next_meeting_status": "expired"
     },
     "TRY": {
       "rate": 46.0,
-      "next_meeting": "2026-06-19",
+      "next_meeting": null,
       "stance": "ease",
       "rate_momentum": "decelerating",
       "cb_name": "CBRT",
-      "cb_note": "インフレ抑制後の利下げサイクル継続。ただし非常に高い水準から。"
+      "cb_note": "インフレ抑制後の利下げサイクル継続。ただし非常に高い水準から。",
+      "next_meeting_source": "unavailable",
+      "next_meeting_status": "expired"
     },
     "ZAR": {
       "rate": 7.25,
-      "next_meeting": "2026-07-17",
+      "next_meeting": null,
       "stance": "neutral",
       "rate_momentum": "stable",
       "cb_name": "SARB",
-      "cb_note": "インフレと成長のバランス。中立スタンス維持。"
+      "cb_note": "インフレと成長のバランス。中立スタンス維持。",
+      "next_meeting_source": "unavailable",
+      "next_meeting_status": "expired"
     },
     "INR": {
       "rate": 5.5,
-      "next_meeting": "2026-08-06",
+      "next_meeting": null,
       "stance": "ease",
       "rate_momentum": "stable",
       "cb_name": "RBI",
-      "cb_note": "成長支援のため緩和バイアス。"
+      "cb_note": "成長支援のため緩和バイアス。",
+      "next_meeting_source": "unavailable",
+      "next_meeting_status": "expired"
     },
     "SEK": {
       "rate": 2.0,
@@ -147,19 +179,23 @@
     },
     "NOK": {
       "rate": 4.25,
-      "next_meeting": "2026-08-13",
+      "next_meeting": null,
       "stance": "pause",
       "rate_momentum": "stable",
       "cb_name": "Norges Bank",
-      "cb_note": "2026年5月に4.00%→4.25%へ利上げ、6月会合は据え置き。政策金利見通しは2026年末にかけて4.5%超えを示唆——一時停止だが追加利上げバイアス残る。"
+      "cb_note": "2026年5月に4.00%→4.25%へ利上げ、6月会合は据え置き。政策金利見通しは2026年末にかけて4.5%超えを示唆——一時停止だが追加利上げバイアス残る。",
+      "next_meeting_source": "unavailable",
+      "next_meeting_status": "expired"
     },
     "BRL": {
       "rate": 14.25,
-      "next_meeting": "2026-08-04",
+      "next_meeting": null,
       "stance": "ease",
       "rate_momentum": "decelerating",
       "cb_name": "BCB (Copom)",
-      "cb_note": "2026年3月のピーク15.00%から3会合連続0.25%利下げで14.25%（2026年6月時点）。積極引き締めの反動で慎重な利下げサイクルだが、インフレはなお目標(3%)を上回る約4.7%——利下げペースは緩やか。"
+      "cb_note": "2026年3月のピーク15.00%から3会合連続0.25%利下げで14.25%（2026年6月時点）。積極引き締めの反動で慎重な利下げサイクルだが、インフレはなお目標(3%)を上回る約4.7%——利下げペースは緩やか。",
+      "next_meeting_source": "unavailable",
+      "next_meeting_status": "expired"
     },
     "PLN": {
       "rate": 3.75,
@@ -179,5 +215,7 @@
     }
   },
   "warning": "JPYは2026-06-17の日銀会合で利上げ確実視。会合後に rate=1.0, rate_momentum='peak'? に更新すること。",
-  "last_auto_run": "2026-08-16T01:01:07.369065+00:00"
+  "last_auto_run": "2026-08-18T13:23:27.442864+00:00",
+  "last_meeting_schedule_sync": "2026-08-18T13:23:27.443456+00:00",
+  "meeting_schedule_source": "forexfactory"
 }
