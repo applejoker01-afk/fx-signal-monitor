@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-08-18",
+  "last_updated": "2026-08-23",
   "notes": "中央銀行会合のたびに手動更新する。stance は tighten/neutral/ease のいずれか。rate_momentum は accelerating/decelerating/peak/trough/stable のいずれか（金利サイクルの勢い）。FRED API + Finnhub API 設定済みなら週次自動更新される。 2026-07-20: SBI証券取扱ペア拡張に伴いSEK/NOK/BRL/PLN/KRWを追加（Web検証、各中銀公式発表ベース）。FRED自動取得の対象外のため、定期autoresearchでの更新運用に切り替え予定。 2026-07-20: AUD/NZDのstance誤り(ease→正しくはpause/tighten)を訂正。旧データは実際には発生していない利下げを前提としていた。既存ロジック(apply_boj_cycle_directional_filter, compute_fa_score)への影響はwiki側に記録。",
   "data_source": "BIS + 各国中央銀行公式発表 + Web検証 (2026-06-11)",
   "verification_source": {
@@ -19,7 +19,7 @@
       "cb_note": "higher-for-longer pause。FF金利 3.5-4.0% 上限 3.75% を維持。利下げは2026H2以降の見通し。",
       "last_auto_update": "2026-05-01",
       "auto_source": "FRED FEDFUNDS",
-      "last_auto_check": "2026-08-18T13:23:25.447659+00:00",
+      "last_auto_check": "2026-08-23T01:02:15.847511+00:00",
       "next_meeting_source": "unavailable",
       "next_meeting_status": "expired"
     },
@@ -32,7 +32,7 @@
       "cb_note": "MRO 2.15%→2.4%へ上昇(2026-06)。利下げサイクルは事実上終了とみられ、利上げ転換の可能性。7/24会合で方針確認まで neutral へ。",
       "last_auto_update": "2026-06-21",
       "auto_source": "ECB SDMX (MRR_FR)",
-      "last_auto_check": "2026-08-18T13:23:26.199241+00:00",
+      "last_auto_check": "2026-08-23T01:02:16.520409+00:00",
       "next_meeting_source": "unavailable",
       "next_meeting_status": "expired"
     },
@@ -56,7 +56,7 @@
       "rate_momentum": "stable",
       "cb_name": "BOE",
       "cb_note": "MPC データ依存。インフレ鈍化でeaseへの転換を検討中だが確認できず中立維持。",
-      "last_auto_check": "2026-08-18T13:23:26.753774+00:00",
+      "last_auto_check": "2026-08-23T01:02:17.498567+00:00",
       "auto_source": "BOE IADB (IUDBEDR)",
       "next_meeting_source": "unavailable",
       "next_meeting_status": "expired"
@@ -171,11 +171,13 @@
     },
     "SEK": {
       "rate": 2.0,
-      "next_meeting": "2026-08-20",
+      "next_meeting": null,
       "stance": "tighten",
       "rate_momentum": "accelerating",
       "cb_name": "Riksbank",
-      "cb_note": "2026年6月まで1.75%を据え置いていたが、中東情勢由来のインフレ懸念を受け2026年7月に2.00%へ利上げ。2026年後半インフレ予想は下方修正(0.6%)も2027年は上方修正(2.7%)。"
+      "cb_note": "2026年6月まで1.75%を据え置いていたが、中東情勢由来のインフレ懸念を受け2026年7月に2.00%へ利上げ。2026年後半インフレ予想は下方修正(0.6%)も2027年は上方修正(2.7%)。",
+      "next_meeting_source": "unavailable",
+      "next_meeting_status": "expired"
     },
     "NOK": {
       "rate": 4.25,
@@ -215,7 +217,7 @@
     }
   },
   "warning": "JPYは2026-06-17の日銀会合で利上げ確実視。会合後に rate=1.0, rate_momentum='peak'? に更新すること。",
-  "last_auto_run": "2026-08-18T13:23:27.442864+00:00",
-  "last_meeting_schedule_sync": "2026-08-18T13:23:27.443456+00:00",
+  "last_auto_run": "2026-08-23T01:02:18.279879+00:00",
+  "last_meeting_schedule_sync": "2026-08-23T01:02:18.280717+00:00",
   "meeting_schedule_source": "forexfactory"
 }
