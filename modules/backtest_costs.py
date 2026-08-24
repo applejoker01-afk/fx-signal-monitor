@@ -62,10 +62,23 @@ def trade_r_multiple(trade: dict) -> float | None:
     return pips / risk_dist
 
 
+# 2026-08-25判明: KRWJPY/INRJPY/TRYJPY等の低ボラ・低単価エキゾチッククロスは、
+# ATRベースの初期SL幅がミリ単位で極端に小さいのに対し、SPREAD_PIPS推定値
+# （未検証の初期値、コード内コメントにも「要検証」と明記）は他ペアからの
+# 類推でそれなりの大きさがあるため、コストがリスク幅の何倍にも達し、R倍数が
+# -19R〜-48Rのように数値的に破綻する。R = pips/risk_dist という定義上、
+# risk_distに対してcostが同程度以上だとR自体が意味を失う（分母が実質コストに
+# 支配される）ため、機械的な閾値でこのケースを検出し「評価不能」として
+# 別扱いする（除外して見なかったことにするのではなく、コスト比率過大という
+# 事実そのものを報告する）。
+COST_DOMINANCE_THRESHOLD = 0.5  # コストがリスク幅の50%以上ならR評価不能とみなす
+
+
 def net_pips_and_r(trade: dict, pair: str, scenario: str = "standard") -> dict | None:
     """
     コスト控除後のpips・R倍数を返す。
-    Returns: {"gross_pips": float, "net_pips": float, "gross_r": float, "net_r": float} または None
+    Returns: {"gross_pips", "net_pips", "gross_r", "net_r", "cost_raw", "cost_dominates"} または None
+    cost_dominates=True の場合、net_r は数値的に信頼できない（呼び出し側で除外を推奨）。
     """
     entry = trade.get("entry_price")
     initial_sl = trade.get("initial_sl", trade.get("sl"))
@@ -78,6 +91,7 @@ def net_pips_and_r(trade: dict, pair: str, scenario: str = "standard") -> dict |
 
     cost = cost_per_trade_raw(pair, scenario)
     net_pips = gross_pips - cost
+    cost_dominates = (cost / risk_dist) >= COST_DOMINANCE_THRESHOLD
 
     return {
         "gross_pips": gross_pips,
@@ -85,6 +99,8 @@ def net_pips_and_r(trade: dict, pair: str, scenario: str = "standard") -> dict |
         "gross_r": gross_pips / risk_dist,
         "net_r": net_pips / risk_dist,
         "cost_raw": cost,
+        "cost_dominates": cost_dominates,
+        "cost_to_risk_ratio": round(cost / risk_dist, 3),
     }
 
 
