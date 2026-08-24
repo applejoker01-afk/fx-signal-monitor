@@ -11,6 +11,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  issues: write
 
 concurrency:
   group: claude-weekly-signal-experiment
@@ -74,6 +75,7 @@ jobs:
           done
 
       - name: Commit and open experiment pull request
+        id: publish
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: ${{ steps.branch.outputs.name }}
@@ -84,12 +86,50 @@ jobs:
             echo "No research artifact was produced; no pull request created."
             exit 0
           fi
+          report_file="$(git diff --cached --name-only | awk '/^research\/results\/.*\.md$/ {print}' | tail -n 1)"
+          if [[ -z "$report_file" ]]; then
+            echo "A dated research/results note is required before publication."
+            exit 1
+          fi
           git config user.name "Claude Research Bot"
           git config user.email "claude-research-bot@users.noreply.github.com"
           git commit -m "research: weekly signal experiment"
           git push origin "$BRANCH"
-          gh pr create \
+          pr_url="$(gh pr create \
             --base main \
             --head "$BRANCH" \
             --title "Research: weekly FX signal experiment" \
-            --body "Automated Claude research artifact. Production changes are prohibited; review the pre-registered rules, cost assumptions, and OOS results before any follow-up implementation."
+            --body "Automated Claude research artifact. Production changes are prohibited; review the pre-registered rules, cost assumptions, and OOS results before any follow-up implementation.")"
+          echo "pr_url=$pr_url" >> "$GITHUB_OUTPUT"
+          echo "report_file=$report_file" >> "$GITHUB_OUTPUT"
+
+      - name: Post experiment summary to GitHub Issue
+        if: steps.publish.outputs.pr_url != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_URL: ${{ steps.publish.outputs.pr_url }}
+          REPORT_FILE: ${{ steps.publish.outputs.report_file }}
+        shell: bash
+        run: |
+          if [[ ! -f "$REPORT_FILE" ]]; then
+            echo "Published research note is missing: $REPORT_FILE"
+            exit 1
+          fi
+          body_file="$(mktemp)"
+          {
+            echo "## $(date -u +'%Y-%m-%d %H:%M UTC') のClaude実験"
+            echo
+            echo "- 実験PR: $PR_URL"
+            echo "- 実行: https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+            echo "- 結果ノート: \`$REPORT_FILE\`"
+            echo
+            echo "### 要約"
+            sed -n '1,240p' "$REPORT_FILE"
+          } > "$body_file"
+
+          issue_number="$(gh issue list --state open --search 'Claude FX実験レポート in:title' --limit 1 --json number --jq '.[0].number')"
+          if [[ -z "$issue_number" ]]; then
+            gh issue create --title "Claude FX実験レポート" --body-file "$body_file"
+          else
+            gh issue comment "$issue_number" --body-file "$body_file"
+          fi
