@@ -147,6 +147,10 @@ def run_backtest(
                     "pips": round(pips, 5),
                     "result": "WIN" if exit_reason.startswith("TP") else "LOSS",
                     "hold_days": i - open_trade["entry_idx"],
+                    # 2026-08-25追加: R倍数・コスト調整計算(modules/backtest_costs.py)で
+                    # 初期SL幅が必要なため、閉じたトレード記録にも初期slを残す。
+                    "sl": round(open_trade["sl"], 5),
+                    "initial_sl": round(open_trade["sl"], 5),
                 })
                 open_trade = None
 
