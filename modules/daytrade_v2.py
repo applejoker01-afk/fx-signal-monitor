@@ -224,16 +224,39 @@ def simulate(bars: list[dict[str, Any]], signals: Iterable[Signal], pair: str,
         exit_price = exit_price - half_cost if signal.direction == "LONG" else exit_price + half_cost
         gross = (exit_price - entry) if signal.direction == "LONG" else (entry - exit_price)
         pips = gross / pip_size(pair)
-        results.append({"strategy_key": signal.strategy_key, "session": signal.session,
-                        "outcome": outcome, "pips": pips, "entry_index": entry_index,
-                        "exit_index": exit_index})
+        def iso_time(bar_index: int) -> str | None:
+            timestamp = bars[bar_index].get("timestamp")
+            if not timestamp:
+                return None
+            return datetime.fromtimestamp(timestamp, timezone.utc).isoformat().replace("+00:00", "Z")
+
+        results.append({
+            "pair": pair,
+            "strategy_key": signal.strategy_key,
+            "direction": signal.direction,
+            "session": signal.session,
+            "signal_time": iso_time(signal.index),
+            "entry_time": iso_time(entry_index),
+            "exit_time": iso_time(exit_index),
+            "entry_price": round(entry, 6),
+            "stop_price": round(signal.stop, 6),
+            "target_price": round(target, 6),
+            "exit_price": round(exit_price, 6),
+            "outcome": outcome,
+            "pips": round(pips, 2),
+            "round_trip_cost_pips": ROUND_TRIP_COST_PIPS.get(pair, 2.0),
+            "entry_index": entry_index,
+            "exit_index": exit_index,
+            "holding_bars": exit_index - entry_index + 1,
+        })
         next_free_index = exit_index + 1
     return results
 
 
 def summarize(results: list[dict[str, Any]]) -> dict[str, Any]:
     if not results:
-        return {"trades": 0, "net_pf": 0.0, "net_expectancy_pips": 0.0,
+        return {"trades": 0, "wins": 0, "losses": 0, "time_exits": 0,
+                "total_net_pips": 0.0, "net_pf": 0.0, "net_expectancy_pips": 0.0,
                 "win_rate": 0.0, "max_drawdown_pips": 0.0, "by_session": {}}
     wins = [row["pips"] for row in results if row["pips"] > 0]
     losses = [row["pips"] for row in results if row["pips"] <= 0]
@@ -248,6 +271,10 @@ def summarize(results: list[dict[str, Any]]) -> dict[str, Any]:
         by_session.setdefault(row["session"], []).append(row["pips"])
     return {
         "trades": len(results),
+        "wins": len(wins),
+        "losses": len(losses),
+        "time_exits": sum(1 for row in results if row["outcome"] == "TIME"),
+        "total_net_pips": round(sum(row["pips"] for row in results), 2),
         "net_pf": round(profit_factor, 2),
         "net_expectancy_pips": round(mean(row["pips"] for row in results), 2),
         "win_rate": round(100 * len(wins) / len(results), 1),
@@ -269,7 +296,8 @@ def prepare_bars(price_data: dict[str, list[Any]]) -> list[dict[str, Any]]:
     return bars
 
 
-def evaluate_pair(price_data: dict[str, list[Any]], pair: str) -> dict[str, Any]:
+def _evaluate_pair(price_data: dict[str, list[Any]], pair: str,
+                   include_trades: bool) -> dict[str, Any]:
     bars = prepare_bars(price_data)
     midpoint = len(bars) * 2 // 3
     strategies: dict[str, dict[str, Any]] = {}
@@ -283,8 +311,21 @@ def evaluate_pair(price_data: dict[str, list[Any]], pair: str) -> dict[str, Any]
         eligible = (metrics["trades"] >= 30 and oos_metrics["trades"] >= 10
                     and metrics["net_pf"] >= 1.05 and metrics["net_expectancy_pips"] > 0
                     and oos_metrics["net_expectancy_pips"] > 0)
-        strategies[key] = {"metrics": metrics, "oos_metrics": oos_metrics,
-                           "eligible": eligible}
+        strategy = {"metrics": metrics, "oos_metrics": oos_metrics,
+                    "eligible": eligible}
+        if include_trades:
+            strategy["trades"] = all_results
+        strategies[key] = strategy
     return {"engine_version": "daytrade-v2", "execution_mode": "paper_only",
             "cost_model": "next_open + configured round-trip cost; stop wins intrabar ties",
             "strategies": strategies}
+
+
+def evaluate_pair(price_data: dict[str, list[Any]], pair: str) -> dict[str, Any]:
+    """Compact report for strategy selection and the browser map."""
+    return _evaluate_pair(price_data, pair, include_trades=False)
+
+
+def backtest_pair(price_data: dict[str, list[Any]], pair: str) -> dict[str, Any]:
+    """Auditable report including every simulated trade and its net result."""
+    return _evaluate_pair(price_data, pair, include_trades=True)
