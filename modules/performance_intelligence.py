@@ -456,10 +456,25 @@ def apply_seasonal_filter(result: dict, now) -> dict:
 # ⑩ 自己学習型シグナル重み付け
 # ============================================================
 
+# 2026-06-10: TP1/TP2/TP3多段階決済 → 単一TP+トレーリング戦略へ刷新。
+# 2026-08-25判明: AUDJPYの実績調整(-2)が、この刷新より前(2026-06-03〜06-08)の
+# 旧戦略下での5件（1勝3敗1分・勝率20%）のみで決まっていた。旧戦略はTP到達率が
+# 低く（変更前 TP到達率6.5%）現行の単一TP+トレーリングとは決済特性が別物のため、
+# 別戦略の実績で現行戦略を評価するのは不当な比較。再検証(run_pair_reverification.py)
+# でも同期間のAUDJPYはフィルタなしの生シグナルで280日53.3%/90日42.9%と、この
+# -2調整ほど悪くないことを確認済み。min_trades=5も1ヶ月未満のサンプルで
+# 確定判定してしまう閾値としては緩すぎた反省を踏まえ、刷新前のトレードは
+# 実績調整の対象から除外する。
+STRATEGY_CUTOVER_DATE = "2026-06-10"
+
+
 def build_pair_performance_map(closed_trades: list, min_trades: int = 5) -> dict:
     """
     決済済みトレードから、ペアごとの実績勝率を集計して
     信頼度調整マップを作る。
+
+    STRATEGY_CUTOVER_DATE より前にエントリーしたトレードは、決済ロジックが
+    別物（旧TP1/2/3多段階）だった旧戦略下の結果なので集計対象から除外する。
 
     Returns:
         {
@@ -471,6 +486,9 @@ def build_pair_performance_map(closed_trades: list, min_trades: int = 5) -> dict
     for t in closed_trades:
         pair = t.get("pair")
         if not pair:
+            continue
+        entry_date = t.get("entry_date") or (t.get("entry_time", "")[:10])
+        if entry_date and entry_date < STRATEGY_CUTOVER_DATE:
             continue
         if pair not in pair_stats:
             pair_stats[pair] = {"wins": 0, "total": 0, "pips": 0.0}

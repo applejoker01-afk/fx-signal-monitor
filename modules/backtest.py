@@ -24,6 +24,7 @@ def run_backtest(
     atr_multipliers: tuple = (3.0, 3.0, 4.5, 6.0),  # 2026-06-09 E案 (PF 2.15)
     lookback_days: int = 180,
     ta_thresholds: tuple = (60, 55),
+    allow_ta_only_when_fa_neutral: bool = False,
 ) -> dict:
     """
     1通貨ペアのバックテストを実行。
@@ -37,6 +38,12 @@ def run_backtest(
         pair_api: ペア定義
         atr_multipliers: (SL, TP1, TP2, TP3) のATR乗数
         lookback_days: 検証する日数
+        allow_ta_only_when_fa_neutral: 2026-08-25追加。FAスコアが40-60の中立帯で
+            方向を持たない（direction=="neutral"）とき、通常はagree判定が
+            成立せずエントリーしないが、Trueにすると中立帯の間だけTA単独の
+            閾値超えでエントリーを許可する（FAが明確にbuy/sellを持つ場合は
+            従来通りTA/FA一致が必須のまま）。EURUSD等FAが恒常的に中立に
+            張り付くペアでTA単独運用が成立するかの検証用。
 
     Returns:
         {
@@ -131,6 +138,12 @@ def run_backtest(
                 entry_dir = "LONG" if fa_sign > 0 else "SHORT"
             elif agree and ta["ta_score"] <= ta_short and fa["score"] <= fa_short:
                 entry_dir = "SHORT"
+            elif allow_ta_only_when_fa_neutral and fa_sign == 0:
+                # FAが中立帯で方向を持たない場合のみ、TA単独の閾値超えで許可
+                if ta["ta_score"] >= ta_long:
+                    entry_dir = "LONG"
+                elif ta["ta_score"] <= ta_short:
+                    entry_dir = "SHORT"
 
             if entry_dir:
                 atr = ta.get("atr") or (current_price * 0.005)
