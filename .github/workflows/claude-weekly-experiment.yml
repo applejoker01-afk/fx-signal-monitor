@@ -136,7 +136,9 @@ jobs:
             sed -n '1,240p' "$REPORT_FILE"
           } > "$body_file"
 
-          issue_number="$(gh issue list --state open --search 'Claude FX実験レポート in:title' --limit 1 --json number --jq '.[0].number')"
+          # Search indexing is asynchronous. Query the open-issue list and use
+          # an exact title match so a just-created rolling report is not missed.
+          issue_number="$(gh issue list --state open --limit 100 --json number,title --jq '.[] | select(.title == "Claude FX実験レポート") | .number' | head -n 1)"
           if [[ -z "$issue_number" ]]; then
             gh issue create --title "Claude FX実験レポート" --body-file "$body_file"
           else
