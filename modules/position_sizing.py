@@ -279,10 +279,11 @@ def calc_position_size(pair: str, entry_price: float, sl_price: float,
 
     confidence_multiplier: 追加の確信度シグナルによるロット調整倍率（2026-08-11追加）。
     exposure_multiplierとは独立した別軸——こちらは「既存ゲートを通過した信号の中での
-    質」を反映する。0.5〜1.5にクランプ（検証したエッジの規模が不確実なため、上下とも
-    控えめな範囲に留める。取引を止めるゲートには使わず、常にexposure_multiplierと
-    掛け合わせて使う）。2方向のシグナルを組み合わせて使う想定:
-      - RSIオーバーソールド反発が確認された場合: 増強（[[2026-08-11-rsi-reversal-filter]]参照）
+    質」を反映する。2026-08-25変更: 0.0〜1.0にクランプ（従来は0.5〜1.5で増額も
+    許容していたが、戦略刷新後29件・JPY損益が確認できるのは7件で合計-25,393円という
+    根拠不足の状態でリスク3%を最大3.75%まで増やす設計は危険と判断し凍結。
+    確信度シグナルは「通常サイズ／減額／見送り」の判定にのみ使い、増額には使わない）:
+      - RSIオーバーソールド反発が確認された場合: 現在は据え置き（従来は増強していたが凍結）
       - ta_scoreが過熱域（>=90）の場合: 減額（wiki/finance/2026-07-11-fx-signal-monitor-evaluation.md
         の「逆U字」発見・[[2026-08-11-rsi-reversal-filter]]のGBPJPY個別分析で再確認）
 
@@ -337,7 +338,7 @@ def calc_position_size(pair: str, entry_price: float, sl_price: float,
         return {"tradable": False, "units": 0, "note": "損失単価の計算に失敗"}
 
     exposure_multiplier = max(0.0, min(1.0, exposure_multiplier))
-    confidence_multiplier = max(0.5, min(1.5, confidence_multiplier))
+    confidence_multiplier = max(0.0, min(1.0, confidence_multiplier))  # 2026-08-25: 増額を禁止
     risk_amount_jpy = balance * (risk_pct / 100.0) * exposure_multiplier * confidence_multiplier
     raw_units_risk = risk_amount_jpy / loss_per_unit_jpy
 

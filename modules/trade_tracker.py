@@ -508,10 +508,14 @@ def open_trade_from_pending_fill(trade: dict, pair_api: dict = None,
         conf_mult = 1.0
         is_long = "LONG" in trade.get("direction", "")
         if trade.get("rsi_reversal_confirmed") and is_long:
-            # RSIオーバーソールド反発を確認 → 増強
-            # 検証: [[2026-08-11-rsi-reversal-filter]]（20年train/test、本物のFA+TAゲート込みで頑健に再現）
-            conf_mult *= 1.25
-            print(f"  [SIZING] {pair}: RSIオーバーソールド反発を確認、ロットを増強")
+            # 2026-08-25変更: 以前はRSIオーバーソールド反発確認でロットを1.25倍に増強
+            # していたが、基準リスク3%が最大3.75%まで上がる設計は、この確信度シグナルの
+            # 検証サンプル数（戦略刷新後29件、JPY損益が確認できるのはわずか7件で合計
+            # -25,393円）に対して踏み込みすぎと判断し凍結。確信度シグナルは当面
+            # 「通常サイズ／見送り」の判定にのみ用い、ロット増額には使わない
+            # （ta_score過熱域による減額は据え置き＝安全側の調整は維持）。
+            print(f"  [SIZING] {pair}: RSIオーバーソールド反発を確認"
+                  "（2026-08-25〜ロット増強は凍結・通常サイズのまま）")
         if trade.get("ta_score_overheated") and is_long:
             # ta_scoreが過熱域（>=90） → 減額
             # 検証: wiki/finance/2026-07-11-fx-signal-monitor-evaluation.md（71件実績、逆U字発見）

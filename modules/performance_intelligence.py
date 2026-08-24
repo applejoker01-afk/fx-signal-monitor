@@ -467,14 +467,27 @@ def apply_seasonal_filter(result: dict, now) -> dict:
 # 実績調整の対象から除外する。
 STRATEGY_CUTOVER_DATE = "2026-06-10"
 
+# 2026-08-25凍結: 動的な実績ベース★調整（勝率に応じてadjustmentを±付与する仕組み）は
+# 一時凍結する。理由: 刷新後(STRATEGY_CUTOVER_DATE以降)の全ペア合計はまだ29件
+# （9勝15敗5分）、JPY損益が記録されているのはそのうち7件で合計-25,393円。
+# min_trades=5というペア単位の閾値はこの規模に対して緩すぎ、数件のブレで
+# ★を動かしてしまう（AUDJPYの-2調整が旧戦略時代の5件だけで決まっていた件と同根）。
+# 解除条件: ペア単位でmin_trades件数を少なくとも30件程度まで引き上げた上で、
+# JPY損益ベースの実績が十分蓄積されてから再評価する。凍結中もwin_rate/totalの
+# 集計自体は返す（監視用）が、adjustmentは常に0に固定する。
+DYNAMIC_ADJUSTMENT_FROZEN = True
 
-def build_pair_performance_map(closed_trades: list, min_trades: int = 5) -> dict:
+
+def build_pair_performance_map(closed_trades: list, min_trades: int = 30) -> dict:
     """
     決済済みトレードから、ペアごとの実績勝率を集計して
     信頼度調整マップを作る。
 
     STRATEGY_CUTOVER_DATE より前にエントリーしたトレードは、決済ロジックが
     別物（旧TP1/2/3多段階）だった旧戦略下の結果なので集計対象から除外する。
+
+    DYNAMIC_ADJUSTMENT_FROZEN が True の間は、win_rate/totalの集計は返すが
+    adjustmentは常に0（凍結中である旨をnoteに明記）。
 
     Returns:
         {
@@ -499,17 +512,26 @@ def build_pair_performance_map(closed_trades: list, min_trades: int = 5) -> dict
 
     perf_map = {}
     for pair, s in pair_stats.items():
+        win_rate = s["wins"] / s["total"] * 100 if s["total"] else 0
+
+        if DYNAMIC_ADJUSTMENT_FROZEN:
+            perf_map[pair] = {
+                "win_rate": round(win_rate, 1),
+                "total": s["total"],
+                "adjustment": 0,
+                "note": f"動的実績調整は凍結中(サンプル{s['total']}件・2026-08-25〜)",
+            }
+            continue
+
         if s["total"] < min_trades:
             # サンプル数が少なすぎる場合は調整なし
             perf_map[pair] = {
-                "win_rate": round(s["wins"] / s["total"] * 100, 1) if s["total"] else 0,
+                "win_rate": round(win_rate, 1),
                 "total": s["total"],
                 "adjustment": 0,
                 "note": f"サンプル不足({s['total']}件)",
             }
             continue
-
-        win_rate = s["wins"] / s["total"] * 100
 
         # 勝率に応じた★調整
         if win_rate >= 65:

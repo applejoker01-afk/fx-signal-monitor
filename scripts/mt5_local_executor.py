@@ -179,8 +179,10 @@ def main() -> int:
         conf_mult = 1.0
         is_long = "LONG" in order.get("direction", "")
         if order.get("rsi_reversal_confirmed") and is_long:
-            conf_mult *= 1.25
-            print(f"  [SIZING] RSIオーバーソールド反発を確認、ロットを増強")
+            # 2026-08-25: ロット増強は凍結（modules/trade_tracker.py参照・
+            # サンプル数不足のため。通常サイズのまま）
+            print(f"  [SIZING] RSIオーバーソールド反発を確認"
+                  "（2026-08-25〜ロット増強は凍結・通常サイズのまま）")
         if order.get("ta_score_overheated") and is_long:
             conf_mult *= 0.75
             print(f"  [SIZING] ta_score過熱域を検知、ロットを減額")
