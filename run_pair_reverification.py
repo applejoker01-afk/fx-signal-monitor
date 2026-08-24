@@ -16,16 +16,49 @@ run_pair_tuning_experiment.py と同じ compute_ta_score/compute_fa_score/run_ba
 """
 
 import json
+import os
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 
-from signal_scanner import compute_ta_score, fetch_history, PAIR_API
+from signal_scanner import compute_ta_score, fetch_history, fetch_history_with_dates, PAIR_API
 from modules.rate_fetcher import fetch_live_central_bank_rates, compute_fa_score
 from modules.backtest import run_backtest
+from modules.calendar_updater import CALENDAR_FILE, CALENDAR_HISTORY_FILE
 
 DEFAULT_TH = (60, 55)
 JPY_PAIRS = sorted(p for p in PAIR_API if p.endswith("JPY"))
 NON_JPY_PAIRS = sorted(p for p in PAIR_API if not p.endswith("JPY"))
+
+
+def load_all_known_events():
+    """
+    2026-08-25追加: data/economic_calendar.json（未来+直近48h）と
+    data/economic_calendar_history.jsonl（過去にアーカイブされた分）を
+    合わせて読む。history側は今回のカレンダー基盤修正でアーカイブを
+    開始したばかりなので、当面はほぼ空 -> イベント回避backtestは
+    「仕組みは動くが検証に足るデータはまだ無い」状態になる想定。
+    """
+    events = []
+    if os.path.exists(CALENDAR_FILE):
+        try:
+            with open(CALENDAR_FILE, "r", encoding="utf-8") as f:
+                events.extend(json.load(f).get("events", []))
+        except Exception as e:
+            print(f"[WARN] {CALENDAR_FILE} read failed: {e}")
+    if os.path.exists(CALENDAR_HISTORY_FILE):
+        try:
+            with open(CALENDAR_HISTORY_FILE, "r", encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if line:
+                        events.append(json.loads(line))
+        except Exception as e:
+            print(f"[WARN] {CALENDAR_HISTORY_FILE} read failed: {e}")
+    return events
+
+
+def events_for_pair(all_events, pair):
+    return [ev for ev in all_events if pair in (ev.get("affects_pairs") or [])]
 
 
 def fmt_row(pair, r):
@@ -179,6 +212,40 @@ def main():
                           cb_rates, PAIR_API, lookback_days=180, ta_thresholds=DEFAULT_TH,
                           allow_ta_only_when_fa_neutral=True)
         print(fmt_row(pair, r))
+
+    # ------------------------------------------------------------
+    # 4) イベント回避backtestの動作確認
+    #    2026-08-25: カレンダー基盤修正の効果測定用。ただしdata/economic_calendar_history.jsonl
+    #    はアーカイブを開始したばかりでほぼ空のため、「機構は動くが検証に足るデータがまだ無い」
+    #    ことを明示する目的の区間。数週間〜数ヶ月分の蓄積後に再実行すれば意味のある比較になる。
+    # ------------------------------------------------------------
+    print("\n" + "─" * 72)
+    print("【イベント回避backtest（動作確認・データ蓄積待ち）】")
+    all_events = load_all_known_events()
+    history_count = 0
+    if os.path.exists(CALENDAR_HISTORY_FILE):
+        with open(CALENDAR_HISTORY_FILE, "r", encoding="utf-8") as f:
+            history_count = sum(1 for line in f if line.strip())
+    print(f"  既知イベント総数: {len(all_events)}件（うちhistory(過去分)由来: {history_count}件）")
+
+    worst_pairs = ["GBPUSD", "NZDUSD", "EURUSD", "EURGBP"]
+    for pair in worst_pairs:
+        prices_dates = fetch_history_with_dates(pair, 280)
+        if not prices_dates:
+            continue
+        dates, prices = prices_dates
+        pair_events = events_for_pair(all_events, pair)
+
+        r_plain = run_backtest(pair, prices, compute_ta_score, compute_fa_score,
+                                cb_rates, PAIR_API, lookback_days=180, ta_thresholds=DEFAULT_TH,
+                                allow_ta_only_when_fa_neutral=True)
+        r_avoid = run_backtest(pair, prices, compute_ta_score, compute_fa_score,
+                                cb_rates, PAIR_API, lookback_days=180, ta_thresholds=DEFAULT_TH,
+                                allow_ta_only_when_fa_neutral=True,
+                                full_dates=dates, avoid_events=pair_events, event_avoid_days=1)
+        print(f"  {pair} (既知イベント{len(pair_events)}件):")
+        print(f"    通常          : " + fmt_row(pair, r_plain).strip())
+        print(f"    イベント回避後: " + fmt_row(pair, r_avoid).strip())
 
     print("\n[OK] 検証完了")
 

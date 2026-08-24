@@ -25,6 +25,9 @@ def run_backtest(
     lookback_days: int = 180,
     ta_thresholds: tuple = (60, 55),
     allow_ta_only_when_fa_neutral: bool = False,
+    full_dates: list = None,
+    avoid_events: list = None,
+    event_avoid_days: int = 1,
 ) -> dict:
     """
     1通貨ペアのバックテストを実行。
@@ -44,6 +47,17 @@ def run_backtest(
             閾値超えでエントリーを許可する（FAが明確にbuy/sellを持つ場合は
             従来通りTA/FA一致が必須のまま）。EURUSD等FAが恒常的に中立に
             張り付くペアでTA単独運用が成立するかの検証用。
+        full_dates: 2026-08-25追加。full_pricesと同じ長さの日付リスト(YYYY-MM-DD)。
+            signal_scanner.fetch_history_with_dates()で取得できる。avoid_eventsを
+            使う場合は必須（無ければイベント回避は無効化される）。
+        avoid_events: 2026-08-25追加。このペアに影響するイベントのリスト
+            （data/economic_calendar.json の "events" 形式、または
+            {"date": "YYYY-MM-DDTHH:MM:SSZ", "importance": "critical"/"high"}
+            の最小形でも可）。critical/highのイベント日から前後event_avoid_days
+            日以内はエントリーを見送る。このバックテストは日次終値ベースで
+            イベント発表の時刻内精度は扱えないため、日単位の粗い回避になる点に
+            注意（本番のevent_filter.pyは時間単位で判定している）。
+        event_avoid_days: avoid_eventsが指定された場合の回避日数（前後）。
 
     Returns:
         {
@@ -64,6 +78,22 @@ def run_backtest(
 
     # 検証開始位置（最低でも50日分の履歴が必要なので、それ以降から）
     start_idx = max(50, n - lookback_days)
+
+    # イベント回避日の集合を事前計算（YYYY-MM-DD文字列の集合）
+    avoid_dates = set()
+    if avoid_events and full_dates:
+        for ev in avoid_events:
+            if ev.get("importance") not in ("critical", "high"):
+                continue
+            ev_date_str = (ev.get("date") or "")[:10]
+            if not ev_date_str:
+                continue
+            try:
+                ev_date = datetime.strptime(ev_date_str, "%Y-%m-%d")
+            except ValueError:
+                continue
+            for delta in range(-event_avoid_days, event_avoid_days + 1):
+                avoid_dates.add((ev_date + timedelta(days=delta)).strftime("%Y-%m-%d"))
 
     trades = []
     open_trade = None  # 同時に1ポジションのみ（バックテストの簡略化）
@@ -121,6 +151,9 @@ def run_backtest(
                 open_trade = None
 
         # ── 新規エントリー判定（保有していない時のみ）──
+        if open_trade is None and full_dates and full_dates[i] in avoid_dates:
+            continue  # イベント前後のため見送り（保有中の決済判定は上で通常通り処理済み）
+
         if open_trade is None:
             ta = compute_ta_score_fn(current_price, hist)
             fa = compute_fa_score_fn(pair, pair_api, cb_rates)

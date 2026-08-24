@@ -16,6 +16,7 @@ import xml.etree.ElementTree as ET
 from datetime import datetime, timezone, timedelta
 
 CALENDAR_FILE = "data/economic_calendar.json"
+CALENDAR_HISTORY_FILE = "data/economic_calendar_history.jsonl"
 USER_AGENT = "fx-signal-monitor/1.0"
 
 # 2026-08-18追加: FinnhubのEconomic Calendar APIが無料枠で403 Forbiddenを返す
@@ -325,6 +326,46 @@ def merge_with_manual_events(auto_events, current_events):
     return merged
 
 
+def _load_archived_event_keys(sample_lines=500):
+    """直近の履歴ファイル末尾を読んで重複キーを把握する（全件読み込みは避ける）。"""
+    if not os.path.exists(CALENDAR_HISTORY_FILE):
+        return set()
+    keys = set()
+    try:
+        with open(CALENDAR_HISTORY_FILE, "r", encoding="utf-8") as f:
+            lines = f.readlines()[-sample_lines:]
+        for line in lines:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                ev = json.loads(line)
+                keys.add(f"{ev.get('date','')}|{ev.get('currency','')}|{ev.get('name','').lower()}")
+            except Exception:
+                continue
+    except Exception as e:
+        print(f"[WARN] Could not read {CALENDAR_HISTORY_FILE}: {e}")
+    return keys
+
+
+def _archive_expiring_events(events):
+    """48h経過で消える前のイベントを恒久履歴ファイルへ追記する（重複はスキップ）。"""
+    seen = _load_archived_event_keys()
+    new_lines = []
+    for ev in events:
+        key = f"{ev.get('date','')}|{ev.get('currency','')}|{ev.get('name','').lower()}"
+        if key in seen:
+            continue
+        seen.add(key)
+        new_lines.append(json.dumps(ev, ensure_ascii=False))
+    if not new_lines:
+        return
+    os.makedirs(os.path.dirname(CALENDAR_HISTORY_FILE), exist_ok=True)
+    with open(CALENDAR_HISTORY_FILE, "a", encoding="utf-8") as f:
+        f.write("\n".join(new_lines) + "\n")
+    print(f"[OK] Archived {len(new_lines)} expiring events -> {CALENDAR_HISTORY_FILE}")
+
+
 def update_economic_calendar(dry_run=False):
     """
     Finnhubから取得して、既存JSONを更新する。
@@ -392,8 +433,13 @@ def update_economic_calendar(dry_run=False):
     merged = merge_with_manual_events(auto_events, current_data.get("events", []))
 
     # 過去のイベント（48h以上前）を削除して肥大化を防ぐ
+    # 2026-08-25追加: 削除する前に data/economic_calendar_history.jsonl へ
+    # 恒久保存する。従来は48h経過で消えるだけで、run_pair_reverification.py等の
+    # バックテストでイベント回避の効果を検証しようにも過去のイベント日程が
+    # 一切残っていなかった（weekly_stats_history.jsonlと同じ理由の欠落）。
     cutoff = datetime.now(timezone.utc) - timedelta(hours=48)
     fresh = []
+    expiring = []
     for ev in merged:
         try:
             dt_str = ev["date"]
@@ -402,8 +448,13 @@ def update_economic_calendar(dry_run=False):
             ev_dt = datetime.fromisoformat(dt_str)
             if ev_dt >= cutoff:
                 fresh.append(ev)
+            else:
+                expiring.append(ev)
         except Exception:
             fresh.append(ev)  # parseに失敗したものは安全側で残す
+
+    if expiring and not dry_run:
+        _archive_expiring_events(expiring)
 
     new_data = {
         "last_updated": datetime.now(timezone.utc).strftime("%Y-%m-%d"),

@@ -367,6 +367,20 @@ def fetch_latest_rates():
 
 
 def fetch_history(pair, days=280):
+    result = fetch_history_with_dates(pair, days)
+    return result[1] if result else None
+
+
+def fetch_history_with_dates(pair, days=280):
+    """
+    fetch_historyと同じ取得だが、各終値に対応する日付(YYYY-MM-DD)も返す。
+    2026-08-25追加: バックテストでイベント日程と価格インデックスを正確に
+    突き合わせるため（fetch_historyの終値配列だけでは日付が失われ、
+    run_backtest側で「start_date + timedelta(days=idx)」という近似に
+    頼らざるを得なかった）。
+
+    Returns: (dates: list[str], closes: list[float]) または取得失敗時 None
+    """
     frm, to = PAIR_API[pair]
     end = datetime.now(timezone.utc).date()
     start = end - timedelta(days=days)
@@ -381,9 +395,10 @@ def fetch_history(pair, days=280):
                 series = sorted(
                     (d, v[to]) for d, v in data["rates"].items() if to in v
                 )
+                dates = [d for d, _ in series]
                 closes = [v for _, v in series]
                 if len(closes) >= 30:
-                    return closes
+                    return dates, closes
         except Exception as e:
             print(f"[WARN] history failed for {pair}: {e}")
     return None
