@@ -544,6 +544,14 @@ def calc_trade_stats(days_back: int = 7) -> dict:
     週次レポート用。
     """
     trades = load_closed_trades(days_back=days_back)
+    return calc_stats_from_trades(trades)
+
+
+def calc_stats_from_trades(trades: list) -> dict:
+    """
+    トレードのリストから統計を計算（calc_trade_stats の中身を切り出し）。
+    週次スナップショットの遡及集計（weekly_stats_history.py）でも再利用する。
+    """
     if not trades:
         return {}
 

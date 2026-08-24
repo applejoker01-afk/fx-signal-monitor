@@ -15,6 +15,7 @@ import urllib.request
 from datetime import datetime, timedelta, timezone
 
 from modules.trade_tracker import calc_trade_stats, load_open_trades
+from modules.weekly_stats_history import record_current_week
 
 
 PAGES_URL = "https://applejoker01-afk.github.io/fx-signal-monitor/"
@@ -43,6 +44,12 @@ def send_weekly_report(webhook_url: str):
     now_jst = datetime.now(timezone.utc) + timedelta(hours=9)
     week_start = (now_jst - timedelta(days=7)).strftime("%m/%d")
     week_end = (now_jst - timedelta(days=1)).strftime("%m/%d")
+
+    record_current_week(
+        stats,
+        week_start=(now_jst - timedelta(days=7)).strftime("%Y-%m-%d"),
+        week_end=(now_jst - timedelta(days=1)).strftime("%Y-%m-%d"),
+    )
 
     total = stats["total_trades"]
     wins = stats["wins"]
