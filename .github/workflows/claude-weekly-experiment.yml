@@ -60,7 +60,10 @@ jobs:
             production strategy, thresholds, stars, risk, sizing, configuration,
             workflows, secrets, or GitHub settings.
           claude_args: |
-            --max-turns 40
+            # The first bounded run completed useful work in 43 turns, then the
+            # action rejected it solely for exceeding 40.  Keep a small bounded
+            # allowance while preserving the one-experiment-per-run constraint.
+            --max-turns 48
             --allowedTools "Read" "Edit" "Glob" "Grep" "Bash(python:*)" "Bash(python3:*)" "Bash(git status:*)" "Bash(git diff:*)"
 
       - name: Enforce research-only changes
