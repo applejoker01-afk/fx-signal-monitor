@@ -9,6 +9,7 @@
 
 import json
 import os
+import time
 import urllib.request
 import urllib.error
 import xml.etree.ElementTree as ET
@@ -43,25 +44,39 @@ HIGH_KEYWORDS = [
     "consumer confidence", "philly fed", "core cpi"
 ]
 
-# 通貨コードから影響を受けるペアへのマッピング
-CURRENCY_TO_PAIRS = {
-    "USD": ["USDJPY", "EURUSD", "GBPUSD", "AUDUSD", "NZDUSD", "USDCAD", "USDCHF"],
-    "EUR": ["EURUSD", "EURJPY", "EURGBP", "EURAUD"],
-    "JPY": ["USDJPY", "EURJPY", "GBPJPY", "AUDJPY", "NZDJPY", "CADJPY", "CHFJPY",
-            "MXNJPY", "TRYJPY", "ZARJPY", "INRJPY", "SGDJPY", "HKDJPY", "CNYJPY"],
-    "GBP": ["GBPJPY", "GBPUSD", "EURGBP"],
-    "AUD": ["AUDJPY", "AUDUSD", "EURAUD"],
-    "NZD": ["NZDJPY", "NZDUSD"],
-    "CAD": ["USDCAD", "CADJPY"],
-    "CHF": ["USDCHF", "CHFJPY"],
-    "MXN": ["MXNJPY"],
-    "TRY": ["TRYJPY"],
-    "ZAR": ["ZARJPY"],
-    "INR": ["INRJPY"],
-    "SGD": ["SGDJPY"],
-    "HKD": ["HKDJPY"],
-    "CNY": ["CNYJPY"],
-}
+# 2026-08-25判明: 通貨→影響ペアの対応表を手動列挙していたため、7/20のSBI取扱拡張
+# (GBPAUD/GBPCHF/AUDCHF/EURCHF/AUDNZD/EURNZD/USDCNY等)の追加がここに反映されず、
+# それらのペアはイベント前後の自動見送りフィルタが一切効かない状態になっていた。
+# signal_scanner.PAIR_API と同一の全ペア一覧をここでも保持し（クロスインポートは
+# calendar_updater→signal_scannerの重い依存を避けるため見送り、他モジュール同様に
+# 独立コピーを持つ既存の設計方針に合わせる）、対応表はそこから機械的に生成することで
+# 「新ペア追加時にここを更新し忘れる」というクラスのバグを構造的に防ぐ。
+# 新ペアを追加する場合は signal_scanner.PAIR_API とここの両方を更新すること。
+_ALL_PAIRS = [
+    ("USD", "JPY"), ("EUR", "JPY"), ("GBP", "JPY"), ("AUD", "JPY"),
+    ("NZD", "JPY"), ("CAD", "JPY"), ("CHF", "JPY"), ("SGD", "JPY"),
+    ("HKD", "JPY"), ("CNY", "JPY"), ("MXN", "JPY"), ("TRY", "JPY"),
+    ("ZAR", "JPY"), ("INR", "JPY"),
+    ("EUR", "USD"), ("GBP", "USD"), ("AUD", "USD"), ("NZD", "USD"),
+    ("USD", "CAD"), ("USD", "CHF"), ("EUR", "GBP"), ("EUR", "AUD"),
+    ("SEK", "JPY"), ("NOK", "JPY"), ("BRL", "JPY"), ("PLN", "JPY"),
+    ("KRW", "JPY"),
+    ("GBP", "AUD"), ("GBP", "CHF"), ("AUD", "CHF"), ("EUR", "CHF"),
+    ("AUD", "NZD"), ("EUR", "NZD"), ("USD", "CNY"),
+]
+
+
+def _build_currency_to_pairs(pairs):
+    mapping = {}
+    for frm, to in pairs:
+        pair_name = frm + to
+        mapping.setdefault(frm, []).append(pair_name)
+        mapping.setdefault(to, []).append(pair_name)
+    return mapping
+
+
+# 通貨コードから影響を受けるペアへのマッピング（_ALL_PAIRSから機械的に生成）
+CURRENCY_TO_PAIRS = _build_currency_to_pairs(_ALL_PAIRS)
 
 
 def http_get(url, timeout=20):
@@ -340,6 +355,38 @@ def update_economic_calendar(dry_run=False):
     if auto_events is None:
         errors.append("ForexFactory fetch also failed")
         return {"fetched_count": 0, "merged_count": 0, "errors": errors}
+
+    # 2026-08-25判明: ForexFactoryの"thisweek"フィードは週替わり直後の瞬間に
+    # まだその週のイベントが公開されておらず0件で返ることがあり、これを
+    # 「正常に取得できたが今週は0件」と区別できなかったため、有効な既存データ
+    # （未来のイベント）を空リストで上書きしてしまうバグがあった
+    # （2026-08-23の週次実行がまさにこれで発生し、2日間イベントフィルタが
+    # 実質機能停止していた）。0件で返ってきた場合は少し待って1回だけ再取得を
+    # 試み、それでも0件なら「取得失敗」と同様に既存データを保持して上書きしない。
+    if source_used == "forexfactory" and len(auto_events) == 0:
+        print("[WARN] ForexFactory returned 0 events, retrying once after a short delay "
+              "(likely mid-rollover of the weekly feed)")
+        time.sleep(5)
+        retry_events = fetch_forexfactory_calendar()
+        if retry_events:
+            auto_events = retry_events
+        else:
+            existing_future = [
+                ev for ev in current_data.get("events", [])
+                if ev.get("source") in ("finnhub", "forexfactory")
+            ]
+            errors.append(
+                f"ForexFactory returned 0 events twice; keeping {len(existing_future)} "
+                "existing auto-fetched events instead of overwriting with empty data"
+            )
+            print(f"[WARN] {errors[-1]}")
+            return {
+                "fetched_count": 0,
+                "merged_count": len(current_data.get("events", [])),
+                "source": source_used,
+                "errors": errors,
+                "skipped_overwrite": True,
+            }
 
     # マージ
     merged = merge_with_manual_events(auto_events, current_data.get("events", []))
