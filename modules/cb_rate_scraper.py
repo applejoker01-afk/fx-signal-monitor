@@ -285,28 +285,52 @@ def reconcile_next_meetings(rates_section, events, now=None):
 
 
 def sync_next_meetings_from_calendar(dry_run=False, now=None):
-    """最新の経済カレンダーを使い、中央銀行JSONの次回会合だけを同期する。"""
+    """
+    中央銀行JSONの次回会合を同期する。
+
+    2026-08-25変更: 従来はForexFactory経由の汎用カレンダー（キーワード一致頼み）
+    だけを見ていたが、中央銀行会合は最重要イベントなので主要中銀の公式サイト
+    （modules/cb_meeting_scraper.py: FRB/BOE/BOJ/ECB）から直接取得した日程を
+    優先的に混ぜる。reconcile_next_meetings側は「同じ通貨で複数候補があれば
+    最も早い未来日を採用」する仕組みなので、直接取得分と汎用カレンダー分の
+    どちらか一方が欠けても他方でカバーできる（どちらも失敗した通貨だけ
+    "unavailable"のまま）。
+    """
     if not os.path.exists(CB_RATES_FILE):
         return {"updated": [], "expired": [], "errors": ["rates file not found"]}
-    if not os.path.exists(CALENDAR_FILE):
-        return {"updated": [], "expired": [], "errors": ["calendar file not found"]}
 
     with open(CB_RATES_FILE, "r", encoding="utf-8") as f:
         current = json.load(f)
-    with open(CALENDAR_FILE, "r", encoding="utf-8") as f:
-        calendar = json.load(f)
+
+    calendar_events = []
+    calendar_source = "calendar"
+    if os.path.exists(CALENDAR_FILE):
+        with open(CALENDAR_FILE, "r", encoding="utf-8") as f:
+            calendar = json.load(f)
+        calendar_events = calendar.get("events", [])
+        calendar_source = calendar.get("last_auto_source", "calendar")
+
+    direct_events = []
+    errors = []
+    try:
+        from modules.cb_meeting_scraper import fetch_all_meeting_events
+        direct_events = fetch_all_meeting_events()
+    except Exception as e:
+        errors.append(f"direct central bank scrape failed: {e}")
 
     result = reconcile_next_meetings(
-        current.get("rates", {}), calendar.get("events", []), now=now,
+        current.get("rates", {}), direct_events + calendar_events, now=now,
     )
     current["last_meeting_schedule_sync"] = (now or datetime.now(timezone.utc)).isoformat()
-    current["meeting_schedule_source"] = calendar.get("last_auto_source", "calendar")
+    current["meeting_schedule_source"] = (
+        f"cb_meeting_scraper({len(direct_events)}) + {calendar_source}({len(calendar_events)})"
+    )
 
     if not dry_run:
         with open(CB_RATES_FILE, "w", encoding="utf-8") as f:
             json.dump(current, f, ensure_ascii=False, indent=2)
 
-    result["errors"] = []
+    result["errors"] = errors
     return result
 
 
