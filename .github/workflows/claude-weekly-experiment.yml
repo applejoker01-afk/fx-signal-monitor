@@ -68,7 +68,9 @@ jobs:
             # action rejected it solely for exceeding 40.  Keep a small bounded
             # allowance while preserving the one-experiment-per-run constraint.
             --max-turns 48
-            --allowedTools "Read" "Edit" "Glob" "Grep" "Bash(python:*)" "Bash(python3:*)" "Bash(git status:*)" "Bash(git diff:*)"
+            # Read-only inspection commands are explicitly scoped.  Write access
+            # remains limited to Edit and the post-run research-only path guard.
+            --allowedTools "Read" "Edit" "Glob" "Grep" "Bash(python:*)" "Bash(python3:*)" "Bash(pwd:*)" "Bash(ls:*)" "Bash(find:*)" "Bash(git status:*)" "Bash(git diff:*)" "Bash(git log:*)" "Bash(git show:*)" "Bash(git ls-files:*)" "Bash(git rev-parse:*)" "Bash(git branch:*)"
 
       - name: Enforce research-only changes
         shell: bash
