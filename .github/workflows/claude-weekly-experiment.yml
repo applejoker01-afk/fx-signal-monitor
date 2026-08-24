@@ -1,0 +1,95 @@
+name: Claude Weekly Signal Experiment
+
+on:
+  schedule:
+    # Saturday 09:30 JST = Saturday 00:30 UTC. Avoiding :00 reduces schedule-delay risk.
+    - cron: '30 0 * * 6'
+  workflow_dispatch:
+
+# The job may create a research-only branch and pull request. It must not push
+# to main, and the path guard below rejects every changed path outside research/.
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: claude-weekly-signal-experiment
+  cancel-in-progress: false
+
+jobs:
+  experiment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out default branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Create an experiment branch
+        id: branch
+        shell: bash
+        run: |
+          branch="claude/experiment-$(date -u +'%Y%m%d')-${GITHUB_RUN_ID}"
+          git checkout -b "$branch"
+          echo "name=$branch" >> "$GITHUB_OUTPUT"
+
+      - name: Run one pre-registered research experiment
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          prompt: |
+            Follow CLAUDE.md exactly. Work on exactly one `queued` experiment in
+            research/EXPERIMENT_REGISTRY.md, in registry order. Do not modify any
+            file outside research/.
+
+            First inspect the existing normalized, cost-adjusted backtest and its
+            data limitations. If it cannot support a valid cost-inclusive rolling
+            out-of-sample test, mark the selected item `hold` and write a concise
+            dated note explaining the missing prerequisite; do not create a proxy
+            performance claim.
+
+            Otherwise, implement only research-local scripts and a dated result
+            under research/results/. Record the fixed rules, target pairs, data
+            cutoff, baseline, common P&L unit, three cost scenarios, IS/OOS
+            protocol, results, limitations, and a single status: rejected, hold,
+            or review. Never retune a failed rule in the same run. Never alter the
+            production strategy, thresholds, stars, risk, sizing, configuration,
+            workflows, secrets, or GitHub settings.
+          claude_args: |
+            --max-turns 40
+            --allowedTools "Read" "Edit" "Glob" "Grep" "Bash(python:*)" "Bash(python3:*)" "Bash(git status:*)" "Bash(git diff:*)"
+
+      - name: Enforce research-only changes
+        shell: bash
+        run: |
+          mapfile -t changed < <((git diff --name-only; git ls-files --others --exclude-standard) | sort -u)
+          for path in "${changed[@]}"; do
+            if [[ -n "$path" && "$path" != research/* ]]; then
+              echo "Blocked non-research change: $path"
+              exit 1
+            fi
+          done
+
+      - name: Commit and open experiment pull request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: ${{ steps.branch.outputs.name }}
+        shell: bash
+        run: |
+          git add research/
+          if git diff --cached --quiet; then
+            echo "No research artifact was produced; no pull request created."
+            exit 0
+          fi
+          git config user.name "Claude Research Bot"
+          git config user.email "claude-research-bot@users.noreply.github.com"
+          git commit -m "research: weekly signal experiment"
+          git push origin "$BRANCH"
+          gh pr create \
+            --base main \
+            --head "$BRANCH" \
+            --title "Research: weekly FX signal experiment" \
+            --body "Automated Claude research artifact. Production changes are prohibited; review the pre-registered rules, cost assumptions, and OOS results before any follow-up implementation."
