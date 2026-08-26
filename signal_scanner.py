@@ -759,14 +759,26 @@ def save_current_state(results, sentiment, us_yields, cb_rates,
 
 
 def detect_changes(current, previous_stars):
-    newly = []; upgraded = []
+    newly = []; upgraded = []; dropped = []
     is_first = not previous_stars
+    current_by_pair = {r["pair"]: r for r in current}
     for r in current:
         prev = previous_stars.get(r["pair"], 0)
         if r["stars"] >= 4:
             if is_first or prev < 4: newly.append(r)
             elif r["stars"] == 5 and prev == 4: upgraded.append(r)
-    return newly, upgraded, is_first
+    # 前回★4以上→今回★4未満（=通知が消えた）ペア（2026-08-26追加）
+    if not is_first:
+        for pair, prev_stars in previous_stars.items():
+            if prev_stars < 4:
+                continue
+            cur = current_by_pair.get(pair)
+            if cur is None or cur["stars"] < 4:
+                dropped.append(cur if cur is not None else {
+                    "pair": pair, "label": pair, "stars": 0,
+                    "direction": "N/A", "ta_score": None, "fa_score": None,
+                })
+    return newly, upgraded, dropped, is_first
 
 
 def stars_to_text(n):
@@ -777,7 +789,7 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results,
                  sentiment, currency_strength=None, portfolio_risk=None,
                  trade_update=None, open_trades=None,
                  drawdown=None, ai_commentary=None, ambush_alerts=None,
-                 rate_warnings=None, latest_pairs=None):
+                 rate_warnings=None, latest_pairs=None, dropped=None):
     if not webhook_url:
         print("[INFO] Discord webhook not configured")
         return False
@@ -790,15 +802,17 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results,
         "normal": "🟢", "complacent": "🟡", "unknown": "❓"
     }.get(risk_mode, "")
 
+    dropped = dropped or []
     if is_first:
         title = f"🚀 FXシグナル監視開始 {risk_emoji}"
         desc = f"監視開始。★4以上: **{len(newly)}件** / 市場: **{risk_mode}**"
         color = 0xD4A574
-    elif newly or upgraded:
+    elif newly or upgraded or dropped:
         title = f"{risk_emoji} FXシグナル変化検出"
         desc = (
-            f"新規★4以上: **{len(newly)}件** / ★4→5昇格: **{len(upgraded)}件**\n"
-            f"市場モード: **{risk_mode.upper()}**"
+            f"新規★4以上: **{len(newly)}件** / ★4→5昇格: **{len(upgraded)}件**"
+            + (f" / 圏外: **{len(dropped)}件**" if dropped else "") +
+            f"\n市場モード: **{risk_mode.upper()}**"
         )
         if risk_mode in ("panic", "risk_off"):
             color = 0xF87171
@@ -1184,6 +1198,26 @@ def send_discord(webhook_url, newly, upgraded, is_first, all_results,
         embeds[0]["fields"].append({
             "name": f"⬆ 昇格: {r['label']} ★4→★5",
             "value": f"```\n価格: {fmt_price(_p, r['price'])}  方向: {r['direction']}{tp_sl}\n```{ev_line}",
+            "inline": False
+        })
+
+    # 📉 前回★4以上→今回圏外になったペア（2026-08-26追加）
+    if dropped:
+        lines = []
+        for r in dropped:
+            ta = r.get("ta_score")
+            fa = r.get("fa_score")
+            score_str = (
+                f"TA {ta}/100 FA {fa}/100" if ta is not None and fa is not None
+                else "スコア不明"
+            )
+            lines.append(
+                f"・{r.get('label', r['pair'])}: {stars_to_text(r.get('stars', 0))} "
+                f"({r.get('direction', 'N/A')} / {score_str})"
+            )
+        embeds[0]["fields"].append({
+            "name": f"📉 圏外に消えたシグナル（{len(dropped)}件）",
+            "value": "\n".join(lines)[:1024],
             "inline": False
         })
 
@@ -2654,9 +2688,9 @@ def main():
 
     # 6. 差分検出
     previous_stars = load_previous_state()
-    newly, upgraded, is_first = detect_changes(results, previous_stars)
-    print(f"\n[INFO] Changes: {len(newly)} new strong, {len(upgraded)} upgraded "
-          f"(first run: {is_first})")
+    newly, upgraded, dropped, is_first = detect_changes(results, previous_stars)
+    print(f"\n[INFO] Changes: {len(newly)} new strong, {len(upgraded)} upgraded, "
+          f"{len(dropped)} dropped (first run: {is_first})")
 
     # ⑦ トレードのライフサイクル管理（通知の前に実行して情報を取得）
     # ENTRY_MODE（2026-07-20追加）:
@@ -2813,6 +2847,7 @@ def main():
             ambush_alerts=None,
             rate_warnings=rate_consistency.get("warnings"),
             latest_pairs=latest["pairs"],
+            dropped=dropped,
         )
         send_email(
             os.environ.get("SMTP_HOST", "smtp.gmail.com"),
