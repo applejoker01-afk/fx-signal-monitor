@@ -720,6 +720,40 @@ def evaluate_full(pair, price, prices, cb_rates, sentiment, now):
 
 
 STATE_FILE = "docs/last_signals.json"
+DIGEST_QUEUE_FILE = "docs/digest_queue.json"
+# 通知は「★5昇格のみ即時、それ以外（新規★4以上・圏外消滅・決済・状態変化）は
+# 1日3回にまとめる」方針（2026-08-26、ユーザー指示）。指値スキャンの既存スケジュール
+# （07:00/13:00/21:00 JST）に合わせる。
+DIGEST_HOURS_JST = (7, 13, 21)
+
+
+def _empty_digest_queue():
+    return {"newly": [], "dropped": [], "closed": [], "state_changes": []}
+
+
+def load_digest_queue():
+    if not os.path.exists(DIGEST_QUEUE_FILE):
+        return _empty_digest_queue()
+    try:
+        with open(DIGEST_QUEUE_FILE, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return {**_empty_digest_queue(), **data}
+    except Exception:
+        return _empty_digest_queue()
+
+
+def save_digest_queue(queue):
+    os.makedirs(os.path.dirname(DIGEST_QUEUE_FILE), exist_ok=True)
+    with open(DIGEST_QUEUE_FILE, "w", encoding="utf-8") as f:
+        json.dump(queue, f, ensure_ascii=False, indent=2, default=str)
+
+
+def _merge_by_pair(existing, new_items):
+    """pairをキーに最新のスナップショットで上書きしつつ積み上げる"""
+    by_pair = {item["pair"]: item for item in existing}
+    for item in new_items:
+        by_pair[item["pair"]] = item
+    return list(by_pair.values())
 
 
 def load_previous_state():
@@ -1374,7 +1408,8 @@ def send_email(smtp_host, smtp_port, smtp_user, smtp_pass,
                all_results, sentiment, us_yields,
                trade_update=None, drawdown=None, rate_warnings=None,
                currency_strength=None, portfolio_risk=None,
-               open_trades=None, ai_commentary=None, latest_pairs=None):
+               open_trades=None, ai_commentary=None, latest_pairs=None,
+               dropped=None):
     """
     シグナル通知メール送信（2026-06-25 モバイル最適化 + エントリー有効性追加）
 
@@ -1399,10 +1434,14 @@ def send_email(smtp_host, smtp_port, smtp_user, smtp_pass,
     ください」）。send_discord()の該当セクションと表示内容・並び順をできる
     限り揃えている。
     """
-    # Defence in depth: this function must not send mail unless a new actionable
-    # signal exists, even if a future caller accidentally invokes it for status.
-    if not (newly or upgraded):
-        print("[INFO] Email skipped: no new or upgraded signal")
+    # Defence in depth: this function must not send mail unless there is an
+    # actionable change to report (new/upgraded/dropped signal, or a trade
+    # close/state change carried via trade_update), even if a future caller
+    # accidentally invokes it for status. 2026-08-26: dropped信号(digest通知)
+    # も許可対象に追加。
+    tu = trade_update or {}
+    if not (newly or upgraded or dropped or tu.get("newly_closed") or tu.get("state_changes")):
+        print("[INFO] Email skipped: nothing actionable to report")
         return False
 
     if not all([smtp_host, smtp_user, smtp_pass, from_addr, to_addr]):
@@ -1565,6 +1604,17 @@ def send_email(smtp_host, smtp_port, smtp_user, smtp_pass,
         for r in upgraded:
             body_lines.append(fmt_signal_block(r, label_prefix="[昇格] "))
             body_lines.append("")
+
+    if dropped:
+        body_lines.append(f"【📉 圏外に消えたシグナル（{len(dropped)}件）】")
+        for r in dropped:
+            ta = r.get("ta_score"); fa = r.get("fa_score")
+            score_str = f"TA {ta}/100 FA {fa}/100" if ta is not None and fa is not None else "スコア不明"
+            body_lines.append(
+                f"・{r.get('label', r.get('pair',''))}: {stars_to_text(r.get('stars', 0))} "
+                f"({r.get('direction', 'N/A')} / {score_str})"
+            )
+        body_lines.append("")
 
     # ── 決済・状態変化・ドローダウン・レート警告（2026-08-11追加） ──────────
     # Discord(send_discord)には元々渡っていたがEmailには渡っていなかった情報。
@@ -2822,8 +2872,9 @@ def main():
         if advice_count:
             print(f"[AI] 決済アドバイス生成: {advice_count}件")
 
-    # 7. 通知（中長期シグナル変化・決済・ドローダウンで送信）
-    #    待ち伏せ・反発監視（短期）はデイトレ画面に集約したため中長期通知では送らない
+    # 7. 通知（2026-08-26改訂: ★5昇格のみ即時、それ以外は1日3回(07/13/21 JST)に
+    #    まとめて配信。毎時スキャン自体は従来通り続けるが、★4以上新規・圏外消滅・
+    #    決済・状態変化はdigest_queueに積んでdigest時刻でまとめて送る。
     #    2026-08-11: ドローダウンは drawdown["alert"]（今の状態が警告域かどうか）
     #    ではなく is_new_escalation（前回通知から状況が変化したか）をトリガーに
     #    変更。決済が止まったまま同じ「3連敗中」を毎時再通知し、無シグナルでも
@@ -2831,40 +2882,76 @@ def main():
     has_close = bool(trade_update.get("newly_closed"))
     has_state_change = bool(trade_update.get("state_changes"))
     has_rate_warn = bool(rate_consistency.get("warnings"))
-    # Email and Discord are signal-only. Dashboard/log state is retained but
-    # never generates an hourly notification by itself.
-    if newly or upgraded:
+
+    def _dispatch_notification(n, u, d, first, tu):
         _wh = os.environ.get("DISCORD_WEBHOOK_URL", "")
         _wh = _wh.replace("discordapp.com", "discord.com")
         send_discord(
-            _wh, newly, upgraded, is_first, results, sentiment,
+            _wh, n, u, first, results, sentiment,
             currency_strength=currency_strength,
             portfolio_risk=portfolio_risk,
-            trade_update=trade_update,
+            trade_update=tu,
             open_trades=open_trades,
             drawdown=drawdown,
             ai_commentary=ai_commentary,
             ambush_alerts=None,
             rate_warnings=rate_consistency.get("warnings"),
             latest_pairs=latest["pairs"],
-            dropped=dropped,
+            dropped=d,
         )
         send_email(
             os.environ.get("SMTP_HOST", "smtp.gmail.com"),
             os.environ.get("SMTP_PORT", "465"),
             os.environ.get("SMTP_USER"), os.environ.get("SMTP_PASS"),
             os.environ.get("MAIL_FROM"), os.environ.get("MAIL_TO"),
-            newly, upgraded, is_first, results, sentiment, us_yields,
-            trade_update=trade_update, drawdown=drawdown,
+            n, u, first, results, sentiment, us_yields,
+            trade_update=tu, drawdown=drawdown,
             rate_warnings=rate_consistency.get("warnings"),
             currency_strength=currency_strength,
             portfolio_risk=portfolio_risk,
             open_trades=open_trades,
             ai_commentary=ai_commentary,
             latest_pairs=latest["pairs"],
+            dropped=d,
         )
+
+    jst_hour = (datetime.now(timezone.utc) + timedelta(hours=9)).hour
+    is_digest_hour = jst_hour in DIGEST_HOURS_JST
+
+    if upgraded or is_first:
+        # ★5昇格・初回起動は埋もれさせず単独で即時通知する。
+        # 今回分のnewly/dropped/決済もここで一緒に報告し、二重報告を避ける
+        # （キューには積まない）。
+        _dispatch_notification(newly, upgraded, dropped, is_first, trade_update)
+        if is_digest_hour:
+            save_digest_queue(_empty_digest_queue())
+    elif is_digest_hour:
+        q = load_digest_queue()
+        merged_newly = _merge_by_pair(q.get("newly", []), newly)
+        merged_dropped = _merge_by_pair(q.get("dropped", []), dropped)
+        merged_closed = q.get("closed", []) + (trade_update.get("newly_closed") or [])
+        merged_state_changes = q.get("state_changes", []) + (trade_update.get("state_changes") or [])
+        if (merged_newly or merged_dropped or merged_closed or merged_state_changes
+                or has_rate_warn or (drawdown and drawdown.get("is_new_escalation"))):
+            merged_trade_update = dict(trade_update)
+            merged_trade_update["newly_closed"] = merged_closed
+            merged_trade_update["state_changes"] = merged_state_changes
+            _dispatch_notification(merged_newly, [], merged_dropped, False, merged_trade_update)
+        else:
+            print("[INFO] Digest hour but nothing queued, skipping email and Discord")
+        save_digest_queue(_empty_digest_queue())
     else:
-        print("[INFO] No new or upgraded signals, skipping email and Discord")
+        if newly or dropped or has_close or has_state_change:
+            q = load_digest_queue()
+            q["newly"] = _merge_by_pair(q.get("newly", []), newly)
+            q["dropped"] = _merge_by_pair(q.get("dropped", []), dropped)
+            q["closed"] = q.get("closed", []) + (trade_update.get("newly_closed") or [])
+            q["state_changes"] = q.get("state_changes", []) + (trade_update.get("state_changes") or [])
+            save_digest_queue(q)
+            print(f"[INFO] Queued for next digest ({DIGEST_HOURS_JST} JST): "
+                  f"{len(newly)} new, {len(dropped)} dropped")
+        else:
+            print("[INFO] No new/dropped/close signals, nothing to queue")
 
     # 📌 指値待機シグナルの通知（新規登録・約定・失効があれば、上のnewly/upgraded判定とは無関係に送信）
     has_pending_update = bool(newly_created_orders or newly_filled_trades or expired_orders)
