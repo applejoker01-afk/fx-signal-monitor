@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-08-28",
+  "last_updated": "2026-08-29",
   "notes": "中央銀行会合のたびに手動更新する。stance は tighten/neutral/ease のいずれか。rate_momentum は accelerating/decelerating/peak/trough/stable のいずれか（金利サイクルの勢い）。FRED API + Finnhub API 設定済みなら週次自動更新される。 2026-07-20: SBI証券取扱ペア拡張に伴いSEK/NOK/BRL/PLN/KRWを追加（Web検証、各中銀公式発表ベース）。FRED自動取得の対象外のため、定期autoresearchでの更新運用に切り替え予定。 2026-07-20: AUD/NZDのstance誤り(ease→正しくはpause/tighten)を訂正。旧データは実際には発生していない利下げを前提としていた。既存ロジック(apply_boj_cycle_directional_filter, compute_fa_score)への影響はwiki側に記録。",
   "data_source": "BIS + 各国中央銀行公式発表 + Web検証 (2026-06-11)",
   "verification_source": {
@@ -19,7 +19,7 @@
       "cb_note": "higher-for-longer pause。FF金利 3.5-4.0% 上限 3.75% を維持。利下げは2026H2以降の見通し。",
       "last_auto_update": "2026-05-01",
       "auto_source": "FRED FEDFUNDS",
-      "last_auto_check": "2026-08-28T10:50:46.249246+00:00",
+      "last_auto_check": "2026-08-29T06:38:13.493232+00:00",
       "next_meeting_source": "federalreserve.gov",
       "next_meeting_status": "scheduled"
     },
@@ -32,7 +32,7 @@
       "cb_note": "MRO 2.15%→2.4%へ上昇(2026-06)。利下げサイクルは事実上終了とみられ、利上げ転換の可能性。7/24会合で方針確認まで neutral へ。",
       "last_auto_update": "2026-06-21",
       "auto_source": "ECB SDMX (MRR_FR)",
-      "last_auto_check": "2026-08-28T10:50:47.004562+00:00",
+      "last_auto_check": "2026-08-29T06:38:14.369885+00:00",
       "next_meeting_source": "ecb.europa.eu",
       "next_meeting_status": "scheduled"
     },
@@ -56,7 +56,7 @@
       "rate_momentum": "stable",
       "cb_name": "BOE",
       "cb_note": "MPC データ依存。インフレ鈍化でeaseへの転換を検討中だが確認できず中立維持。",
-      "last_auto_check": "2026-08-28T10:50:47.774468+00:00",
+      "last_auto_check": "2026-08-29T06:38:15.102630+00:00",
       "auto_source": "BOE IADB (IUDBEDR)",
       "next_meeting_source": "bankofengland.co.uk",
       "next_meeting_status": "scheduled"
@@ -217,7 +217,7 @@
     }
   },
   "warning": "JPYは2026-06-17の日銀会合で利上げ確実視。会合後に rate=1.0, rate_momentum='peak'? に更新すること。",
-  "last_auto_run": "2026-08-28T10:50:48.509639+00:00",
-  "last_meeting_schedule_sync": "2026-08-28T10:50:49.845888+00:00",
-  "meeting_schedule_source": "cb_meeting_scraper(97) + forexfactory(5)"
+  "last_auto_run": "2026-08-29T06:38:15.489833+00:00",
+  "last_meeting_schedule_sync": "2026-08-29T06:38:17.257007+00:00",
+  "meeting_schedule_source": "cb_meeting_scraper(97) + forexfactory(3)"
 }
