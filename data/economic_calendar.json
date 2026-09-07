@@ -1,6 +1,6 @@
 {
-  "last_updated": "2026-09-06",
-  "last_auto_run": "2026-09-06T03:59:59.684770+00:00",
+  "last_updated": "2026-09-07",
+  "last_auto_run": "2026-09-07T03:59:02.952362+00:00",
   "last_auto_source": "forexfactory",
   "notes": "月初に1ヶ月分の重要イベントを手動追加。importance: critical/high/medium",
   "importance_guide": {
@@ -11,17 +11,37 @@
   "data_source": "ForexFactory (auto, Finnhub 403のためフォールバック中) + 手動編集",
   "events": [
     {
-      "date": "2026-09-04T08:50:00Z",
-      "country": "GBP",
-      "currency": "GBP",
-      "name": "BOE Gov Bailey Speaks",
-      "importance": "critical",
+      "date": "2026-09-10T12:15:00Z",
+      "country": "EUR",
+      "currency": "EUR",
+      "name": "Main Refinancing Rate",
+      "importance": "high",
       "affects_pairs": [
-        "GBPJPY",
-        "GBPUSD",
+        "EURJPY",
+        "EURUSD",
         "EURGBP",
-        "GBPAUD",
-        "GBPCHF"
+        "EURAUD",
+        "EURCHF",
+        "EURNZD"
+      ],
+      "source": "forexfactory",
+      "actual": null,
+      "estimate": "2.65%",
+      "previous": "2.40%"
+    },
+    {
+      "date": "2026-09-10T12:15:00Z",
+      "country": "EUR",
+      "currency": "EUR",
+      "name": "Monetary Policy Statement",
+      "importance": "high",
+      "affects_pairs": [
+        "EURJPY",
+        "EURUSD",
+        "EURGBP",
+        "EURAUD",
+        "EURCHF",
+        "EURNZD"
       ],
       "source": "forexfactory",
       "actual": null,
@@ -29,40 +49,10 @@
       "previous": null
     },
     {
-      "date": "2026-09-04T12:30:00Z",
-      "country": "CAD",
-      "currency": "CAD",
-      "name": "Employment Change",
-      "importance": "high",
-      "affects_pairs": [
-        "CADJPY",
-        "USDCAD"
-      ],
-      "source": "forexfactory",
-      "actual": null,
-      "estimate": "15.1K",
-      "previous": "75.1K"
-    },
-    {
-      "date": "2026-09-04T12:30:00Z",
-      "country": "CAD",
-      "currency": "CAD",
-      "name": "Unemployment Rate",
-      "importance": "critical",
-      "affects_pairs": [
-        "CADJPY",
-        "USDCAD"
-      ],
-      "source": "forexfactory",
-      "actual": null,
-      "estimate": "6.4%",
-      "previous": "6.4%"
-    },
-    {
-      "date": "2026-09-04T12:30:00Z",
+      "date": "2026-09-10T12:30:00Z",
       "country": "USD",
       "currency": "USD",
-      "name": "Average Hourly Earnings m/m",
+      "name": "Core PPI m/m",
       "importance": "high",
       "affects_pairs": [
         "USDJPY",
@@ -77,13 +67,13 @@
       "source": "forexfactory",
       "actual": null,
       "estimate": "0.3%",
-      "previous": "0.1%"
+      "previous": "0.2%"
     },
     {
-      "date": "2026-09-04T12:30:00Z",
+      "date": "2026-09-10T12:30:00Z",
       "country": "USD",
       "currency": "USD",
-      "name": "Non-Farm Employment Change",
+      "name": "PPI m/m",
       "importance": "high",
       "affects_pairs": [
         "USDJPY",
@@ -97,14 +87,51 @@
       ],
       "source": "forexfactory",
       "actual": null,
-      "estimate": "55K",
-      "previous": "-23K"
+      "estimate": "0.4%",
+      "previous": "0.0%"
     },
     {
-      "date": "2026-09-04T12:30:00Z",
+      "date": "2026-09-10T12:45:00Z",
+      "country": "EUR",
+      "currency": "EUR",
+      "name": "ECB Press Conference",
+      "importance": "critical",
+      "affects_pairs": [
+        "EURJPY",
+        "EURUSD",
+        "EURGBP",
+        "EURAUD",
+        "EURCHF",
+        "EURNZD"
+      ],
+      "source": "forexfactory",
+      "actual": null,
+      "estimate": null,
+      "previous": null
+    },
+    {
+      "date": "2026-09-11T06:00:00Z",
+      "country": "GBP",
+      "currency": "GBP",
+      "name": "GDP m/m",
+      "importance": "critical",
+      "affects_pairs": [
+        "GBPJPY",
+        "GBPUSD",
+        "EURGBP",
+        "GBPAUD",
+        "GBPCHF"
+      ],
+      "source": "forexfactory",
+      "actual": null,
+      "estimate": "0.0%",
+      "previous": "0.3%"
+    },
+    {
+      "date": "2026-09-11T12:30:00Z",
       "country": "USD",
       "currency": "USD",
-      "name": "Unemployment Rate",
+      "name": "Core CPI m/m",
       "importance": "critical",
       "affects_pairs": [
         "USDJPY",
@@ -118,8 +145,71 @@
       ],
       "source": "forexfactory",
       "actual": null,
-      "estimate": "4.1%",
-      "previous": "4.1%"
+      "estimate": "0.2%",
+      "previous": "0.2%"
+    },
+    {
+      "date": "2026-09-11T12:30:00Z",
+      "country": "USD",
+      "currency": "USD",
+      "name": "Core CPI y/y",
+      "importance": "critical",
+      "affects_pairs": [
+        "USDJPY",
+        "EURUSD",
+        "GBPUSD",
+        "AUDUSD",
+        "NZDUSD",
+        "USDCAD",
+        "USDCHF",
+        "USDCNY"
+      ],
+      "source": "forexfactory",
+      "actual": null,
+      "estimate": "2.4%",
+      "previous": "2.5%"
+    },
+    {
+      "date": "2026-09-11T12:30:00Z",
+      "country": "USD",
+      "currency": "USD",
+      "name": "CPI m/m",
+      "importance": "critical",
+      "affects_pairs": [
+        "USDJPY",
+        "EURUSD",
+        "GBPUSD",
+        "AUDUSD",
+        "NZDUSD",
+        "USDCAD",
+        "USDCHF",
+        "USDCNY"
+      ],
+      "source": "forexfactory",
+      "actual": null,
+      "estimate": "0.4%",
+      "previous": "0.1%"
+    },
+    {
+      "date": "2026-09-11T12:30:00Z",
+      "country": "USD",
+      "currency": "USD",
+      "name": "CPI y/y",
+      "importance": "critical",
+      "affects_pairs": [
+        "USDJPY",
+        "EURUSD",
+        "GBPUSD",
+        "AUDUSD",
+        "NZDUSD",
+        "USDCAD",
+        "USDCHF",
+        "USDCNY"
+      ],
+      "source": "forexfactory",
+      "actual": null,
+      "estimate": "3.4%",
+      "previous": "3.4%"
     }
   ]
 }
