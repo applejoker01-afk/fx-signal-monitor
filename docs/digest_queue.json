@@ -214,7 +214,222 @@
       "ai_exit_advice": "# ポジション分析\n\n**1. 現状整理**\nGBPCHFは金利差+3.50%の有利条件下でロングをホールド中。テクニカルは弱トレンド（ADX21.3）で方向性が限定的ですが、ファンダメンタルズ側の支持が比較的堅牢です。\n\n**2. 利益を伸ばす選択肢**\n\n**A. トレール戦略への切替**\n狙い：弱トレンド相場での損失限定と利益伸長の両立\n方法：SL1.09204を保持しつつ、相場が上昇時のみトレール幅を狭める（例：20-30pips）。TP1到達後に部分利確しながら運用\nリスク：トレンド転換時の引き返しで損切りが早期化する可能性\n\n**B. 段階的部分利確 + コア保有**\n狙い：金利差の長期恩恵を活かしながら利益確定リスクを分散\n方法：TP1（1.09943）で25～30%利確→ TP2以降はスワップ享受を重視し、SLは徐々に引き上げ\nリスク：数日単位での小動きで機会損失感が生じる可能性\n\n**C. フルホールド（スワップ重視）**\n狙い：弱トレンド局面では長期保有で金利差の複利効果を最大化\n根拠：BOE-SNB金利差3.50%は堅調。SL回収日数が不明なため要確認（通常30日以上なら有利）\nリスク：CHFサイクル強化局面での為替急変動\n\n**3. 留意点**\nSNBサイクル底値圏での政策転換（利上げ示唆）や、英政策金利据置での金利差縮小が下振れ要因となるため、四半期ごとの中銀発言に注視してください。"
     }
   ],
-  "dropped": [],
+  "dropped": [
+    {
+      "pair": "GBPCHF",
+      "label": "GBP/CHF",
+      "price": 1.0958,
+      "ta_score": 86.7,
+      "dma_score": 85,
+      "macd_score": 35,
+      "rsi_score": 50,
+      "trend_strength": 18,
+      "atr_quality": 0,
+      "breakout_bonus": 0,
+      "divergence_adj": 0,
+      "ema_short_bonus": 12,
+      "dma200": 1.0674,
+      "dma50": 1.08985,
+      "rsi": 54.03,
+      "macd": 0.00186,
+      "macd_signal": 0.00212,
+      "atr": 0.00242,
+      "rsi_reversal_confirmed": false,
+      "ta_score_overheated": false,
+      "fa_score": 70.2,
+      "fa_direction": "buy",
+      "fa_rate_diff": 3.5,
+      "fa_detail": "BOE(3.75% neutral/stable) vs SNB(0.25% ease/trough) 差+3.50% / CHFサイクル強化(trough)",
+      "stars": 3,
+      "verdict": "◎ 高信頼ロング（過熱スコア降格: ta_score逆U字の実績データに基づく）",
+      "direction": "LONG",
+      "pair_type": "major",
+      "intervention_news": {
+        "GBP": {
+          "score": 0,
+          "level": "none",
+          "hits": [],
+          "reason": "関連報道なし",
+          "headlines": [],
+          "cached": true,
+          "timestamp": "2026-09-08T18:28:15.746258+00:00"
+        },
+        "CHF": {
+          "score": 0,
+          "level": "none",
+          "hits": [],
+          "reason": "関連報道なし",
+          "headlines": [],
+          "cached": true,
+          "timestamp": "2026-09-08T18:28:16.631048+00:00"
+        }
+      },
+      "upcoming_events": [
+        {
+          "name": "GDP m/m",
+          "currency": "GBP",
+          "importance": "critical",
+          "hours_until": 59.5,
+          "date": "2026-09-11T06:00:00Z"
+        }
+      ],
+      "volatility_regime": {
+        "regime": "normal",
+        "regime_label": "通常ボラ相場",
+        "atr_ratio": 1.15,
+        "atr_90d": 0.0021,
+        "sl_multiplier": 3.0,
+        "tp1_multiplier": 1.5,
+        "tp2_multiplier": 4.5,
+        "tp3_multiplier": 6.0,
+        "note": "ATR比率1.2 → TP=1.5×ATR（Phase1出口改善・到達率向上）"
+      },
+      "staged_tp": {
+        "sl": 1.09204,
+        "tp": 1.09943,
+        "trail_atr_mult": 2.0,
+        "trail_distance": 0.00484,
+        "be_plus_offset": 0.00363,
+        "be_target_after_tp": 1.09943,
+        "max_target": 1.11032,
+        "rr_tp": 0.5,
+        "tp_mode": "single_with_trail",
+        "tp1": 1.09943,
+        "tp2": 1.10669,
+        "tp3": 1.11032,
+        "sl_width": 0.00726,
+        "tp1_width": 0.00363,
+        "rr_tp1": 0.5,
+        "rr_tp2": 1.5,
+        "rr_tp3": 2.0,
+        "spread_price": 0.0003,
+        "spread_pips": 3.0,
+        "spread_atr_ratio": 0.124,
+        "sl_dist_effective": 0.00741,
+        "tp_dist_effective": 0.00348,
+        "rr_effective": 0.47,
+        "spread_is_dynamic": true,
+        "spread_pips_dynamic": 3.0,
+        "regime_label": "通常ボラ相場",
+        "strategy": "TP(1.09943)到達 → SLを BE+0.5R(1.09943) へ移動 → トレーリング(2.0×ATR=0.00484)発動 → 利を伸ばす（理論最大: 1.11032）",
+        "chandelier_sl_active": true,
+        "chandelier_note": "Chandelier Exit: 過去22日高値(1.0993)-3.0xATR",
+        "spread_session": "NY afternoon",
+        "spread_session_mult": 1.0,
+        "spread_vix_mult": 1.0
+      },
+      "carry_score": {
+        "carry_score": 15.85,
+        "label": "非常に優れたキャリー",
+        "annual_swap_pct": 3.5,
+        "daily_volatility_pct": 0.22,
+        "breakeven_days": 57,
+        "note": "SL幅をスワップで回収: 約57日"
+      },
+      "support_resistance": {
+        "resistance": [
+          {
+            "price": 1.099,
+            "strength": 1,
+            "label": "弱いレジスタンス",
+            "distance_pct": 0.29
+          }
+        ],
+        "support": [
+          {
+            "price": 1.0505,
+            "strength": 2,
+            "label": "サポート",
+            "distance_pct": 4.13
+          },
+          {
+            "price": 1.06275,
+            "strength": 2,
+            "label": "サポート",
+            "distance_pct": 3.02
+          },
+          {
+            "price": 1.0389,
+            "strength": 1,
+            "label": "弱いサポート",
+            "distance_pct": 5.19
+          },
+          {
+            "price": 1.041,
+            "strength": 1,
+            "label": "弱いサポート",
+            "distance_pct": 5.0
+          }
+        ],
+        "nearest_resistance": {
+          "price": 1.099,
+          "strength": 1,
+          "label": "弱いレジスタンス",
+          "distance_pct": 0.29
+        },
+        "nearest_support": {
+          "price": 1.06275,
+          "strength": 2,
+          "label": "サポート",
+          "distance_pct": 3.02
+        },
+        "context": "レジスタンス(1.099)まで0.29%（非常に近い・注意） / サポート(1.06275)まで3.02%"
+      },
+      "market_regime": {
+        "adx": 21.3,
+        "plus_di": 60.7,
+        "minus_di": 39.3,
+        "regime": "weak_trend",
+        "regime_label": "弱トレンド相場",
+        "trend_direction": "up",
+        "note": "順張りやや有効"
+      },
+      "ambush": {
+        "has_alert": true,
+        "nearest": {
+          "type": "ピボットPP",
+          "price": 1.095433,
+          "role": "ピボットPP",
+          "kind": "support",
+          "distance": 0.000367,
+          "distance_pct": 0.033
+        },
+        "approaching": [
+          {
+            "type": "ピボットPP",
+            "price": 1.095433,
+            "role": "ピボットPP",
+            "kind": "support",
+            "distance": 0.000367,
+            "distance_pct": 0.033
+          }
+        ],
+        "message": "ピボットPP（1.095433）に接近 あと0.03% → 反発でのロング候補"
+      },
+      "high_confidence_zone": true,
+      "ambush_quality": "整合（シグナル方向とPOIが一致）",
+      "spread_filter_applied": true,
+      "spread_filter_reason": "💸 スプレッド広め: GBPCHF spread=3.0pips (12% of ATR) — 実効RR 1:0.5→1:0.47。★4→★3降格。",
+      "cb_meeting_blackout": {
+        "active": false,
+        "severity": "none",
+        "reason": ""
+      },
+      "strength_context": {
+        "base_currency": "GBP",
+        "quote_currency": "CHF",
+        "base_score": -17.8,
+        "base_label": "中立",
+        "base_rank": 6,
+        "quote_score": -45.3,
+        "quote_label": "やや弱い",
+        "quote_rank": 12,
+        "spread": 27.5,
+        "context": "やや強い通貨 vs 弱め（ロング寄り）",
+        "bias": "slight_long"
+      }
+    }
+  ],
   "closed": [],
   "state_changes": []
 }
