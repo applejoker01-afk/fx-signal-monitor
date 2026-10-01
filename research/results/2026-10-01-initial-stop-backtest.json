@@ -1,0 +1,4573 @@
+{
+  "experiment": "EXP-005",
+  "generated_at": "2026-10-01T12:53:07.391705+00:00",
+  "research_status": "REJECTED",
+  "promotion_status": "HOLD",
+  "scope": "TA-only initial-stop/OCO component; NOT full production strategy",
+  "input_sha256": {
+    "prices": "9d37784862de70788d24105806ca72979bf07f62373642509f966ff8bd767888",
+    "manifest": "1c94f5030bccaf12364c8add129f89ef1bff12651e26ca706c789728a0e4946e",
+    "protocol": "fe2b12890033cc139e7b54fb6f31df440b3903884d5ca98986506e8d08bee3ae",
+    "configuration": "845eae45e3dbe762b56bfc1755d2cdac5da8cdf89dc1ee01805c1fb1278f91e5",
+    "signal_scanner.py": "5478a4fefe55486fb3429263655ef7ad27f4c2ba4307f8d669b82c52c845fac4",
+    "modules/advanced_analytics.py": "bd703ea76800ebbef8317373c46844f4eca3dfd46a9a7dd3e64709ec7d5184dd",
+    "modules/profitability.py": "a540d286d2ad91b88f1dcd6d9e6cb62b0aac2bb35f198a430dd37f77a3859b10",
+    "modules/spread_monitor.py": "e21c3e3d0d0e934b2d1d11f2318a7ee4b5df459003dbf45a3db3789bd45db8e5",
+    "research/download_daily_history.py": "a89bba9a3383a0817282df40c6eba7d78f1c478f103a1f85410fb3a3ad254ce4",
+    "research/backtest_initial_stop.py": "97bc6b53a85d9d9ba565f8922dcfcc33de079337b1e5fc7b1b5708910a644c6a"
+  },
+  "config": {
+    "version": "profitability_v1",
+    "selection_mode": "shadow",
+    "broker_costs_verified": false,
+    "slippage_pips_per_side": 0.2,
+    "commission_pips_round_trip": 0.0,
+    "adverse_spread_multiplier": 2.0,
+    "adverse_slippage_multiplier": 3.0,
+    "max_total_open_risk_pct": 6.0,
+    "max_currency_direction_risk_pct": 3.0,
+    "min_cohort_trades": 30,
+    "min_walk_forward_train_trades": 30,
+    "walk_forward_folds": 3,
+    "min_walk_forward_test_trades": 10
+  },
+  "data_quality": {
+    "AUDJPY": {
+      "first": "2016-01-04",
+      "flat_bars": 0,
+      "last": "2025-12-31",
+      "rows": 2607,
+      "unmatched_dates": 0
+    },
+    "AUDUSD": {
+      "first": "2016-01-04",
+      "flat_bars": 0,
+      "last": "2025-12-31",
+      "rows": 2607,
+      "unmatched_dates": 0
+    },
+    "EURJPY": {
+      "first": "2016-01-04",
+      "flat_bars": 0,
+      "last": "2025-12-31",
+      "rows": 2607,
+      "unmatched_dates": 0
+    },
+    "EURUSD": {
+      "first": "2016-01-04",
+      "flat_bars": 0,
+      "last": "2025-12-31",
+      "rows": 2607,
+      "unmatched_dates": 0
+    },
+    "GBPJPY": {
+      "first": "2016-01-04",
+      "flat_bars": 0,
+      "last": "2025-12-31",
+      "rows": 2607,
+      "unmatched_dates": 0
+    },
+    "GBPUSD": {
+      "first": "2016-01-04",
+      "flat_bars": 0,
+      "last": "2025-12-31",
+      "rows": 2607,
+      "unmatched_dates": 0
+    },
+    "NZDJPY": {
+      "first": "2016-01-04",
+      "flat_bars": 0,
+      "last": "2025-12-31",
+      "rows": 2605,
+      "unmatched_dates": 0
+    },
+    "USDCAD": {
+      "first": "2016-01-04",
+      "flat_bars": 0,
+      "last": "2025-12-31",
+      "rows": 2607,
+      "unmatched_dates": 0
+    },
+    "USDCHF": {
+      "first": "2016-01-04",
+      "flat_bars": 0,
+      "last": "2025-12-31",
+      "rows": 2607,
+      "unmatched_dates": 0
+    },
+    "USDJPY": {
+      "first": "2016-01-04",
+      "flat_bars": 0,
+      "last": "2025-12-31",
+      "rows": 2607,
+      "unmatched_dates": 0
+    }
+  },
+  "periods": {
+    "reference_2017_2021": {
+      "range": [
+        "2017-01-01",
+        "2021-12-31"
+      ],
+      "by_pair": {
+        "USDJPY": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 329,
+              "mean_net_r": -0.09389370001699716,
+              "total_net_r": -30.891027305592075,
+              "profit_factor": 0.786108576180861,
+              "win_rate_pct": 55.92705167173252,
+              "max_realized_drawdown_r": -36.288810509390686,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 143,
+                "SL_GAP": 1,
+                "TIME_20_BARS": 2,
+                "TP": 182
+              }
+            },
+            "adverse": {
+              "trades": 329,
+              "mean_net_r": -0.14382697948923015,
+              "total_net_r": -47.31907625195671,
+              "profit_factor": 0.6953445335526945,
+              "win_rate_pct": 55.015197568389056,
+              "max_realized_drawdown_r": -50.996010038243995,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 143,
+                "SL_GAP": 1,
+                "TIME_20_BARS": 2,
+                "TP": 182
+              }
+            },
+            "skipped_geometry": 3,
+            "ambiguous_stop_target_bars": 7
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 278,
+              "mean_net_r": -0.060464744108861504,
+              "total_net_r": -16.80919886226349,
+              "profit_factor": 0.8291496590494984,
+              "win_rate_pct": 64.02877697841727,
+              "max_realized_drawdown_r": -23.727593613003798,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 96,
+                "SL_GAP": 1,
+                "TIME_20_BARS": 4,
+                "TP": 176
+              }
+            },
+            "adverse": {
+              "trades": 278,
+              "mean_net_r": -0.08341588816089944,
+              "total_net_r": -23.189616908730038,
+              "profit_factor": 0.7695254206937433,
+              "win_rate_pct": 62.94964028776978,
+              "max_realized_drawdown_r": -28.17394635145114,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 96,
+                "SL_GAP": 1,
+                "TIME_20_BARS": 4,
+                "TP": 176
+              }
+            },
+            "skipped_geometry": 1,
+            "ambiguous_stop_target_bars": 2
+          }
+        },
+        "EURUSD": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 370,
+              "mean_net_r": -0.07506032565432663,
+              "total_net_r": -27.772320492100846,
+              "profit_factor": 0.838270274778408,
+              "win_rate_pct": 53.513513513513516,
+              "max_realized_drawdown_r": -39.937447393767435,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 170,
+                "SL_GAP": 1,
+                "TIME_20_BARS": 1,
+                "TP": 198
+              }
+            },
+            "adverse": {
+              "trades": 370,
+              "mean_net_r": -0.13101720350868687,
+              "total_net_r": -48.47636529821415,
+              "profit_factor": 0.739912699185329,
+              "win_rate_pct": 53.513513513513516,
+              "max_realized_drawdown_r": -57.53029293575353,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 170,
+                "SL_GAP": 1,
+                "TIME_20_BARS": 1,
+                "TP": 198
+              }
+            },
+            "skipped_geometry": 1,
+            "ambiguous_stop_target_bars": 9
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 302,
+              "mean_net_r": -0.029263601782059306,
+              "total_net_r": -8.83760773818191,
+              "profit_factor": 0.914198865740515,
+              "win_rate_pct": 65.56291390728477,
+              "max_realized_drawdown_r": -19.057710905196082,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 102,
+                "TIME_20_BARS": 2,
+                "TP": 198
+              }
+            },
+            "adverse": {
+              "trades": 302,
+              "mean_net_r": -0.048790951405103936,
+              "total_net_r": -14.734867324341383,
+              "profit_factor": 0.8599003959028906,
+              "win_rate_pct": 65.56291390728477,
+              "max_realized_drawdown_r": -23.292168739845874,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 102,
+                "TIME_20_BARS": 2,
+                "TP": 198
+              }
+            },
+            "skipped_geometry": 1,
+            "ambiguous_stop_target_bars": 1
+          }
+        },
+        "GBPJPY": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 345,
+              "mean_net_r": -0.04064011592166114,
+              "total_net_r": -14.02083999297309,
+              "profit_factor": 0.9061793154576911,
+              "win_rate_pct": 56.231884057971016,
+              "max_realized_drawdown_r": -19.712749677297634,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 146,
+                "SL_GAP": 3,
+                "TIME_20_BARS": 2,
+                "TP": 193
+              }
+            },
+            "adverse": {
+              "trades": 345,
+              "mean_net_r": -0.09154342288867205,
+              "total_net_r": -31.582480896591825,
+              "profit_factor": 0.8025076006457538,
+              "win_rate_pct": 55.94202898550725,
+              "max_realized_drawdown_r": -35.16079159332223,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 146,
+                "SL_GAP": 3,
+                "TIME_20_BARS": 2,
+                "TP": 193
+              }
+            },
+            "skipped_geometry": 1,
+            "ambiguous_stop_target_bars": 7
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 289,
+              "mean_net_r": -0.04523591966949371,
+              "total_net_r": -13.073180784483682,
+              "profit_factor": 0.8686822788625951,
+              "win_rate_pct": 64.70588235294117,
+              "max_realized_drawdown_r": -15.571512517359917,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 97,
+                "SL_GAP": 2,
+                "TIME_20_BARS": 3,
+                "TP": 186
+              }
+            },
+            "adverse": {
+              "trades": 289,
+              "mean_net_r": -0.06961808769583386,
+              "total_net_r": -20.119627344095996,
+              "profit_factor": 0.8030444943354612,
+              "win_rate_pct": 64.3598615916955,
+              "max_realized_drawdown_r": -21.49197192207649,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 97,
+                "SL_GAP": 2,
+                "TIME_20_BARS": 3,
+                "TP": 186
+              }
+            },
+            "skipped_geometry": 1,
+            "ambiguous_stop_target_bars": 1
+          }
+        },
+        "AUDJPY": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 361,
+              "mean_net_r": -0.12970449326206848,
+              "total_net_r": -46.82332206760675,
+              "profit_factor": 0.7181794101043483,
+              "win_rate_pct": 53.73961218836565,
+              "max_realized_drawdown_r": -50.1064990380501,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 162,
+                "SL_GAP": 2,
+                "TIME_20_BARS": 2,
+                "TP": 194
+              }
+            },
+            "adverse": {
+              "trades": 361,
+              "mean_net_r": -0.20423759559521673,
+              "total_net_r": -73.72977200987322,
+              "profit_factor": 0.5994786768586936,
+              "win_rate_pct": 53.73961218836565,
+              "max_realized_drawdown_r": -75.90834643848518,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 162,
+                "SL_GAP": 2,
+                "TIME_20_BARS": 2,
+                "TP": 194
+              }
+            },
+            "skipped_geometry": 6,
+            "ambiguous_stop_target_bars": 7
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 286,
+              "mean_net_r": -0.01393426939371122,
+              "total_net_r": -3.985201046601407,
+              "profit_factor": 0.9562107011674175,
+              "win_rate_pct": 67.48251748251748,
+              "max_realized_drawdown_r": -8.301950506252236,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 88,
+                "SL_GAP": 1,
+                "TIME_20_BARS": 3,
+                "TP": 193
+              }
+            },
+            "adverse": {
+              "trades": 286,
+              "mean_net_r": -0.047180766875486474,
+              "total_net_r": -13.493699326389129,
+              "profit_factor": 0.8569325143802312,
+              "win_rate_pct": 67.48251748251748,
+              "max_realized_drawdown_r": -16.59355481636707,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 88,
+                "SL_GAP": 1,
+                "TIME_20_BARS": 3,
+                "TP": 193
+              }
+            },
+            "skipped_geometry": 3,
+            "ambiguous_stop_target_bars": 0
+          }
+        },
+        "EURJPY": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 377,
+              "mean_net_r": -0.06345985500741745,
+              "total_net_r": -23.924365337796388,
+              "profit_factor": 0.8561537781060669,
+              "win_rate_pct": 55.96816976127321,
+              "max_realized_drawdown_r": -29.293038323602353,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 165,
+                "SL_GAP": 1,
+                "TP": 210
+              }
+            },
+            "adverse": {
+              "trades": 377,
+              "mean_net_r": -0.10424921428464314,
+              "total_net_r": -39.301953785310445,
+              "profit_factor": 0.7766913484168765,
+              "win_rate_pct": 55.70291777188329,
+              "max_realized_drawdown_r": -41.53118824511325,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 165,
+                "SL_GAP": 1,
+                "TP": 210
+              }
+            },
+            "skipped_geometry": 4,
+            "ambiguous_stop_target_bars": 9
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 301,
+              "mean_net_r": -0.005833645089480443,
+              "total_net_r": -1.7559271719336131,
+              "profit_factor": 0.9819790416544507,
+              "win_rate_pct": 68.10631229235881,
+              "max_realized_drawdown_r": -8.758328135263316,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 93,
+                "SL_GAP": 2,
+                "TIME_20_BARS": 1,
+                "TP": 204
+              }
+            },
+            "adverse": {
+              "trades": 301,
+              "mean_net_r": -0.02551524641703417,
+              "total_net_r": -7.680089171527285,
+              "profit_factor": 0.9224839516028729,
+              "win_rate_pct": 67.77408637873754,
+              "max_realized_drawdown_r": -11.607800872978936,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 93,
+                "SL_GAP": 2,
+                "TIME_20_BARS": 1,
+                "TP": 204
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 1
+          }
+        },
+        "AUDUSD": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 346,
+              "mean_net_r": -0.07449873619455302,
+              "total_net_r": -25.776562723315372,
+              "profit_factor": 0.8296903253134933,
+              "win_rate_pct": 56.06936416184971,
+              "max_realized_drawdown_r": -31.086050626235,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 149,
+                "SL_GAP": 2,
+                "TIME_20_BARS": 1,
+                "TP": 193
+              }
+            },
+            "adverse": {
+              "trades": 346,
+              "mean_net_r": -0.14113399993036815,
+              "total_net_r": -48.83236397590736,
+              "profit_factor": 0.7065939776395976,
+              "win_rate_pct": 55.78034682080925,
+              "max_realized_drawdown_r": -51.78458107951033,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 149,
+                "SL_GAP": 2,
+                "TIME_20_BARS": 1,
+                "TP": 193
+              }
+            },
+            "skipped_geometry": 3,
+            "ambiguous_stop_target_bars": 6
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 290,
+              "mean_net_r": -0.025408662080844083,
+              "total_net_r": -7.368512003444787,
+              "profit_factor": 0.922686969115073,
+              "win_rate_pct": 66.55172413793103,
+              "max_realized_drawdown_r": -16.44711704135552,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 94,
+                "SL_GAP": 1,
+                "TIME_20_BARS": 2,
+                "TP": 192
+              }
+            },
+            "adverse": {
+              "trades": 290,
+              "mean_net_r": -0.05491993074057548,
+              "total_net_r": -15.926779914766891,
+              "profit_factor": 0.838100769170075,
+              "win_rate_pct": 66.20689655172414,
+              "max_realized_drawdown_r": -22.291799416744773,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 94,
+                "SL_GAP": 1,
+                "TIME_20_BARS": 2,
+                "TP": 192
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 2
+          }
+        },
+        "GBPUSD": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 361,
+              "mean_net_r": -0.08687325789680994,
+              "total_net_r": -31.361246100748364,
+              "profit_factor": 0.807764898704779,
+              "win_rate_pct": 54.57063711911357,
+              "max_realized_drawdown_r": -41.373558304043,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 162,
+                "SL_GAP": 1,
+                "TIME_20_BARS": 1,
+                "TP": 196
+              }
+            },
+            "adverse": {
+              "trades": 361,
+              "mean_net_r": -0.13974048930016517,
+              "total_net_r": -50.446316637359594,
+              "profit_factor": 0.7105211524997929,
+              "win_rate_pct": 54.016620498614955,
+              "max_realized_drawdown_r": -57.498458835093224,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 162,
+                "SL_GAP": 1,
+                "TIME_20_BARS": 1,
+                "TP": 196
+              }
+            },
+            "skipped_geometry": 1,
+            "ambiguous_stop_target_bars": 6
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 305,
+              "mean_net_r": -0.0587437642983857,
+              "total_net_r": -17.91684811100763,
+              "profit_factor": 0.8342795903749127,
+              "win_rate_pct": 64.26229508196721,
+              "max_realized_drawdown_r": -26.52277061752967,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 108,
+                "TIME_20_BARS": 1,
+                "TP": 195
+              }
+            },
+            "adverse": {
+              "trades": 305,
+              "mean_net_r": -0.08393289832123034,
+              "total_net_r": -25.59953398797525,
+              "profit_factor": 0.7690974801289324,
+              "win_rate_pct": 63.60655737704918,
+              "max_realized_drawdown_r": -31.932636173544395,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 108,
+                "TIME_20_BARS": 1,
+                "TP": 195
+              }
+            },
+            "skipped_geometry": 1,
+            "ambiguous_stop_target_bars": 1
+          }
+        },
+        "USDCAD": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 332,
+              "mean_net_r": -0.007096197548027432,
+              "total_net_r": -2.355937585945111,
+              "profit_factor": 0.981985474999105,
+              "win_rate_pct": 60.24096385542169,
+              "max_realized_drawdown_r": -14.105038921931017,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 130,
+                "TIME_20_BARS": 2,
+                "TP": 200
+              }
+            },
+            "adverse": {
+              "trades": 332,
+              "mean_net_r": -0.0676551325384759,
+              "total_net_r": -22.461504002773978,
+              "profit_factor": 0.8429703481648133,
+              "win_rate_pct": 60.24096385542169,
+              "max_realized_drawdown_r": -27.885651473669668,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 130,
+                "TIME_20_BARS": 2,
+                "TP": 200
+              }
+            },
+            "skipped_geometry": 5,
+            "ambiguous_stop_target_bars": 3
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 284,
+              "mean_net_r": 0.013441721120703125,
+              "total_net_r": 3.8174487982796883,
+              "profit_factor": 1.0439900169009657,
+              "win_rate_pct": 69.01408450704226,
+              "max_realized_drawdown_r": -10.060046273802719,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 86,
+                "TIME_20_BARS": 2,
+                "TP": 196
+              }
+            },
+            "adverse": {
+              "trades": 284,
+              "mean_net_r": -0.014398460144062526,
+              "total_net_r": -4.089162680913756,
+              "profit_factor": 0.9541698313408474,
+              "win_rate_pct": 69.01408450704226,
+              "max_realized_drawdown_r": -14.687040748580296,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 86,
+                "TIME_20_BARS": 2,
+                "TP": 196
+              }
+            },
+            "skipped_geometry": 1,
+            "ambiguous_stop_target_bars": 0
+          }
+        },
+        "USDCHF": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 325,
+              "mean_net_r": -0.11682379301853076,
+              "total_net_r": -37.9677327310225,
+              "profit_factor": 0.7412799209186844,
+              "win_rate_pct": 54.46153846153846,
+              "max_realized_drawdown_r": -44.18269529070234,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 146,
+                "TIME_20_BARS": 2,
+                "TP": 177
+              }
+            },
+            "adverse": {
+              "trades": 325,
+              "mean_net_r": -0.20100657965023924,
+              "total_net_r": -65.32713838632773,
+              "profit_factor": 0.5988948641108502,
+              "win_rate_pct": 53.53846153846154,
+              "max_realized_drawdown_r": -69.97503708627603,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 146,
+                "TIME_20_BARS": 2,
+                "TP": 177
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 6
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 277,
+              "mean_net_r": -0.06562901188291712,
+              "total_net_r": -18.17923629156804,
+              "profit_factor": 0.8115308095335075,
+              "win_rate_pct": 64.98194945848375,
+              "max_realized_drawdown_r": -26.116545960970114,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 95,
+                "SL_GAP": 1,
+                "TIME_20_BARS": 1,
+                "TP": 180
+              }
+            },
+            "adverse": {
+              "trades": 277,
+              "mean_net_r": -0.11153494617366316,
+              "total_net_r": -30.895180090104724,
+              "profit_factor": 0.6947389013020979,
+              "win_rate_pct": 63.898916967509024,
+              "max_realized_drawdown_r": -35.19777283343162,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 95,
+                "SL_GAP": 1,
+                "TIME_20_BARS": 1,
+                "TP": 180
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 0
+          }
+        },
+        "NZDJPY": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 339,
+              "mean_net_r": -0.03689718946920874,
+              "total_net_r": -12.508147230061756,
+              "profit_factor": 0.9089390563122766,
+              "win_rate_pct": 58.70206489675516,
+              "max_realized_drawdown_r": -25.735542299276432,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 136,
+                "SL_GAP": 1,
+                "TIME_20_BARS": 1,
+                "TP": 200
+              }
+            },
+            "adverse": {
+              "trades": 339,
+              "mean_net_r": -0.11261030663916358,
+              "total_net_r": -38.17489395067648,
+              "profit_factor": 0.7494924418449465,
+              "win_rate_pct": 58.11209439528024,
+              "max_realized_drawdown_r": -38.549486962557786,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 136,
+                "SL_GAP": 1,
+                "TIME_20_BARS": 1,
+                "TP": 200
+              }
+            },
+            "skipped_geometry": 1,
+            "ambiguous_stop_target_bars": 4
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 302,
+              "mean_net_r": -0.03167373405351237,
+              "total_net_r": -9.565467684160735,
+              "profit_factor": 0.9040218776198384,
+              "win_rate_pct": 66.2251655629139,
+              "max_realized_drawdown_r": -13.434607577152251,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 96,
+                "SL_GAP": 3,
+                "TIME_20_BARS": 1,
+                "TP": 201
+              }
+            },
+            "adverse": {
+              "trades": 302,
+              "mean_net_r": -0.07605295198019407,
+              "total_net_r": -22.967991498018613,
+              "profit_factor": 0.7805770644162481,
+              "win_rate_pct": 65.56291390728477,
+              "max_realized_drawdown_r": -23.339908639148323,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 96,
+                "SL_GAP": 3,
+                "TIME_20_BARS": 1,
+                "TP": 201
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 1
+          }
+        }
+      },
+      "overall": {
+        "legacy_chandelier": {
+          "standard": {
+            "trades": 3485,
+            "mean_net_r": -0.07271205209961613,
+            "total_net_r": -253.40150156716194,
+            "profit_factor": 0.8341000544420425,
+            "win_rate_pct": 55.896700143472025,
+            "max_realized_drawdown_r": -264.13818115754367,
+            "period_end_trades": 7,
+            "exit_reasons": {
+              "PERIOD_END": 7,
+              "SL": 1509,
+              "SL_GAP": 12,
+              "TIME_20_BARS": 14,
+              "TP": 1943
+            }
+          },
+          "adverse": {
+            "trades": 3485,
+            "mean_net_r": -0.1336160301850765,
+            "total_net_r": -465.6518651949913,
+            "profit_factor": 0.7196053888971305,
+            "win_rate_pct": 55.52367288378766,
+            "max_realized_drawdown_r": -471.3428786998943,
+            "period_end_trades": 7,
+            "exit_reasons": {
+              "PERIOD_END": 7,
+              "SL": 1509,
+              "SL_GAP": 12,
+              "TIME_20_BARS": 14,
+              "TP": 1943
+            }
+          }
+        },
+        "fixed_initial_atr": {
+          "standard": {
+            "trades": 2914,
+            "mean_net_r": -0.03214609845414057,
+            "total_net_r": -93.6737308953659,
+            "profit_factor": 0.9039942569603081,
+            "win_rate_pct": 66.09471516815374,
+            "max_realized_drawdown_r": -120.33660502256488,
+            "period_end_trades": 7,
+            "exit_reasons": {
+              "PERIOD_END": 7,
+              "SL": 955,
+              "SL_GAP": 11,
+              "TIME_20_BARS": 20,
+              "TP": 1921
+            }
+          },
+          "adverse": {
+            "trades": 2914,
+            "mean_net_r": -0.06132345512932843,
+            "total_net_r": -178.69654824686293,
+            "profit_factor": 0.8223141935042334,
+            "win_rate_pct": 65.64859299931366,
+            "max_realized_drawdown_r": -186.30468824557278,
+            "period_end_trades": 7,
+            "exit_reasons": {
+              "PERIOD_END": 7,
+              "SL": 955,
+              "SL_GAP": 11,
+              "TIME_20_BARS": 20,
+              "TP": 1921
+            }
+          }
+        }
+      },
+      "expanding_train_range": null
+    },
+    "test_2022": {
+      "range": [
+        "2022-01-01",
+        "2022-12-31"
+      ],
+      "by_pair": {
+        "USDJPY": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 96,
+              "mean_net_r": 0.29679965388178214,
+              "total_net_r": 28.492766772651084,
+              "profit_factor": 1.7305837634013097,
+              "win_rate_pct": 59.375,
+              "max_realized_drawdown_r": -8.749448711252011,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 39,
+                "TP": 57
+              }
+            },
+            "adverse": {
+              "trades": 96,
+              "mean_net_r": 0.2458765674988781,
+              "total_net_r": 23.604150479892297,
+              "profit_factor": 1.561319835078631,
+              "win_rate_pct": 59.375,
+              "max_realized_drawdown_r": -10.840384396138493,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 39,
+                "TP": 57
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 2
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 82,
+              "mean_net_r": -0.026067518242180003,
+              "total_net_r": -2.13753649585876,
+              "profit_factor": 0.9208319816348608,
+              "win_rate_pct": 67.07317073170732,
+              "max_realized_drawdown_r": -5.257875677544139,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 27,
+                "TP": 55
+              }
+            },
+            "adverse": {
+              "trades": 82,
+              "mean_net_r": -0.04353676490233237,
+              "total_net_r": -3.570014721991254,
+              "profit_factor": 0.8695840848377171,
+              "win_rate_pct": 67.07317073170732,
+              "max_realized_drawdown_r": -5.5235975461311275,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 27,
+                "TP": 55
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 2
+          }
+        },
+        "EURUSD": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 55,
+              "mean_net_r": 0.0117961004041054,
+              "total_net_r": 0.6487855222257959,
+              "profit_factor": 1.0240290934157705,
+              "win_rate_pct": 50.90909090909091,
+              "max_realized_drawdown_r": -6.7387525535147415,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 27,
+                "TP": 27
+              }
+            },
+            "adverse": {
+              "trades": 55,
+              "mean_net_r": -0.015278863296770704,
+              "total_net_r": -0.8403374813223913,
+              "profit_factor": 0.9697307441287935,
+              "win_rate_pct": 50.90909090909091,
+              "max_realized_drawdown_r": -7.309762611327202,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 27,
+                "TP": 27
+              }
+            },
+            "skipped_geometry": 1,
+            "ambiguous_stop_target_bars": 1
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 42,
+              "mean_net_r": -0.045624761051024004,
+              "total_net_r": -1.9162399641430095,
+              "profit_factor": 0.8722506690571329,
+              "win_rate_pct": 64.28571428571429,
+              "max_realized_drawdown_r": -6.459493510553445,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 15,
+                "TP": 26
+              }
+            },
+            "adverse": {
+              "trades": 42,
+              "mean_net_r": -0.06111188932105273,
+              "total_net_r": -2.5666993514842145,
+              "profit_factor": 0.8323407403193297,
+              "win_rate_pct": 64.28571428571429,
+              "max_realized_drawdown_r": -7.028818532464295,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 15,
+                "TP": 26
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 0
+          }
+        },
+        "GBPJPY": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 75,
+              "mean_net_r": -0.1715791349446237,
+              "total_net_r": -12.86843512084678,
+              "profit_factor": 0.6386612539312057,
+              "win_rate_pct": 52.0,
+              "max_realized_drawdown_r": -13.783882412779235,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 35,
+                "TP": 39
+              }
+            },
+            "adverse": {
+              "trades": 75,
+              "mean_net_r": -0.20236811036295804,
+              "total_net_r": -15.177608277221859,
+              "profit_factor": 0.5899141543376316,
+              "win_rate_pct": 52.0,
+              "max_realized_drawdown_r": -15.7975332452428,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 35,
+                "TP": 39
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 0
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 61,
+              "mean_net_r": -0.11925544981712081,
+              "total_net_r": -7.27458243884437,
+              "profit_factor": 0.7044440601758731,
+              "win_rate_pct": 59.01639344262295,
+              "max_realized_drawdown_r": -7.608938267065238,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 24,
+                "TP": 36
+              }
+            },
+            "adverse": {
+              "trades": 61,
+              "mean_net_r": -0.13859364503446425,
+              "total_net_r": -8.45421234710232,
+              "profit_factor": 0.6628530939233122,
+              "win_rate_pct": 59.01639344262295,
+              "max_realized_drawdown_r": -8.722617255077799,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 24,
+                "TP": 36
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 0
+          }
+        },
+        "AUDJPY": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 76,
+              "mean_net_r": 0.008020048999721537,
+              "total_net_r": 0.609523723978836,
+              "profit_factor": 1.0225749527399568,
+              "win_rate_pct": 64.47368421052632,
+              "max_realized_drawdown_r": -5.236641126773943,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 27,
+                "TP": 49
+              }
+            },
+            "adverse": {
+              "trades": 76,
+              "mean_net_r": -0.02623232463048429,
+              "total_net_r": -1.9936566719168054,
+              "profit_factor": 0.9287511487595438,
+              "win_rate_pct": 64.47368421052632,
+              "max_realized_drawdown_r": -6.815248860525152,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 27,
+                "TP": 49
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 2
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 75,
+              "mean_net_r": 0.040577042460426316,
+              "total_net_r": 3.043278184531973,
+              "profit_factor": 1.1383308265696352,
+              "win_rate_pct": 70.66666666666667,
+              "max_realized_drawdown_r": -3.516385302879845,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 22,
+                "TP": 53
+              }
+            },
+            "adverse": {
+              "trades": 75,
+              "mean_net_r": 0.011872450461158198,
+              "total_net_r": 0.8904337845868654,
+              "profit_factor": 1.039304079532862,
+              "win_rate_pct": 70.66666666666667,
+              "max_realized_drawdown_r": -3.6191520416081993,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 22,
+                "TP": 53
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 0
+          }
+        },
+        "EURJPY": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 81,
+              "mean_net_r": -0.041450303426952766,
+              "total_net_r": -3.3574745775831754,
+              "profit_factor": 0.891694368465059,
+              "win_rate_pct": 61.72839506172839,
+              "max_realized_drawdown_r": -5.809193432291149,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 31,
+                "TP": 50
+              }
+            },
+            "adverse": {
+              "trades": 81,
+              "mean_net_r": -0.07668455550487085,
+              "total_net_r": -6.2114489958945365,
+              "profit_factor": 0.810381481439648,
+              "win_rate_pct": 61.72839506172839,
+              "max_realized_drawdown_r": -7.911288673103337,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 31,
+                "TP": 50
+              }
+            },
+            "skipped_geometry": 1,
+            "ambiguous_stop_target_bars": 1
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 75,
+              "mean_net_r": -0.01824373622802753,
+              "total_net_r": -1.3682802171020647,
+              "profit_factor": 0.9452687913159176,
+              "win_rate_pct": 66.66666666666667,
+              "max_realized_drawdown_r": -3.4354653808935254,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 25,
+                "TP": 50
+              }
+            },
+            "adverse": {
+              "trades": 75,
+              "mean_net_r": -0.033635031798643064,
+              "total_net_r": -2.5226273848982306,
+              "profit_factor": 0.9002646181387057,
+              "win_rate_pct": 66.66666666666667,
+              "max_realized_drawdown_r": -3.921372394516962,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 25,
+                "TP": 50
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 1
+          }
+        },
+        "AUDUSD": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 66,
+              "mean_net_r": 0.07039853588824377,
+              "total_net_r": 4.646303368624089,
+              "profit_factor": 1.1659394060222892,
+              "win_rate_pct": 57.57575757575758,
+              "max_realized_drawdown_r": -7.519841269841277,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 28,
+                "TP": 37
+              }
+            },
+            "adverse": {
+              "trades": 66,
+              "mean_net_r": 0.019524857154735835,
+              "total_net_r": 1.288640572212563,
+              "profit_factor": 1.0428190353852795,
+              "win_rate_pct": 57.57575757575758,
+              "max_realized_drawdown_r": -8.458636137641282,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 28,
+                "TP": 37
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 1
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 59,
+              "mean_net_r": -0.001771840004867737,
+              "total_net_r": -0.10453856028719627,
+              "profit_factor": 0.9947730719856398,
+              "win_rate_pct": 66.10169491525424,
+              "max_realized_drawdown_r": -5.0,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 20,
+                "TP": 38
+              }
+            },
+            "adverse": {
+              "trades": 59,
+              "mean_net_r": -0.024534828886307418,
+              "total_net_r": -1.4475549042921374,
+              "profit_factor": 0.9292919963526459,
+              "win_rate_pct": 66.10169491525424,
+              "max_realized_drawdown_r": -5.586717480902587,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 20,
+                "TP": 38
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 0
+          }
+        },
+        "GBPUSD": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 59,
+              "mean_net_r": -0.06170181079473142,
+              "total_net_r": -3.6404068368891536,
+              "profit_factor": 0.8483163817962853,
+              "win_rate_pct": 59.32203389830509,
+              "max_realized_drawdown_r": -6.998082000504557,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 24,
+                "TP": 34
+              }
+            },
+            "adverse": {
+              "trades": 59,
+              "mean_net_r": -0.11359967099234577,
+              "total_net_r": -6.702380588548404,
+              "profit_factor": 0.7414856364304802,
+              "win_rate_pct": 57.6271186440678,
+              "max_realized_drawdown_r": -8.329341991193148,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 24,
+                "TP": 34
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 3
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 55,
+              "mean_net_r": -5.36936085585037e-05,
+              "total_net_r": -0.0029531484707182587,
+              "profit_factor": 0.9998303612124426,
+              "win_rate_pct": 67.27272727272727,
+              "max_realized_drawdown_r": -5.483671045150669,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 17,
+                "TP": 37
+              }
+            },
+            "adverse": {
+              "trades": 55,
+              "mean_net_r": -0.02077531743222297,
+              "total_net_r": -1.1426424587722628,
+              "profit_factor": 0.9356335451678122,
+              "win_rate_pct": 65.45454545454545,
+              "max_realized_drawdown_r": -5.9945669541218525,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 17,
+                "TP": 37
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 1
+          }
+        },
+        "USDCAD": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 77,
+              "mean_net_r": -0.05848944365729047,
+              "total_net_r": -4.503687161611364,
+              "profit_factor": 0.8475090503295807,
+              "win_rate_pct": 61.03896103896104,
+              "max_realized_drawdown_r": -6.349663287960306,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 29,
+                "TP": 47
+              }
+            },
+            "adverse": {
+              "trades": 77,
+              "mean_net_r": -0.11089751334385285,
+              "total_net_r": -8.539108527476666,
+              "profit_factor": 0.7353502668343641,
+              "win_rate_pct": 61.03896103896104,
+              "max_realized_drawdown_r": -9.467545807875462,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 29,
+                "TP": 47
+              }
+            },
+            "skipped_geometry": 1,
+            "ambiguous_stop_target_bars": 2
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 68,
+              "mean_net_r": 0.05549740064680314,
+              "total_net_r": 3.773823243982614,
+              "profit_factor": 1.2031234154622759,
+              "win_rate_pct": 70.58823529411765,
+              "max_realized_drawdown_r": -3.044212767675207,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 18,
+                "TP": 49
+              }
+            },
+            "adverse": {
+              "trades": 68,
+              "mean_net_r": 0.03059581268596263,
+              "total_net_r": 2.0805152626454584,
+              "profit_factor": 1.1088643764844808,
+              "win_rate_pct": 70.58823529411765,
+              "max_realized_drawdown_r": -3.8926801319860744,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 18,
+                "TP": 49
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 0
+          }
+        },
+        "USDCHF": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 82,
+              "mean_net_r": -0.034532767425536265,
+              "total_net_r": -2.8316869288939728,
+              "profit_factor": 0.9115797362124017,
+              "win_rate_pct": 59.75609756097561,
+              "max_realized_drawdown_r": -8.028069454345049,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 32,
+                "TP": 49
+              }
+            },
+            "adverse": {
+              "trades": 82,
+              "mean_net_r": -0.10155539343234836,
+              "total_net_r": -8.327542261452562,
+              "profit_factor": 0.7639777380104351,
+              "win_rate_pct": 59.75609756097561,
+              "max_realized_drawdown_r": -10.951648349888622,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 32,
+                "TP": 49
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 1
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 67,
+              "mean_net_r": -0.052333491068602814,
+              "total_net_r": -3.506343901596389,
+              "profit_factor": 0.8477178844276443,
+              "win_rate_pct": 64.17910447761194,
+              "max_realized_drawdown_r": -8.81772992774442,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 23,
+                "TP": 43
+              }
+            },
+            "adverse": {
+              "trades": 67,
+              "mean_net_r": -0.0869582335306134,
+              "total_net_r": -5.826201646551099,
+              "profit_factor": 0.7557722582892066,
+              "win_rate_pct": 64.17910447761194,
+              "max_realized_drawdown_r": -9.50186254875751,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 23,
+                "TP": 43
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 0
+          }
+        },
+        "NZDJPY": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 88,
+              "mean_net_r": -0.0619822283796269,
+              "total_net_r": -5.454436097407168,
+              "profit_factor": 0.8484878861831343,
+              "win_rate_pct": 59.09090909090909,
+              "max_realized_drawdown_r": -11.687429677297956,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 36,
+                "TP": 52
+              }
+            },
+            "adverse": {
+              "trades": 88,
+              "mean_net_r": -0.1334835469464559,
+              "total_net_r": -11.746552131288121,
+              "profit_factor": 0.7016252030033173,
+              "win_rate_pct": 57.95454545454545,
+              "max_realized_drawdown_r": -14.8139007961128,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 36,
+                "TP": 52
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 2
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 74,
+              "mean_net_r": 0.027894360018135344,
+              "total_net_r": 2.0641826413420157,
+              "profit_factor": 1.0938264836973643,
+              "win_rate_pct": 70.27027027027027,
+              "max_realized_drawdown_r": -4.718736271847451,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 22,
+                "TP": 52
+              }
+            },
+            "adverse": {
+              "trades": 74,
+              "mean_net_r": -0.012675342289372813,
+              "total_net_r": -0.937975329413588,
+              "profit_factor": 0.9592418044659364,
+              "win_rate_pct": 68.91891891891892,
+              "max_realized_drawdown_r": -5.8333773470984855,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 22,
+                "TP": 52
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 0
+          }
+        }
+      },
+      "overall": {
+        "legacy_chandelier": {
+          "standard": {
+            "trades": 755,
+            "mean_net_r": 0.002306294919534037,
+            "total_net_r": 1.741252664248198,
+            "profit_factor": 1.005631974894789,
+            "win_rate_pct": 58.80794701986755,
+            "max_realized_drawdown_r": -40.98138363101206,
+            "period_end_trades": 6,
+            "exit_reasons": {
+              "PERIOD_END": 6,
+              "SL": 308,
+              "TP": 441
+            }
+          },
+          "adverse": {
+            "trades": 755,
+            "mean_net_r": -0.04588853494439269,
+            "total_net_r": -34.6458438830165,
+            "profit_factor": 0.895172007536275,
+            "win_rate_pct": 58.54304635761589,
+            "max_realized_drawdown_r": -53.11723157633168,
+            "period_end_trades": 6,
+            "exit_reasons": {
+              "PERIOD_END": 6,
+              "SL": 308,
+              "TP": 441
+            }
+          }
+        },
+        "fixed_initial_atr": {
+          "standard": {
+            "trades": 658,
+            "mean_net_r": -0.011290563307668547,
+            "total_net_r": -7.42919065644591,
+            "profit_factor": 0.9653854036778574,
+            "win_rate_pct": 66.8693009118541,
+            "max_realized_drawdown_r": -25.872017408939254,
+            "period_end_trades": 6,
+            "exit_reasons": {
+              "PERIOD_END": 6,
+              "SL": 213,
+              "TP": 439
+            }
+          },
+          "adverse": {
+            "trades": 658,
+            "mean_net_r": -0.03570969467670636,
+            "total_net_r": -23.496979097272803,
+            "profit_factor": 0.8931524890577751,
+            "win_rate_pct": 66.56534954407294,
+            "max_realized_drawdown_r": -32.78335785508073,
+            "period_end_trades": 6,
+            "exit_reasons": {
+              "PERIOD_END": 6,
+              "SL": 213,
+              "TP": 439
+            }
+          }
+        }
+      },
+      "expanding_train_range": [
+        "2017-01-01",
+        "2021-12-31"
+      ],
+      "expanding_train_metrics": {
+        "legacy_chandelier": {
+          "standard": {
+            "trades": 3485,
+            "mean_net_r": -0.07271205209961613,
+            "total_net_r": -253.40150156716194,
+            "profit_factor": 0.8341000544420425,
+            "win_rate_pct": 55.896700143472025,
+            "max_realized_drawdown_r": -264.13818115754367,
+            "period_end_trades": 7,
+            "exit_reasons": {
+              "PERIOD_END": 7,
+              "SL": 1509,
+              "SL_GAP": 12,
+              "TIME_20_BARS": 14,
+              "TP": 1943
+            }
+          },
+          "adverse": {
+            "trades": 3485,
+            "mean_net_r": -0.1336160301850765,
+            "total_net_r": -465.6518651949913,
+            "profit_factor": 0.7196053888971305,
+            "win_rate_pct": 55.52367288378766,
+            "max_realized_drawdown_r": -471.3428786998943,
+            "period_end_trades": 7,
+            "exit_reasons": {
+              "PERIOD_END": 7,
+              "SL": 1509,
+              "SL_GAP": 12,
+              "TIME_20_BARS": 14,
+              "TP": 1943
+            }
+          }
+        },
+        "fixed_initial_atr": {
+          "standard": {
+            "trades": 2914,
+            "mean_net_r": -0.03214609845414057,
+            "total_net_r": -93.6737308953659,
+            "profit_factor": 0.9039942569603081,
+            "win_rate_pct": 66.09471516815374,
+            "max_realized_drawdown_r": -120.33660502256488,
+            "period_end_trades": 7,
+            "exit_reasons": {
+              "PERIOD_END": 7,
+              "SL": 955,
+              "SL_GAP": 11,
+              "TIME_20_BARS": 20,
+              "TP": 1921
+            }
+          },
+          "adverse": {
+            "trades": 2914,
+            "mean_net_r": -0.06132345512932843,
+            "total_net_r": -178.69654824686293,
+            "profit_factor": 0.8223141935042334,
+            "win_rate_pct": 65.64859299931366,
+            "max_realized_drawdown_r": -186.30468824557278,
+            "period_end_trades": 7,
+            "exit_reasons": {
+              "PERIOD_END": 7,
+              "SL": 955,
+              "SL_GAP": 11,
+              "TIME_20_BARS": 20,
+              "TP": 1921
+            }
+          }
+        }
+      }
+    },
+    "test_2023": {
+      "range": [
+        "2023-01-01",
+        "2023-12-31"
+      ],
+      "by_pair": {
+        "USDJPY": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 69,
+              "mean_net_r": 0.031485277913683316,
+              "total_net_r": 2.172484176044149,
+              "profit_factor": 1.0804623768905242,
+              "win_rate_pct": 60.869565217391305,
+              "max_realized_drawdown_r": -5.245899640696875,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 27,
+                "TP": 42
+              }
+            },
+            "adverse": {
+              "trades": 69,
+              "mean_net_r": -0.01622828560492719,
+              "total_net_r": -1.1197517067399776,
+              "profit_factor": 0.9616150419731522,
+              "win_rate_pct": 60.869565217391305,
+              "max_realized_drawdown_r": -7.101217899523414,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 27,
+                "TP": 42
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 0
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 58,
+              "mean_net_r": 0.04278437934595697,
+              "total_net_r": 2.4814940020655047,
+              "profit_factor": 1.1459702354156183,
+              "win_rate_pct": 70.6896551724138,
+              "max_realized_drawdown_r": -4.295263044814085,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 17,
+                "TP": 41
+              }
+            },
+            "adverse": {
+              "trades": 58,
+              "mean_net_r": 0.02599168302959456,
+              "total_net_r": 1.5075176157164853,
+              "profit_factor": 1.0871400311937602,
+              "win_rate_pct": 70.6896551724138,
+              "max_realized_drawdown_r": -4.57151554969636,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 17,
+                "TP": 41
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 0
+          }
+        },
+        "EURUSD": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 65,
+              "mean_net_r": -0.1643484810485457,
+              "total_net_r": -10.682651268155471,
+              "profit_factor": 0.6505028344344712,
+              "win_rate_pct": 52.30769230769231,
+              "max_realized_drawdown_r": -12.154483002896502,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 30,
+                "TP": 34
+              }
+            },
+            "adverse": {
+              "trades": 65,
+              "mean_net_r": -0.22585338254219667,
+              "total_net_r": -14.680469865242783,
+              "profit_factor": 0.5618408637174048,
+              "win_rate_pct": 52.30769230769231,
+              "max_realized_drawdown_r": -16.12475547433568,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 30,
+                "TP": 34
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 1
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 54,
+              "mean_net_r": -0.09876387911352598,
+              "total_net_r": -5.333249472130403,
+              "profit_factor": 0.7406735310625421,
+              "win_rate_pct": 61.111111111111114,
+              "max_realized_drawdown_r": -6.805081206871433,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 20,
+                "TP": 33
+              }
+            },
+            "adverse": {
+              "trades": 54,
+              "mean_net_r": -0.11771587837653892,
+              "total_net_r": -6.356657432333103,
+              "profit_factor": 0.6957407427889735,
+              "win_rate_pct": 61.111111111111114,
+              "max_realized_drawdown_r": -7.800943041425999,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 20,
+                "TP": 33
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 0
+          }
+        },
+        "GBPJPY": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 80,
+              "mean_net_r": -0.006901238001367288,
+              "total_net_r": -0.5520990401093826,
+              "profit_factor": 0.9835571412606462,
+              "win_rate_pct": 57.5,
+              "max_realized_drawdown_r": -8.45505073049898,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 32,
+                "SL_GAP": 1,
+                "TP": 46
+              }
+            },
+            "adverse": {
+              "trades": 80,
+              "mean_net_r": -0.055642337045814845,
+              "total_net_r": -4.451386963665187,
+              "profit_factor": 0.8761604401093668,
+              "win_rate_pct": 57.5,
+              "max_realized_drawdown_r": -10.403582395484612,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 32,
+                "SL_GAP": 1,
+                "TP": 46
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 0
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 60,
+              "mean_net_r": 0.055660870259132425,
+              "total_net_r": 3.339652215547944,
+              "profit_factor": 1.2014650939716511,
+              "win_rate_pct": 71.66666666666667,
+              "max_realized_drawdown_r": -3.0324722105682347,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 15,
+                "SL_GAP": 1,
+                "TP": 43
+              }
+            },
+            "adverse": {
+              "trades": 60,
+              "mean_net_r": 0.03469233205425156,
+              "total_net_r": 2.081539923255092,
+              "profit_factor": 1.1220813669555922,
+              "win_rate_pct": 71.66666666666667,
+              "max_realized_drawdown_r": -3.1447512994949185,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 15,
+                "SL_GAP": 1,
+                "TP": 43
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 0
+          }
+        },
+        "AUDJPY": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 76,
+              "mean_net_r": -0.10151043341362566,
+              "total_net_r": -7.714792939435546,
+              "profit_factor": 0.7693276726986295,
+              "win_rate_pct": 53.94736842105263,
+              "max_realized_drawdown_r": -10.421168189283295,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 33,
+                "TIME_20_BARS": 1,
+                "TP": 41
+              }
+            },
+            "adverse": {
+              "trades": 76,
+              "mean_net_r": -0.15344949856256773,
+              "total_net_r": -11.662161890755153,
+              "profit_factor": 0.6741334031635094,
+              "win_rate_pct": 53.94736842105263,
+              "max_realized_drawdown_r": -12.98658911091854,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 33,
+                "TIME_20_BARS": 1,
+                "TP": 41
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 1
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 56,
+              "mean_net_r": 0.007153149968745512,
+              "total_net_r": 0.40057639824974867,
+              "profit_factor": 1.02349922979115,
+              "win_rate_pct": 67.85714285714286,
+              "max_realized_drawdown_r": -3.035173488871326,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 16,
+                "TIME_20_BARS": 1,
+                "TP": 38
+              }
+            },
+            "adverse": {
+              "trades": 56,
+              "mean_net_r": -0.01710768900561993,
+              "total_net_r": -0.9580305843147162,
+              "profit_factor": 0.9448717047968476,
+              "win_rate_pct": 67.85714285714286,
+              "max_realized_drawdown_r": -3.1383154844906422,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 16,
+                "TIME_20_BARS": 1,
+                "TP": 38
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 0
+          }
+        },
+        "EURJPY": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 78,
+              "mean_net_r": 0.004595319470898599,
+              "total_net_r": 0.35843491873009115,
+              "profit_factor": 1.0104181547346331,
+              "win_rate_pct": 55.12820512820513,
+              "max_realized_drawdown_r": -7.26364708624537,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 33,
+                "TIME_20_BARS": 1,
+                "TP": 43
+              }
+            },
+            "adverse": {
+              "trades": 78,
+              "mean_net_r": -0.05453311764040973,
+              "total_net_r": -4.253583175951954,
+              "profit_factor": 0.8879872509310393,
+              "win_rate_pct": 55.12820512820513,
+              "max_realized_drawdown_r": -9.705902554686622,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 33,
+                "TIME_20_BARS": 1,
+                "TP": 43
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 2
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 61,
+              "mean_net_r": -0.004129471346625015,
+              "total_net_r": -0.251897752144126,
+              "profit_factor": 0.9877286982335618,
+              "win_rate_pct": 65.57377049180327,
+              "max_realized_drawdown_r": -3.6385333157379858,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 18,
+                "SL_GAP": 1,
+                "TIME_20_BARS": 1,
+                "TP": 40
+              }
+            },
+            "adverse": {
+              "trades": 61,
+              "mean_net_r": -0.020942491804335696,
+              "total_net_r": -1.2774920000644772,
+              "profit_factor": 0.9389273742814976,
+              "win_rate_pct": 65.57377049180327,
+              "max_realized_drawdown_r": -3.8101332293458268,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 18,
+                "SL_GAP": 1,
+                "TIME_20_BARS": 1,
+                "TP": 40
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 0
+          }
+        },
+        "AUDUSD": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 64,
+              "mean_net_r": -0.1900325098928633,
+              "total_net_r": -12.162080633143253,
+              "profit_factor": 0.6572575605634114,
+              "win_rate_pct": 43.75,
+              "max_realized_drawdown_r": -13.560613420040312,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 35,
+                "TP": 28
+              }
+            },
+            "adverse": {
+              "trades": 64,
+              "mean_net_r": -0.2575514715561003,
+              "total_net_r": -16.48329417959043,
+              "profit_factor": 0.5734725795589012,
+              "win_rate_pct": 43.75,
+              "max_realized_drawdown_r": -17.69602927106339,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 35,
+                "TP": 28
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 2
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 53,
+              "mean_net_r": -0.13240842996626354,
+              "total_net_r": -7.0176467882119695,
+              "profit_factor": 0.6733639617205232,
+              "win_rate_pct": 58.490566037735846,
+              "max_realized_drawdown_r": -10.86923694236501,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 21,
+                "TP": 31
+              }
+            },
+            "adverse": {
+              "trades": 53,
+              "mean_net_r": -0.1617774793479867,
+              "total_net_r": -8.574206405443295,
+              "profit_factor": 0.6127799936445393,
+              "win_rate_pct": 58.490566037735846,
+              "max_realized_drawdown_r": -11.819611965815895,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 21,
+                "TP": 31
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 0
+          }
+        },
+        "GBPUSD": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 70,
+              "mean_net_r": 0.06541460731171506,
+              "total_net_r": 4.579022511820054,
+              "profit_factor": 1.173505913366653,
+              "win_rate_pct": 60.0,
+              "max_realized_drawdown_r": -7.41187843245232,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 25,
+                "SL_GAP": 1,
+                "TIME_20_BARS": 1,
+                "TP": 42
+              }
+            },
+            "adverse": {
+              "trades": 70,
+              "mean_net_r": 0.016916498038515443,
+              "total_net_r": 1.1841548626960816,
+              "profit_factor": 1.0420518283586693,
+              "win_rate_pct": 60.0,
+              "max_realized_drawdown_r": -9.138552238221948,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 25,
+                "SL_GAP": 1,
+                "TIME_20_BARS": 1,
+                "TP": 42
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 0
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 63,
+              "mean_net_r": -0.025788167174556977,
+              "total_net_r": -1.624654531997089,
+              "profit_factor": 0.9203255506704492,
+              "win_rate_pct": 65.07936507936508,
+              "max_realized_drawdown_r": -6.511199272772739,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 19,
+                "SL_GAP": 1,
+                "TIME_20_BARS": 1,
+                "TP": 41
+              }
+            },
+            "adverse": {
+              "trades": 63,
+              "mean_net_r": -0.05161980703633124,
+              "total_net_r": -3.2520478432888678,
+              "profit_factor": 0.8446587352993443,
+              "win_rate_pct": 65.07936507936508,
+              "max_realized_drawdown_r": -7.183478725372944,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 19,
+                "SL_GAP": 1,
+                "TIME_20_BARS": 1,
+                "TP": 41
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 0
+          }
+        },
+        "USDCAD": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 78,
+              "mean_net_r": -0.2417879132299695,
+              "total_net_r": -18.85945723193762,
+              "profit_factor": 0.5312423479521985,
+              "win_rate_pct": 47.43589743589744,
+              "max_realized_drawdown_r": -20.02992030931998,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 40,
+                "TIME_20_BARS": 1,
+                "TP": 37
+              }
+            },
+            "adverse": {
+              "trades": 78,
+              "mean_net_r": -0.33594281274269033,
+              "total_net_r": -26.203539393929848,
+              "profit_factor": 0.4288378244979754,
+              "win_rate_pct": 47.43589743589744,
+              "max_realized_drawdown_r": -27.307207399251013,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 40,
+                "TIME_20_BARS": 1,
+                "TP": 37
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 6
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 60,
+              "mean_net_r": -0.031807937422616214,
+              "total_net_r": -1.9084762453569721,
+              "profit_factor": 0.9056743830914653,
+              "win_rate_pct": 65.0,
+              "max_realized_drawdown_r": -6.701125177561768,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 20,
+                "TIME_20_BARS": 1,
+                "TP": 39
+              }
+            },
+            "adverse": {
+              "trades": 60,
+              "mean_net_r": -0.0617056585107832,
+              "total_net_r": -3.7023395106469925,
+              "profit_factor": 0.8228164610716591,
+              "win_rate_pct": 65.0,
+              "max_realized_drawdown_r": -7.3397333226880335,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 20,
+                "TIME_20_BARS": 1,
+                "TP": 39
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 0
+          }
+        },
+        "USDCHF": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 61,
+              "mean_net_r": -0.0934800468418196,
+              "total_net_r": -5.702282857350996,
+              "profit_factor": 0.77190868570596,
+              "win_rate_pct": 59.01639344262295,
+              "max_realized_drawdown_r": -7.849283691981617,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 25,
+                "TP": 36
+              }
+            },
+            "adverse": {
+              "trades": 61,
+              "mean_net_r": -0.17134726496788502,
+              "total_net_r": -10.452183163040988,
+              "profit_factor": 0.6300061846298141,
+              "win_rate_pct": 59.01639344262295,
+              "max_realized_drawdown_r": -11.439731930970915,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 25,
+                "TP": 36
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 4
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 54,
+              "mean_net_r": 0.09915845818261974,
+              "total_net_r": 5.354556741861465,
+              "profit_factor": 1.4118889801431893,
+              "win_rate_pct": 75.92592592592592,
+              "max_realized_drawdown_r": -3.3755102464816993,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 13,
+                "TP": 41
+              }
+            },
+            "adverse": {
+              "trades": 54,
+              "mean_net_r": 0.05448790827766069,
+              "total_net_r": 2.9423470469936777,
+              "profit_factor": 1.214518623643343,
+              "win_rate_pct": 75.92592592592592,
+              "max_realized_drawdown_r": -3.8545375402062367,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 13,
+                "TP": 41
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 0
+          }
+        },
+        "NZDJPY": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 81,
+              "mean_net_r": -0.07031009732216999,
+              "total_net_r": -5.695117883095769,
+              "profit_factor": 0.8351775389305564,
+              "win_rate_pct": 56.79012345679013,
+              "max_realized_drawdown_r": -8.435086967977885,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 34,
+                "TP": 46
+              }
+            },
+            "adverse": {
+              "trades": 81,
+              "mean_net_r": -0.15118988742128447,
+              "total_net_r": -12.246380881124043,
+              "profit_factor": 0.684821084885483,
+              "win_rate_pct": 56.79012345679013,
+              "max_realized_drawdown_r": -12.627816431668943,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 34,
+                "TP": 46
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 2
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 71,
+              "mean_net_r": -0.08298271660219525,
+              "total_net_r": -5.891772878755862,
+              "profit_factor": 0.7743091988897467,
+              "win_rate_pct": 61.971830985915496,
+              "max_realized_drawdown_r": -6.886402266006452,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 25,
+                "TIME_20_BARS": 1,
+                "TP": 44
+              }
+            },
+            "adverse": {
+              "trades": 71,
+              "mean_net_r": -0.12829936454189128,
+              "total_net_r": -9.109254882474284,
+              "profit_factor": 0.66801866957648,
+              "win_rate_pct": 61.971830985915496,
+              "max_realized_drawdown_r": -9.84422031086398,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 25,
+                "TIME_20_BARS": 1,
+                "TP": 44
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 0
+          }
+        }
+      },
+      "overall": {
+        "legacy_chandelier": {
+          "standard": {
+            "trades": 722,
+            "mean_net_r": -0.07515033275157029,
+            "total_net_r": -54.258540246633764,
+            "profit_factor": 0.8307878451396307,
+            "win_rate_pct": 54.70914127423823,
+            "max_realized_drawdown_r": -55.15792278710759,
+            "period_end_trades": 7,
+            "exit_reasons": {
+              "PERIOD_END": 7,
+              "SL": 314,
+              "SL_GAP": 2,
+              "TIME_20_BARS": 4,
+              "TP": 395
+            }
+          },
+          "adverse": {
+            "trades": 722,
+            "mean_net_r": -0.13901467639521367,
+            "total_net_r": -100.36859635734422,
+            "profit_factor": 0.7150002485631474,
+            "win_rate_pct": 54.70914127423823,
+            "max_realized_drawdown_r": -100.9324145587511,
+            "period_end_trades": 7,
+            "exit_reasons": {
+              "PERIOD_END": 7,
+              "SL": 314,
+              "SL_GAP": 2,
+              "TIME_20_BARS": 4,
+              "TP": 395
+            }
+          }
+        },
+        "fixed_initial_atr": {
+          "standard": {
+            "trades": 590,
+            "mean_net_r": -0.017714268323511452,
+            "total_net_r": -10.451418310871759,
+            "profit_factor": 0.9458280598373009,
+            "win_rate_pct": 66.27118644067797,
+            "max_realized_drawdown_r": -19.627068203745523,
+            "period_end_trades": 7,
+            "exit_reasons": {
+              "PERIOD_END": 7,
+              "SL": 184,
+              "SL_GAP": 3,
+              "TIME_20_BARS": 5,
+              "TP": 391
+            }
+          },
+          "adverse": {
+            "trades": 590,
+            "mean_net_r": -0.04525190520779742,
+            "total_net_r": -26.698624072600495,
+            "profit_factor": 0.8656110805564727,
+            "win_rate_pct": 66.27118644067797,
+            "max_realized_drawdown_r": -34.767428474707806,
+            "period_end_trades": 7,
+            "exit_reasons": {
+              "PERIOD_END": 7,
+              "SL": 184,
+              "SL_GAP": 3,
+              "TIME_20_BARS": 5,
+              "TP": 391
+            }
+          }
+        }
+      },
+      "expanding_train_range": [
+        "2017-01-01",
+        "2022-12-31"
+      ],
+      "expanding_train_metrics": {
+        "legacy_chandelier": {
+          "standard": {
+            "trades": 4236,
+            "mean_net_r": -0.05920455097620436,
+            "total_net_r": -250.79047793520124,
+            "profit_factor": 0.8634491263607368,
+            "win_rate_pct": 56.373937677053824,
+            "max_realized_drawdown_r": -292.4285110921612,
+            "period_end_trades": 6,
+            "exit_reasons": {
+              "PERIOD_END": 6,
+              "SL": 1817,
+              "SL_GAP": 12,
+              "TIME_20_BARS": 14,
+              "TP": 2387
+            }
+          },
+          "adverse": {
+            "trades": 4236,
+            "mean_net_r": -0.11785027002426592,
+            "total_net_r": -499.21374382278907,
+            "profit_factor": 0.7492953539822647,
+            "win_rate_pct": 56.01983002832861,
+            "max_realized_drawdown_r": -517.4055931819604,
+            "period_end_trades": 6,
+            "exit_reasons": {
+              "PERIOD_END": 6,
+              "SL": 1817,
+              "SL_GAP": 12,
+              "TIME_20_BARS": 14,
+              "TP": 2387
+            }
+          }
+        },
+        "fixed_initial_atr": {
+          "standard": {
+            "trades": 3567,
+            "mean_net_r": -0.02835771382914754,
+            "total_net_r": -101.15196522856964,
+            "profit_factor": 0.915022314470311,
+            "win_rate_pct": 66.1900756938604,
+            "max_realized_drawdown_r": -135.2387448473766,
+            "period_end_trades": 6,
+            "exit_reasons": {
+              "PERIOD_END": 6,
+              "SL": 1168,
+              "SL_GAP": 11,
+              "TIME_20_BARS": 20,
+              "TP": 2362
+            }
+          },
+          "adverse": {
+            "trades": 3567,
+            "mean_net_r": -0.05654581561341619,
+            "total_net_r": -201.69892429305546,
+            "profit_factor": 0.8354082962783436,
+            "win_rate_pct": 65.76955424726661,
+            "max_realized_drawdown_r": -210.98530305086337,
+            "period_end_trades": 6,
+            "exit_reasons": {
+              "PERIOD_END": 6,
+              "SL": 1168,
+              "SL_GAP": 11,
+              "TIME_20_BARS": 20,
+              "TP": 2362
+            }
+          }
+        }
+      }
+    },
+    "test_2024": {
+      "range": [
+        "2024-01-01",
+        "2024-12-31"
+      ],
+      "by_pair": {
+        "USDJPY": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 63,
+              "mean_net_r": -0.0007511020467136541,
+              "total_net_r": -0.04731942894296043,
+              "profit_factor": 0.9978662336985661,
+              "win_rate_pct": 63.492063492063494,
+              "max_realized_drawdown_r": -6.210198673550678,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 22,
+                "TP": 40
+              }
+            },
+            "adverse": {
+              "trades": 63,
+              "mean_net_r": -0.024426483799704368,
+              "total_net_r": -1.538868479381376,
+              "profit_factor": 0.9325868145968758,
+              "win_rate_pct": 63.492063492063494,
+              "max_realized_drawdown_r": -7.181961827812762,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 22,
+                "TP": 40
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 2
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 57,
+              "mean_net_r": 0.0449239641853748,
+              "total_net_r": 2.5606659585663643,
+              "profit_factor": 1.1582956068692747,
+              "win_rate_pct": 70.17543859649123,
+              "max_realized_drawdown_r": -4.441344445428469,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 16,
+                "TP": 40
+              }
+            },
+            "adverse": {
+              "trades": 57,
+              "mean_net_r": 0.02669606762198439,
+              "total_net_r": 1.5216758544531115,
+              "profit_factor": 1.0926047804232168,
+              "win_rate_pct": 70.17543859649123,
+              "max_realized_drawdown_r": -4.630534135193196,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 16,
+                "TP": 40
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 2
+          }
+        },
+        "EURUSD": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 66,
+              "mean_net_r": -0.10040633434285166,
+              "total_net_r": -6.626818066628209,
+              "profit_factor": 0.7864319292335565,
+              "win_rate_pct": 51.515151515151516,
+              "max_realized_drawdown_r": -11.718310074128162,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 31,
+                "TP": 34
+              }
+            },
+            "adverse": {
+              "trades": 66,
+              "mean_net_r": -0.14377100873720874,
+              "total_net_r": -9.488886576655776,
+              "profit_factor": 0.7123784646833882,
+              "win_rate_pct": 51.515151515151516,
+              "max_realized_drawdown_r": -12.673823915922828,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 31,
+                "TP": 34
+              }
+            },
+            "skipped_geometry": 1,
+            "ambiguous_stop_target_bars": 1
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 56,
+              "mean_net_r": -0.08127391214322117,
+              "total_net_r": -4.551339080020384,
+              "profit_factor": 0.7835691431739813,
+              "win_rate_pct": 60.714285714285715,
+              "max_realized_drawdown_r": -8.537643467043518,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 21,
+                "TP": 34
+              }
+            },
+            "adverse": {
+              "trades": 56,
+              "mean_net_r": -0.10315276241752885,
+              "total_net_r": -5.776554695381616,
+              "profit_factor": 0.7333170872105254,
+              "win_rate_pct": 60.714285714285715,
+              "max_realized_drawdown_r": -9.257579050296043,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 21,
+                "TP": 34
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 0
+          }
+        },
+        "GBPJPY": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 74,
+              "mean_net_r": -0.07579972627745243,
+              "total_net_r": -5.60917974453148,
+              "profit_factor": 0.830024856226319,
+              "win_rate_pct": 55.4054054054054,
+              "max_realized_drawdown_r": -13.772365912670193,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 33,
+                "TP": 41
+              }
+            },
+            "adverse": {
+              "trades": 74,
+              "mean_net_r": -0.11842939234419253,
+              "total_net_r": -8.763775033470248,
+              "profit_factor": 0.7465128462709731,
+              "win_rate_pct": 55.4054054054054,
+              "max_realized_drawdown_r": -14.655669663356043,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 33,
+                "TP": 41
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 2
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 67,
+              "mean_net_r": -0.08131967909098678,
+              "total_net_r": -5.448418499096116,
+              "profit_factor": 0.7820632600361556,
+              "win_rate_pct": 62.6865671641791,
+              "max_realized_drawdown_r": -10.788752548158467,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 25,
+                "TP": 42
+              }
+            },
+            "adverse": {
+              "trades": 67,
+              "mean_net_r": -0.10210820380527383,
+              "total_net_r": -6.841249654953348,
+              "profit_factor": 0.7313240938162003,
+              "win_rate_pct": 62.6865671641791,
+              "max_realized_drawdown_r": -11.466807515703458,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 25,
+                "TP": 42
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 2
+          }
+        },
+        "AUDJPY": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 94,
+              "mean_net_r": 0.045862033527631775,
+              "total_net_r": 4.311031151597389,
+              "profit_factor": 1.1224866961029842,
+              "win_rate_pct": 60.638297872340424,
+              "max_realized_drawdown_r": -8.793574996061245,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 35,
+                "TIME_20_BARS": 1,
+                "TP": 58
+              }
+            },
+            "adverse": {
+              "trades": 94,
+              "mean_net_r": -0.01028945283242555,
+              "total_net_r": -0.9672085662480008,
+              "profit_factor": 0.9747382156309105,
+              "win_rate_pct": 60.638297872340424,
+              "max_realized_drawdown_r": -12.537414924900819,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 35,
+                "TIME_20_BARS": 1,
+                "TP": 58
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 2
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 81,
+              "mean_net_r": 0.021296275868907515,
+              "total_net_r": 1.724998345381509,
+              "profit_factor": 1.0733246565386552,
+              "win_rate_pct": 69.1358024691358,
+              "max_realized_drawdown_r": -6.844371974147194,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 23,
+                "TIME_20_BARS": 1,
+                "TP": 56
+              }
+            },
+            "adverse": {
+              "trades": 81,
+              "mean_net_r": -0.005207750473710576,
+              "total_net_r": -0.4218277883705565,
+              "profit_factor": 0.9825817943067596,
+              "win_rate_pct": 69.1358024691358,
+              "max_realized_drawdown_r": -7.373087805807775,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 23,
+                "TIME_20_BARS": 1,
+                "TP": 56
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 1
+          }
+        },
+        "EURJPY": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 78,
+              "mean_net_r": 0.05122671730889564,
+              "total_net_r": 3.9956839500938606,
+              "profit_factor": 1.1379740189682077,
+              "win_rate_pct": 62.82051282051282,
+              "max_realized_drawdown_r": -8.134982888374065,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 27,
+                "SL_GAP": 1,
+                "TP": 49
+              }
+            },
+            "adverse": {
+              "trades": 78,
+              "mean_net_r": 0.016843654462325906,
+              "total_net_r": 1.3138050480614198,
+              "profit_factor": 1.0432359849435358,
+              "win_rate_pct": 62.82051282051282,
+              "max_realized_drawdown_r": -8.662592611621267,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 27,
+                "SL_GAP": 1,
+                "TP": 49
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 2
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 70,
+              "mean_net_r": -0.014420319183650636,
+              "total_net_r": -1.0094223428555438,
+              "profit_factor": 0.9560350066045542,
+              "win_rate_pct": 67.14285714285714,
+              "max_realized_drawdown_r": -6.515876398462183,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 21,
+                "SL_GAP": 1,
+                "TP": 47
+              }
+            },
+            "adverse": {
+              "trades": 70,
+              "mean_net_r": -0.03368604541609916,
+              "total_net_r": -2.358023179126942,
+              "profit_factor": 0.8989544774815286,
+              "win_rate_pct": 67.14285714285714,
+              "max_realized_drawdown_r": -6.840889353877619,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 21,
+                "SL_GAP": 1,
+                "TP": 47
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 2
+          }
+        },
+        "AUDUSD": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 69,
+              "mean_net_r": -0.18476007956247856,
+              "total_net_r": -12.748445489811019,
+              "profit_factor": 0.6136834700057267,
+              "win_rate_pct": 52.17391304347826,
+              "max_realized_drawdown_r": -18.024827097933155,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 33,
+                "TP": 35
+              }
+            },
+            "adverse": {
+              "trades": 69,
+              "mean_net_r": -0.25979193791430394,
+              "total_net_r": -17.92564371608697,
+              "profit_factor": 0.5115614028216302,
+              "win_rate_pct": 52.17391304347826,
+              "max_realized_drawdown_r": -22.436979908017232,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 33,
+                "TP": 35
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 1
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 60,
+              "mean_net_r": -0.130464695197558,
+              "total_net_r": -7.827881711853479,
+              "profit_factor": 0.6738382620061051,
+              "win_rate_pct": 60.0,
+              "max_realized_drawdown_r": -10.878298612249901,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 24,
+                "TP": 35
+              }
+            },
+            "adverse": {
+              "trades": 60,
+              "mean_net_r": -0.16520275064436796,
+              "total_net_r": -9.91216503866208,
+              "profit_factor": 0.6008163899817527,
+              "win_rate_pct": 60.0,
+              "max_realized_drawdown_r": -12.443845588122429,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 24,
+                "TP": 35
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 0
+          }
+        },
+        "GBPUSD": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 70,
+              "mean_net_r": -0.17236231307372163,
+              "total_net_r": -12.065361915160516,
+              "profit_factor": 0.6107947769303059,
+              "win_rate_pct": 55.714285714285715,
+              "max_realized_drawdown_r": -13.617794351241761,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 31,
+                "TP": 38
+              }
+            },
+            "adverse": {
+              "trades": 70,
+              "mean_net_r": -0.2534008630937017,
+              "total_net_r": -17.738060416559115,
+              "profit_factor": 0.498835036235438,
+              "win_rate_pct": 55.714285714285715,
+              "max_realized_drawdown_r": -19.129378766061343,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 31,
+                "TP": 38
+              }
+            },
+            "skipped_geometry": 1,
+            "ambiguous_stop_target_bars": 1
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 59,
+              "mean_net_r": -0.022867271605573964,
+              "total_net_r": -1.3491690247288646,
+              "profit_factor": 0.9294151165617772,
+              "win_rate_pct": 66.10169491525424,
+              "max_realized_drawdown_r": -5.0,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 19,
+                "TP": 39
+              }
+            },
+            "adverse": {
+              "trades": 59,
+              "mean_net_r": -0.056977893146875166,
+              "total_net_r": -3.361695695665635,
+              "profit_factor": 0.8308853275215883,
+              "win_rate_pct": 66.10169491525424,
+              "max_realized_drawdown_r": -5.1767852593817825,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 19,
+                "TP": 39
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 0
+          }
+        },
+        "USDCAD": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 65,
+              "mean_net_r": -0.23223589758724178,
+              "total_net_r": -15.095333343170722,
+              "profit_factor": 0.5505231073657124,
+              "win_rate_pct": 47.69230769230769,
+              "max_realized_drawdown_r": -18.896842120551522,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 33,
+                "TP": 31
+              }
+            },
+            "adverse": {
+              "trades": 65,
+              "mean_net_r": -0.2813988817044192,
+              "total_net_r": -18.29092731078725,
+              "profit_factor": 0.4849322703942797,
+              "win_rate_pct": 47.69230769230769,
+              "max_realized_drawdown_r": -21.75413449823312,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 33,
+                "TP": 31
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 2
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 60,
+              "mean_net_r": -0.18771451020125188,
+              "total_net_r": -11.262870612075114,
+              "profit_factor": 0.5916916140943386,
+              "win_rate_pct": 53.333333333333336,
+              "max_realized_drawdown_r": -14.797622570832093,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 27,
+                "TP": 32
+              }
+            },
+            "adverse": {
+              "trades": 60,
+              "mean_net_r": -0.22129779896754,
+              "total_net_r": -13.277867938052388,
+              "profit_factor": 0.5340062319482061,
+              "win_rate_pct": 53.333333333333336,
+              "max_realized_drawdown_r": -16.484669420289105,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 27,
+                "TP": 32
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 1
+          }
+        },
+        "USDCHF": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 77,
+              "mean_net_r": -0.05036238959999789,
+              "total_net_r": -3.8779039991998365,
+              "profit_factor": 0.8824877576000049,
+              "win_rate_pct": 57.142857142857146,
+              "max_realized_drawdown_r": -10.586809553347639,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 33,
+                "TP": 44
+              }
+            },
+            "adverse": {
+              "trades": 77,
+              "mean_net_r": -0.14804695257407444,
+              "total_net_r": -11.399615348203737,
+              "profit_factor": 0.6988945687808658,
+              "win_rate_pct": 57.142857142857146,
+              "max_realized_drawdown_r": -15.660115390538408,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 33,
+                "TP": 44
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 0
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 70,
+              "mean_net_r": -0.004296623080053089,
+              "total_net_r": -0.3007636156037169,
+              "profit_factor": 0.9863289265634676,
+              "win_rate_pct": 68.57142857142857,
+              "max_realized_drawdown_r": -5.693695040998487,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 22,
+                "TP": 48
+              }
+            },
+            "adverse": {
+              "trades": 70,
+              "mean_net_r": -0.04583526983259395,
+              "total_net_r": -3.2084688882815784,
+              "profit_factor": 0.8606379523003562,
+              "win_rate_pct": 68.57142857142857,
+              "max_realized_drawdown_r": -6.479733392017709,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 22,
+                "TP": 48
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 0
+          }
+        },
+        "NZDJPY": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 81,
+              "mean_net_r": 0.05098802775518875,
+              "total_net_r": 4.130030248170289,
+              "profit_factor": 1.1461033490117187,
+              "win_rate_pct": 65.4320987654321,
+              "max_realized_drawdown_r": -6.5367672936017005,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 27,
+                "SL_GAP": 1,
+                "TIME_20_BARS": 1,
+                "TP": 52
+              }
+            },
+            "adverse": {
+              "trades": 81,
+              "mean_net_r": -0.0408085947042354,
+              "total_net_r": -3.3054961710430666,
+              "profit_factor": 0.8989630684244816,
+              "win_rate_pct": 61.72839506172839,
+              "max_realized_drawdown_r": -9.384811894900462,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 27,
+                "SL_GAP": 1,
+                "TIME_20_BARS": 1,
+                "TP": 52
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 3
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 76,
+              "mean_net_r": 0.08055605220409692,
+              "total_net_r": 6.122259967511364,
+              "profit_factor": 1.3351381683304355,
+              "win_rate_pct": 76.3157894736842,
+              "max_realized_drawdown_r": -4.890227728709952,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 17,
+                "SL_GAP": 1,
+                "TIME_20_BARS": 1,
+                "TP": 57
+              }
+            },
+            "adverse": {
+              "trades": 76,
+              "mean_net_r": 0.03671799808182671,
+              "total_net_r": 2.790567854218829,
+              "profit_factor": 1.1448079078060305,
+              "win_rate_pct": 72.36842105263158,
+              "max_realized_drawdown_r": -5.270149926633589,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 17,
+                "SL_GAP": 1,
+                "TIME_20_BARS": 1,
+                "TP": 57
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 1
+          }
+        }
+      },
+      "overall": {
+        "legacy_chandelier": {
+          "standard": {
+            "trades": 737,
+            "mean_net_r": -0.05920436450146974,
+            "total_net_r": -43.633616637583145,
+            "profit_factor": 0.8588882654946404,
+            "win_rate_pct": 57.530529172320215,
+            "max_realized_drawdown_r": -53.11026760611046,
+            "period_end_trades": 6,
+            "exit_reasons": {
+              "PERIOD_END": 6,
+              "SL": 305,
+              "SL_GAP": 2,
+              "TIME_20_BARS": 2,
+              "TP": 422
+            }
+          },
+          "adverse": {
+            "trades": 737,
+            "mean_net_r": -0.11954501569928645,
+            "total_net_r": -88.10467657037417,
+            "profit_factor": 0.7387521726623029,
+            "win_rate_pct": 57.12347354138399,
+            "max_realized_drawdown_r": -92.79600335906892,
+            "period_end_trades": 6,
+            "exit_reasons": {
+              "PERIOD_END": 6,
+              "SL": 305,
+              "SL_GAP": 2,
+              "TIME_20_BARS": 2,
+              "TP": 422
+            }
+          }
+        },
+        "fixed_initial_atr": {
+          "standard": {
+            "trades": 656,
+            "mean_net_r": -0.03253344605910667,
+            "total_net_r": -21.341940614773982,
+            "profit_factor": 0.9028396753232054,
+            "win_rate_pct": 65.85365853658537,
+            "max_realized_drawdown_r": -38.2961849703977,
+            "period_end_trades": 7,
+            "exit_reasons": {
+              "PERIOD_END": 7,
+              "SL": 215,
+              "SL_GAP": 2,
+              "TIME_20_BARS": 2,
+              "TP": 430
+            }
+          },
+          "adverse": {
+            "trades": 656,
+            "mean_net_r": -0.062264648124728976,
+            "total_net_r": -40.84560916982222,
+            "profit_factor": 0.8197503303263198,
+            "win_rate_pct": 65.39634146341463,
+            "max_realized_drawdown_r": -52.78227163510004,
+            "period_end_trades": 7,
+            "exit_reasons": {
+              "PERIOD_END": 7,
+              "SL": 215,
+              "SL_GAP": 2,
+              "TIME_20_BARS": 2,
+              "TP": 430
+            }
+          }
+        }
+      },
+      "expanding_train_range": [
+        "2017-01-01",
+        "2023-12-31"
+      ],
+      "expanding_train_metrics": {
+        "legacy_chandelier": {
+          "standard": {
+            "trades": 4955,
+            "mean_net_r": -0.06273591385846844,
+            "total_net_r": -310.8564531687106,
+            "profit_factor": 0.8560806114425776,
+            "win_rate_pct": 56.08476286579213,
+            "max_realized_drawdown_r": -310.8564531687109,
+            "period_end_trades": 7,
+            "exit_reasons": {
+              "PERIOD_END": 7,
+              "SL": 2134,
+              "SL_GAP": 14,
+              "TIME_20_BARS": 19,
+              "TP": 2781
+            }
+          },
+          "adverse": {
+            "trades": 4955,
+            "mean_net_r": -0.12215433353325728,
+            "total_net_r": -605.274722657289,
+            "profit_factor": 0.7420104896479688,
+            "win_rate_pct": 55.78203834510595,
+            "max_realized_drawdown_r": -605.274722657289,
+            "period_end_trades": 7,
+            "exit_reasons": {
+              "PERIOD_END": 7,
+              "SL": 2134,
+              "SL_GAP": 14,
+              "TIME_20_BARS": 19,
+              "TP": 2781
+            }
+          }
+        },
+        "fixed_initial_atr": {
+          "standard": {
+            "trades": 4153,
+            "mean_net_r": -0.02752467718450834,
+            "total_net_r": -114.30998434726358,
+            "profit_factor": 0.917437688922051,
+            "win_rate_pct": 66.19311341199133,
+            "max_realized_drawdown_r": -135.2387448473766,
+            "period_end_trades": 7,
+            "exit_reasons": {
+              "PERIOD_END": 7,
+              "SL": 1354,
+              "SL_GAP": 14,
+              "TIME_20_BARS": 26,
+              "TP": 2752
+            }
+          },
+          "adverse": {
+            "trades": 4153,
+            "mean_net_r": -0.055622818006202494,
+            "total_net_r": -231.00156317975876,
+            "profit_factor": 0.8379319587178332,
+            "win_rate_pct": 65.831928726222,
+            "max_realized_drawdown_r": -234.9191018859388,
+            "period_end_trades": 7,
+            "exit_reasons": {
+              "PERIOD_END": 7,
+              "SL": 1354,
+              "SL_GAP": 14,
+              "TIME_20_BARS": 26,
+              "TP": 2752
+            }
+          }
+        }
+      }
+    },
+    "test_2025": {
+      "range": [
+        "2025-01-01",
+        "2025-12-31"
+      ],
+      "by_pair": {
+        "USDJPY": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 64,
+              "mean_net_r": -0.11183318678216325,
+              "total_net_r": -7.157323954058448,
+              "profit_factor": 0.7551395447663982,
+              "win_rate_pct": 56.25,
+              "max_realized_drawdown_r": -11.027606392940971,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 27,
+                "SL_GAP": 1,
+                "TP": 36
+              }
+            },
+            "adverse": {
+              "trades": 64,
+              "mean_net_r": -0.1282743149898822,
+              "total_net_r": -8.20955615935246,
+              "profit_factor": 0.7237669652007247,
+              "win_rate_pct": 56.25,
+              "max_realized_drawdown_r": -11.556129113087731,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 27,
+                "SL_GAP": 1,
+                "TP": 36
+              }
+            },
+            "skipped_geometry": 2,
+            "ambiguous_stop_target_bars": 1
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 62,
+              "mean_net_r": -0.08852587135135867,
+              "total_net_r": -5.488604023784236,
+              "profit_factor": 0.7663319325242669,
+              "win_rate_pct": 61.29032258064516,
+              "max_realized_drawdown_r": -8.573185016817014,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 22,
+                "SL_GAP": 1,
+                "TIME_20_BARS": 1,
+                "TP": 37
+              }
+            },
+            "adverse": {
+              "trades": 62,
+              "mean_net_r": -0.09800459851436073,
+              "total_net_r": -6.076285107890365,
+              "profit_factor": 0.7438353185003846,
+              "win_rate_pct": 61.29032258064516,
+              "max_realized_drawdown_r": -8.792154989199368,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 22,
+                "SL_GAP": 1,
+                "TIME_20_BARS": 1,
+                "TP": 37
+              }
+            },
+            "skipped_geometry": 1,
+            "ambiguous_stop_target_bars": 0
+          }
+        },
+        "EURUSD": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 78,
+              "mean_net_r": -0.10358162448388912,
+              "total_net_r": -8.079366709743352,
+              "profit_factor": 0.7623715673604896,
+              "win_rate_pct": 56.41025641025641,
+              "max_realized_drawdown_r": -10.750233677403342,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 34,
+                "TP": 44
+              }
+            },
+            "adverse": {
+              "trades": 78,
+              "mean_net_r": -0.15498339563399,
+              "total_net_r": -12.088704859451223,
+              "profit_factor": 0.6740631692216449,
+              "win_rate_pct": 56.41025641025641,
+              "max_realized_drawdown_r": -14.364958472461726,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 34,
+                "TP": 44
+              }
+            },
+            "skipped_geometry": 2,
+            "ambiguous_stop_target_bars": 1
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 63,
+              "mean_net_r": 0.03355794814041845,
+              "total_net_r": 2.1141507328463622,
+              "profit_factor": 1.1112710912024397,
+              "win_rate_pct": 69.84126984126983,
+              "max_realized_drawdown_r": -3.0247553241430984,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 19,
+                "TP": 44
+              }
+            },
+            "adverse": {
+              "trades": 63,
+              "mean_net_r": 0.017326471897277502,
+              "total_net_r": 1.091567729528482,
+              "profit_factor": 1.0564888273758883,
+              "win_rate_pct": 69.84126984126983,
+              "max_realized_drawdown_r": -3.180398699223952,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 19,
+                "TP": 44
+              }
+            },
+            "skipped_geometry": 1,
+            "ambiguous_stop_target_bars": 0
+          }
+        },
+        "GBPJPY": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 70,
+              "mean_net_r": 0.023307578320700396,
+              "total_net_r": 1.631530482449027,
+              "profit_factor": 1.0579966588626373,
+              "win_rate_pct": 58.57142857142857,
+              "max_realized_drawdown_r": -5.259629069222877,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 28,
+                "TIME_20_BARS": 1,
+                "TP": 40
+              }
+            },
+            "adverse": {
+              "trades": 70,
+              "mean_net_r": -0.020294777260587465,
+              "total_net_r": -1.4206344082411229,
+              "profit_factor": 0.952455023216941,
+              "win_rate_pct": 58.57142857142857,
+              "max_realized_drawdown_r": -7.7375773203155545,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 28,
+                "TIME_20_BARS": 1,
+                "TP": 40
+              }
+            },
+            "skipped_geometry": 1,
+            "ambiguous_stop_target_bars": 2
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 58,
+              "mean_net_r": -0.056553512003191114,
+              "total_net_r": -3.2801036961850834,
+              "profit_factor": 0.8370657529925128,
+              "win_rate_pct": 63.793103448275865,
+              "max_realized_drawdown_r": -7.220944544634835,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 20,
+                "TIME_20_BARS": 1,
+                "TP": 36
+              }
+            },
+            "adverse": {
+              "trades": 58,
+              "mean_net_r": -0.0755000339572912,
+              "total_net_r": -4.379001969522889,
+              "profit_factor": 0.7861431232528078,
+              "win_rate_pct": 63.793103448275865,
+              "max_realized_drawdown_r": -8.185889471886457,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 20,
+                "TIME_20_BARS": 1,
+                "TP": 36
+              }
+            },
+            "skipped_geometry": 1,
+            "ambiguous_stop_target_bars": 2
+          }
+        },
+        "AUDJPY": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 66,
+              "mean_net_r": -0.14188270602563824,
+              "total_net_r": -9.364258597692125,
+              "profit_factor": 0.6936193981992657,
+              "win_rate_pct": 53.03030303030303,
+              "max_realized_drawdown_r": -12.093725283112404,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 30,
+                "TP": 35
+              }
+            },
+            "adverse": {
+              "trades": 66,
+              "mean_net_r": -0.19066455211152394,
+              "total_net_r": -12.583860439360585,
+              "profit_factor": 0.6150451967432581,
+              "win_rate_pct": 51.515151515151516,
+              "max_realized_drawdown_r": -14.695674273257334,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 30,
+                "TP": 35
+              }
+            },
+            "skipped_geometry": 2,
+            "ambiguous_stop_target_bars": 0
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 57,
+              "mean_net_r": -0.05895232361538089,
+              "total_net_r": -3.3602824460767113,
+              "profit_factor": 0.8265408113955325,
+              "win_rate_pct": 64.91228070175438,
+              "max_realized_drawdown_r": -6.094909030227768,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 18,
+                "TIME_20_BARS": 1,
+                "TP": 37
+              }
+            },
+            "adverse": {
+              "trades": 57,
+              "mean_net_r": -0.0885687168364111,
+              "total_net_r": -5.048416859675434,
+              "profit_factor": 0.7478719403448293,
+              "win_rate_pct": 63.1578947368421,
+              "max_realized_drawdown_r": -7.118952202949552,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 18,
+                "TIME_20_BARS": 1,
+                "TP": 37
+              }
+            },
+            "skipped_geometry": 1,
+            "ambiguous_stop_target_bars": 0
+          }
+        },
+        "EURJPY": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 76,
+              "mean_net_r": 0.020475377731193487,
+              "total_net_r": 1.5561287075707042,
+              "profit_factor": 1.0529870816629412,
+              "win_rate_pct": 60.526315789473685,
+              "max_realized_drawdown_r": -9.388168846050913,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 29,
+                "TP": 46
+              }
+            },
+            "adverse": {
+              "trades": 76,
+              "mean_net_r": -0.016427038926937546,
+              "total_net_r": -1.248454958447248,
+              "profit_factor": 0.9597944133003206,
+              "win_rate_pct": 60.526315789473685,
+              "max_realized_drawdown_r": -10.468510418469604,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 29,
+                "TP": 46
+              }
+            },
+            "skipped_geometry": 1,
+            "ambiguous_stop_target_bars": 1
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 64,
+              "mean_net_r": 0.04404198016410421,
+              "total_net_r": 2.8186867305026713,
+              "profit_factor": 1.151920148416214,
+              "win_rate_pct": 70.3125,
+              "max_realized_drawdown_r": -5.80729224489227,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 17,
+                "SL_GAP": 1,
+                "TP": 45
+              }
+            },
+            "adverse": {
+              "trades": 64,
+              "mean_net_r": 0.0245110124365181,
+              "total_net_r": 1.568704795937157,
+              "profit_factor": 1.0826742113655758,
+              "win_rate_pct": 70.3125,
+              "max_realized_drawdown_r": -6.08889495705116,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 17,
+                "SL_GAP": 1,
+                "TP": 45
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 1
+          }
+        },
+        "AUDUSD": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 73,
+              "mean_net_r": -0.1502869774953943,
+              "total_net_r": -10.970949357163786,
+              "profit_factor": 0.6906017677311261,
+              "win_rate_pct": 50.68493150684932,
+              "max_realized_drawdown_r": -15.592323289491173,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 35,
+                "TP": 37
+              }
+            },
+            "adverse": {
+              "trades": 73,
+              "mean_net_r": -0.22521994909435322,
+              "total_net_r": -16.44105628388778,
+              "profit_factor": 0.5797169491515537,
+              "win_rate_pct": 50.68493150684932,
+              "max_realized_drawdown_r": -20.13330848919163,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 35,
+                "TP": 37
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 1
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 65,
+              "mean_net_r": -0.12543936696882788,
+              "total_net_r": -8.153558852973813,
+              "profit_factor": 0.6797375582798226,
+              "win_rate_pct": 60.0,
+              "max_realized_drawdown_r": -10.682776678823029,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 25,
+                "TP": 39
+              }
+            },
+            "adverse": {
+              "trades": 65,
+              "mean_net_r": -0.1589559920264903,
+              "total_net_r": -10.332139481721866,
+              "profit_factor": 0.6062707788071681,
+              "win_rate_pct": 60.0,
+              "max_realized_drawdown_r": -12.416062667631978,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 25,
+                "TP": 39
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 0
+          }
+        },
+        "GBPUSD": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 74,
+              "mean_net_r": -0.04426594408984196,
+              "total_net_r": -3.275679862648304,
+              "profit_factor": 0.8908106712450561,
+              "win_rate_pct": 59.45945945945946,
+              "max_realized_drawdown_r": -8.938494606719027,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 30,
+                "TP": 44
+              }
+            },
+            "adverse": {
+              "trades": 74,
+              "mean_net_r": -0.10076359855138055,
+              "total_net_r": -7.456506292802159,
+              "profit_factor": 0.7741197874919308,
+              "win_rate_pct": 59.45945945945946,
+              "max_realized_drawdown_r": -12.0005446932032,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 30,
+                "TP": 44
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 0
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 65,
+              "mean_net_r": -0.022734226111530337,
+              "total_net_r": -1.4777246972494709,
+              "profit_factor": 0.9332787960320418,
+              "win_rate_pct": 66.15384615384616,
+              "max_realized_drawdown_r": -5.260119310900932,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 21,
+                "SL_GAP": 1,
+                "TP": 43
+              }
+            },
+            "adverse": {
+              "trades": 65,
+              "mean_net_r": -0.044611677813207476,
+              "total_net_r": -2.8997590578584855,
+              "profit_factor": 0.8724818766203144,
+              "win_rate_pct": 66.15384615384616,
+              "max_realized_drawdown_r": -5.968512867360573,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 21,
+                "SL_GAP": 1,
+                "TP": 43
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 0
+          }
+        },
+        "USDCAD": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 78,
+              "mean_net_r": -0.0697868511148427,
+              "total_net_r": -5.44337438695773,
+              "profit_factor": 0.8472324267007523,
+              "win_rate_pct": 53.84615384615385,
+              "max_realized_drawdown_r": -8.934405671566587,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 35,
+                "TP": 42
+              }
+            },
+            "adverse": {
+              "trades": 78,
+              "mean_net_r": -0.16075231081171615,
+              "total_net_r": -12.538680243313864,
+              "profit_factor": 0.6918808347449281,
+              "win_rate_pct": 53.84615384615385,
+              "max_realized_drawdown_r": -15.636514375341138,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 35,
+                "TP": 42
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 4
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 69,
+              "mean_net_r": -0.0007903794160519944,
+              "total_net_r": -0.05453617970758795,
+              "profit_factor": 0.9974560539446063,
+              "win_rate_pct": 68.1159420289855,
+              "max_realized_drawdown_r": -4.410184763626146,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 21,
+                "TP": 47
+              }
+            },
+            "adverse": {
+              "trades": 69,
+              "mean_net_r": -0.03376328656502845,
+              "total_net_r": -2.3296667729869625,
+              "profit_factor": 0.8958752100370929,
+              "win_rate_pct": 68.1159420289855,
+              "max_realized_drawdown_r": -5.785119359676337,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 21,
+                "TP": 47
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 0
+          }
+        },
+        "USDCHF": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 64,
+              "mean_net_r": -0.21206159066498412,
+              "total_net_r": -13.571941802558985,
+              "profit_factor": 0.6202103699068959,
+              "win_rate_pct": 43.75,
+              "max_realized_drawdown_r": -14.939194189609253,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 35,
+                "TP": 28
+              }
+            },
+            "adverse": {
+              "trades": 64,
+              "mean_net_r": -0.320379264765159,
+              "total_net_r": -20.504272944970168,
+              "profit_factor": 0.4981971323818039,
+              "win_rate_pct": 43.75,
+              "max_realized_drawdown_r": -21.656205064601696,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 35,
+                "TP": 28
+              }
+            },
+            "skipped_geometry": 1,
+            "ambiguous_stop_target_bars": 1
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 51,
+              "mean_net_r": -0.17343499120040382,
+              "total_net_r": -8.845184551220592,
+              "profit_factor": 0.5930520458437122,
+              "win_rate_pct": 56.86274509803921,
+              "max_realized_drawdown_r": -9.98081018370859,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 21,
+                "TIME_20_BARS": 1,
+                "TP": 28
+              }
+            },
+            "adverse": {
+              "trades": 51,
+              "mean_net_r": -0.21226449236318096,
+              "total_net_r": -10.825489110522229,
+              "profit_factor": 0.5232561684626167,
+              "win_rate_pct": 56.86274509803921,
+              "max_realized_drawdown_r": -11.765637668262839,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 21,
+                "TIME_20_BARS": 1,
+                "TP": 28
+              }
+            },
+            "skipped_geometry": 0,
+            "ambiguous_stop_target_bars": 0
+          }
+        },
+        "NZDJPY": {
+          "legacy_chandelier": {
+            "standard": {
+              "trades": 68,
+              "mean_net_r": -0.14731447290763758,
+              "total_net_r": -10.017384157719354,
+              "profit_factor": 0.7231922112952247,
+              "win_rate_pct": 48.529411764705884,
+              "max_realized_drawdown_r": -11.982242300520236,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 33,
+                "SL_GAP": 2,
+                "TP": 33
+              }
+            },
+            "adverse": {
+              "trades": 68,
+              "mean_net_r": -0.221464277163097,
+              "total_net_r": -15.059570847090594,
+              "profit_factor": 0.6176098133280716,
+              "win_rate_pct": 48.529411764705884,
+              "max_realized_drawdown_r": -15.287136878067777,
+              "period_end_trades": 0,
+              "exit_reasons": {
+                "SL": 33,
+                "SL_GAP": 2,
+                "TP": 33
+              }
+            },
+            "skipped_geometry": 1,
+            "ambiguous_stop_target_bars": 0
+          },
+          "fixed_initial_atr": {
+            "standard": {
+              "trades": 53,
+              "mean_net_r": -0.1407220231229211,
+              "total_net_r": -7.458267225514817,
+              "profit_factor": 0.6539245915620979,
+              "win_rate_pct": 60.37735849056604,
+              "max_realized_drawdown_r": -10.162417739461137,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 19,
+                "SL_GAP": 1,
+                "TP": 32
+              }
+            },
+            "adverse": {
+              "trades": 53,
+              "mean_net_r": -0.1820671551601298,
+              "total_net_r": -9.649559223486879,
+              "profit_factor": 0.573162190046979,
+              "win_rate_pct": 60.37735849056604,
+              "max_realized_drawdown_r": -11.305094164037726,
+              "period_end_trades": 1,
+              "exit_reasons": {
+                "PERIOD_END": 1,
+                "SL": 19,
+                "SL_GAP": 1,
+                "TP": 32
+              }
+            },
+            "skipped_geometry": 1,
+            "ambiguous_stop_target_bars": 0
+          }
+        }
+      },
+      "overall": {
+        "legacy_chandelier": {
+          "standard": {
+            "trades": 711,
+            "mean_net_r": -0.09098821327499627,
+            "total_net_r": -64.69261963852233,
+            "profit_factor": 0.8005216582654437,
+            "win_rate_pct": 54.28973277074543,
+            "max_realized_drawdown_r": -71.03819568864209,
+            "period_end_trades": 6,
+            "exit_reasons": {
+              "PERIOD_END": 6,
+              "SL": 316,
+              "SL_GAP": 3,
+              "TIME_20_BARS": 1,
+              "TP": 385
+            }
+          },
+          "adverse": {
+            "trades": 711,
+            "mean_net_r": -0.15126764759060085,
+            "total_net_r": -107.55129743691718,
+            "profit_factor": 0.6957510203538158,
+            "win_rate_pct": 54.14908579465541,
+            "max_realized_drawdown_r": -110.10929864578608,
+            "period_end_trades": 6,
+            "exit_reasons": {
+              "PERIOD_END": 6,
+              "SL": 316,
+              "SL_GAP": 3,
+              "TIME_20_BARS": 1,
+              "TP": 385
+            }
+          }
+        },
+        "fixed_initial_atr": {
+          "standard": {
+            "trades": 607,
+            "mean_net_r": -0.05467120957061496,
+            "total_net_r": -33.18542420936327,
+            "profit_factor": 0.8441099023768865,
+            "win_rate_pct": 64.41515650741351,
+            "max_realized_drawdown_r": -40.710250551210386,
+            "period_end_trades": 8,
+            "exit_reasons": {
+              "PERIOD_END": 8,
+              "SL": 203,
+              "SL_GAP": 4,
+              "TIME_20_BARS": 4,
+              "TP": 388
+            }
+          },
+          "adverse": {
+            "trades": 607,
+            "mean_net_r": -0.08052725709752796,
+            "total_net_r": -48.88004505819944,
+            "profit_factor": 0.776994532014701,
+            "win_rate_pct": 64.2504118616145,
+            "max_realized_drawdown_r": -52.451532146052905,
+            "period_end_trades": 8,
+            "exit_reasons": {
+              "PERIOD_END": 8,
+              "SL": 203,
+              "SL_GAP": 4,
+              "TIME_20_BARS": 4,
+              "TP": 388
+            }
+          }
+        }
+      },
+      "expanding_train_range": [
+        "2017-01-01",
+        "2024-12-31"
+      ],
+      "expanding_train_metrics": {
+        "legacy_chandelier": {
+          "standard": {
+            "trades": 5687,
+            "mean_net_r": -0.062095534019616726,
+            "total_net_r": -353.13730196956004,
+            "profit_factor": 0.8568866554331831,
+            "win_rate_pct": 56.32143485141551,
+            "max_realized_drawdown_r": -357.5766766230751,
+            "period_end_trades": 6,
+            "exit_reasons": {
+              "PERIOD_END": 6,
+              "SL": 2441,
+              "SL_GAP": 16,
+              "TIME_20_BARS": 21,
+              "TP": 3203
+            }
+          },
+          "adverse": {
+            "trades": 5687,
+            "mean_net_r": -0.12161887426533952,
+            "total_net_r": -691.6465379469848,
+            "profit_factor": 0.7420656341627074,
+            "win_rate_pct": 56.0049235097591,
+            "max_realized_drawdown_r": -692.9230388240135,
+            "period_end_trades": 6,
+            "exit_reasons": {
+              "PERIOD_END": 6,
+              "SL": 2441,
+              "SL_GAP": 16,
+              "TIME_20_BARS": 21,
+              "TP": 3203
+            }
+          }
+        },
+        "fixed_initial_atr": {
+          "standard": {
+            "trades": 4806,
+            "mean_net_r": -0.02801937231048031,
+            "total_net_r": -134.66110332416864,
+            "profit_factor": 0.9160005899030542,
+            "win_rate_pct": 66.18809821057012,
+            "max_realized_drawdown_r": -158.0647460093896,
+            "period_end_trades": 7,
+            "exit_reasons": {
+              "PERIOD_END": 7,
+              "SL": 1572,
+              "SL_GAP": 16,
+              "TIME_20_BARS": 29,
+              "TP": 3182
+            }
+          },
+          "adverse": {
+            "trades": 4806,
+            "mean_net_r": -0.05632897168866772,
+            "total_net_r": -270.7170379357377,
+            "profit_factor": 0.8360123313366669,
+            "win_rate_pct": 65.81356637536413,
+            "max_realized_drawdown_r": -275.98933754695435,
+            "period_end_trades": 7,
+            "exit_reasons": {
+              "PERIOD_END": 7,
+              "SL": 1572,
+              "SL_GAP": 16,
+              "TIME_20_BARS": 29,
+              "TP": 3182
+            }
+          }
+        }
+      }
+    }
+  },
+  "oos_overall": {
+    "legacy_chandelier": {
+      "standard": {
+        "trades": 2925,
+        "mean_net_r": -0.054989238925979865,
+        "total_net_r": -160.8435238584909,
+        "profit_factor": 0.8726847860302273,
+        "win_rate_pct": 56.376068376068375,
+        "max_realized_drawdown_r": -188.96328755643552,
+        "period_end_trades": 25,
+        "exit_reasons": {
+          "PERIOD_END": 25,
+          "SL": 1243,
+          "SL_GAP": 7,
+          "TIME_20_BARS": 7,
+          "TP": 1643
+        }
+      },
+      "adverse": {
+        "trades": 2925,
+        "mean_net_r": -0.11304971427270157,
+        "total_net_r": -330.6704142476525,
+        "profit_factor": 0.7592350447122953,
+        "win_rate_pct": 56.17094017094017,
+        "max_realized_drawdown_r": -333.5079537906656,
+        "period_end_trades": 25,
+        "exit_reasons": {
+          "PERIOD_END": 25,
+          "SL": 1243,
+          "SL_GAP": 7,
+          "TIME_20_BARS": 7,
+          "TP": 1643
+        }
+      }
+    },
+    "fixed_initial_atr": {
+      "standard": {
+        "trades": 2511,
+        "mean_net_r": -0.02883630975366584,
+        "total_net_r": -72.40797379145486,
+        "profit_factor": 0.9138093100503364,
+        "win_rate_pct": 65.87017124651533,
+        "max_realized_drawdown_r": -80.74588278364794,
+        "period_end_trades": 28,
+        "exit_reasons": {
+          "PERIOD_END": 28,
+          "SL": 815,
+          "SL_GAP": 9,
+          "TIME_20_BARS": 11,
+          "TP": 1648
+        }
+      },
+      "adverse": {
+        "trades": 2511,
+        "mean_net_r": -0.05572332034961965,
+        "total_net_r": -139.9212573978949,
+        "profit_factor": 0.838123718847645,
+        "win_rate_pct": 65.63122262046993,
+        "max_realized_drawdown_r": -142.7910472080054,
+        "period_end_trades": 28,
+        "exit_reasons": {
+          "PERIOD_END": 28,
+          "SL": 815,
+          "SL_GAP": 9,
+          "TIME_20_BARS": 11,
+          "TP": 1648
+        }
+      }
+    }
+  },
+  "difference_tests": {
+    "overall": {
+      "standard": {
+        "days": 1043,
+        "mean_delta_r_per_day": 0.0847895973797087,
+        "total_delta_r": 88.43555006703623,
+        "ci95": [
+          -0.005731510468091007,
+          0.16366943939977915
+        ],
+        "p_one_sided": 0.01859628074385123,
+        "p_bonferroni_11": 0.20455908818236354,
+        "block_trading_days": 20,
+        "iterations": 5000,
+        "seed": 20261001
+      },
+      "adverse": {
+        "days": 1043,
+        "mean_delta_r_per_day": 0.18288509765077385,
+        "total_delta_r": 190.74915684975716,
+        "ci95": [
+          0.08781892104806828,
+          0.2705422832564188
+        ],
+        "p_one_sided": 0.0001999600079984003,
+        "p_bonferroni_11": 0.0021995600879824036,
+        "block_trading_days": 20,
+        "iterations": 5000,
+        "seed": 20261001
+      }
+    },
+    "USDJPY": {
+      "standard": {
+        "days": 1043,
+        "mean_delta_r_per_day": -0.024970841922056525,
+        "total_delta_r": -26.044588124704973,
+        "ci95": [
+          -0.10400780811511552,
+          0.02238495776996865
+        ],
+        "p_one_sided": 0.76124775044991,
+        "p_bonferroni_11": 1.0,
+        "block_trading_days": 20,
+        "iterations": 5000,
+        "seed": 20261001
+      },
+      "adverse": {
+        "days": 1043,
+        "mean_delta_r_per_day": -0.018555206609904614,
+        "total_delta_r": -19.35308049413052,
+        "ci95": [
+          -0.098040827943824,
+          0.029605289970495476
+        ],
+        "p_one_sided": 0.7396520695860828,
+        "p_bonferroni_11": 1.0,
+        "block_trading_days": 20,
+        "iterations": 5000,
+        "seed": 20261001
+      }
+    },
+    "EURUSD": {
+      "standard": {
+        "days": 1043,
+        "mean_delta_r_per_day": 0.014432763891518506,
+        "total_delta_r": 15.053372738853806,
+        "ci95": [
+          -0.0031475707143189756,
+          0.03200020000340665
+        ],
+        "p_one_sided": 0.051989602079584085,
+        "p_bonferroni_11": 0.571885622875425,
+        "block_trading_days": 20,
+        "iterations": 5000,
+        "seed": 20261001
+      },
+      "adverse": {
+        "days": 1043,
+        "mean_delta_r_per_day": 0.022521625151487746,
+        "total_delta_r": 23.49005503300171,
+        "ci95": [
+          0.0036238890329994824,
+          0.041785909416177214
+        ],
+        "p_one_sided": 0.01199760047990402,
+        "p_bonferroni_11": 0.13197360527894422,
+        "block_trading_days": 20,
+        "iterations": 5000,
+        "seed": 20261001
+      }
+    },
+    "GBPJPY": {
+      "standard": {
+        "days": 1043,
+        "mean_delta_r_per_day": 0.004539531164392129,
+        "total_delta_r": 4.7347310044609925,
+        "ci95": [
+          -0.01275809996058706,
+          0.022645102013259626
+        ],
+        "p_one_sided": 0.3117376524695061,
+        "p_bonferroni_11": 1.0,
+        "block_trading_days": 20,
+        "iterations": 5000,
+        "seed": 20261001
+      },
+      "adverse": {
+        "days": 1043,
+        "mean_delta_r_per_day": 0.01171666407888298,
+        "total_delta_r": 12.220480634274946,
+        "ci95": [
+          -0.006371937112259249,
+          0.031159496621946902
+        ],
+        "p_one_sided": 0.10877824435112977,
+        "p_bonferroni_11": 1.0,
+        "block_trading_days": 20,
+        "iterations": 5000,
+        "seed": 20261001
+      }
+    },
+    "AUDJPY": {
+      "standard": {
+        "days": 1043,
+        "mean_delta_r_per_day": 0.013391243665999971,
+        "total_delta_r": 13.967067143637973,
+        "ci95": [
+          -0.003705552858174927,
+          0.02998783989303085
+        ],
+        "p_one_sided": 0.0625874825034993,
+        "p_bonferroni_11": 0.6884623075384922,
+        "block_trading_days": 20,
+        "iterations": 5000,
+        "seed": 20261001
+      },
+      "adverse": {
+        "days": 1043,
+        "mean_delta_r_per_day": 0.020775691390706324,
+        "total_delta_r": 21.669046120506703,
+        "ci95": [
+          0.002558002503745788,
+          0.03853972548187024
+        ],
+        "p_one_sided": 0.010597880423915218,
+        "p_bonferroni_11": 0.11657668466306739,
+        "block_trading_days": 20,
+        "iterations": 5000,
+        "seed": 20261001
+      }
+    },
+    "EURJPY": {
+      "standard": {
+        "days": 1043,
+        "mean_delta_r_per_day": -0.0022662383321290012,
+        "total_delta_r": -2.3636865804105485,
+        "ci95": [
+          -0.023128948716495512,
+          0.018216286869193195
+        ],
+        "p_one_sided": 0.5864827034593081,
+        "p_bonferroni_11": 1.0,
+        "block_trading_days": 20,
+        "iterations": 5000,
+        "seed": 20261001
+      },
+      "adverse": {
+        "days": 1043,
+        "mean_delta_r_per_day": 0.005570704040345006,
+        "total_delta_r": 5.810244314079842,
+        "ci95": [
+          -0.016591613546001527,
+          0.02787560894437999
+        ],
+        "p_one_sided": 0.3077384523095381,
+        "p_bonferroni_11": 1.0,
+        "block_trading_days": 20,
+        "iterations": 5000,
+        "seed": 20261001
+      }
+    },
+    "AUDUSD": {
+      "standard": {
+        "days": 1043,
+        "mean_delta_r_per_day": 0.007796305079738744,
+        "total_delta_r": 8.131546198167511,
+        "ci95": [
+          -0.01929551965399149,
+          0.03170600900342882
+        ],
+        "p_one_sided": 0.28754249150169964,
+        "p_bonferroni_11": 1.0,
+        "block_trading_days": 20,
+        "iterations": 5000,
+        "seed": 20261001
+      },
+      "adverse": {
+        "days": 1043,
+        "mean_delta_r_per_day": 0.018499796526589868,
+        "total_delta_r": 19.295287777233227,
+        "ci95": [
+          -0.009516894803179032,
+          0.04401867307507718
+        ],
+        "p_one_sided": 0.08378324335132974,
+        "p_bonferroni_11": 0.9216156768646271,
+        "block_trading_days": 20,
+        "iterations": 5000,
+        "seed": 20261001
+      }
+    },
+    "GBPUSD": {
+      "standard": {
+        "days": 1043,
+        "mean_delta_r_per_day": 0.009537799329273036,
+        "total_delta_r": 9.947924700431775,
+        "ci95": [
+          -0.011999902667176795,
+          0.030228653288865058
+        ],
+        "p_one_sided": 0.1871625674865027,
+        "p_bonferroni_11": 1.0,
+        "block_trading_days": 20,
+        "iterations": 5000,
+        "seed": 20261001
+      },
+      "adverse": {
+        "days": 1043,
+        "mean_delta_r_per_day": 0.019229767382194004,
+        "total_delta_r": 20.05664737962834,
+        "ci95": [
+          -0.0032255428256380125,
+          0.04180479354112671
+        ],
+        "p_one_sided": 0.047390521895620874,
+        "p_bonferroni_11": 0.5212957408518296,
+        "block_trading_days": 20,
+        "iterations": 5000,
+        "seed": 20261001
+      }
+    },
+    "USDCAD": {
+      "standard": {
+        "days": 1043,
+        "mean_delta_r_per_day": 0.03302952284805405,
+        "total_delta_r": 34.44979233052036,
+        "ci95": [
+          0.015665367287981305,
+          0.05189626779005961
+        ],
+        "p_one_sided": 0.0005998800239952009,
+        "p_bonferroni_11": 0.0065986802639472104,
+        "block_trading_days": 20,
+        "iterations": 5000,
+        "seed": 20261001
+      },
+      "adverse": {
+        "days": 1043,
+        "mean_delta_r_per_day": 0.046349852844167524,
+        "total_delta_r": 48.34289651646671,
+        "ci95": [
+          0.026188025702685074,
+          0.0686404833177172
+        ],
+        "p_one_sided": 0.0001999600079984003,
+        "p_bonferroni_11": 0.0021995600879824036,
+        "block_trading_days": 20,
+        "iterations": 5000,
+        "seed": 20261001
+      }
+    },
+    "USDCHF": {
+      "standard": {
+        "days": 1043,
+        "mean_delta_r_per_day": 0.017915704948652498,
+        "total_delta_r": 18.686080261444552,
+        "ci95": [
+          -0.0005324502893072911,
+          0.03601734327232776
+        ],
+        "p_one_sided": 0.02659468106378724,
+        "p_bonferroni_11": 0.29254149170165966,
+        "block_trading_days": 20,
+        "iterations": 5000,
+        "seed": 20261001
+      },
+      "adverse": {
+        "days": 1043,
+        "mean_delta_r_per_day": 0.032373730699238955,
+        "total_delta_r": 33.76580111930623,
+        "ci95": [
+          0.012496122479285228,
+          0.05315706109180051
+        ],
+        "p_one_sided": 0.0013997200559888023,
+        "p_bonferroni_11": 0.015396920615876825,
+        "block_trading_days": 20,
+        "iterations": 5000,
+        "seed": 20261001
+      }
+    },
+    "NZDJPY": {
+      "standard": {
+        "days": 1041,
+        "mean_delta_r_per_day": 0.011405677612521328,
+        "total_delta_r": 11.87331039463471,
+        "ci95": [
+          -0.010570210994195311,
+          0.03474827736384778
+        ],
+        "p_one_sided": 0.15336932613477305,
+        "p_bonferroni_11": 1.0,
+        "block_trading_days": 20,
+        "iterations": 5000,
+        "seed": 20261001
+      },
+      "adverse": {
+        "days": 1041,
+        "mean_delta_r_per_day": 0.02444935489854938,
+        "total_delta_r": 25.451778449389924,
+        "ci95": [
+          -0.0001356268615483431,
+          0.05084831849967514
+        ],
+        "p_one_sided": 0.03659268146370726,
+        "p_bonferroni_11": 0.40251949610077986,
+        "block_trading_days": 20,
+        "iterations": 5000,
+        "seed": 20261001
+      }
+    }
+  },
+  "gate_failures": [
+    "test_2022/standard: \u56fa\u5b9aATR\u306e\u30b3\u30b9\u30c8\u5f8c\u5408\u8a08R\u304c\u6b63\u3067\u306f\u306a\u3044\u3002",
+    "test_2022/standard: \u57fa\u6e96\u306e\u5408\u8a08R\u3092\u6539\u5584\u3057\u3066\u3044\u306a\u3044\u3002",
+    "test_2022/adverse: \u56fa\u5b9aATR\u306e\u30b3\u30b9\u30c8\u5f8c\u5408\u8a08R\u304c\u6b63\u3067\u306f\u306a\u3044\u3002",
+    "test_2023/standard: \u56fa\u5b9aATR\u306e\u30b3\u30b9\u30c8\u5f8c\u5408\u8a08R\u304c\u6b63\u3067\u306f\u306a\u3044\u3002",
+    "test_2023/adverse: \u56fa\u5b9aATR\u306e\u30b3\u30b9\u30c8\u5f8c\u5408\u8a08R\u304c\u6b63\u3067\u306f\u306a\u3044\u3002",
+    "test_2024/standard: \u56fa\u5b9aATR\u306e\u30b3\u30b9\u30c8\u5f8c\u5408\u8a08R\u304c\u6b63\u3067\u306f\u306a\u3044\u3002",
+    "test_2024/adverse: \u56fa\u5b9aATR\u306e\u30b3\u30b9\u30c8\u5f8c\u5408\u8a08R\u304c\u6b63\u3067\u306f\u306a\u3044\u3002",
+    "test_2025/standard: \u56fa\u5b9aATR\u306e\u30b3\u30b9\u30c8\u5f8c\u5408\u8a08R\u304c\u6b63\u3067\u306f\u306a\u3044\u3002",
+    "test_2025/adverse: \u56fa\u5b9aATR\u306e\u30b3\u30b9\u30c8\u5f8c\u5408\u8a08R\u304c\u6b63\u3067\u306f\u306a\u3044\u3002"
+  ],
+  "simulated_ledger": {
+    "file": "2026-10-01-initial-stop-backtest-trades.json.gz",
+    "sha256": "78cd80642e5986f3c356f108687949be26c1bf08a73284536b119ed45b0be1df",
+    "total_trades": 11835
+  }
+}

@@ -7,6 +7,7 @@ on:
       - 'profitability_config.json'
       - 'run_profitability_report.py'
       - 'tests/test_profitability.py'
+      - 'research/*.py'
       - '.github/workflows/profitability-tests.yml'
   push:
     branches: [main]
@@ -15,6 +16,7 @@ on:
       - 'signal_scanner.py'
       - 'profitability_config.json'
       - 'tests/test_profitability.py'
+      - 'research/*.py'
       - '.github/workflows/profitability-tests.yml'
 permissions:
   contents: read
@@ -30,3 +32,4 @@ jobs:
       - run: python -B -m unittest discover -s tests -p test_profitability.py -v
       - run: python -B test_spread_monitor.py
       - run: python -B test_entry_validator.py
+      - run: python -B research/test_initial_stop.py
