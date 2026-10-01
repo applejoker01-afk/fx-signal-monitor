@@ -26,6 +26,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - run: python -m pip install PyYAML==6.0.2
       - run: python -B -m unittest discover -s tests -p test_profitability.py -v
       - run: python -B test_spread_monitor.py
       - run: python -B test_entry_validator.py
