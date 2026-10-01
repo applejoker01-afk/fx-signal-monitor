@@ -360,11 +360,10 @@ def calc_staged_tp(price: float, direction: str, atr: float, regime: dict,
     # BE+0.5R: SLをBEからリスクの0.5倍分プラス側に移動（小利確保）
     be_offset = sl_width * 0.5
 
-    # ─── Chandelier Exit 動的SL（2026-06-11 研究C反映）───
-    # 真の Chandelier Exit: 過去N日の高値/安値 ± ATR*mult
-    # 条件: prices が22本以上ある場合に使用。エントリー価格より有利（保護的）な場合のみ採用。
-    # 参照: wiki/concepts/chandelier-exit-trailing-stop.md
-    CHANDELIER_PERIOD = 22
+    # Initial risk must be fixed at the entry-time ATR distance. A historical
+    # Chandelier stop can sit ABOVE a later pullback buy limit (or below a sell
+    # limit), producing an impossible positive-P&L SL loss and oversized units.
+    # Trailing remains a post-TP state managed by trade_tracker.
     chandelier_sl_active = False
     chandelier_note = ""
 
@@ -375,22 +374,7 @@ def calc_staged_tp(price: float, direction: str, atr: float, regime: dict,
         tp3 = price + tp3_width
         be_target = price + be_offset
 
-        # Chandelier Exit SL: 過去22日高値 - ATR*sl_mult
-        if prices and len(prices) >= CHANDELIER_PERIOD:
-            recent_high = max(prices[-CHANDELIER_PERIOD:])
-            sl_ce = recent_high - sl_width
-            # CE SL はエントリー価格より下（安全）かつ固定SLより上（タイト）な時のみ採用
-            if sl_fixed < sl_ce < price:
-                sl = sl_ce
-                chandelier_sl_active = True
-                chandelier_note = (
-                    f"Chandelier Exit: 過去{CHANDELIER_PERIOD}日高値"
-                    f"({round(recent_high, _pair_decimals(pair))})-{sl_mult}xATR"
-                )
-            else:
-                sl = sl_fixed  # 固定SLの方が安全（広い）場合はそちらを使用
-        else:
-            sl = sl_fixed
+        sl = sl_fixed
 
     elif direction in ("SHORT", "LIGHT_SHORT"):
         sl_fixed = price + sl_width
@@ -399,22 +383,7 @@ def calc_staged_tp(price: float, direction: str, atr: float, regime: dict,
         tp3 = price - tp3_width
         be_target = price - be_offset
 
-        # Chandelier Exit SL: 過去22日安値 + ATR*sl_mult
-        if prices and len(prices) >= CHANDELIER_PERIOD:
-            recent_low = min(prices[-CHANDELIER_PERIOD:])
-            sl_ce = recent_low + sl_width
-            # CE SL はエントリー価格より上（安全）かつ固定SLより下（タイト）な時のみ採用
-            if price < sl_ce < sl_fixed:
-                sl = sl_ce
-                chandelier_sl_active = True
-                chandelier_note = (
-                    f"Chandelier Exit: 過去{CHANDELIER_PERIOD}日安値"
-                    f"({round(recent_low, _pair_decimals(pair))})+{sl_mult}xATR"
-                )
-            else:
-                sl = sl_fixed
-        else:
-            sl = sl_fixed
+        sl = sl_fixed
 
     else:
         return {}
@@ -423,9 +392,14 @@ def calc_staged_tp(price: float, direction: str, atr: float, regime: dict,
     # 注: pair 未指定の旧呼び出し互換のため price>10 をフォールバックに残す
     decimals = _pair_decimals(pair) if pair else (3 if price > 10 else 6)
 
-    rr_tp = round(tp_mult / sl_mult, 1)
-    rr_tp2 = round(tp2_mult / sl_mult, 1)
-    rr_tp3 = round(tp3_mult / sl_mult, 1)
+    # Derive displayed RR from the same rounded prices sent to the user.
+    sl = round(sl, decimals)
+    tp = round(tp, decimals)
+    sl_width = abs(price - sl)
+    tp_width = abs(tp - price)
+    rr_tp = round(tp_width / sl_width, 2) if sl_width else 0
+    rr_tp2 = round(abs(round(tp2, decimals) - price) / sl_width, 2) if sl_width else 0
+    rr_tp3 = round(abs(round(tp3, decimals) - price) / sl_width, 2) if sl_width else 0
 
     # ── スプレッド補正（2026-06-23 追加、2026-06-25 動的化）──
     # bid/ask スプレッドを考慮した実効 SL/TP 距離と RR を算出。
