@@ -22,6 +22,7 @@ SL/TPは指値注文作成時点（現在値ベース）で計算した絶対価
 import json
 import os
 from datetime import datetime, timedelta, timezone
+from modules.profitability import cost_snapshot, finite, validate_geometry, side
 
 PENDING_FILE = "data/pending_orders.json"
 
@@ -103,6 +104,10 @@ def create_pending_order(r: dict, now: datetime,
     _d = 3 if pair and pair.upper().endswith("JPY") else 6
     limit_price = round(limit_price, _d) if limit_price is not None else None
 
+    reason = validate_geometry(direction, limit_price, staged.get("sl"), staged.get("tp") or staged.get("tp1"), require_target=True)
+    if reason:
+        raise ValueError(f"{pair}: {reason}")
+    costs = cost_snapshot(pair, staged.get("spread_pips_dynamic", staged.get("spread_pips")), now)
     return {
         "pair": pair,
         "direction": direction,
@@ -128,6 +133,8 @@ def create_pending_order(r: dict, now: datetime,
         # 値をそのまま保持し、約定時（数時間〜数日後）に再計算しない
         "rsi_reversal_confirmed": r.get("rsi_reversal_confirmed", False),
         "ta_score_overheated": r.get("ta_score_overheated", False),
+        "strategy_version": "profitability_v1",
+        "execution_costs": costs,
         "created_time": now.isoformat(),
         "valid_until": next_scan_time_utc(now).isoformat(),
     }
@@ -136,7 +143,7 @@ def create_pending_order(r: dict, now: datetime,
 def _is_filled(order: dict, current_price: float) -> bool:
     direction = order.get("direction", "")
     limit_price = order.get("limit_price")
-    if limit_price is None or current_price is None:
+    if not finite(limit_price) or not finite(current_price) or min(limit_price, current_price) <= 0:
         return False
     if "LONG" in direction:
         # 買い指値: 現在値が指値以下まで下がってくれば約定
@@ -160,18 +167,31 @@ def check_pending_fills(pending: dict, latest_pairs: dict, now: datetime):
         is_expired = False
         if valid_until:
             try:
-                if now > datetime.fromisoformat(valid_until):
+                expiry = datetime.fromisoformat(valid_until.replace("Z", "+00:00"))
+                if expiry.tzinfo is None:
+                    expiry = expiry.replace(tzinfo=timezone.utc)
+                if now >= expiry:
                     is_expired = True
             except Exception:
-                pass
+                is_expired = True
+        else:
+            is_expired = True
 
-        if current_price is not None and _is_filled(order, current_price):
+        # An observed quote AFTER expiry is not evidence of a fill before it.
+        # Likewise a gap through the stop cannot be called a successful entry
+        # from hourly midpoint observations; quarantine it rather than invent P&L.
+        geometry = validate_geometry(order.get("direction"), order.get("limit_price"), order.get("sl"), order.get("tp"), require_target=True)
+        sign = side(order.get("direction"))
+        through_stop = finite(current_price) and finite(order.get("sl")) and sign * (current_price - order["sl"]) <= 0
+        if is_expired or geometry or through_stop:
+            order = dict(order)
+            order["cancel_reason"] = "EXPIRED" if is_expired else (geometry or "GAP_THROUGH_STOP_UNVERIFIED")
+            expired[pair] = order
+        elif current_price is not None and _is_filled(order, current_price):
             order = dict(order)
             order["fill_price"] = current_price
             order["fill_time"] = now.isoformat()
             filled[pair] = order
-        elif is_expired:
-            expired[pair] = order
         else:
             remaining[pair] = order
 
@@ -185,6 +205,9 @@ def pending_order_to_trade(order: dict, now: datetime) -> dict:
     （SL/TPはスキャン時点の絶対価格をそのまま維持し、押し目分だけ実効RRが改善する）。
     """
     entry_price = order.get("limit_price")
+    reason = validate_geometry(order.get("direction"), entry_price, order.get("sl"), order.get("tp"), require_target=True)
+    if reason:
+        raise ValueError(reason)
     return {
         "pair": order.get("pair"),
         "entry_time": now.isoformat(),
@@ -215,4 +238,7 @@ def pending_order_to_trade(order: dict, now: datetime) -> dict:
         "entry_source": "pending_limit_order",   # 通常の成行エントリーと区別するためのフラグ
         "pending_created_time": order.get("created_time"),
         "pending_scan_price": order.get("scan_price"),
+        "strategy_version": order.get("strategy_version", "legacy_l3"),
+        "execution_costs": order.get("execution_costs") or cost_snapshot(order["pair"], now=now),
+        "fill_basis": "paper_limit_touch_unverified",
     }

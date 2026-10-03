@@ -262,7 +262,8 @@ def calc_position_size(pair: str, entry_price: float, sl_price: float,
                         pair_api: dict, latest_pairs: dict,
                         account: dict = None, open_trades: dict = None,
                         exposure_multiplier: float = 1.0,
-                        confidence_multiplier: float = 1.0) -> dict:
+                        confidence_multiplier: float = 1.0,
+                        direction: str = None, execution_costs: dict = None) -> dict:
     """
     仮想口座残高・リスク許容度・SL値幅から推奨ロット数を算出する。
 
@@ -311,8 +312,20 @@ def calc_position_size(pair: str, entry_price: float, sl_price: float,
 
     if pair not in pair_api:
         return {"tradable": False, "units": 0, "note": f"{pair}: 未対応ペア"}
-    if entry_price is None or sl_price is None:
+    from modules.profitability import finite, validate_geometry, cost_snapshot, portfolio_budget
+    if not finite(entry_price) or not finite(sl_price):
         return {"tradable": False, "units": 0, "note": "価格データ不足"}
+    direction = direction or ("LONG" if entry_price > sl_price else "SHORT")
+    invalid = validate_geometry(direction, entry_price, sl_price)
+    if invalid or not finite(balance) or balance <= 0:
+        return {"tradable": False, "units": 0, "note": invalid or "残高が不正"}
+    if (any(not finite(v) or v < 0 for v in (risk_pct, max_margin_pct, exposure_multiplier, confidence_multiplier))
+            or not finite(leverage) or leverage <= 0):
+        return {"tradable": False, "units": 0, "note": "サイジング設定が不正"}
+    costs = execution_costs or cost_snapshot(pair)
+    price_cost = costs.get("standard_price_cost")
+    if not finite(price_cost) or price_cost < 0:
+        return {"tradable": False, "units": 0, "note": "取引コストが不正"}
 
     from_ccy, to_ccy = pair_api[pair]
     sl_distance = abs(entry_price - sl_price)
@@ -327,12 +340,12 @@ def calc_position_size(pair: str, entry_price: float, sl_price: float,
     # 例: USDJPYでSL値幅0.936円 → 1USDあたり損失0.936円（TOがJPYなので直接）
     # 例: EURUSDでSL値幅0.003USD → 1EURあたり損失 = 0.003 × USDJPYレート
     if to_ccy == "JPY":
-        loss_per_unit_jpy = sl_distance
+        loss_per_unit_jpy = sl_distance + price_cost
     else:
         to_jpy_rate = from_currency_jpy_rate(to_ccy, latest_pairs)
         if to_jpy_rate is None:
             return {"tradable": False, "units": 0, "note": f"{to_ccy}の対円レート取得不可"}
-        loss_per_unit_jpy = sl_distance * to_jpy_rate
+        loss_per_unit_jpy = (sl_distance + price_cost) * to_jpy_rate
 
     if loss_per_unit_jpy <= 0:
         return {"tradable": False, "units": 0, "note": "損失単価の計算に失敗"}
@@ -340,6 +353,11 @@ def calc_position_size(pair: str, entry_price: float, sl_price: float,
     exposure_multiplier = max(0.0, min(1.0, exposure_multiplier))
     confidence_multiplier = max(0.0, min(1.0, confidence_multiplier))  # 2026-08-25: 増額を禁止
     risk_amount_jpy = balance * (risk_pct / 100.0) * exposure_multiplier * confidence_multiplier
+    budget = portfolio_budget(pair, direction, open_trades, pair_api, latest_pairs, balance)
+    risk_amount_jpy = min(risk_amount_jpy, budget["available_jpy"])
+    if risk_amount_jpy <= 0:
+        return {"tradable": False, "units": 0, "risk_amount_jpy": 0,
+                "portfolio_risk_budget": budget, "note": budget["reason"]}
     raw_units_risk = risk_amount_jpy / loss_per_unit_jpy
 
     # 証拠金ベースの上限units（既存ポジション分を差し引いた残り予算で判定）
@@ -365,6 +383,7 @@ def calc_position_size(pair: str, entry_price: float, sl_price: float,
             "margin_required_jpy": 0,
             "estimated_loss_jpy": 0,
             "existing_margin_jpy": round(existing_margin_jpy, 0),
+            "portfolio_risk_budget": budget,
             "note": (
                 f"残高不足: 最小取引単位({min_unit}{from_ccy})でも{reason}を超過"
                 f"（リスク許容¥{risk_amount_jpy:.0f} / 証拠金余力¥{available_margin_jpy:.0f}"
@@ -394,6 +413,8 @@ def calc_position_size(pair: str, entry_price: float, sl_price: float,
         "existing_margin_jpy": round(existing_margin_jpy, 0),
         "exposure_multiplier": exposure_multiplier,
         "confidence_multiplier": confidence_multiplier,
+        "portfolio_risk_budget": budget,
+        "execution_costs": costs,
         "note": (
             f"{units}{from_ccy}単位（証拠金約¥{margin_required_jpy:.0f}・"
             f"想定損失¥{estimated_loss_jpy:.0f}）{exposure_note}{confidence_note}"
