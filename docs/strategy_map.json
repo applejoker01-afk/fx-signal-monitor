@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-27T23:37:53.497837+00:00",
+  "generated_at": "2026-10-04T23:50:57.300220+00:00",
   "engine_version": "daytrade-v2",
   "execution_mode": "paper_only",
   "lookback_days": 60,
@@ -11,10 +11,10 @@
   ],
   "strategy_map": {
     "USDJPY": {
-      "status": "paper",
-      "strategy_key": "trend_breakout",
-      "strategy": "トレンド継続ブレイク",
-      "reason": "コスト控除後の全期間・最終1/3で暫定条件を通過。長期データ検証前のペーパー監視です",
+      "status": "hold",
+      "strategy_key": null,
+      "strategy": "条件未達（監視停止）",
+      "reason": "コスト控除後・最終1/3の検証条件を満たす手法がありません",
       "validation": {
         "engine_version": "daytrade-v2",
         "execution_mode": "paper_only",
@@ -22,27 +22,27 @@
         "strategies": {
           "trend_breakout": {
             "metrics": {
-              "trades": 112,
-              "wins": 57,
-              "losses": 55,
-              "time_exits": 57,
-              "total_net_pips": 294.14,
-              "net_pf": 1.2,
-              "net_expectancy_pips": 2.63,
+              "trades": 108,
+              "wins": 55,
+              "losses": 53,
+              "time_exits": 51,
+              "total_net_pips": 317.93,
+              "net_pf": 1.22,
+              "net_expectancy_pips": 2.94,
               "win_rate": 50.9,
               "max_drawdown_pips": -301.8,
               "by_session": {
                 "london": {
                   "trades": 33,
-                  "expectancy_pips": 2.48
-                },
-                "tokyo": {
-                  "trades": 47,
-                  "expectancy_pips": -0.36
+                  "expectancy_pips": 1.94
                 },
                 "overlap": {
-                  "trades": 28,
-                  "expectancy_pips": -1.97
+                  "trades": 27,
+                  "expectancy_pips": -4.09
+                },
+                "tokyo": {
+                  "trades": 44,
+                  "expectancy_pips": 1.82
                 },
                 "new_york": {
                   "trades": 4,
@@ -51,27 +51,27 @@
               }
             },
             "oos_metrics": {
-              "trades": 35,
-              "wins": 17,
-              "losses": 18,
-              "time_exits": 18,
-              "total_net_pips": 210.69,
-              "net_pf": 1.46,
-              "net_expectancy_pips": 6.02,
-              "win_rate": 48.6,
+              "trades": 32,
+              "wins": 15,
+              "losses": 17,
+              "time_exits": 14,
+              "total_net_pips": -45.81,
+              "net_pf": 0.92,
+              "net_expectancy_pips": -1.43,
+              "win_rate": 46.9,
               "max_drawdown_pips": -251.0,
               "by_session": {
+                "london": {
+                  "trades": 8,
+                  "expectancy_pips": 10.89
+                },
                 "tokyo": {
-                  "trades": 20,
-                  "expectancy_pips": 7.2
+                  "trades": 15,
+                  "expectancy_pips": 1.41
                 },
                 "overlap": {
-                  "trades": 6,
-                  "expectancy_pips": -25.62
-                },
-                "london": {
                   "trades": 7,
-                  "expectancy_pips": 18.25
+                  "expectancy_pips": -35.26
                 },
                 "new_york": {
                   "trades": 2,
@@ -79,126 +79,64 @@
                 }
               }
             },
-            "eligible": true
+            "eligible": false
           },
           "range_reversion": {
             "metrics": {
-              "trades": 62,
-              "wins": 25,
-              "losses": 37,
-              "time_exits": 4,
-              "total_net_pips": -87.01,
-              "net_pf": 0.72,
-              "net_expectancy_pips": -1.4,
-              "win_rate": 40.3,
-              "max_drawdown_pips": -122.3,
+              "trades": 65,
+              "wins": 26,
+              "losses": 39,
+              "time_exits": 3,
+              "total_net_pips": -85.81,
+              "net_pf": 0.74,
+              "net_expectancy_pips": -1.32,
+              "win_rate": 40.0,
+              "max_drawdown_pips": -138.2,
               "by_session": {
-                "london": {
-                  "trades": 23,
-                  "expectancy_pips": -4.25
-                },
-                "overlap": {
-                  "trades": 17,
-                  "expectancy_pips": 0.11
-                },
-                "tokyo": {
-                  "trades": 15,
-                  "expectancy_pips": -0.65
-                },
                 "new_york": {
                   "trades": 7,
                   "expectancy_pips": 2.66
+                },
+                "tokyo": {
+                  "trades": 17,
+                  "expectancy_pips": 1.49
+                },
+                "london": {
+                  "trades": 22,
+                  "expectancy_pips": -4.11
+                },
+                "overlap": {
+                  "trades": 19,
+                  "expectancy_pips": -2.07
                 }
               }
             },
             "oos_metrics": {
               "trades": 25,
-              "wins": 9,
-              "losses": 16,
+              "wins": 10,
+              "losses": 15,
               "time_exits": 3,
-              "total_net_pips": -43.36,
-              "net_pf": 0.71,
-              "net_expectancy_pips": -1.73,
-              "win_rate": 36.0,
-              "max_drawdown_pips": -68.9,
+              "total_net_pips": -33.42,
+              "net_pf": 0.79,
+              "net_expectancy_pips": -1.34,
+              "win_rate": 40.0,
+              "max_drawdown_pips": -70.7,
               "by_session": {
                 "overlap": {
-                  "trades": 9,
-                  "expectancy_pips": 0.28
-                },
-                "new_york": {
-                  "trades": 1,
-                  "expectancy_pips": 5.73
-                },
-                "tokyo": {
-                  "trades": 5,
-                  "expectancy_pips": 2.38
+                  "trades": 10,
+                  "expectancy_pips": -3.29
                 },
                 "london": {
-                  "trades": 10,
-                  "expectancy_pips": -6.35
+                  "trades": 8,
+                  "expectancy_pips": -6.83
+                },
+                "tokyo": {
+                  "trades": 7,
+                  "expectancy_pips": 7.73
                 }
               }
             },
             "eligible": false
-          }
-        }
-      },
-      "metrics": {
-        "trades": 112,
-        "wins": 57,
-        "losses": 55,
-        "time_exits": 57,
-        "total_net_pips": 294.14,
-        "net_pf": 1.2,
-        "net_expectancy_pips": 2.63,
-        "win_rate": 50.9,
-        "max_drawdown_pips": -301.8,
-        "by_session": {
-          "london": {
-            "trades": 33,
-            "expectancy_pips": 2.48
-          },
-          "tokyo": {
-            "trades": 47,
-            "expectancy_pips": -0.36
-          },
-          "overlap": {
-            "trades": 28,
-            "expectancy_pips": -1.97
-          },
-          "new_york": {
-            "trades": 4,
-            "expectancy_pips": 71.11
-          }
-        }
-      },
-      "oos_metrics": {
-        "trades": 35,
-        "wins": 17,
-        "losses": 18,
-        "time_exits": 18,
-        "total_net_pips": 210.69,
-        "net_pf": 1.46,
-        "net_expectancy_pips": 6.02,
-        "win_rate": 48.6,
-        "max_drawdown_pips": -251.0,
-        "by_session": {
-          "tokyo": {
-            "trades": 20,
-            "expectancy_pips": 7.2
-          },
-          "overlap": {
-            "trades": 6,
-            "expectancy_pips": -25.62
-          },
-          "london": {
-            "trades": 7,
-            "expectancy_pips": 18.25
-          },
-          "new_york": {
-            "trades": 2,
-            "expectancy_pips": 46.38
           }
         }
       },
@@ -216,56 +154,56 @@
         "strategies": {
           "trend_breakout": {
             "metrics": {
-              "trades": 111,
-              "wins": 47,
+              "trades": 113,
+              "wins": 49,
               "losses": 64,
-              "time_exits": 54,
-              "total_net_pips": -189.25,
+              "time_exits": 55,
+              "total_net_pips": -203.02,
               "net_pf": 0.76,
-              "net_expectancy_pips": -1.7,
-              "win_rate": 42.3,
-              "max_drawdown_pips": -214.7,
+              "net_expectancy_pips": -1.8,
+              "win_rate": 43.4,
+              "max_drawdown_pips": -217.2,
               "by_session": {
-                "london": {
-                  "trades": 33,
-                  "expectancy_pips": -1.31
-                },
-                "tokyo": {
-                  "trades": 37,
-                  "expectancy_pips": -1.37
-                },
                 "overlap": {
-                  "trades": 36,
-                  "expectancy_pips": -4.61
+                  "trades": 37,
+                  "expectancy_pips": -5.62
                 },
                 "new_york": {
                   "trades": 5,
                   "expectancy_pips": 14.11
+                },
+                "london": {
+                  "trades": 33,
+                  "expectancy_pips": -1.91
+                },
+                "tokyo": {
+                  "trades": 38,
+                  "expectancy_pips": -0.07
                 }
               }
             },
             "oos_metrics": {
-              "trades": 36,
-              "wins": 15,
-              "losses": 21,
+              "trades": 43,
+              "wins": 16,
+              "losses": 27,
               "time_exits": 15,
-              "total_net_pips": -63.43,
-              "net_pf": 0.76,
-              "net_expectancy_pips": -1.76,
-              "win_rate": 41.7,
-              "max_drawdown_pips": -100.8,
+              "total_net_pips": -169.47,
+              "net_pf": 0.58,
+              "net_expectancy_pips": -3.94,
+              "win_rate": 37.2,
+              "max_drawdown_pips": -169.5,
               "by_session": {
+                "london": {
+                  "trades": 14,
+                  "expectancy_pips": -2.1
+                },
                 "overlap": {
-                  "trades": 10,
-                  "expectancy_pips": -10.13
+                  "trades": 12,
+                  "expectancy_pips": -14.99
                 },
                 "tokyo": {
-                  "trades": 15,
-                  "expectancy_pips": 0.3
-                },
-                "london": {
-                  "trades": 10,
-                  "expectancy_pips": 0.17
+                  "trades": 16,
+                  "expectancy_pips": 0.5
                 },
                 "new_york": {
                   "trades": 1,
@@ -277,56 +215,56 @@
           },
           "range_reversion": {
             "metrics": {
-              "trades": 43,
-              "wins": 9,
-              "losses": 34,
+              "trades": 41,
+              "wins": 10,
+              "losses": 31,
               "time_exits": 2,
-              "total_net_pips": -107.95,
-              "net_pf": 0.23,
-              "net_expectancy_pips": -2.51,
-              "win_rate": 20.9,
-              "max_drawdown_pips": -117.2,
+              "total_net_pips": -92.87,
+              "net_pf": 0.28,
+              "net_expectancy_pips": -2.27,
+              "win_rate": 24.4,
+              "max_drawdown_pips": -97.3,
               "by_session": {
-                "tokyo": {
-                  "trades": 20,
-                  "expectancy_pips": -1.29
-                },
-                "new_york": {
-                  "trades": 4,
-                  "expectancy_pips": -4.33
-                },
                 "london": {
                   "trades": 11,
-                  "expectancy_pips": -4.05
+                  "expectancy_pips": -3.55
+                },
+                "tokyo": {
+                  "trades": 19,
+                  "expectancy_pips": -1.11
                 },
                 "overlap": {
                   "trades": 8,
-                  "expectancy_pips": -2.55
+                  "expectancy_pips": -2.34
+                },
+                "new_york": {
+                  "trades": 3,
+                  "expectancy_pips": -4.66
                 }
               }
             },
             "oos_metrics": {
-              "trades": 16,
-              "wins": 5,
-              "losses": 11,
-              "time_exits": 1,
-              "total_net_pips": -31.84,
-              "net_pf": 0.39,
-              "net_expectancy_pips": -1.99,
-              "win_rate": 31.2,
-              "max_drawdown_pips": -41.0,
+              "trades": 13,
+              "wins": 4,
+              "losses": 9,
+              "time_exits": 0,
+              "total_net_pips": -29.05,
+              "net_pf": 0.36,
+              "net_expectancy_pips": -2.23,
+              "win_rate": 30.8,
+              "max_drawdown_pips": -33.4,
               "by_session": {
-                "london": {
-                  "trades": 2,
-                  "expectancy_pips": -3.27
+                "tokyo": {
+                  "trades": 6,
+                  "expectancy_pips": -1.79
                 },
                 "overlap": {
-                  "trades": 5,
-                  "expectancy_pips": -2.42
+                  "trades": 4,
+                  "expectancy_pips": -3.03
                 },
-                "tokyo": {
-                  "trades": 9,
-                  "expectancy_pips": -1.46
+                "london": {
+                  "trades": 3,
+                  "expectancy_pips": -2.06
                 }
               }
             },
@@ -337,10 +275,10 @@
       "alert_eligible": false
     },
     "GBPJPY": {
-      "status": "paper",
-      "strategy_key": "trend_breakout",
-      "strategy": "トレンド継続ブレイク",
-      "reason": "コスト控除後の全期間・最終1/3で暫定条件を通過。長期データ検証前のペーパー監視です",
+      "status": "hold",
+      "strategy_key": null,
+      "strategy": "条件未達（監視停止）",
+      "reason": "コスト控除後・最終1/3の検証条件を満たす手法がありません",
       "validation": {
         "engine_version": "daytrade-v2",
         "execution_mode": "paper_only",
@@ -348,183 +286,125 @@
         "strategies": {
           "trend_breakout": {
             "metrics": {
-              "trades": 105,
-              "wins": 45,
-              "losses": 60,
-              "time_exits": 64,
-              "total_net_pips": 183.33,
-              "net_pf": 1.11,
-              "net_expectancy_pips": 1.75,
-              "win_rate": 42.9,
+              "trades": 106,
+              "wins": 48,
+              "losses": 58,
+              "time_exits": 65,
+              "total_net_pips": 224.32,
+              "net_pf": 1.13,
+              "net_expectancy_pips": 2.12,
+              "win_rate": 45.3,
               "max_drawdown_pips": -275.6,
               "by_session": {
                 "london": {
-                  "trades": 34,
-                  "expectancy_pips": -1.06
+                  "trades": 35,
+                  "expectancy_pips": -1.24
                 },
                 "overlap": {
-                  "trades": 26,
-                  "expectancy_pips": 2.51
+                  "trades": 25,
+                  "expectancy_pips": 0.76
                 },
                 "tokyo": {
                   "trades": 37,
-                  "expectancy_pips": -1.36
+                  "expectancy_pips": 1.89
                 },
                 "new_york": {
-                  "trades": 8,
-                  "expectancy_pips": 25.52
+                  "trades": 9,
+                  "expectancy_pips": 19.9
                 }
               }
             },
             "oos_metrics": {
-              "trades": 37,
-              "wins": 19,
+              "trades": 34,
+              "wins": 16,
               "losses": 18,
-              "time_exits": 21,
-              "total_net_pips": 194.45,
-              "net_pf": 1.33,
-              "net_expectancy_pips": 5.26,
-              "win_rate": 51.4,
+              "time_exits": 19,
+              "total_net_pips": -116.96,
+              "net_pf": 0.81,
+              "net_expectancy_pips": -3.44,
+              "win_rate": 47.1,
               "max_drawdown_pips": -275.6,
               "by_session": {
-                "tokyo": {
-                  "trades": 18,
-                  "expectancy_pips": 12.57
-                },
                 "london": {
                   "trades": 11,
-                  "expectancy_pips": 2.99
+                  "expectancy_pips": -6.37
+                },
+                "tokyo": {
+                  "trades": 15,
+                  "expectancy_pips": 4.86
                 },
                 "overlap": {
                   "trades": 5,
-                  "expectancy_pips": -8.94
+                  "expectancy_pips": -19.03
                 },
                 "new_york": {
                   "trades": 3,
-                  "expectancy_pips": -6.66
-                }
-              }
-            },
-            "eligible": true
-          },
-          "range_reversion": {
-            "metrics": {
-              "trades": 55,
-              "wins": 22,
-              "losses": 33,
-              "time_exits": 0,
-              "total_net_pips": -76.41,
-              "net_pf": 0.75,
-              "net_expectancy_pips": -1.39,
-              "win_rate": 40.0,
-              "max_drawdown_pips": -119.2,
-              "by_session": {
-                "london": {
-                  "trades": 18,
-                  "expectancy_pips": -3.3
-                },
-                "overlap": {
-                  "trades": 19,
-                  "expectancy_pips": -1.04
-                },
-                "tokyo": {
-                  "trades": 12,
-                  "expectancy_pips": 2.7
-                },
-                "new_york": {
-                  "trades": 6,
-                  "expectancy_pips": -4.96
-                }
-              }
-            },
-            "oos_metrics": {
-              "trades": 16,
-              "wins": 7,
-              "losses": 9,
-              "time_exits": 0,
-              "total_net_pips": 9.32,
-              "net_pf": 1.1,
-              "net_expectancy_pips": 0.58,
-              "win_rate": 43.8,
-              "max_drawdown_pips": -70.8,
-              "by_session": {
-                "tokyo": {
-                  "trades": 2,
-                  "expectancy_pips": 13.62
-                },
-                "overlap": {
-                  "trades": 5,
-                  "expectancy_pips": 5.53
-                },
-                "london": {
-                  "trades": 6,
-                  "expectancy_pips": -5.96
-                },
-                "new_york": {
-                  "trades": 3,
-                  "expectancy_pips": -3.28
+                  "expectancy_pips": -8.22
                 }
               }
             },
             "eligible": false
-          }
-        }
-      },
-      "metrics": {
-        "trades": 105,
-        "wins": 45,
-        "losses": 60,
-        "time_exits": 64,
-        "total_net_pips": 183.33,
-        "net_pf": 1.11,
-        "net_expectancy_pips": 1.75,
-        "win_rate": 42.9,
-        "max_drawdown_pips": -275.6,
-        "by_session": {
-          "london": {
-            "trades": 34,
-            "expectancy_pips": -1.06
           },
-          "overlap": {
-            "trades": 26,
-            "expectancy_pips": 2.51
-          },
-          "tokyo": {
-            "trades": 37,
-            "expectancy_pips": -1.36
-          },
-          "new_york": {
-            "trades": 8,
-            "expectancy_pips": 25.52
-          }
-        }
-      },
-      "oos_metrics": {
-        "trades": 37,
-        "wins": 19,
-        "losses": 18,
-        "time_exits": 21,
-        "total_net_pips": 194.45,
-        "net_pf": 1.33,
-        "net_expectancy_pips": 5.26,
-        "win_rate": 51.4,
-        "max_drawdown_pips": -275.6,
-        "by_session": {
-          "tokyo": {
-            "trades": 18,
-            "expectancy_pips": 12.57
-          },
-          "london": {
-            "trades": 11,
-            "expectancy_pips": 2.99
-          },
-          "overlap": {
-            "trades": 5,
-            "expectancy_pips": -8.94
-          },
-          "new_york": {
-            "trades": 3,
-            "expectancy_pips": -6.66
+          "range_reversion": {
+            "metrics": {
+              "trades": 55,
+              "wins": 21,
+              "losses": 34,
+              "time_exits": 0,
+              "total_net_pips": -129.83,
+              "net_pf": 0.62,
+              "net_expectancy_pips": -2.36,
+              "win_rate": 38.2,
+              "max_drawdown_pips": -129.8,
+              "by_session": {
+                "london": {
+                  "trades": 17,
+                  "expectancy_pips": -6.16
+                },
+                "tokyo": {
+                  "trades": 13,
+                  "expectancy_pips": 1.94
+                },
+                "overlap": {
+                  "trades": 18,
+                  "expectancy_pips": -1.55
+                },
+                "new_york": {
+                  "trades": 7,
+                  "expectancy_pips": -3.22
+                }
+              }
+            },
+            "oos_metrics": {
+              "trades": 22,
+              "wins": 8,
+              "losses": 14,
+              "time_exits": 0,
+              "total_net_pips": -46.81,
+              "net_pf": 0.69,
+              "net_expectancy_pips": -2.13,
+              "win_rate": 36.4,
+              "max_drawdown_pips": -91.4,
+              "by_session": {
+                "overlap": {
+                  "trades": 7,
+                  "expectancy_pips": -0.53
+                },
+                "london": {
+                  "trades": 8,
+                  "expectancy_pips": -6.97
+                },
+                "new_york": {
+                  "trades": 4,
+                  "expectancy_pips": -0.66
+                },
+                "tokyo": {
+                  "trades": 3,
+                  "expectancy_pips": 5.11
+                }
+              }
+            },
+            "eligible": false
           }
         }
       },
@@ -542,60 +422,60 @@
         "strategies": {
           "trend_breakout": {
             "metrics": {
-              "trades": 92,
+              "trades": 94,
               "wins": 35,
-              "losses": 57,
-              "time_exits": 56,
-              "total_net_pips": -205.37,
-              "net_pf": 0.79,
-              "net_expectancy_pips": -2.23,
-              "win_rate": 38.0,
-              "max_drawdown_pips": -213.3,
+              "losses": 59,
+              "time_exits": 55,
+              "total_net_pips": -263.46,
+              "net_pf": 0.76,
+              "net_expectancy_pips": -2.8,
+              "win_rate": 37.2,
+              "max_drawdown_pips": -278.0,
               "by_session": {
-                "overlap": {
-                  "trades": 24,
-                  "expectancy_pips": -7.72
-                },
-                "tokyo": {
-                  "trades": 40,
-                  "expectancy_pips": 0.51
-                },
                 "london": {
                   "trades": 20,
-                  "expectancy_pips": -6.4
+                  "expectancy_pips": -6.08
+                },
+                "overlap": {
+                  "trades": 25,
+                  "expectancy_pips": -9.27
                 },
                 "new_york": {
                   "trades": 8,
-                  "expectancy_pips": 10.92
+                  "expectancy_pips": 10.18
+                },
+                "tokyo": {
+                  "trades": 41,
+                  "expectancy_pips": 0.2
                 }
               }
             },
             "oos_metrics": {
               "trades": 34,
-              "wins": 12,
-              "losses": 22,
-              "time_exits": 18,
-              "total_net_pips": -112.52,
-              "net_pf": 0.74,
-              "net_expectancy_pips": -3.31,
-              "win_rate": 35.3,
-              "max_drawdown_pips": -213.3,
+              "wins": 11,
+              "losses": 23,
+              "time_exits": 19,
+              "total_net_pips": -206.63,
+              "net_pf": 0.55,
+              "net_expectancy_pips": -6.08,
+              "win_rate": 32.4,
+              "max_drawdown_pips": -278.0,
               "by_session": {
-                "tokyo": {
-                  "trades": 15,
-                  "expectancy_pips": 1.71
-                },
                 "london": {
                   "trades": 8,
-                  "expectancy_pips": -6.14
+                  "expectancy_pips": 3.3
+                },
+                "tokyo": {
+                  "trades": 14,
+                  "expectancy_pips": -9.51
                 },
                 "overlap": {
-                  "trades": 7,
-                  "expectancy_pips": -11.39
+                  "trades": 9,
+                  "expectancy_pips": -10.32
                 },
                 "new_york": {
-                  "trades": 4,
-                  "expectancy_pips": -2.31
+                  "trades": 3,
+                  "expectancy_pips": -2.35
                 }
               }
             },
@@ -603,60 +483,60 @@
           },
           "range_reversion": {
             "metrics": {
-              "trades": 89,
-              "wins": 31,
-              "losses": 58,
-              "time_exits": 5,
-              "total_net_pips": -137.31,
-              "net_pf": 0.62,
-              "net_expectancy_pips": -1.54,
-              "win_rate": 34.8,
-              "max_drawdown_pips": -142.3,
+              "trades": 83,
+              "wins": 29,
+              "losses": 54,
+              "time_exits": 6,
+              "total_net_pips": -116.83,
+              "net_pf": 0.65,
+              "net_expectancy_pips": -1.41,
+              "win_rate": 34.9,
+              "max_drawdown_pips": -127.3,
               "by_session": {
                 "london": {
-                  "trades": 27,
-                  "expectancy_pips": -2.24
+                  "trades": 22,
+                  "expectancy_pips": -2.49
                 },
                 "overlap": {
                   "trades": 33,
-                  "expectancy_pips": -0.97
+                  "expectancy_pips": -0.84
                 },
                 "tokyo": {
-                  "trades": 22,
-                  "expectancy_pips": -2.3
+                  "trades": 21,
+                  "expectancy_pips": -2.04
                 },
                 "new_york": {
                   "trades": 7,
-                  "expectancy_pips": 0.84
+                  "expectancy_pips": 1.24
                 }
               }
             },
             "oos_metrics": {
-              "trades": 19,
+              "trades": 18,
               "wins": 7,
-              "losses": 12,
+              "losses": 11,
               "time_exits": 1,
-              "total_net_pips": -26.87,
-              "net_pf": 0.64,
-              "net_expectancy_pips": -1.41,
-              "win_rate": 36.8,
-              "max_drawdown_pips": -32.3,
+              "total_net_pips": -15.7,
+              "net_pf": 0.77,
+              "net_expectancy_pips": -0.87,
+              "win_rate": 38.9,
+              "max_drawdown_pips": -25.2,
               "by_session": {
                 "overlap": {
-                  "trades": 6,
-                  "expectancy_pips": -0.94
+                  "trades": 5,
+                  "expectancy_pips": 0.8
                 },
                 "tokyo": {
-                  "trades": 7,
-                  "expectancy_pips": -1.25
+                  "trades": 6,
+                  "expectancy_pips": -0.49
                 },
                 "london": {
                   "trades": 3,
                   "expectancy_pips": 1.36
                 },
                 "new_york": {
-                  "trades": 3,
-                  "expectancy_pips": -5.51
+                  "trades": 4,
+                  "expectancy_pips": -5.21
                 }
               }
             },
@@ -678,60 +558,60 @@
         "strategies": {
           "trend_breakout": {
             "metrics": {
-              "trades": 99,
-              "wins": 42,
-              "losses": 57,
-              "time_exits": 51,
-              "total_net_pips": 31.65,
-              "net_pf": 1.02,
-              "net_expectancy_pips": 0.32,
-              "win_rate": 42.4,
+              "trades": 102,
+              "wins": 43,
+              "losses": 59,
+              "time_exits": 53,
+              "total_net_pips": 62.16,
+              "net_pf": 1.04,
+              "net_expectancy_pips": 0.61,
+              "win_rate": 42.2,
               "max_drawdown_pips": -343.0,
               "by_session": {
-                "tokyo": {
-                  "trades": 37,
-                  "expectancy_pips": -1.05
-                },
-                "overlap": {
-                  "trades": 25,
-                  "expectancy_pips": -4.46
-                },
-                "london": {
-                  "trades": 28,
-                  "expectancy_pips": -2.46
-                },
                 "new_york": {
                   "trades": 9,
                   "expectancy_pips": 27.9
+                },
+                "tokyo": {
+                  "trades": 37,
+                  "expectancy_pips": 1.36
+                },
+                "london": {
+                  "trades": 30,
+                  "expectancy_pips": -1.52
+                },
+                "overlap": {
+                  "trades": 26,
+                  "expectancy_pips": -7.44
                 }
               }
             },
             "oos_metrics": {
-              "trades": 37,
-              "wins": 18,
+              "trades": 36,
+              "wins": 17,
               "losses": 19,
               "time_exits": 19,
-              "total_net_pips": 120.64,
-              "net_pf": 1.21,
-              "net_expectancy_pips": 3.26,
-              "win_rate": 48.6,
-              "max_drawdown_pips": -236.3,
+              "total_net_pips": 23.34,
+              "net_pf": 1.04,
+              "net_expectancy_pips": 0.65,
+              "win_rate": 47.2,
+              "max_drawdown_pips": -235.2,
               "by_session": {
-                "overlap": {
-                  "trades": 9,
-                  "expectancy_pips": -19.65
-                },
-                "tokyo": {
-                  "trades": 16,
-                  "expectancy_pips": 11.32
+                "london": {
+                  "trades": 10,
+                  "expectancy_pips": 7.85
                 },
                 "new_york": {
-                  "trades": 4,
-                  "expectancy_pips": -1.44
+                  "trades": 3,
+                  "expectancy_pips": 9.73
                 },
-                "london": {
-                  "trades": 8,
-                  "expectancy_pips": 15.27
+                "tokyo": {
+                  "trades": 13,
+                  "expectancy_pips": 9.92
+                },
+                "overlap": {
+                  "trades": 10,
+                  "expectancy_pips": -21.34
                 }
               }
             },
@@ -739,27 +619,27 @@
           },
           "range_reversion": {
             "metrics": {
-              "trades": 75,
-              "wins": 20,
-              "losses": 55,
-              "time_exits": 1,
-              "total_net_pips": -287.77,
-              "net_pf": 0.32,
-              "net_expectancy_pips": -3.84,
-              "win_rate": 26.7,
-              "max_drawdown_pips": -295.5,
+              "trades": 73,
+              "wins": 19,
+              "losses": 54,
+              "time_exits": 2,
+              "total_net_pips": -290.94,
+              "net_pf": 0.31,
+              "net_expectancy_pips": -3.99,
+              "win_rate": 26.0,
+              "max_drawdown_pips": -303.8,
               "by_session": {
+                "tokyo": {
+                  "trades": 26,
+                  "expectancy_pips": -2.44
+                },
                 "overlap": {
                   "trades": 19,
-                  "expectancy_pips": -3.64
+                  "expectancy_pips": -3.14
                 },
                 "london": {
-                  "trades": 19,
-                  "expectancy_pips": -5.52
-                },
-                "tokyo": {
-                  "trades": 24,
-                  "expectancy_pips": -2.67
+                  "trades": 15,
+                  "expectancy_pips": -7.88
                 },
                 "new_york": {
                   "trades": 13,
@@ -768,31 +648,31 @@
               }
             },
             "oos_metrics": {
-              "trades": 27,
-              "wins": 3,
-              "losses": 24,
-              "time_exits": 0,
-              "total_net_pips": -212.46,
-              "net_pf": 0.12,
-              "net_expectancy_pips": -7.87,
-              "win_rate": 11.1,
-              "max_drawdown_pips": -221.4,
+              "trades": 25,
+              "wins": 4,
+              "losses": 21,
+              "time_exits": 1,
+              "total_net_pips": -187.8,
+              "net_pf": 0.15,
+              "net_expectancy_pips": -7.51,
+              "win_rate": 16.0,
+              "max_drawdown_pips": -192.2,
               "by_session": {
-                "london": {
-                  "trades": 8,
-                  "expectancy_pips": -10.16
-                },
-                "overlap": {
-                  "trades": 8,
-                  "expectancy_pips": -8.33
-                },
                 "tokyo": {
                   "trades": 8,
-                  "expectancy_pips": -5.28
+                  "expectancy_pips": -3.83
+                },
+                "london": {
+                  "trades": 6,
+                  "expectancy_pips": -12.95
+                },
+                "overlap": {
+                  "trades": 9,
+                  "expectancy_pips": -6.96
                 },
                 "new_york": {
-                  "trades": 3,
-                  "expectancy_pips": -7.43
+                  "trades": 2,
+                  "expectancy_pips": -8.41
                 }
               }
             },
@@ -814,56 +694,56 @@
         "strategies": {
           "trend_breakout": {
             "metrics": {
-              "trades": 129,
-              "wins": 50,
-              "losses": 79,
+              "trades": 133,
+              "wins": 48,
+              "losses": 85,
               "time_exits": 72,
-              "total_net_pips": -212.56,
-              "net_pf": 0.68,
-              "net_expectancy_pips": -1.65,
-              "win_rate": 38.8,
-              "max_drawdown_pips": -223.4,
+              "total_net_pips": -321.89,
+              "net_pf": 0.58,
+              "net_expectancy_pips": -2.42,
+              "win_rate": 36.1,
+              "max_drawdown_pips": -321.9,
               "by_session": {
-                "london": {
-                  "trades": 27,
-                  "expectancy_pips": 2.51
-                },
-                "tokyo": {
-                  "trades": 56,
-                  "expectancy_pips": -1.78
-                },
                 "overlap": {
-                  "trades": 41,
-                  "expectancy_pips": -4.32
+                  "trades": 43,
+                  "expectancy_pips": -5.33
                 },
                 "new_york": {
                   "trades": 5,
                   "expectancy_pips": -0.72
+                },
+                "tokyo": {
+                  "trades": 56,
+                  "expectancy_pips": -2.18
+                },
+                "london": {
+                  "trades": 29,
+                  "expectancy_pips": 1.14
                 }
               }
             },
             "oos_metrics": {
-              "trades": 50,
-              "wins": 18,
-              "losses": 32,
-              "time_exits": 23,
-              "total_net_pips": -131.08,
-              "net_pf": 0.59,
-              "net_expectancy_pips": -2.62,
-              "win_rate": 36.0,
-              "max_drawdown_pips": -131.1,
+              "trades": 51,
+              "wins": 15,
+              "losses": 36,
+              "time_exits": 28,
+              "total_net_pips": -198.58,
+              "net_pf": 0.43,
+              "net_expectancy_pips": -3.89,
+              "win_rate": 29.4,
+              "max_drawdown_pips": -198.6,
               "by_session": {
-                "tokyo": {
-                  "trades": 22,
-                  "expectancy_pips": -2.29
-                },
                 "london": {
-                  "trades": 9,
-                  "expectancy_pips": 0.9
+                  "trades": 10,
+                  "expectancy_pips": -3.15
                 },
                 "overlap": {
-                  "trades": 17,
-                  "expectancy_pips": -6.62
+                  "trades": 18,
+                  "expectancy_pips": -7.44
+                },
+                "tokyo": {
+                  "trades": 21,
+                  "expectancy_pips": -2.71
                 },
                 "new_york": {
                   "trades": 2,
@@ -879,48 +759,48 @@
               "wins": 15,
               "losses": 24,
               "time_exits": 0,
-              "total_net_pips": -52.19,
-              "net_pf": 0.43,
-              "net_expectancy_pips": -1.34,
+              "total_net_pips": -63.33,
+              "net_pf": 0.39,
+              "net_expectancy_pips": -1.62,
               "win_rate": 38.5,
-              "max_drawdown_pips": -53.3,
+              "max_drawdown_pips": -69.7,
               "by_session": {
-                "tokyo": {
-                  "trades": 22,
-                  "expectancy_pips": -1.62
-                },
-                "overlap": {
-                  "trades": 5,
-                  "expectancy_pips": -2.11
-                },
                 "london": {
                   "trades": 12,
                   "expectancy_pips": -0.49
+                },
+                "tokyo": {
+                  "trades": 22,
+                  "expectancy_pips": -1.99
+                },
+                "overlap": {
+                  "trades": 5,
+                  "expectancy_pips": -2.71
                 }
               }
             },
             "oos_metrics": {
-              "trades": 14,
-              "wins": 7,
+              "trades": 11,
+              "wins": 4,
               "losses": 7,
               "time_exits": 0,
-              "total_net_pips": -11.14,
-              "net_pf": 0.58,
-              "net_expectancy_pips": -0.8,
-              "win_rate": 50.0,
-              "max_drawdown_pips": -15.3,
+              "total_net_pips": -27.67,
+              "net_pf": 0.26,
+              "net_expectancy_pips": -2.52,
+              "win_rate": 36.4,
+              "max_drawdown_pips": -33.4,
               "by_session": {
-                "london": {
-                  "trades": 4,
-                  "expectancy_pips": -1.27
+                "overlap": {
+                  "trades": 3,
+                  "expectancy_pips": -1.85
                 },
                 "tokyo": {
-                  "trades": 8,
-                  "expectancy_pips": -0.98
+                  "trades": 6,
+                  "expectancy_pips": -3.37
                 },
-                "overlap": {
+                "london": {
                   "trades": 2,
-                  "expectancy_pips": 0.9
+                  "expectancy_pips": -0.96
                 }
               }
             },
@@ -942,56 +822,56 @@
         "strategies": {
           "trend_breakout": {
             "metrics": {
-              "trades": 120,
+              "trades": 121,
               "wins": 49,
-              "losses": 71,
-              "time_exits": 56,
-              "total_net_pips": -123.85,
-              "net_pf": 0.88,
-              "net_expectancy_pips": -1.03,
-              "win_rate": 40.8,
+              "losses": 72,
+              "time_exits": 60,
+              "total_net_pips": -131.78,
+              "net_pf": 0.86,
+              "net_expectancy_pips": -1.09,
+              "win_rate": 40.5,
               "max_drawdown_pips": -269.8,
               "by_session": {
-                "london": {
-                  "trades": 41,
-                  "expectancy_pips": 1.12
-                },
-                "tokyo": {
-                  "trades": 36,
-                  "expectancy_pips": -3.19
-                },
                 "overlap": {
-                  "trades": 38,
-                  "expectancy_pips": -2.23
+                  "trades": 39,
+                  "expectancy_pips": -2.36
                 },
                 "new_york": {
                   "trades": 5,
                   "expectancy_pips": 5.93
+                },
+                "tokyo": {
+                  "trades": 36,
+                  "expectancy_pips": -1.9
+                },
+                "london": {
+                  "trades": 41,
+                  "expectancy_pips": -0.02
                 }
               }
             },
             "oos_metrics": {
-              "trades": 38,
-              "wins": 14,
-              "losses": 24,
-              "time_exits": 16,
-              "total_net_pips": -51.5,
-              "net_pf": 0.83,
-              "net_expectancy_pips": -1.36,
-              "win_rate": 36.8,
-              "max_drawdown_pips": -141.3,
+              "trades": 41,
+              "wins": 18,
+              "losses": 23,
+              "time_exits": 18,
+              "total_net_pips": -61.96,
+              "net_pf": 0.82,
+              "net_expectancy_pips": -1.51,
+              "win_rate": 43.9,
+              "max_drawdown_pips": -89.4,
               "by_session": {
-                "tokyo": {
-                  "trades": 13,
-                  "expectancy_pips": -2.99
-                },
                 "london": {
-                  "trades": 13,
-                  "expectancy_pips": 1.14
+                  "trades": 14,
+                  "expectancy_pips": 0.96
                 },
                 "overlap": {
-                  "trades": 11,
-                  "expectancy_pips": -5.02
+                  "trades": 13,
+                  "expectancy_pips": -9.71
+                },
+                "tokyo": {
+                  "trades": 13,
+                  "expectancy_pips": 1.77
                 },
                 "new_york": {
                   "trades": 1,
@@ -1003,27 +883,27 @@
           },
           "range_reversion": {
             "metrics": {
-              "trades": 42,
+              "trades": 44,
               "wins": 8,
-              "losses": 34,
+              "losses": 36,
               "time_exits": 1,
-              "total_net_pips": -133.83,
-              "net_pf": 0.21,
-              "net_expectancy_pips": -3.19,
-              "win_rate": 19.0,
-              "max_drawdown_pips": -146.6,
+              "total_net_pips": -153.22,
+              "net_pf": 0.17,
+              "net_expectancy_pips": -3.48,
+              "win_rate": 18.2,
+              "max_drawdown_pips": -153.2,
               "by_session": {
-                "london": {
-                  "trades": 11,
-                  "expectancy_pips": -4.62
-                },
-                "overlap": {
-                  "trades": 14,
-                  "expectancy_pips": -2.29
-                },
                 "tokyo": {
                   "trades": 13,
-                  "expectancy_pips": -3.57
+                  "expectancy_pips": -3.14
+                },
+                "overlap": {
+                  "trades": 16,
+                  "expectancy_pips": -2.83
+                },
+                "london": {
+                  "trades": 11,
+                  "expectancy_pips": -5.68
                 },
                 "new_york": {
                   "trades": 4,
@@ -1032,27 +912,27 @@
               }
             },
             "oos_metrics": {
-              "trades": 15,
+              "trades": 13,
               "wins": 2,
-              "losses": 13,
+              "losses": 11,
               "time_exits": 1,
-              "total_net_pips": -56.87,
-              "net_pf": 0.12,
-              "net_expectancy_pips": -3.79,
-              "win_rate": 13.3,
-              "max_drawdown_pips": -64.6,
+              "total_net_pips": -46.69,
+              "net_pf": 0.15,
+              "net_expectancy_pips": -3.59,
+              "win_rate": 15.4,
+              "max_drawdown_pips": -46.7,
               "by_session": {
-                "overlap": {
-                  "trades": 6,
-                  "expectancy_pips": -1.62
-                },
                 "tokyo": {
                   "trades": 5,
-                  "expectancy_pips": -4.12
+                  "expectancy_pips": -2.94
+                },
+                "overlap": {
+                  "trades": 6,
+                  "expectancy_pips": -3.5
                 },
                 "london": {
-                  "trades": 4,
-                  "expectancy_pips": -6.65
+                  "trades": 2,
+                  "expectancy_pips": -5.49
                 }
               }
             },
@@ -1074,27 +954,27 @@
         "strategies": {
           "trend_breakout": {
             "metrics": {
-              "trades": 75,
-              "wins": 39,
-              "losses": 36,
-              "time_exits": 49,
-              "total_net_pips": -77.74,
-              "net_pf": 0.86,
-              "net_expectancy_pips": -1.04,
-              "win_rate": 52.0,
-              "max_drawdown_pips": -151.6,
+              "trades": 74,
+              "wins": 40,
+              "losses": 34,
+              "time_exits": 50,
+              "total_net_pips": -94.79,
+              "net_pf": 0.83,
+              "net_expectancy_pips": -1.28,
+              "win_rate": 54.1,
+              "max_drawdown_pips": -149.6,
               "by_session": {
+                "overlap": {
+                  "trades": 33,
+                  "expectancy_pips": -0.88
+                },
                 "london": {
-                  "trades": 19,
-                  "expectancy_pips": -1.58
+                  "trades": 16,
+                  "expectancy_pips": -1.93
                 },
                 "tokyo": {
                   "trades": 23,
-                  "expectancy_pips": -2.84
-                },
-                "overlap": {
-                  "trades": 31,
-                  "expectancy_pips": -0.92
+                  "expectancy_pips": -3.51
                 },
                 "new_york": {
                   "trades": 2,
@@ -1103,27 +983,27 @@
               }
             },
             "oos_metrics": {
-              "trades": 28,
-              "wins": 17,
+              "trades": 25,
+              "wins": 14,
               "losses": 11,
-              "time_exits": 23,
-              "total_net_pips": 17.89,
-              "net_pf": 1.14,
-              "net_expectancy_pips": 0.64,
-              "win_rate": 60.7,
-              "max_drawdown_pips": -59.6,
+              "time_exits": 18,
+              "total_net_pips": -17.62,
+              "net_pf": 0.88,
+              "net_expectancy_pips": -0.7,
+              "win_rate": 56.0,
+              "max_drawdown_pips": -49.5,
               "by_session": {
-                "london": {
-                  "trades": 7,
-                  "expectancy_pips": 6.88
+                "tokyo": {
+                  "trades": 8,
+                  "expectancy_pips": -4.03
                 },
                 "overlap": {
                   "trades": 10,
-                  "expectancy_pips": -2.36
+                  "expectancy_pips": -1.59
                 },
-                "tokyo": {
-                  "trades": 10,
-                  "expectancy_pips": -3.22
+                "london": {
+                  "trades": 6,
+                  "expectancy_pips": 0.85
                 },
                 "new_york": {
                   "trades": 1,
@@ -1135,60 +1015,60 @@
           },
           "range_reversion": {
             "metrics": {
-              "trades": 43,
-              "wins": 21,
-              "losses": 22,
+              "trades": 47,
+              "wins": 23,
+              "losses": 24,
               "time_exits": 0,
-              "total_net_pips": -69.98,
-              "net_pf": 0.54,
-              "net_expectancy_pips": -1.63,
-              "win_rate": 48.8,
+              "total_net_pips": -84.85,
+              "net_pf": 0.5,
+              "net_expectancy_pips": -1.81,
+              "win_rate": 48.9,
               "max_drawdown_pips": -94.6,
               "by_session": {
-                "overlap": {
-                  "trades": 14,
-                  "expectancy_pips": -2.62
-                },
                 "london": {
-                  "trades": 13,
-                  "expectancy_pips": -0.39
+                  "trades": 12,
+                  "expectancy_pips": -0.87
                 },
                 "new_york": {
                   "trades": 7,
                   "expectancy_pips": -2.74
                 },
+                "overlap": {
+                  "trades": 14,
+                  "expectancy_pips": -3.69
+                },
                 "tokyo": {
-                  "trades": 9,
-                  "expectancy_pips": -1.0
+                  "trades": 14,
+                  "expectancy_pips": -0.26
                 }
               }
             },
             "oos_metrics": {
-              "trades": 17,
-              "wins": 12,
-              "losses": 5,
+              "trades": 20,
+              "wins": 14,
+              "losses": 6,
               "time_exits": 0,
-              "total_net_pips": 7.54,
-              "net_pf": 1.23,
-              "net_expectancy_pips": 0.44,
-              "win_rate": 70.6,
-              "max_drawdown_pips": -23.2,
+              "total_net_pips": 2.25,
+              "net_pf": 1.05,
+              "net_expectancy_pips": 0.11,
+              "win_rate": 70.0,
+              "max_drawdown_pips": -17.3,
               "by_session": {
-                "london": {
-                  "trades": 8,
-                  "expectancy_pips": 1.31
-                },
-                "overlap": {
-                  "trades": 2,
-                  "expectancy_pips": -8.86
-                },
                 "new_york": {
                   "trades": 3,
                   "expectancy_pips": 1.48
                 },
+                "overlap": {
+                  "trades": 3,
+                  "expectancy_pips": -7.85
+                },
                 "tokyo": {
-                  "trades": 4,
-                  "expectancy_pips": 2.58
+                  "trades": 9,
+                  "expectancy_pips": 1.75
+                },
+                "london": {
+                  "trades": 5,
+                  "expectancy_pips": 1.13
                 }
               }
             },
@@ -1211,55 +1091,55 @@
           "trend_breakout": {
             "metrics": {
               "trades": 100,
-              "wins": 44,
-              "losses": 56,
-              "time_exits": 61,
-              "total_net_pips": -31.51,
-              "net_pf": 0.95,
-              "net_expectancy_pips": -0.32,
-              "win_rate": 44.0,
-              "max_drawdown_pips": -139.6,
+              "wins": 46,
+              "losses": 54,
+              "time_exits": 62,
+              "total_net_pips": -7.19,
+              "net_pf": 0.99,
+              "net_expectancy_pips": -0.07,
+              "win_rate": 46.0,
+              "max_drawdown_pips": -191.7,
               "by_session": {
                 "london": {
                   "trades": 30,
-                  "expectancy_pips": 0.31
-                },
-                "tokyo": {
-                  "trades": 30,
-                  "expectancy_pips": -2.37
+                  "expectancy_pips": -0.87
                 },
                 "overlap": {
                   "trades": 36,
-                  "expectancy_pips": -0.24
+                  "expectancy_pips": -0.41
                 },
                 "new_york": {
                   "trades": 4,
                   "expectancy_pips": 9.75
+                },
+                "tokyo": {
+                  "trades": 30,
+                  "expectancy_pips": -0.17
                 }
               }
             },
             "oos_metrics": {
               "trades": 31,
-              "wins": 11,
-              "losses": 20,
-              "time_exits": 19,
-              "total_net_pips": -112.91,
-              "net_pf": 0.54,
-              "net_expectancy_pips": -3.64,
-              "win_rate": 35.5,
-              "max_drawdown_pips": -114.9,
+              "wins": 14,
+              "losses": 17,
+              "time_exits": 16,
+              "total_net_pips": -69.09,
+              "net_pf": 0.71,
+              "net_expectancy_pips": -2.23,
+              "win_rate": 45.2,
+              "max_drawdown_pips": -110.2,
               "by_session": {
-                "overlap": {
-                  "trades": 10,
-                  "expectancy_pips": -11.21
-                },
                 "london": {
-                  "trades": 11,
-                  "expectancy_pips": 0.31
+                  "trades": 10,
+                  "expectancy_pips": -0.79
                 },
                 "tokyo": {
+                  "trades": 11,
+                  "expectancy_pips": -2.06
+                },
+                "overlap": {
                   "trades": 9,
-                  "expectancy_pips": -5.14
+                  "expectancy_pips": -8.95
                 },
                 "new_york": {
                   "trades": 1,
@@ -1271,60 +1151,60 @@
           },
           "range_reversion": {
             "metrics": {
-              "trades": 65,
-              "wins": 21,
-              "losses": 44,
-              "time_exits": 0,
-              "total_net_pips": -136.42,
-              "net_pf": 0.35,
-              "net_expectancy_pips": -2.1,
+              "trades": 62,
+              "wins": 20,
+              "losses": 42,
+              "time_exits": 1,
+              "total_net_pips": -133.79,
+              "net_pf": 0.34,
+              "net_expectancy_pips": -2.16,
               "win_rate": 32.3,
-              "max_drawdown_pips": -141.4,
+              "max_drawdown_pips": -155.1,
               "by_session": {
+                "overlap": {
+                  "trades": 9,
+                  "expectancy_pips": -0.67
+                },
                 "london": {
                   "trades": 19,
-                  "expectancy_pips": -3.66
-                },
-                "new_york": {
-                  "trades": 6,
-                  "expectancy_pips": 1.12
-                },
-                "overlap": {
-                  "trades": 11,
-                  "expectancy_pips": -1.33
+                  "expectancy_pips": -3.7
                 },
                 "tokyo": {
                   "trades": 29,
-                  "expectancy_pips": -2.03
+                  "expectancy_pips": -2.12
+                },
+                "new_york": {
+                  "trades": 5,
+                  "expectancy_pips": 0.81
                 }
               }
             },
             "oos_metrics": {
-              "trades": 26,
-              "wins": 9,
-              "losses": 17,
-              "time_exits": 0,
-              "total_net_pips": -38.98,
-              "net_pf": 0.5,
-              "net_expectancy_pips": -1.5,
-              "win_rate": 34.6,
-              "max_drawdown_pips": -53.1,
+              "trades": 21,
+              "wins": 7,
+              "losses": 14,
+              "time_exits": 1,
+              "total_net_pips": -44.21,
+              "net_pf": 0.35,
+              "net_expectancy_pips": -2.11,
+              "win_rate": 33.3,
+              "max_drawdown_pips": -52.5,
               "by_session": {
-                "london": {
-                  "trades": 8,
-                  "expectancy_pips": -3.08
-                },
-                "overlap": {
-                  "trades": 3,
-                  "expectancy_pips": 1.22
-                },
-                "tokyo": {
-                  "trades": 12,
-                  "expectancy_pips": -2.11
-                },
                 "new_york": {
                   "trades": 3,
                   "expectancy_pips": 2.41
+                },
+                "tokyo": {
+                  "trades": 11,
+                  "expectancy_pips": -2.64
+                },
+                "london": {
+                  "trades": 4,
+                  "expectancy_pips": -3.96
+                },
+                "overlap": {
+                  "trades": 3,
+                  "expectancy_pips": -2.18
                 }
               }
             },
@@ -1347,59 +1227,59 @@
           "trend_breakout": {
             "metrics": {
               "trades": 103,
-              "wins": 40,
-              "losses": 63,
-              "time_exits": 71,
-              "total_net_pips": -119.22,
-              "net_pf": 0.85,
-              "net_expectancy_pips": -1.16,
-              "win_rate": 38.8,
-              "max_drawdown_pips": -171.8,
+              "wins": 38,
+              "losses": 65,
+              "time_exits": 67,
+              "total_net_pips": -251.33,
+              "net_pf": 0.73,
+              "net_expectancy_pips": -2.44,
+              "win_rate": 36.9,
+              "max_drawdown_pips": -258.3,
               "by_session": {
-                "london": {
-                  "trades": 25,
-                  "expectancy_pips": -3.17
-                },
                 "overlap": {
-                  "trades": 31,
-                  "expectancy_pips": -5.38
-                },
-                "new_york": {
-                  "trades": 10,
-                  "expectancy_pips": 4.5
+                  "trades": 32,
+                  "expectancy_pips": -6.16
                 },
                 "tokyo": {
                   "trades": 37,
-                  "expectancy_pips": 2.22
+                  "expectancy_pips": 0.32
+                },
+                "london": {
+                  "trades": 25,
+                  "expectancy_pips": -4.98
+                },
+                "new_york": {
+                  "trades": 9,
+                  "expectancy_pips": 6.52
                 }
               }
             },
             "oos_metrics": {
-              "trades": 34,
-              "wins": 11,
-              "losses": 23,
-              "time_exits": 22,
-              "total_net_pips": -39.5,
-              "net_pf": 0.87,
-              "net_expectancy_pips": -1.16,
-              "win_rate": 32.4,
-              "max_drawdown_pips": -151.2,
+              "trades": 33,
+              "wins": 9,
+              "losses": 24,
+              "time_exits": 19,
+              "total_net_pips": -230.63,
+              "net_pf": 0.39,
+              "net_expectancy_pips": -6.99,
+              "win_rate": 27.3,
+              "max_drawdown_pips": -251.4,
               "by_session": {
-                "tokyo": {
-                  "trades": 15,
-                  "expectancy_pips": 6.45
-                },
                 "london": {
-                  "trades": 7,
-                  "expectancy_pips": -2.82
-                },
-                "overlap": {
-                  "trades": 7,
-                  "expectancy_pips": -13.66
+                  "trades": 8,
+                  "expectancy_pips": -0.86
                 },
                 "new_york": {
                   "trades": 5,
                   "expectancy_pips": -4.2
+                },
+                "tokyo": {
+                  "trades": 11,
+                  "expectancy_pips": -11.27
+                },
+                "overlap": {
+                  "trades": 9,
+                  "expectancy_pips": -8.76
                 }
               }
             },
@@ -1407,60 +1287,60 @@
           },
           "range_reversion": {
             "metrics": {
-              "trades": 58,
-              "wins": 27,
-              "losses": 31,
-              "time_exits": 0,
-              "total_net_pips": -31.94,
-              "net_pf": 0.83,
-              "net_expectancy_pips": -0.55,
-              "win_rate": 46.6,
-              "max_drawdown_pips": -72.9,
+              "trades": 54,
+              "wins": 24,
+              "losses": 30,
+              "time_exits": 1,
+              "total_net_pips": -44.63,
+              "net_pf": 0.77,
+              "net_expectancy_pips": -0.83,
+              "win_rate": 44.4,
+              "max_drawdown_pips": -91.4,
               "by_session": {
-                "overlap": {
-                  "trades": 15,
-                  "expectancy_pips": -1.89
-                },
                 "tokyo": {
-                  "trades": 17,
-                  "expectancy_pips": 0.71
+                  "trades": 15,
+                  "expectancy_pips": -0.49
                 },
                 "london": {
-                  "trades": 18,
-                  "expectancy_pips": -0.62
+                  "trades": 16,
+                  "expectancy_pips": 0.05
+                },
+                "overlap": {
+                  "trades": 14,
+                  "expectancy_pips": -1.99
                 },
                 "new_york": {
-                  "trades": 8,
-                  "expectancy_pips": -0.56
+                  "trades": 9,
+                  "expectancy_pips": -1.13
                 }
               }
             },
             "oos_metrics": {
-              "trades": 12,
-              "wins": 5,
-              "losses": 7,
-              "time_exits": 0,
-              "total_net_pips": -27.13,
-              "net_pf": 0.5,
-              "net_expectancy_pips": -2.26,
-              "win_rate": 41.7,
-              "max_drawdown_pips": -32.7,
+              "trades": 16,
+              "wins": 6,
+              "losses": 10,
+              "time_exits": 1,
+              "total_net_pips": -46.3,
+              "net_pf": 0.4,
+              "net_expectancy_pips": -2.89,
+              "win_rate": 37.5,
+              "max_drawdown_pips": -51.2,
               "by_session": {
                 "overlap": {
-                  "trades": 2,
-                  "expectancy_pips": -6.46
+                  "trades": 4,
+                  "expectancy_pips": -5.23
                 },
                 "tokyo": {
-                  "trades": 4,
-                  "expectancy_pips": -1.98
+                  "trades": 5,
+                  "expectancy_pips": -2.68
                 },
                 "london": {
                   "trades": 5,
                   "expectancy_pips": 0.82
                 },
                 "new_york": {
-                  "trades": 1,
-                  "expectancy_pips": -10.4
+                  "trades": 2,
+                  "expectancy_pips": -8.07
                 }
               }
             },
