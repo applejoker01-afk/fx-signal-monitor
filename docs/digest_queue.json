@@ -200,7 +200,234 @@
       "ai_exit_advice": "# ポジション状況整理と選択肢提示\n\n## 1. 現状整理\nGBPCHF LONGはテクニカルスコア高(TA86.7)・ファンダ良好(FA70.2)で、金利差+3.50%のキャリー環境にあります。ただしADX1.1でレンジ局面の低ボラティリティ状態です。\n\n## 2. 利益を伸ばす選択肢\n\n**A案：トレール売却に切替（中期保有志向）**\n- 狙い：TP2(1.1215)到達時点でトレール設定に切替、上値追いしながら戻り売却を回避\n- リスク：レンジ反転時に早期損切りされる可能性\n\n**B案：TP1で部分利確→残枠トレール保持（リスク調整型）**\n- 狙い：確実な利益確保と同時に、上値余地(TP2/TP3)を追求するハイブリッド戦略\n- リスク：分割による手数料増加、心理的なポジション管理の複雑化\n\n**C案：現OCO固定のまま長期保有（スワップ重視）**\n- 狙い：金利差+3.50%でスワップ蓄積、SL回収日数が明確になれば金利収益化のベース構築\n- リスク：CHFサイクル(trough)からの利上げリスク、SL回収スケジュール不透明\n\n## 3. 留意点\nSNB利上げサイクルシフト時は金利差縮小が急速化する可能性があり、長期保有判断は中銀会合スケジュール確認が必須です。"
     }
   ],
-  "dropped": [],
+  "dropped": [
+    {
+      "pair": "GBPCHF",
+      "label": "GBP/CHF",
+      "price": 1.1029,
+      "ta_score": 86.7,
+      "dma_score": 85,
+      "macd_score": 35,
+      "rsi_score": 50,
+      "trend_strength": 18,
+      "atr_quality": 0,
+      "breakout_bonus": 0,
+      "divergence_adj": 0,
+      "ema_short_bonus": 12,
+      "dma200": 1.07079,
+      "dma50": 1.09636,
+      "rsi": 54.36,
+      "macd": 0.0016,
+      "macd_signal": 0.00171,
+      "atr": 0.00356,
+      "rsi_reversal_confirmed": false,
+      "ta_score_overheated": false,
+      "fa_score": 70.2,
+      "fa_direction": "buy",
+      "fa_rate_diff": 3.5,
+      "fa_detail": "BOE(3.75% neutral/stable) vs SNB(0.25% ease/trough) 差+3.50% / CHFサイクル強化(trough)",
+      "stars": 3,
+      "verdict": "◎ 高信頼ロング（過熱スコア降格: ta_score逆U字の実績データに基づく）",
+      "direction": "LONG",
+      "pair_type": "major",
+      "intervention_news": {
+        "GBP": {
+          "score": 0,
+          "level": "none",
+          "hits": [],
+          "reason": "関連報道なし",
+          "headlines": [],
+          "cached": true,
+          "timestamp": "2026-10-06T21:33:05.438178+00:00"
+        },
+        "CHF": {
+          "score": 0,
+          "level": "none",
+          "hits": [],
+          "reason": "関連報道なし",
+          "headlines": [],
+          "cached": true,
+          "timestamp": "2026-10-06T21:33:06.601261+00:00"
+        }
+      },
+      "upcoming_events": [
+        {
+          "name": "BOE Gov Bailey Speaks",
+          "currency": "GBP",
+          "importance": "critical",
+          "hours_until": 38.7,
+          "date": "2026-10-08T12:15:00Z"
+        }
+      ],
+      "volatility_regime": {
+        "regime": "high",
+        "regime_label": "高ボラ相場",
+        "atr_ratio": 1.53,
+        "atr_90d": 0.00233,
+        "sl_multiplier": 3.5,
+        "tp1_multiplier": 2.0,
+        "tp2_multiplier": 5.0,
+        "tp3_multiplier": 7.0,
+        "note": "ATRが90日平均の1.5倍 → SL拡大・TP縮小（Phase1出口改善）"
+      },
+      "staged_tp": {
+        "sl": 1.09654,
+        "tp": 1.11002,
+        "trail_atr_mult": 2.0,
+        "trail_distance": 0.00712,
+        "be_plus_offset": 0.00623,
+        "be_target_after_tp": 1.10913,
+        "max_target": 1.12782,
+        "rr_tp": 0.6,
+        "tp_mode": "single_with_trail",
+        "tp1": 1.11002,
+        "tp2": 1.1207,
+        "tp3": 1.12782,
+        "sl_width": 0.01246,
+        "tp1_width": 0.00712,
+        "rr_tp1": 0.6,
+        "rr_tp2": 1.4,
+        "rr_tp3": 2.0,
+        "spread_price": 0.00048,
+        "spread_pips": 4.8,
+        "spread_atr_ratio": 0.135,
+        "sl_dist_effective": 0.0127,
+        "tp_dist_effective": 0.00688,
+        "rr_effective": 0.54,
+        "spread_is_dynamic": true,
+        "spread_pips_dynamic": 4.8,
+        "regime_label": "高ボラ相場",
+        "strategy": "TP(1.11002)到達 → SLを BE+0.5R(1.10913) へ移動 → トレーリング(2.0×ATR=0.00712)発動 → 利を伸ばす（理論最大: 1.12782）",
+        "chandelier_sl_active": true,
+        "chandelier_note": "Chandelier Exit: 過去22日高値(1.109)-3.5xATR",
+        "spread_session": "NY close/Off-hours",
+        "spread_session_mult": 1.6,
+        "spread_vix_mult": 1.0
+      },
+      "carry_score": {
+        "carry_score": 10.84,
+        "label": "非常に優れたキャリー",
+        "annual_swap_pct": 3.5,
+        "daily_volatility_pct": 0.32,
+        "breakeven_days": 84,
+        "note": "SL幅をスワップで回収: 約84日"
+      },
+      "support_resistance": {
+        "resistance": [
+          {
+            "price": 1.1032,
+            "strength": 1,
+            "label": "弱いレジスタンス",
+            "distance_pct": 0.03
+          },
+          {
+            "price": 1.109,
+            "strength": 1,
+            "label": "弱いレジスタンス",
+            "distance_pct": 0.55
+          }
+        ],
+        "support": [
+          {
+            "price": 1.0505,
+            "strength": 2,
+            "label": "サポート",
+            "distance_pct": 4.75
+          },
+          {
+            "price": 1.05445,
+            "strength": 2,
+            "label": "サポート",
+            "distance_pct": 4.39
+          },
+          {
+            "price": 1.092,
+            "strength": 2,
+            "label": "サポート",
+            "distance_pct": 0.99
+          },
+          {
+            "price": 1.0389,
+            "strength": 1,
+            "label": "弱いサポート",
+            "distance_pct": 5.8
+          }
+        ],
+        "nearest_resistance": {
+          "price": 1.1032,
+          "strength": 1,
+          "label": "弱いレジスタンス",
+          "distance_pct": 0.03
+        },
+        "nearest_support": {
+          "price": 1.092,
+          "strength": 2,
+          "label": "サポート",
+          "distance_pct": 0.99
+        },
+        "context": "レジスタンス(1.1032)まで0.03%（非常に近い・注意） / サポート(1.092)まで0.99%"
+      },
+      "market_regime": {
+        "adx": 0.0,
+        "plus_di": 50.0,
+        "minus_di": 50.0,
+        "regime": "ranging",
+        "regime_label": "レンジ相場",
+        "trend_direction": "neutral",
+        "note": "順張りは機能しにくい・逆張り向き"
+      },
+      "performance": {
+        "win_rate": 100.0,
+        "total_trades": 2,
+        "adjustment": 0,
+        "note": "動的実績調整は凍結中(サンプル2件・2026-08-25〜)"
+      },
+      "ambush": {
+        "has_alert": true,
+        "nearest": {
+          "type": "レジスタンス",
+          "price": 1.1032,
+          "role": "弱いレジスタンス",
+          "kind": "resistance",
+          "distance": 0.0003,
+          "distance_pct": 0.027
+        },
+        "approaching": [
+          {
+            "type": "レジスタンス",
+            "price": 1.1032,
+            "role": "弱いレジスタンス",
+            "kind": "resistance",
+            "distance": 0.0003,
+            "distance_pct": 0.027
+          }
+        ],
+        "message": "弱いレジスタンス（1.1032）に接近 あと0.03% → 反落でのショート候補"
+      },
+      "high_confidence_zone": false,
+      "ambush_quality": "注意（シグナルとPOIが逆方向）",
+      "spread_filter_applied": true,
+      "spread_filter_reason": "💸 スプレッド広め: GBPCHF spread=4.8pips (14% of ATR) — 実効RR 1:0.6→1:0.54。★4→★3降格。",
+      "cb_meeting_blackout": {
+        "active": false,
+        "severity": "none",
+        "reason": ""
+      },
+      "strength_context": {
+        "base_currency": "GBP",
+        "quote_currency": "CHF",
+        "base_score": -9.1,
+        "base_label": "中立",
+        "base_rank": 6,
+        "quote_score": -18.9,
+        "quote_label": "中立",
+        "quote_rank": 10,
+        "spread": 9.8,
+        "context": "通貨強弱が拮抗（中立）",
+        "bias": "neutral"
+      }
+    }
+  ],
   "closed": [],
   "state_changes": [
     {
@@ -260,6 +487,59 @@
         "extreme_price": 1.1035,
         "sl": 1.10229,
         "initial_sl": 1.08852
+      }
+    },
+    {
+      "pair": "GBPCHF",
+      "trade": {
+        "pair": "GBPCHF",
+        "entry_time": "2026-10-01T21:43:06.798698+00:00",
+        "entry_date": "2026-10-01",
+        "entry_price": 1.096782,
+        "direction": "LONG",
+        "initial_stars": 4,
+        "sl": 1.10229,
+        "initial_sl": 1.08852,
+        "tp": 1.10229,
+        "trail_distance": 0.00612,
+        "trail_atr_mult": 2.0,
+        "be_target_after_tp": 1.10229,
+        "max_target": 1.11606,
+        "tp_mode": "single_with_trail",
+        "tp_hit": true,
+        "trail_active": true,
+        "extreme_price": 1.1035,
+        "tp1": 1.10229,
+        "tp2": 1.11147,
+        "tp3": 1.11606,
+        "ta_score": 91.3,
+        "fa_score": 70.2,
+        "fa_rate_diff": 3.5,
+        "regime": "normal",
+        "rsi_reversal_confirmed": false,
+        "ta_score_overheated": true,
+        "entry_source": "pending_limit_order",
+        "pending_created_time": "2026-10-01T18:07:30.750273+00:00",
+        "pending_scan_price": 1.0977,
+        "pyramid_seq": 1,
+        "position_sizing": {
+          "tradable": true,
+          "units": 14400,
+          "margin_required_jpy": 120141.0,
+          "risk_amount_jpy": 22682.0,
+          "estimated_loss_jpy": 22613.0,
+          "existing_margin_jpy": 0.0,
+          "exposure_multiplier": 1.0,
+          "confidence_multiplier": 0.75,
+          "note": "14400GBP単位（証拠金約¥120141・想定損失¥22613） ※ta_score過熱域のためロット75%に減額"
+        },
+        "units": 14400,
+        "current_price": 1.1029,
+        "current_stars": 3,
+        "tp_hit_time": "2026-10-06T16:39:18.481274+00:00"
+      },
+      "update": {
+        "sl": 1.10229
       }
     }
   ]
