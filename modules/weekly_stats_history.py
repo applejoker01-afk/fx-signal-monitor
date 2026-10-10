@@ -45,6 +45,8 @@ def _slim(stats: dict) -> dict:
         "pair_stats": slim_pair_stats,
         "best_pips": best.get("pips"),
         "worst_pips": worst.get("pips"),
+        "profit_metrics": stats.get("profit_metrics", {}),
+        "excluded_trades": stats.get("excluded_trades", 0),
     }
 
 

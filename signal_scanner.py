@@ -51,6 +51,7 @@ from modules.performance_intelligence import (
     apply_seasonal_filter,                     # 2026-07-20 季節性フィルタ（AUDJPY 8月）
 )
 from modules.ai_commentary import generate_market_commentary, generate_exit_advice, has_ai_key
+from modules.profitability import partition_trades, build_report
 from modules.ambush_alert import evaluate_ambush, collect_ambush_alerts
 from modules.geopolitical_risk import apply_geopolitical_filter
 from modules.intervention_news_monitor import apply_intervention_news_filter  # 2026-08-03 為替介入ニュース検知
@@ -2424,6 +2425,7 @@ body{{background:var(--bg-deep);color:var(--text-primary);font-family:var(--jp);
       <a href="./terminal.html" class="nav-link"><span>🖥</span><span>分析ターミナル</span></a>
       <a href="./daytrade.html" class="nav-link"><span>⚡</span><span>デイトレ</span></a>
       <a href="./position_manager.html" class="nav-link"><span>📋</span><span>ポジション管理</span></a>
+      <a href="./profitability.html" class="nav-link"><span>収益・検証</span></a>
       <a href="./last_signals.json" class="nav-link" target="_blank"><span>{{}}</span><span>Raw JSON</span></a>
     </div>
   </nav>
@@ -2554,6 +2556,9 @@ def main():
     # ⑩ 自己学習: 過去の決済実績からペア別信頼度マップを構築
     from modules.trade_tracker import load_closed_trades
     closed_trades_all = load_closed_trades(days_back=90)
+    closed_trades_all, rejected_history = partition_trades(closed_trades_all)
+    if rejected_history:
+        print(f"[AUDIT] 不整合のある決済 {len(rejected_history)}件を信頼度学習から除外")
     perf_map = build_pair_performance_map(closed_trades_all, min_trades=5)
     # 2026-06-16: 静的ベースライン（バックテスト実証値）をマージ
     perf_map = apply_static_baseline(perf_map)
@@ -2785,6 +2790,9 @@ def main():
     for pair, order in filled_orders.items():
         trade = pending_order_to_trade(order, now)
         trade = open_trade_from_pending_fill(trade, PAIR_API, latest["pairs"])
+        if trade.get("_rejected"):
+            print(f"[PENDING] 約定記録を見送り: {pair}: {trade['_rejected']}")
+            continue
         newly_filled_trades.append(trade)
         open_trades = load_open_trades()  # サイジングに反映させるため再読込
         print(f"[PENDING] ✅約定: {pair} {order['direction']} "
@@ -2813,7 +2821,11 @@ def main():
                     and can_pyramid
                     and pair not in remaining_orders
                     and pair not in closed_this_cycle_pairs):
-                order = create_pending_order(r, now)
+                try:
+                    order = create_pending_order(r, now)
+                except ValueError as exc:
+                    print(f"[PENDING] 不正な注文を見送り: {exc}")
+                    continue
                 remaining_orders[pair] = order
                 newly_created_orders[pair] = order
                 print(f"[PENDING] 📌新規指値登録: {pair} {order['direction']} "
@@ -2823,12 +2835,22 @@ def main():
 
     if expired_orders:
         for pair in expired_orders:
-            print(f"[PENDING] ⌛失効: {pair}（次回スキャンまでに約定せず）")
+            print(f"[PENDING] ⌛失効/取消: {pair}: {expired_orders[pair].get('cancel_reason', 'EXPIRED')}")
 
     save_pending_orders(remaining_orders)
 
+    # Audit and cost-inclusive evaluation stay in shadow; no star boosts or
+    # speculative rule promotion based on a handful of trades.
+    profitability_report = build_report(results, load_closed_trades(), now)
+    os.makedirs("docs", exist_ok=True)
+    with open("docs/profitability_report.json", "w", encoding="utf-8") as handle:
+        json.dump(profitability_report, handle, ensure_ascii=False, indent=2, allow_nan=False)
+    print(f"[PROFITABILITY] 有効決済 {profitability_report['ledger']['valid_trades']}件 / "
+          f"除外 {profitability_report['ledger']['excluded_trades']}件 / shadow")
+
     # ⑪ ドローダウン監視（決済後の全履歴で連敗チェック）
     closed_after = load_closed_trades(days_back=14)
+    closed_after, _ = partition_trades(closed_after)
     drawdown = check_drawdown_alert(closed_after, recent_n=5)
     if drawdown.get("alert"):
         print(f"[DRAWDOWN] {drawdown['message']} → {drawdown['recommendation']}")

@@ -40,6 +40,7 @@ from datetime import datetime, timezone
 
 from modules.position_sizing import calc_position_size, pnl_to_jpy, record_trade_pnl
 from modules.advanced_analytics import calc_correlated_exposure_multiplier
+from modules.profitability import validate_geometry, partition_trades, trade_metrics, summarize, audit_trade
 
 
 OPEN_TRADES_FILE = "data/open_trades.json"
@@ -165,7 +166,7 @@ def _pair_decimals(pair: str) -> int:
 
 
 def check_exit_condition(trade: dict, current_price: float,
-                         current_stars: int, current_direction: str) -> dict:
+                         current_stars: int, current_direction: str, now: datetime = None) -> dict:
     """
     保有中トレードが決済条件を満たすか判定（2026-06-10: 単一TP+トレーリング対応）。
 
@@ -293,7 +294,7 @@ def check_exit_condition(trade: dict, current_price: float,
         # 根拠: 567,000バックテスト研究でMoving Average Exit（＝SIGNAL_LOST）は最下位
         #       autoresearch: wiki/finance/fx-exit-strategy-fundamentals.md
         if exit_reason is None:
-            hold_h = _hours_between(trade.get("entry_time", ""), datetime.now(timezone.utc))
+            hold_h = _hours_between(trade.get("entry_time", ""), now or datetime.now(timezone.utc))
             current_pips = (
                 (current_price - entry_price) if is_long
                 else (entry_price - current_price)
@@ -391,6 +392,7 @@ def update_trades(results: list, now: datetime,
                 price_for_trade,
                 cur.get("stars", 0),
                 cur.get("direction", ""),
+                now=now,
             )
 
             # 現在価格を保存（保有ポジション表示用） — ペア別精度で丸める
@@ -430,16 +432,37 @@ def update_trades(results: list, now: datetime,
                     "hold_hours": _hours_between(trade["entry_time"], now),
                     **exit_info,
                 }
+                metrics = trade_metrics(closed)
+                if metrics:
+                    closed["profit_metrics"] = metrics
+                audit_errors = audit_trade(closed)
+                # A missing legacy original stop prevents R evaluation, but is
+                # distinct from an impossible stop/P&L that must not credit cash.
+                hold_account_update = any(not error.startswith("初期SL欠損") for error in audit_errors)
+                if audit_errors:
+                    closed["ledger_audit_errors"] = audit_errors
+                if hold_account_update:
+                    closed["account_update_held"] = True
                 # シミュレーション口座残高へ反映（2026-07-20追加）
                 # units（新規エントリー時にサイジング済み）が無いトレード（機能追加前の
                 # 既存ポジション等）はスキップし、残高は変動させない。
                 units = trade.get("units")
-                if units and pair_api is not None and latest_pairs is not None:
+                if units and pair_api is not None and latest_pairs is not None and not hold_account_update:
                     pnl_per_unit = pnl_to_jpy(pair, pair_api, exit_info.get("pips", 0), latest_pairs)
                     if pnl_per_unit is not None:
                         pnl_jpy = round(units * pnl_per_unit, 0)
                         closed["pnl_jpy"] = pnl_jpy
-                        record_trade_pnl(pnl_jpy)
+                        if metrics and trade.get("execution_costs"):
+                            fee_jpy = pnl_to_jpy(pair, pair_api, metrics["standard_price_cost"], latest_pairs)
+                            net_pnl = round(pnl_jpy - units * fee_jpy, 0) if fee_jpy is not None else None
+                            if net_pnl is not None:
+                                closed["net_pnl_jpy_estimate_ex_swap"] = net_pnl
+                                closed["account_pnl_basis"] = "model_net_excluding_swap"
+                                record_trade_pnl(net_pnl)
+                            else:
+                                record_trade_pnl(pnl_jpy)
+                        else:
+                            record_trade_pnl(pnl_jpy)
                 append_closed_trade(closed)
                 newly_closed.append(closed)
                 # remaining_tradesには追加しない = このトレードは除去
@@ -484,6 +507,11 @@ def open_trade_from_pending_fill(trade: dict, pair_api: dict = None,
     open_trades = load_open_trades()
     pair = trade["pair"]
     existing = open_trades.get(pair, [])
+    reason = validate_geometry(trade.get("direction"), trade.get("entry_price"), trade.get("initial_sl"), trade.get("tp"), require_target=True)
+    if reason:
+        return {**trade, "_rejected": reason}
+    if pair_api is None or latest_pairs is None:
+        return {**trade, "_rejected": "サイジングに必要な通貨/価格データ不足"}
 
     # 2026-07-24追加: ピラミッディング上限チェック。指値待機経由の約定でも
     # 同一ペアの同時保有数はMAX_POSITIONS_PER_PAIRまで
@@ -491,7 +519,7 @@ def open_trade_from_pending_fill(trade: dict, pair_api: dict = None,
     # 二重の安全装置。約定検知のタイムラグで上限を超えるケースを防ぐ）。
     if len(existing) >= MAX_POSITIONS_PER_PAIR:
         print(f"  [PENDING] {pair}: 上限({MAX_POSITIONS_PER_PAIR})到達のため約定を破棄")
-        return trade
+        return {**trade, "_rejected": "同一ペアの保有上限"}
 
     trade["pyramid_seq"] = len(existing) + 1
 
@@ -528,10 +556,15 @@ def open_trade_from_pending_fill(trade: dict, pair_api: dict = None,
             pair, trade["entry_price"], trade["sl"], pair_api, latest_pairs,
             open_trades=open_trades, exposure_multiplier=exp_mult,
             confidence_multiplier=conf_mult,
+            direction=trade["direction"], execution_costs=trade.get("execution_costs"),
         )
         trade["position_sizing"] = sizing
         if sizing.get("tradable"):
             trade["units"] = sizing["units"]
+            if sizing.get("execution_costs"):
+                trade["execution_costs"] = sizing["execution_costs"]
+        else:
+            return {**trade, "_rejected": sizing.get("note", "数量/リスク予算不足")}
 
     open_trades.setdefault(pair, []).append(trade)
     save_open_trades(open_trades)
@@ -558,6 +591,14 @@ def calc_stats_from_trades(trades: list) -> dict:
     """
     if not trades:
         return {}
+
+    profit_metrics = summarize(trades)
+    trades, rejected = partition_trades(trades)
+    if not trades:
+        return {"total_trades": 0, "wins": 0, "losses": 0, "evens": 0,
+                "win_rate": 0, "reason_counts": {}, "pair_stats": {},
+                "avg_hold_hours": 0, "best_trade": None, "worst_trade": None,
+                "profit_metrics": profit_metrics, "excluded_trades": len(rejected)}
 
     total = len(trades)
     wins = sum(1 for t in trades if t.get("result") == "WIN")
@@ -588,8 +629,8 @@ def calc_stats_from_trades(trades: list) -> dict:
     avg_hold = round(sum(hold_hours) / len(hold_hours), 1) if hold_hours else 0
 
     # 最大の勝ち・負け
-    best = max(trades, key=lambda t: t.get("pips", 0)) if trades else None
-    worst = min(trades, key=lambda t: t.get("pips", 0)) if trades else None
+    best = max(trades, key=lambda t: trade_metrics(t)["standard_net_r_estimate"])
+    worst = min(trades, key=lambda t: trade_metrics(t)["standard_net_r_estimate"])
 
     return {
         "total_trades": total,
@@ -602,4 +643,6 @@ def calc_stats_from_trades(trades: list) -> dict:
         "avg_hold_hours": avg_hold,
         "best_trade": best,
         "worst_trade": worst,
+        "profit_metrics": profit_metrics,
+        "excluded_trades": len(rejected),
     }
