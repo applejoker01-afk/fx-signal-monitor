@@ -5,7 +5,7 @@
   USD: FRED API (DFEDTARU) - APIキー必要
   EUR: ECB公式SDMX - キー不要
   GBP: BOE公式IADB - キー不要
-  AUD: RBA F1.1 CSV → 失敗時 BIS
+  AUD: RBA F1 日次CSV(FIRMMCRTD) → 失敗時 BIS
   JPY/NZD/CAD/CHF/NOK/SEK/HKD/CNY/MXN/TRY/ZAR/INR/BRL/PLN/KRW: BIS WS_CBPOL（2026-10-13〜）
   SGD ほか上記以外: 既存JSONを保持（手動メンテ）
 
@@ -178,7 +178,10 @@ def fetch_gbp_boe_rate():
 # AUD: RBA公式XML
 # ===========================================================================
 
-RBA_F11_URL = "https://www.rba.gov.au/statistics/tables/csv/f1.1-data.csv"
+# 2026-10-13: F1.1 は「月平均」の表で、9/30 利上げ月の値が 4.36% になる（実値 4.60%）。
+# 日次の F1 表から、系列ID FIRMMCRTD（Cash Rate Target, daily）の列を名前で引く。
+RBA_F1_URL = "https://www.rba.gov.au/statistics/tables/csv/f1-data.csv"
+RBA_CASH_RATE_SERIES_ID = "FIRMMCRTD"
 _RBA_DATE_FORMATS = ("%d-%b-%Y", "%Y-%m-%d", "%d/%m/%Y")
 
 
@@ -191,23 +194,38 @@ def _parse_rba_date(s):
     return None
 
 
-def parse_rba_f11_csv(text):
-    """RBA F1.1 CSV（先頭列=日付、2列目=Cash Rate Target）から最新の値を返す。
-    F1.1 はメタデータ行（Title/Description/Series ID 等）が先頭に並ぶため、
-    「1列目が日付・2列目が数値」の行だけを拾う。"""
-    for line in reversed(text.strip().splitlines()):
-        parts = [p.strip().strip('"') for p in line.split(",")]
-        if len(parts) < 2 or not parts[0]:
+def parse_rba_f1_csv(text, series_id=RBA_CASH_RATE_SERIES_ID):
+    """RBA 統計表CSVから series_id 列の最新値を返す。
+    先頭のメタデータ行（Title/Description/Frequency/Series ID…）の
+    「Series ID」行で列位置を特定し、日付行のうち当該列が数値の最新行を採る
+    （当日分は空欄で先行掲載されることがあるため空欄行は飛ばす）。
+    Series ID 行が無い・列が見つからない場合は None（誤った列を読むより安全）。"""
+    import csv
+    import io
+    col = None
+    latest = None
+    for parts in csv.reader(io.StringIO(text.lstrip("\ufeff"))):
+        if not parts:
             continue
-        d = _parse_rba_date(parts[0])
+        head = parts[0].strip()
+        if head == "Series ID":
+            ids = [p.strip() for p in parts]
+            col = ids.index(series_id) if series_id in ids else None
+            continue
+        if col is None or len(parts) <= col:
+            continue
+        d = _parse_rba_date(head)
         if d is None:
             continue
         try:
-            rate = float(parts[1])
+            rate = float(parts[col])
         except ValueError:
             continue
-        return {"rate": rate, "date": d.isoformat(), "source": "RBA F1.1"}
-    return None
+        if latest is None or d > latest[0]:
+            latest = (d, rate)
+    if latest is None:
+        return None
+    return {"rate": latest[1], "date": latest[0].isoformat(), "source": f"RBA F1 {series_id}"}
 
 
 def fetch_aud_rba_rate():
@@ -218,15 +236,15 @@ def fetch_aud_rba_rate():
     少なくとも 2026-09 以降 AUD は 4.35% のまま更新が止まっていた
     （実際は 2026-09-29 に 4.60% へ利上げ）。失敗はログに [WARN] が出るだけで
     誰も気づかなかった。
-      1) RBA F1.1 統計表 CSV（一次ソース・最速）
+      1) RBA F1 日次統計表 CSV の FIRMMCRTD 列（一次ソース・最速）
       2) BIS 中銀政策金利 API（RBA がbot遮断した場合のフォールバック。
          1〜3週間の公表遅延があるため、手動検証より古い値は update 側で採用しない）
     """
     try:
-        res = parse_rba_f11_csv(http_get(RBA_F11_URL, timeout=15))
+        res = parse_rba_f1_csv(http_get(RBA_F1_URL, timeout=20))
         if res:
             return res
-        print("[WARN] RBA F1.1: 数値行を解析できず（フォーマット変更の可能性）")
+        print(f"[WARN] RBA F1: {RBA_CASH_RATE_SERIES_ID} 列を解析できず（フォーマット変更の可能性）→ BISへフォールバック")
     except Exception as e:
         print(f"[WARN] RBA fetch failed: {e} → BISへフォールバック")
     return fetch_bis_policy_rate("AUD")

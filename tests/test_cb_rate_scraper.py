@@ -13,13 +13,30 @@ from modules import cb_rate_scraper as scr  # noqa: E402
 
 # ---------------------------------------------------------------- cb_rate_scraper
 
-def test_parse_rba_f11_csv_takes_latest_numeric_row():
-    text = ("F1.1 INTEREST RATES AND YIELDS – MONEY MARKET\n"
-            "Title,Cash Rate Target,Interbank Overnight Cash Rate\n"
-            "Series ID,FIRMMCRTD,FIRMMCRID\n"
-            "26-Sep-2026,4.35,4.34\n"
-            "30-Sep-2026,4.60,4.59\n")
-    assert scr.parse_rba_f11_csv(text) == {"rate": 4.6, "date": "2026-09-30", "source": "RBA F1.1"}
+# RBA F1（日次）CSV の実際の先頭構造を縮約したもの（2026-10-13取得）
+RBA_F1_SAMPLE = (
+    "\ufeffF1 INTEREST RATES AND YIELDS - MONEY MARKET\n"
+    "Title,Cash Rate Target,Change in the Cash Rate Target,Interbank Overnight Cash Rate\n"
+    "Frequency,Daily,as announced,Daily\n"
+    "\n"
+    "Series ID,FIRMMCRTD,FIRMMCCRT,FIRMMCRID\n"
+    "29-Sep-2026,4.35,,4.35\n"
+    "30-Sep-2026,4.60,0.25,4.59\n"
+    "12-Oct-2026,4.60,,4.60\n"
+    "13-Oct-2026,,,\n"
+)  # 最終行: 当日分は空欄で先行掲載される
+
+
+def test_parse_rba_f1_reads_cash_rate_target_by_series_id():
+    assert scr.parse_rba_f1_csv(RBA_F1_SAMPLE) == {
+        "rate": 4.6, "date": "2026-10-12", "source": "RBA F1 FIRMMCRTD"}
+
+
+def test_parse_rba_rejects_table_without_target_series():
+    """F1.1（月平均, 系列ID FIRMMCRT）を誤って読むと 9月=4.36% になる。日次系列IDが無ければ None。"""
+    f11 = ("Title,Cash Rate Target\nSeries ID,FIRMMCRT,FIRMMCRI\n"
+           "31/08/2026,4.35,4.35\n30/09/2026,4.36,4.36\n")
+    assert scr.parse_rba_f1_csv(f11) is None
 
 
 def test_parse_bis_csv_latest_per_area():
