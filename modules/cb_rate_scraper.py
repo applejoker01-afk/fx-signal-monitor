@@ -2,14 +2,14 @@
 中央銀行政策金利の自動取得モジュール
 
 データソース（優先順位順）:
-  USD: FRED API (FEDFUNDS) - APIキー必要
-  EUR: ECB公式XML - キー不要
-  GBP: BOE公式XML - キー不要
-  JPY: 日銀公式（手動JSON補完）
-  AUD: RBA公式XML - キー不要
-  NZD/CAD/CHF/その他: 既存JSONからfallback
+  USD: FRED API (DFEDTARU) - APIキー必要
+  EUR: ECB公式SDMX - キー不要
+  GBP: BOE公式IADB - キー不要
+  AUD: RBA F1.1 CSV → 失敗時 BIS
+  JPY/NZD/CAD/CHF/NOK/SEK/HKD/CNY/MXN/TRY/ZAR/INR/BRL/PLN/KRW: BIS WS_CBPOL（2026-10-13〜）
+  SGD ほか上記以外: 既存JSONを保持（手動メンテ）
 
-取得失敗時は既存 central_bank_rates.json の値を保持する。
+取得失敗時、または取得値の観測日が人による検証日以前の場合は既存値を保持する。
 """
 
 import json
@@ -178,31 +178,113 @@ def fetch_gbp_boe_rate():
 # AUD: RBA公式XML
 # ===========================================================================
 
+RBA_F11_URL = "https://www.rba.gov.au/statistics/tables/csv/f1.1-data.csv"
+_RBA_DATE_FORMATS = ("%d-%b-%Y", "%Y-%m-%d", "%d/%m/%Y")
+
+
+def _parse_rba_date(s):
+    for fmt in _RBA_DATE_FORMATS:
+        try:
+            return datetime.strptime(s, fmt).date()
+        except ValueError:
+            continue
+    return None
+
+
+def parse_rba_f11_csv(text):
+    """RBA F1.1 CSV（先頭列=日付、2列目=Cash Rate Target）から最新の値を返す。
+    F1.1 はメタデータ行（Title/Description/Series ID 等）が先頭に並ぶため、
+    「1列目が日付・2列目が数値」の行だけを拾う。"""
+    for line in reversed(text.strip().splitlines()):
+        parts = [p.strip().strip('"') for p in line.split(",")]
+        if len(parts) < 2 or not parts[0]:
+            continue
+        d = _parse_rba_date(parts[0])
+        if d is None:
+            continue
+        try:
+            rate = float(parts[1])
+        except ValueError:
+            continue
+        return {"rate": rate, "date": d.isoformat(), "source": "RBA F1.1"}
+    return None
+
+
 def fetch_aud_rba_rate():
     """
     Reserve Bank of Australia の Cash Rate Target を取得。
-    F1.1 シリーズ
+
+    2026-10-13修正: 旧URL(statistics/cash-rate/cash-rate-data.csv)が404になり、
+    少なくとも 2026-09 以降 AUD は 4.35% のまま更新が止まっていた
+    （実際は 2026-09-29 に 4.60% へ利上げ）。失敗はログに [WARN] が出るだけで
+    誰も気づかなかった。
+      1) RBA F1.1 統計表 CSV（一次ソース・最速）
+      2) BIS 中銀政策金利 API（RBA がbot遮断した場合のフォールバック。
+         1〜3週間の公表遅延があるため、手動検証より古い値は update 側で採用しない）
     """
-    url = "https://www.rba.gov.au/statistics/cash-rate/cash-rate-data.csv"
     try:
-        text = http_get(url, timeout=15)
-        lines = text.strip().split("\n")
-        # ヘッダ後の最新行を探す
-        for line in reversed(lines):
-            parts = [p.strip() for p in line.split(",")]
-            if len(parts) >= 3 and parts[0] and re.match(r"\d{4}-\d{2}-\d{2}", parts[0]):
-                try:
-                    rate = float(parts[1])
-                    return {
-                        "rate": rate,
-                        "date": parts[0],
-                        "source": "RBA Cash Rate",
-                    }
-                except ValueError:
-                    continue
+        res = parse_rba_f11_csv(http_get(RBA_F11_URL, timeout=15))
+        if res:
+            return res
+        print("[WARN] RBA F1.1: 数値行を解析できず（フォーマット変更の可能性）")
     except Exception as e:
-        print(f"[WARN] RBA fetch failed: {e}")
-    return None
+        print(f"[WARN] RBA fetch failed: {e} → BISへフォールバック")
+    return fetch_bis_policy_rate("AUD")
+
+
+# ===========================================================================
+# BIS 中銀政策金利（WS_CBPOL）— 手動メンテだった通貨の自動化（2026-10-13追加）
+# ===========================================================================
+# 背景: JPY/NZD/CAD/CHF/NOK/SEK/EM通貨は「手動メンテ」で、実際には数ヶ月放置され
+# CAD 2.75%(正2.25) / MXN 9.0%(正6.5) / TRY 46%(正37) など大きく乖離していた。
+# BIS は各国中銀の政策金利を日次系列で一括公開しており、キー不要・bot遮断なし。
+# ただし公表は1〜3週間遅れるため、会合直後は手動検証値の方が新しいことがある。
+# → update_central_bank_rates() で「観測日 <= 手動検証日」の値では上書きしない。
+# USD(FRED DFEDTARU)・EUR(ECB MRO)・GBP(BOE) は既存の一次ソースの方が速く、
+# BIS の定義（US=レンジ中央値、XM=預金ファシリティ金利）とも異なるので対象外。
+BIS_CBPOL_URL = "https://stats.bis.org/api/v1/data/WS_CBPOL/D.{areas}?lastNObservations=1&format=csv"
+BIS_AREA = {
+    "AUD": "AU", "JPY": "JP", "NZD": "NZ", "CAD": "CA", "CHF": "CH",
+    "NOK": "NO", "SEK": "SE", "HKD": "HK", "CNY": "CN", "MXN": "MX",
+    "TRY": "TR", "ZAR": "ZA", "INR": "IN", "BRL": "BR", "PLN": "PL", "KRW": "KR",
+}
+_bis_cache = {}
+
+
+def parse_bis_cbpol_csv(text):
+    """BIS WS_CBPOL CSV → {REF_AREA: {"rate", "date"}}（エリアごとに最新観測日）"""
+    import csv
+    import io
+    out = {}
+    for row in csv.DictReader(io.StringIO(text)):
+        area, d, v = row.get("REF_AREA"), row.get("TIME_PERIOD"), row.get("OBS_VALUE")
+        if not area or not d or v in (None, "", "NaN"):
+            continue
+        try:
+            rate = float(v)
+        except ValueError:
+            continue
+        if area not in out or d > out[area]["date"]:
+            out[area] = {"rate": rate, "date": d}
+    return out
+
+
+def _fetch_bis_all():
+    if "data" not in _bis_cache:
+        url = BIS_CBPOL_URL.format(areas="+".join(sorted(set(BIS_AREA.values()))))
+        try:
+            _bis_cache["data"] = parse_bis_cbpol_csv(http_get(url, timeout=40))
+        except Exception as e:
+            print(f"[WARN] BIS policy rate fetch failed: {e}")
+            _bis_cache["data"] = {}
+    return _bis_cache["data"]
+
+
+def fetch_bis_policy_rate(ccy):
+    obs = _fetch_bis_all().get(BIS_AREA.get(ccy, ""))
+    if not obs:
+        return None
+    return {"rate": obs["rate"], "date": obs["date"], "source": "BIS WS_CBPOL"}
 
 
 # ===========================================================================
@@ -215,6 +297,8 @@ FETCH_FUNCTIONS = {
     "EUR": fetch_eur_ecb_rate,
     "GBP": fetch_gbp_boe_rate,
     "AUD": fetch_aud_rba_rate,
+    **{ccy: (lambda c=ccy: fetch_bis_policy_rate(c))
+       for ccy in BIS_AREA if ccy != "AUD"},
 }
 
 
@@ -343,7 +427,8 @@ def sync_next_meetings_from_calendar(dry_run=False, now=None):
 def update_central_bank_rates(dry_run=False):
     """
     既存JSONを読み込み、自動取得可能な通貨だけ更新する。
-    手動メンテ通貨（JPY, NZD, CAD, CHF, MXN, TRY, ZAR, INR, SGD, HKD, CNY）はそのまま保持。
+    stance（tighten/ease等）は自動更新しない。金利が変わった通貨は
+    rate_fetcher.check_central_bank_data_staleness が stance 見直しを促す。
 
     Args:
         dry_run: Trueの場合はファイル書き込みせず結果dictだけ返す
@@ -376,12 +461,28 @@ def update_central_bank_rates(dry_run=False):
             kept.append(ccy)
             continue
 
+        if ccy not in rates_section:
+            kept.append(ccy)
+            continue
         new_rate = round(result["rate"], 4)
-        old_rate = rates_section.get(ccy, {}).get("rate")
+        old_rate = rates_section[ccy].get("rate")
+        changed = old_rate is None or abs(new_rate - old_rate) >= 0.001
+
+        # 公表遅延のあるソース（BIS等）が、人の検証より古い観測値で上書きするのを防ぐ。
+        # 例: 2026-10-13 時点で BIS の AUD は 09-24 観測の 4.35%、手動検証(10-13)は 4.60%。
+        verified = (rates_section[ccy].get("stance_verified")
+                    or current.get("stance_last_verified") or "")[:10]
+        obs_date = str(result.get("date") or "")[:10]
+        if changed and verified and obs_date and obs_date <= verified:
+            kept.append(ccy)
+            print(f"  - {ccy}: {result.get('source')} {new_rate}% (観測{obs_date}) は"
+                  f"手動検証({verified})の {old_rate}% より古いため不採用")
+            continue
+
         rates_section[ccy]["last_auto_check"] = datetime.now(timezone.utc).isoformat()
         rates_section[ccy]["auto_source"] = result.get("source", "unknown")
 
-        if old_rate is None or abs(new_rate - old_rate) >= 0.001:
+        if changed:
             rates_section[ccy]["rate"] = new_rate
             rates_section[ccy]["last_auto_update"] = result.get("date") or datetime.now(timezone.utc).isoformat()[:10]
             updated.append({
