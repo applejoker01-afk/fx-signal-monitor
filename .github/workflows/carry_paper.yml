@@ -1,0 +1,57 @@
+name: Carry Paper Portfolio (weekdays, after NY close)
+
+# 横断キャリー（EXP-007b、OOSを生き延びた唯一の候補）のペーパー運用。
+# **発注は一切行わない。** 時価評価と月次（21営業日）リバランスを台帳に記録するだけ。
+# 金利収益は経過暦日/365で計上するため、平日のみの実行で週末分も正しく入る。
+# UTC 21:30 = NYクローズ(17:00 ET)直後。金利は同日 00:00 UTC の Daily Data Refresh 後の値。
+
+on:
+  schedule:
+    - cron: '30 21 * * 1-5'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: "carry-paper"
+  cancel-in-progress: false
+
+jobs:
+  paper:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyyaml
+
+      - name: Run carry paper portfolio
+        run: |
+          mkdir -p docs
+          python run_carry_paper.py | tee docs/carry_paper_report.txt
+
+      - name: Commit ledger
+        run: |
+          git config --local user.email "fx-monitor-bot@github-actions"
+          git config --local user.name  "FX Monitor Bot"
+          git add data/paper_portfolio_diversified.json data/paper_portfolio_longonly.json docs/carry_paper_report.txt
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "📒 Carry paper ledger $(date -u +'%Y-%m-%d UTC')"
+            for i in 1 2 3; do
+              git pull --rebase origin main && git push && break
+              sleep 10
+            done
+          fi
