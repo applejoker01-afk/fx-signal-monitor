@@ -370,6 +370,9 @@ def calc_staged_tp(price: float, direction: str, atr: float, regime: dict,
 
     if direction in ("LONG", "LIGHT_LONG"):
         sl_fixed = price - sl_width
+        # The initial stop is ATR-based.  Chandelier is only a post-entry
+        # trailing-stop concept and must not tighten an entry to a few pips.
+        sl = sl_fixed
         tp = price + tp_width
         tp2 = price + tp2_width
         tp3 = price + tp3_width
@@ -381,8 +384,6 @@ def calc_staged_tp(price: float, direction: str, atr: float, regime: dict,
             sl_ce = recent_high - sl_width
             # CE SL はエントリー価格より下（安全）かつ固定SLより上（タイト）な時のみ採用
             if sl_fixed < sl_ce < price:
-                sl = sl_ce
-                chandelier_sl_active = True
                 chandelier_note = (
                     f"Chandelier Exit: 過去{CHANDELIER_PERIOD}日高値"
                     f"({round(recent_high, _pair_decimals(pair))})-{sl_mult}xATR"
@@ -394,6 +395,9 @@ def calc_staged_tp(price: float, direction: str, atr: float, regime: dict,
 
     elif direction in ("SHORT", "LIGHT_SHORT"):
         sl_fixed = price + sl_width
+        # The initial stop is ATR-based.  Chandelier is only a post-entry
+        # trailing-stop concept and must not tighten an entry to a few pips.
+        sl = sl_fixed
         tp = price - tp_width
         tp2 = price - tp2_width
         tp3 = price - tp3_width
@@ -405,8 +409,6 @@ def calc_staged_tp(price: float, direction: str, atr: float, regime: dict,
             sl_ce = recent_low + sl_width
             # CE SL はエントリー価格より上（安全）かつ固定SLより下（タイト）な時のみ採用
             if price < sl_ce < sl_fixed:
-                sl = sl_ce
-                chandelier_sl_active = True
                 chandelier_note = (
                     f"Chandelier Exit: 過去{CHANDELIER_PERIOD}日安値"
                     f"({round(recent_low, _pair_decimals(pair))})+{sl_mult}xATR"
@@ -423,9 +425,13 @@ def calc_staged_tp(price: float, direction: str, atr: float, regime: dict,
     # 注: pair 未指定の旧呼び出し互換のため price>10 をフォールバックに残す
     decimals = _pair_decimals(pair) if pair else (3 if price > 10 else 6)
 
-    rr_tp = round(tp_mult / sl_mult, 1)
-    rr_tp2 = round(tp2_mult / sl_mult, 1)
-    rr_tp3 = round(tp3_mult / sl_mult, 1)
+    # Report RR from the actual notification prices, not only from configured
+    # multipliers.  This keeps SL/TP/RR consistent if stop selection changes.
+    sl_dist_mid = abs(price - sl)
+    tp_dist_mid = abs(tp - price)
+    rr_tp = round(tp_dist_mid / sl_dist_mid, 2) if sl_dist_mid > 0 else 0
+    rr_tp2 = round(abs(tp2 - price) / sl_dist_mid, 2) if sl_dist_mid > 0 else 0
+    rr_tp3 = round(abs(tp3 - price) / sl_dist_mid, 2) if sl_dist_mid > 0 else 0
 
     # ── スプレッド補正（2026-06-23 追加、2026-06-25 動的化）──
     # bid/ask スプレッドを考慮した実効 SL/TP 距離と RR を算出。
@@ -437,8 +443,6 @@ def calc_staged_tp(price: float, direction: str, atr: float, regime: dict,
     spread_is_dynamic = spread_pips is not None
     spread_half = spread_price / 2.0
     # 中値ベースの距離
-    sl_dist_mid = sl_width  # = atr * sl_mult
-    tp_dist_mid = tp_width  # = atr * tp_mult
     # 実効距離（スプレッドにより SL は近く、TP は遠くなる）
     sl_dist_effective = sl_dist_mid + spread_half
     tp_dist_effective = max(tp_dist_mid - spread_half, 0.0)

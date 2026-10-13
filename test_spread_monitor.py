@@ -135,6 +135,28 @@ regime = detect_volatility_regime(prices_dummy, atr)
 # 静的スプレッド（パラメータなし）
 staged_static = calc_staged_tp(price, "LONG", atr, regime, prices=prices_dummy, pair="GBPJPY")
 
+# Regression: an old Chandelier candidate must never turn an initial 3xATR
+# GBPJPY stop into a stop just a few pips below entry.  Chandelier belongs to
+# post-entry trailing, which is managed by trade_tracker.
+entry_ce = 216.690
+atr_ce = 0.494
+regime_ce = {
+    "sl_multiplier": 3.0, "tp1_multiplier": 1.5,
+    "tp2_multiplier": 4.5, "tp3_multiplier": 6.0,
+}
+staged_ce = calc_staged_tp(
+    entry_ce, "LONG", atr_ce, regime_ce,
+    prices=[218.150] * 22, pair="GBPJPY", spread_pips=1.6,
+)
+check("initial SL ignores tight Chandelier candidate",
+      staged_ce["sl"] == 215.208,
+      f"sl={staged_ce['sl']}")
+check("Chandelier is not active at initial entry",
+      staged_ce["chandelier_sl_active"] is False)
+check("reported RR agrees with actual initial SL and TP",
+      staged_ce["rr_tp"] == 0.5 and staged_ce["rr_effective"] == 0.49,
+      f"rr={staged_ce['rr_tp']}, effective={staged_ce['rr_effective']}")
+
 # 動的スプレッド: London/NY low-VIX（タイト）
 tight_pips = get_dynamic_spread_pips("GBPJPY", vix=14, utc_now=dt_tight)
 staged_tight = calc_staged_tp(price, "LONG", atr, regime, prices=prices_dummy,
