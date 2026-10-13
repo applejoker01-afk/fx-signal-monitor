@@ -2318,9 +2318,12 @@ def generate_html_report(results, sentiment, us_yields, cb_rates,
     # （check_central_bank_data_staleness）なので同じ基準に合わせる。カレンダーは
     # 「今後7日間」を表示する性質上、8日以上更新が止まっていれば表示内容自体が
     # 信頼できないため短め。
-    _cb_meta = _load_json_meta("data/central_bank_rates.json", "last_updated", "data_source")
-    _cb_dt = _parse_date_flex(_cb_meta.get("last_updated"))
-    cb_freshness_badge = _freshness_badge("最終更新", _cb_dt, max_age_days=45)
+    # 2026-10-13: last_updated は日次自動取得で毎日書き換わっていたため常に「新鮮」
+    # 表示だった。人がstanceを検証した日（stance_last_verified）で判定する。
+    _cb_meta = _load_json_meta("data/central_bank_rates.json",
+                               "stance_last_verified", "last_updated", "data_source")
+    _cb_dt = _parse_date_flex(_cb_meta.get("stance_last_verified") or _cb_meta.get("last_updated"))
+    cb_freshness_badge = _freshness_badge("stance最終検証", _cb_dt, max_age_days=45)
 
     _cal_meta = _load_json_meta("data/economic_calendar.json", "last_updated", "last_auto_run")
     _cal_dt = _parse_date_flex(_cal_meta.get("last_auto_run") or _cal_meta.get("last_updated"))

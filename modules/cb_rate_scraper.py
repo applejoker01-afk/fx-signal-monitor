@@ -60,24 +60,30 @@ def fetch_usd_fed_funds():
         print("[INFO] FRED_API_KEY not set, skipping USD auto-fetch")
         return None
 
-    # 最新の月次データを取得
+    # 2026-10-13: FEDFUNDS（実効金利・月次平均）→ DFEDTARU（誘導目標上限・日次）に変更。
+    # FEDFUNDSは月次平均＋公表遅延のため、2026-09-16のFOMC利上げ(→3.75-4.00%)が
+    # 4週間経っても JSON に反映されず 3.75% のまま、last_auto_update も 09-01 で止まり、
+    # 「利上げ後にstanceが見直されていない」ことを検知できなかった。
+    # rate_fetcher.FRED_RATE_SERIES（スキャン時の上書き）も DFEDTARU なので揃える。
     url = (
         "https://api.stlouisfed.org/fred/series/observations"
-        f"?series_id=FEDFUNDS&api_key={api_key}&file_type=json"
-        "&sort_order=desc&limit=2"
+        f"?series_id=DFEDTARU&api_key={api_key}&file_type=json"
+        "&sort_order=desc&limit=5"
     )
     try:
         data = json.loads(http_get(url))
-        obs = data.get("observations", [])
-        if not obs:
-            return None
-        latest = obs[0]
-        rate = float(latest["value"])
-        return {
-            "rate": rate,
-            "date": latest["date"],
-            "source": "FRED FEDFUNDS",
-        }
+        # 日次系列は休日等で value="." の欠損行があるため数値の最新行を使う
+        for latest in data.get("observations", []):
+            try:
+                rate = float(latest["value"])
+            except (TypeError, ValueError):
+                continue
+            return {
+                "rate": rate,
+                "date": latest["date"],
+                "source": "FRED DFEDTARU",
+            }
+        return None
     except Exception as e:
         print(f"[WARN] FRED fetch failed: {e}")
         return None
@@ -396,7 +402,10 @@ def update_central_bank_rates(dry_run=False):
             kept.append(ccy)
 
     current["rates"] = rates_section
-    current["last_updated"] = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    # 2026-10-13: last_updated は書き換えない。自動取得はrateしか更新しないのに
+    # 毎日 last_updated を当日にしていたため、stanceの陳腐化検知
+    # （rate_fetcher.check_central_bank_data_staleness）が永久に発火しなかった。
+    # 自動実行の記録は last_auto_run、人によるstance検証は stance_last_verified。
     current["last_auto_run"] = datetime.now(timezone.utc).isoformat()
 
     if not dry_run:

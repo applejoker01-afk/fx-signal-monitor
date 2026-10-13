@@ -196,32 +196,82 @@ def check_central_bank_data_staleness(max_age_days: int = 45) -> list:
     このチェックはstance/rateの中身までは検証しないが、「最終更新から
     max_age_days日以上経過」を検知して通知することで、今回のような巻き戻りや
     更新忘れが長期間気づかれないリスクを減らす。
+
+    2026-10-13修正: 日次の cb_rate_scraper が実行のたびに last_updated を
+    当日に書き換えていたため、このチェックは導入以来一度も発火し得なかった
+    （stanceは9月初旬以降誰も見直していないのに「最終更新: 今日」と表示）。
+    判定基準を「人がstanceを検証した日」= stance_last_verified に変更し、
+    さらに「自動取得で金利が変わったのにその後stanceが見直されていない通貨」を
+    通貨単位で検知する（例: ECBの金利が自動更新で上がったが stance=neutral のまま）。
+    check_stance_consistency の前回比較は1回のスキャンでしか発火しないため、
+    こちらは見直されるまで毎回警告し続ける。
     """
     import json as _json
     if not os.path.exists(CENTRAL_BANK_FILE):
         return []
+    warnings = []
     try:
         with open(CENTRAL_BANK_FILE, "r", encoding="utf-8") as f:
             data = _json.load(f)
-        last_updated_str = data.get("last_updated")
-        if not last_updated_str:
+        verified_str = cb_stance_verified_date(data)
+        if not verified_str:
             return []
-        last_updated = datetime.fromisoformat(last_updated_str).replace(tzinfo=timezone.utc)
-        age_days = (datetime.now(timezone.utc) - last_updated).days
-        if age_days >= max_age_days:
-            return [{
+        now = datetime.now(timezone.utc)
+        stale = []  # (ccy, verified_date, age_days)
+        for ccy, info in (data.get("rates") or {}).items():
+            ccy_verified = info.get("stance_verified") or verified_str
+            try:
+                age = (now - _parse_ymd(ccy_verified)).days
+            except ValueError:
+                continue
+            if age >= max_age_days:
+                stale.append((ccy, ccy_verified, age))
+        if stale:
+            oldest = max(a for _, _, a in stale)
+            ccys = ", ".join(c for c, _, _ in sorted(stale, key=lambda x: -x[2]))
+            warnings.append({
                 "ccy": "ALL",
                 "stance": None,
                 "message": (
-                    f"central_bank_rates.json の最終更新が{age_days}日前"
-                    f"（{last_updated_str}）と古く、fa_score算出に使われる各国政策金利・"
+                    f"{len(stale)}通貨のstanceが{max_age_days}日以上未検証"
+                    f"（最古{oldest}日前）: {ccys}。fa_score算出に使われる政策金利・"
                     f"stanceが実態と乖離している可能性があります。中銀会合の結果を確認し、"
-                    f"手動更新を検討してください。"
+                    f"見直した通貨の stance_verified を更新してください。"
                 ),
-            }]
+            })
+        for ccy, info in (data.get("rates") or {}).items():
+            auto_upd = info.get("last_auto_update")
+            ccy_verified = info.get("stance_verified") or verified_str
+            if not auto_upd:
+                continue
+            try:
+                if _parse_ymd(auto_upd) > _parse_ymd(ccy_verified):
+                    cb = info.get("cb_name", ccy)
+                    warnings.append({
+                        "ccy": ccy,
+                        "stance": info.get("stance"),
+                        "message": (
+                            f"{cb}({ccy}): {auto_upd[:10]}に金利が自動更新({info.get('rate')}%)"
+                            f"されたが、stance={info.get('stance')}/"
+                            f"{info.get('rate_momentum')} は{ccy_verified}以降未検証。"
+                        ),
+                    })
+            except ValueError:
+                continue
     except Exception as e:
         print(f"[WARN] central_bank_rates.json 鮮度チェック失敗: {e}")
-    return []
+    return warnings
+
+
+def _parse_ymd(s: str) -> datetime:
+    """'YYYY-MM-DD' または ISO8601 を UTC aware datetime に変換。"""
+    return datetime.fromisoformat(str(s)[:10]).replace(tzinfo=timezone.utc)
+
+
+def cb_stance_verified_date(data: dict):
+    """central_bank_rates.json で「人がstanceを検証した日」を返す。
+    stance_last_verified が無い旧形式のファイルは last_updated にフォールバック。"""
+    return data.get("stance_last_verified") or data.get("last_updated")
 
 
 def save_rates_snapshot(rates, snapshot_file="docs/rates_snapshot.json"):
@@ -372,6 +422,17 @@ def _fallback_yields():
 # 金利差ベースのFAスコア計算（添付資料に基づく）
 # ---------------------------------------------------------------------------
 
+# stance 1段階差あたりの点数。tighten vs ease の完全ダイバージェンスで ±15点
+# （旧実装の最大補正値と同じ）、片側のみ tighten/ease で ±7.5点。
+STANCE_WEIGHT = 7.5
+
+
+def _stance_strength(stance: str) -> int:
+    """stance を通貨の強さ方向の符号に変換（tighten=+1 / ease=-1 / その他=0）。
+    "pause"・"neutral"・未知値は 0（方向感なし）として扱う。"""
+    return {"tighten": 1, "ease": -1}.get(stance, 0)
+
+
 def _rate_momentum_bonus(stance: str, momentum: str) -> float:
     """
     金利サイクルのモメンタムによる追加ボーナス（-8〜+8）。
@@ -431,19 +492,15 @@ def compute_fa_score(pair, pair_api, central_bank_rates, bond_trend=None):
     diff_score = diff_magnitude if rate_diff > 0 else -diff_magnitude
 
     # スタンスダイバージェンスボーナス（金利差が将来も拡大か縮小か）
-    stance_bonus = 0
-    if rate_diff > 0:
-        if stance_from == "tighten" and stance_to == "ease":
-            stance_bonus = 15
-        elif stance_from == "ease":
-            stance_bonus = -10
-        elif stance_from == "tighten":
-            stance_bonus = 5
-    elif rate_diff < 0:
-        if stance_from == "ease" and stance_to == "tighten":
-            stance_bonus = -15
-        elif stance_from == "tighten":
-            stance_bonus = 10
+    # 2026-10-13修正: 旧実装は rate_diff の符号ごとに別々の if 分岐を持ち、
+    #   (1) TO通貨のstanceをほぼ無視（例: AUDNZDでNZD利上げが反映されない）
+    #   (2) 同じ通貨ペアを逆向きに計算すると score(A/B) + score(B/A) != 100
+    #       （34ペア中11ペアで最大±10点のズレ。AUDNZD/NZDAUDが両方「買い寄り」）
+    #   (3) 金利差ちょうど0（GBPUSD等）ではstanceが一切反映されない
+    # という欠陥があった。FROM/TOの強さの差で反対称に計算する。
+    stance_bonus = STANCE_WEIGHT * (
+        _stance_strength(stance_from) - _stance_strength(stance_to)
+    )
 
     # 債券補正（米10年債トレンド・USD絡みペアのみ）
     bond_bonus = 0
