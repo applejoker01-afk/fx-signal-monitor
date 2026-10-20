@@ -411,7 +411,205 @@
       "ai_exit_advice": "# ポジション分析：EURNZD SHORT\n\n## 1. 現状整理\n強いダウントレンド環境（ADX44.3）でショートポジション保有中。テクニカルスコア21.7と低迷していますが、ファンダメンタルズ（NZD強化・金利差）が下支えしており、複数TPまでの値幅が確保されている状態です。\n\n## 2. 利益を伸ばす選択肢\n\n**A. トレール切替戦略**\n- 狙い：TP1到達後、残玉をトレールストップに切替、トレンド継続時の利益拡大を狙う\n- リスク：トレンド転換時に利益の一部を失う可能性\n\n**B. 段階的部分利確**\n- 狙い：TP1・TP2で計50%程度決済し、最終TP3を狙うポジション保持\n- リスク：保有量減で上昇局面での利益取り逃し（ただし利益固定効果で心理安定）\n\n**C. 金利差縮小まで部分保有**\n- 狙い：NZD加速局面は短期的、ECB・RBNZの金利差変動まで調整ポジションを維持\n- リスク：スワップが-0.10%と逆風のため、長期保有には不向き\n\n## 3. 留意点\nECBが利上げサイクル終了方向（decelerating）でNZDとの金利差がさらに縮小するリスク、および予期しない中銀発言や介入による急転換に注意が必要です。"
     }
   ],
-  "dropped": [],
+  "dropped": [
+    {
+      "pair": "EURNZD",
+      "label": "EUR/NZD",
+      "price": 1.9797,
+      "ta_score": 21.7,
+      "dma_score": 30,
+      "macd_score": 15,
+      "rsi_score": 35,
+      "trend_strength": -20,
+      "atr_quality": 0,
+      "breakout_bonus": 15,
+      "divergence_adj": 0,
+      "ema_short_bonus": 0,
+      "dma200": 1.98361,
+      "dma50": 1.98663,
+      "rsi": 38.8,
+      "macd": -0.00161,
+      "macd_signal": 0.00202,
+      "atr": 0.00485,
+      "rsi_reversal_confirmed": false,
+      "ta_score_overheated": false,
+      "fa_score": 37.2,
+      "fa_direction": "sell",
+      "fa_rate_diff": -0.1,
+      "fa_detail": "ECB(2.65% tighten/decelerating) vs RBNZ(2.75% tighten/accelerating) 差-0.10% / NZDサイクル強化(accelerating)",
+      "stars": 3,
+      "verdict": "○ ショート条件成立",
+      "direction": "SHORT",
+      "pair_type": "major",
+      "intervention_news": {
+        "EUR": {
+          "score": 0,
+          "level": "none",
+          "hits": [],
+          "reason": "関連報道なし",
+          "headlines": [],
+          "cached": true,
+          "timestamp": "2026-10-20T00:59:19.217518+00:00"
+        }
+      },
+      "upcoming_events": [
+        {
+          "name": "CPI q/q",
+          "currency": "NZD",
+          "importance": "critical",
+          "hours_until": 44.8,
+          "date": "2026-10-21T21:45:00Z"
+        }
+      ],
+      "volatility_regime": {
+        "regime": "normal",
+        "regime_label": "通常ボラ相場",
+        "atr_ratio": 0.97,
+        "atr_90d": 0.00502,
+        "sl_multiplier": 3.0,
+        "tp1_multiplier": 1.5,
+        "tp2_multiplier": 4.5,
+        "tp3_multiplier": 6.0,
+        "note": "ATR比率1.0 → TP=1.5×ATR（Phase1出口改善・到達率向上）"
+      },
+      "staged_tp": {
+        "sl": 1.99425,
+        "tp": 1.972425,
+        "trail_atr_mult": 2.0,
+        "trail_distance": 0.0097,
+        "be_plus_offset": 0.007275,
+        "be_target_after_tp": 1.972425,
+        "max_target": 1.9506,
+        "rr_tp": 0.5,
+        "tp_mode": "single_with_trail",
+        "tp1": 1.972425,
+        "tp2": 1.957875,
+        "tp3": 1.9506,
+        "sl_width": 0.01455,
+        "tp1_width": 0.007275,
+        "rr_tp1": 0.5,
+        "rr_tp2": 1.5,
+        "rr_tp3": 2.0,
+        "spread_price": 0.00054,
+        "spread_pips": 5.4,
+        "spread_atr_ratio": 0.111,
+        "sl_dist_effective": 0.01482,
+        "tp_dist_effective": 0.007005,
+        "rr_effective": 0.47,
+        "spread_is_dynamic": true,
+        "spread_pips_dynamic": 5.4,
+        "regime_label": "通常ボラ相場",
+        "strategy": "TP(1.972425)到達 → SLを BE+0.5R(1.972425) へ移動 → トレーリング(2.0×ATR=0.0097)発動 → 利を伸ばす（理論最大: 1.9506）",
+        "chandelier_sl_active": false,
+        "chandelier_note": "Chandelier Exit: 過去22日安値(1.9792)+3.0xATR",
+        "spread_session": "深夜クローズ",
+        "spread_session_mult": 1.8,
+        "spread_vix_mult": 1.0
+      },
+      "carry_score": {
+        "carry_score": 0.41,
+        "label": "キャリー効率が低い",
+        "annual_swap_pct": 0.1,
+        "daily_volatility_pct": 0.24,
+        "breakeven_days": 2235,
+        "note": "SL幅をスワップで回収: 約2235日"
+      },
+      "support_resistance": {
+        "resistance": [
+          {
+            "price": 1.99105,
+            "strength": 2,
+            "label": "レジスタンス",
+            "distance_pct": 0.57
+          },
+          {
+            "price": 1.9981,
+            "strength": 1,
+            "label": "弱いレジスタンス",
+            "distance_pct": 0.93
+          },
+          {
+            "price": 2.0121,
+            "strength": 1,
+            "label": "弱いレジスタンス",
+            "distance_pct": 1.64
+          },
+          {
+            "price": 2.0181,
+            "strength": 1,
+            "label": "弱いレジスタンス",
+            "distance_pct": 1.94
+          }
+        ],
+        "support": [
+          {
+            "price": 1.9552,
+            "strength": 6,
+            "label": "強いサポート",
+            "distance_pct": 1.24
+          },
+          {
+            "price": 1.9491,
+            "strength": 1,
+            "label": "弱いサポート",
+            "distance_pct": 1.55
+          },
+          {
+            "price": 1.969,
+            "strength": 1,
+            "label": "弱いサポート",
+            "distance_pct": 0.54
+          }
+        ],
+        "nearest_resistance": {
+          "price": 1.99105,
+          "strength": 2,
+          "label": "レジスタンス",
+          "distance_pct": 0.57
+        },
+        "nearest_support": {
+          "price": 1.969,
+          "strength": 1,
+          "label": "弱いサポート",
+          "distance_pct": 0.54
+        },
+        "context": "レジスタンス(1.99105)まで0.57% / サポート(1.969)まで0.54%"
+      },
+      "market_regime": {
+        "adx": 44.9,
+        "plus_di": 27.5,
+        "minus_di": 72.5,
+        "regime": "trending",
+        "regime_label": "トレンド相場",
+        "trend_direction": "down",
+        "note": "順張りシグナル有効"
+      },
+      "ambush": {
+        "has_alert": false,
+        "approaching": []
+      },
+      "spread_filter_applied": true,
+      "spread_filter_reason": "💸 スプレッド広め: EURNZD spread=5.4pips (11% of ATR) — 実効RR 1:0.5→1:0.47。★4→★3降格。",
+      "cb_meeting_blackout": {
+        "active": false,
+        "severity": "none",
+        "reason": ""
+      },
+      "strength_context": {
+        "base_currency": "EUR",
+        "quote_currency": "NZD",
+        "base_score": -17.4,
+        "base_label": "中立",
+        "base_rank": 13,
+        "quote_score": -15.3,
+        "quote_label": "中立",
+        "quote_rank": 12,
+        "spread": -2.1,
+        "context": "通貨強弱が拮抗（中立）",
+        "bias": "neutral"
+      }
+    }
+  ],
   "closed": [],
   "state_changes": []
 }
