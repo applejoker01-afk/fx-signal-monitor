@@ -714,7 +714,7 @@
     {
       "pair": "EURAUD",
       "label": "EUR/AUD",
-      "price": 1.5853,
+      "price": 1.5831,
       "ta_score": 34.7,
       "dma_score": 15,
       "macd_score": 15,
@@ -724,12 +724,12 @@
       "breakout_bonus": 15,
       "divergence_adj": 0,
       "ema_short_bonus": -12,
-      "dma200": 1.64052,
-      "dma50": 1.61468,
-      "rsi": 33.49,
-      "macd": -0.00665,
-      "macd_signal": -0.00467,
-      "atr": 0.00508,
+      "dma200": 1.64023,
+      "dma50": 1.61354,
+      "rsi": 32.4,
+      "macd": -0.00749,
+      "macd_signal": -0.00523,
+      "atr": 0.00487,
       "rsi_reversal_confirmed": false,
       "ta_score_overheated": false,
       "fa_score": 31.4,
@@ -737,9 +737,30 @@
       "fa_rate_diff": -1.95,
       "fa_detail": "ECB(2.65% tighten/decelerating) vs RBA(4.60% tighten/stable) 差-1.95% / AUDサイクル強化(stable)",
       "stars": 1,
-      "verdict": "○ ショート条件成立",
-      "direction": "SHORT",
+      "verdict": "⏸ イベント前自動見送り",
+      "direction": "WAIT_EVENT",
       "pair_type": "major",
+      "original_stars": 4,
+      "event_warning": "重要イベント直前 (CPI m/m まで 0.8h)",
+      "event_info": {
+        "date": "2026-10-28T00:30:00Z",
+        "country": "AUD",
+        "currency": "AUD",
+        "name": "CPI m/m",
+        "importance": "critical",
+        "affects_pairs": [
+          "AUDJPY",
+          "AUDUSD",
+          "EURAUD",
+          "GBPAUD",
+          "AUDCHF",
+          "AUDNZD"
+        ],
+        "source": "forexfactory",
+        "actual": null,
+        "estimate": "0.7%",
+        "previous": "0.4%"
+      },
       "intervention_news": {
         "EUR": {
           "score": 0,
@@ -748,7 +769,7 @@
           "reason": "関連報道なし",
           "headlines": [],
           "cached": true,
-          "timestamp": "2026-10-27T09:41:42.368649+00:00"
+          "timestamp": "2026-10-27T23:40:21.147797+00:00"
         }
       },
       "upcoming_events": [
@@ -756,97 +777,63 @@
           "name": "CPI m/m",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 14.8,
+          "hours_until": 0.8,
           "date": "2026-10-28T00:30:00Z"
         },
         {
           "name": "CPI y/y",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 14.8,
+          "hours_until": 0.8,
           "date": "2026-10-28T00:30:00Z"
         },
         {
           "name": "Trimmed Mean CPI m/m",
           "currency": "AUD",
           "importance": "critical",
-          "hours_until": 14.8,
+          "hours_until": 0.8,
           "date": "2026-10-28T00:30:00Z"
         },
         {
           "name": "Main Refinancing Rate",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 51.6,
+          "hours_until": 37.6,
           "date": "2026-10-29T13:15:00Z"
         },
         {
           "name": "Monetary Policy Statement",
           "currency": "EUR",
           "importance": "high",
-          "hours_until": 51.6,
+          "hours_until": 37.6,
           "date": "2026-10-29T13:15:00Z"
         },
         {
           "name": "ECB Press Conference",
           "currency": "EUR",
           "importance": "critical",
-          "hours_until": 52.1,
+          "hours_until": 38.1,
           "date": "2026-10-29T13:45:00Z"
         }
       ],
       "volatility_regime": {
         "regime": "normal",
         "regime_label": "通常ボラ相場",
-        "atr_ratio": 1.3,
-        "atr_90d": 0.00391,
+        "atr_ratio": 1.24,
+        "atr_90d": 0.00392,
         "sl_multiplier": 3.0,
         "tp1_multiplier": 1.5,
         "tp2_multiplier": 4.5,
         "tp3_multiplier": 6.0,
-        "note": "ATR比率1.3 → TP=1.5×ATR（Phase1出口改善・到達率向上）"
-      },
-      "staged_tp": {
-        "sl": 1.60054,
-        "tp": 1.57768,
-        "trail_atr_mult": 2.0,
-        "trail_distance": 0.01016,
-        "be_plus_offset": 0.00762,
-        "be_target_after_tp": 1.57768,
-        "max_target": 1.55482,
-        "rr_tp": 0.5,
-        "tp_mode": "single_with_trail",
-        "tp1": 1.57768,
-        "tp2": 1.56244,
-        "tp3": 1.55482,
-        "sl_width": 0.01524,
-        "tp1_width": 0.00762,
-        "rr_tp1": 0.5,
-        "rr_tp2": 1.5,
-        "rr_tp3": 2.0,
-        "spread_price": 0.000255,
-        "spread_pips": 2.6,
-        "spread_atr_ratio": 0.05,
-        "sl_dist_effective": 0.015367,
-        "tp_dist_effective": 0.007492,
-        "rr_effective": 0.49,
-        "spread_is_dynamic": true,
-        "spread_pips_dynamic": 2.55,
-        "regime_label": "通常ボラ相場",
-        "strategy": "TP(1.57768)到達 → SLを BE+0.5R(1.57768) へ移動 → トレーリング(2.0×ATR=0.01016)発動 → 利を伸ばす（理論最大: 1.55482）",
-        "chandelier_sl_active": false,
-        "chandelier_note": "",
-        "spread_session": "London",
-        "spread_session_mult": 0.85,
-        "spread_vix_mult": 1.0
+        "note": "ATR比率1.2 → TP=1.5×ATR（Phase1出口改善・到達率向上）"
       },
       "carry_score": {
-        "carry_score": 6.09,
+        "carry_score": 6.34,
         "label": "非常に優れたキャリー",
         "annual_swap_pct": 1.95,
-        "daily_volatility_pct": 0.32,
-        "breakeven_days": 149,
-        "note": "SL幅をスワップで回収: 約149日"
+        "daily_volatility_pct": 0.31,
+        "breakeven_days": 143,
+        "note": "SL幅をスワップで回収: 約143日"
       },
       "support_resistance": {
         "resistance": [
@@ -854,25 +841,25 @@
             "price": 1.6315,
             "strength": 3,
             "label": "レジスタンス",
-            "distance_pct": 2.91
+            "distance_pct": 3.06
           },
           {
             "price": 1.646267,
             "strength": 3,
             "label": "レジスタンス",
-            "distance_pct": 3.85
+            "distance_pct": 3.99
           },
           {
             "price": 1.621,
             "strength": 2,
             "label": "レジスタンス",
-            "distance_pct": 2.25
+            "distance_pct": 2.39
           },
           {
             "price": 1.6546,
             "strength": 1,
             "label": "弱いレジスタンス",
-            "distance_pct": 4.37
+            "distance_pct": 4.52
           }
         ],
         "support": [],
@@ -880,21 +867,20 @@
           "price": 1.621,
           "strength": 2,
           "label": "レジスタンス",
-          "distance_pct": 2.25
+          "distance_pct": 2.39
         },
         "nearest_support": null,
-        "context": "レジスタンス(1.621)まで2.25%"
+        "context": "レジスタンス(1.621)まで2.39%"
       },
       "market_regime": {
-        "adx": 28.2,
-        "plus_di": 35.9,
-        "minus_di": 64.1,
-        "regime": "weak_trend",
-        "regime_label": "弱トレンド相場",
+        "adx": 35.2,
+        "plus_di": 32.4,
+        "minus_di": 67.6,
+        "regime": "trending",
+        "regime_label": "トレンド相場",
         "trend_direction": "down",
-        "note": "順張りやや有効"
+        "note": "順張りシグナル有効"
       },
-      "performance_adjusted": true,
       "performance": {
         "win_rate": 0.0,
         "total_trades": 1,
@@ -902,47 +888,25 @@
         "note": "動的実績調整は凍結中(サンプル1件・2026-08-25〜) / 主力ペア(実証76.9%)"
       },
       "ambush": {
-        "has_alert": true,
-        "nearest": {
-          "type": "ピボットS1",
-          "price": 1.583467,
-          "role": "ピボットS1",
-          "kind": "support",
-          "distance": 0.001833,
-          "distance_pct": 0.116
-        },
-        "approaching": [
-          {
-            "type": "ピボットS1",
-            "price": 1.583467,
-            "role": "ピボットS1",
-            "kind": "support",
-            "distance": 0.001833,
-            "distance_pct": 0.116
-          }
-        ],
-        "message": "ピボットS1（1.583467）に接近 あと0.12% → 反発でのロング候補"
+        "has_alert": false,
+        "approaching": []
       },
-      "high_confidence_zone": false,
-      "ambush_quality": "注意（シグナルとPOIが逆方向）",
-      "session_filter_applied": true,
-      "session_filter_reason": "🕐 セッションフィルタ: EURAUD London単独枠(09:00 UTC, 08-13 UTC) — 実データで決着勝率11.1%(n=9)と最弱の時間帯。★5→★2降格。",
       "cb_meeting_blackout": {
         "active": true,
         "severity": "warn",
-        "reason": "EUR 中銀会合まで 38h（要注意期間）",
+        "reason": "EUR 中銀会合まで 24h（要注意期間）",
         "currency": "EUR"
       },
       "strength_context": {
         "base_currency": "EUR",
         "quote_currency": "AUD",
-        "base_score": -32.7,
+        "base_score": -30.8,
         "base_label": "やや弱い",
         "base_rank": 15,
-        "quote_score": -0.8,
+        "quote_score": -1.2,
         "quote_label": "中立",
-        "quote_rank": 10,
-        "spread": -31.9,
+        "quote_rank": 11,
+        "spread": -29.6,
         "context": "やや弱い通貨 vs 強め（ショート寄り）",
         "bias": "slight_short"
       }
@@ -1976,6 +1940,108 @@
           "note": "残高不足: 最小取引単位(100EUR)でも証拠金上限（既存ポジション込み）を超過（リスク許容¥21747 / 証拠金余力¥288[既存保有分¥289667控除後]）"
         },
         "current_price": 1.9586,
+        "current_stars": 3
+      },
+      "update": {
+        "sl": 1.96319
+      }
+    },
+    {
+      "pair": "EURAUD",
+      "trade": {
+        "pair": "EURAUD",
+        "entry_time": "2026-10-21T23:08:49.435964+00:00",
+        "entry_date": "2026-10-21",
+        "entry_price": 1.598763,
+        "direction": "SHORT",
+        "initial_stars": 5,
+        "sl": 1.589385,
+        "initial_sl": 1.61283,
+        "tp": 1.589385,
+        "trail_distance": 0.01042,
+        "trail_atr_mult": 2.0,
+        "be_target_after_tp": 1.589385,
+        "max_target": 1.56594,
+        "tp_mode": "single_with_trail",
+        "tp_hit": true,
+        "trail_active": true,
+        "extreme_price": 1.5831,
+        "tp1": 1.589385,
+        "tp2": 1.573755,
+        "tp3": 1.56594,
+        "ta_score": 34.7,
+        "fa_score": 31.4,
+        "fa_rate_diff": -1.95,
+        "regime": "normal",
+        "rsi_reversal_confirmed": false,
+        "ta_score_overheated": false,
+        "entry_source": "pending_limit_order",
+        "pending_created_time": "2026-10-21T16:43:54.552041+00:00",
+        "pending_scan_price": 1.5972,
+        "pyramid_seq": 1,
+        "position_sizing": {
+          "tradable": true,
+          "units": 11300,
+          "margin_required_jpy": 80279.0,
+          "risk_amount_jpy": 28995.0,
+          "estimated_loss_jpy": 17654.0,
+          "existing_margin_jpy": 209388.0,
+          "exposure_multiplier": 1.0,
+          "confidence_multiplier": 1.0,
+          "note": "11300EUR単位（証拠金約¥80279・想定損失¥17654）"
+        },
+        "units": 11300,
+        "current_price": 1.5831,
+        "current_stars": 1
+      },
+      "update": {
+        "extreme_price": 1.5831,
+        "sl": 1.589385
+      }
+    },
+    {
+      "pair": "EURNZD",
+      "trade": {
+        "pair": "EURNZD",
+        "entry_time": "2026-10-21T23:08:49.435964+00:00",
+        "entry_date": "2026-10-21",
+        "entry_price": 1.971722,
+        "direction": "SHORT",
+        "initial_stars": 4,
+        "sl": 1.96319,
+        "initial_sl": 1.98452,
+        "tp": 1.96319,
+        "trail_distance": 0.00948,
+        "trail_atr_mult": 2.0,
+        "be_target_after_tp": 1.96319,
+        "max_target": 1.94186,
+        "tp_mode": "single_with_trail",
+        "tp_hit": true,
+        "trail_active": true,
+        "extreme_price": 1.9565,
+        "tp1": 1.96319,
+        "tp2": 1.94897,
+        "tp3": 1.94186,
+        "ta_score": 13.7,
+        "fa_score": 37.2,
+        "fa_rate_diff": -0.1,
+        "regime": "normal",
+        "rsi_reversal_confirmed": false,
+        "ta_score_overheated": false,
+        "entry_source": "pending_limit_order",
+        "pending_created_time": "2026-10-21T16:43:54.552041+00:00",
+        "pending_scan_price": 1.9703,
+        "pyramid_seq": 1,
+        "position_sizing": {
+          "tradable": false,
+          "units": 0,
+          "risk_amount_jpy": 21747.0,
+          "margin_required_jpy": 0,
+          "estimated_loss_jpy": 0,
+          "existing_margin_jpy": 289667.0,
+          "note": "残高不足: 最小取引単位(100EUR)でも証拠金上限（既存ポジション込み）を超過（リスク許容¥21747 / 証拠金余力¥288[既存保有分¥289667控除後]）"
+        },
+        "current_price": 1.9582,
         "current_stars": 3
       },
       "update": {
