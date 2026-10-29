@@ -193,6 +193,231 @@
         "bias": "slight_short"
       },
       "ai_exit_advice": "# EURAUD SHORT ポジション分析\n\n## 1. 現状整理\n強いトレンド（ADX30.5）でショートポジションが機能中。テクニカルスコア34.7で買いシグナルと相反する状況にあり、トレンド継続 vs 反転の判断が重要です。\n\n## 2. 利益を伸ばす選択肢\n\n**A案：トレール切替で長期保有**\n- 狙い：トレンド継続時にTP3(1.55524)まで利伸ばし、同時にスワップ収集（-1.95%で負だが、大きな利益があれば相対化可能）\n- リスク：テクニカルスコア34.7の上昇圧力でトレンド反転の可能性あり。TA悪化に応じ早期撤退要\n\n**B案：部分利確＋OCO継続**\n- 狙い：TP1で30～40%利確し確定益を確保しつつ、残玉でTP2/3狙い。利益の「歪度」を高める\n- リスク：中途半端な利確で、強トレンド時の大利益を逃す可能性\n\n**C案：TP2(1.56208)でOCO固定**\n- 狙い：テクニカス悪化への防衛。勝率と期待値のバランス型\n- リスク：トレンド継続なら最大利益を約30%取り落とし\n\n## 3. 留意点\n**ECB/RBA金利差-1.95%の縮小圧力（ECB利上げ休止の可能性）と豪ドルサイクル安定の組み合わせは、反発リスク材料**となるため、TA34.7の上昇をモニタリング必須です。"
+    },
+    {
+      "pair": "GBPCHF",
+      "label": "GBP/CHF",
+      "price": 1.1043,
+      "ta_score": 98,
+      "dma_score": 85,
+      "macd_score": 85,
+      "rsi_score": 50,
+      "trend_strength": 18,
+      "atr_quality": 0,
+      "breakout_bonus": 15,
+      "divergence_adj": 0,
+      "ema_short_bonus": 12,
+      "dma200": 1.07345,
+      "dma50": 1.09942,
+      "rsi": 54.91,
+      "macd": 0.00124,
+      "macd_signal": 0.00109,
+      "atr": 0.00241,
+      "rsi_reversal_confirmed": false,
+      "ta_score_overheated": true,
+      "fa_score": 78.1,
+      "fa_direction": "buy",
+      "fa_rate_diff": 3.75,
+      "fa_detail": "BOE(3.75% neutral/stable) vs SNB(0.00% neutral/stable) 差+3.75%",
+      "stars": 4,
+      "verdict": "◎ 高信頼ロング（過熱スコア降格: ta_score逆U字の実績データに基づく）",
+      "direction": "LONG",
+      "pair_type": "major",
+      "intervention_news": {
+        "GBP": {
+          "score": 0,
+          "level": "none",
+          "hits": [],
+          "reason": "関連報道なし",
+          "headlines": [],
+          "cached": true,
+          "timestamp": "2026-10-29T16:49:28.528836+00:00"
+        },
+        "CHF": {
+          "score": 0,
+          "level": "none",
+          "hits": [],
+          "reason": "関連報道なし",
+          "headlines": [],
+          "cached": true,
+          "timestamp": "2026-10-29T16:49:56.141402+00:00"
+        }
+      },
+      "upcoming_events": [],
+      "volatility_regime": {
+        "regime": "normal",
+        "regime_label": "通常ボラ相場",
+        "atr_ratio": 1.0,
+        "atr_90d": 0.0024,
+        "sl_multiplier": 3.0,
+        "tp1_multiplier": 1.5,
+        "tp2_multiplier": 4.5,
+        "tp3_multiplier": 6.0,
+        "note": "ATR比率1.0 → TP=1.5×ATR（Phase1出口改善・到達率向上）"
+      },
+      "staged_tp": {
+        "sl": 1.09707,
+        "tp": 1.107915,
+        "trail_atr_mult": 2.0,
+        "trail_distance": 0.00482,
+        "be_plus_offset": 0.003615,
+        "be_target_after_tp": 1.107915,
+        "max_target": 1.11876,
+        "rr_tp": 0.5,
+        "tp_mode": "single_with_trail",
+        "tp1": 1.107915,
+        "tp2": 1.115145,
+        "tp3": 1.11876,
+        "sl_width": 0.00723,
+        "tp1_width": 0.003615,
+        "rr_tp1": 0.5,
+        "rr_tp2": 1.5,
+        "rr_tp3": 2.0,
+        "spread_price": 0.00024,
+        "spread_pips": 2.4,
+        "spread_atr_ratio": 0.1,
+        "sl_dist_effective": 0.00735,
+        "tp_dist_effective": 0.003495,
+        "rr_effective": 0.48,
+        "spread_is_dynamic": true,
+        "spread_pips_dynamic": 2.4,
+        "regime_label": "通常ボラ相場",
+        "strategy": "TP(1.107915)到達 → SLを BE+0.5R(1.107915) へ移動 → トレーリング(2.0×ATR=0.00482)発動 → 利を伸ばす（理論最大: 1.11876）",
+        "chandelier_sl_active": false,
+        "chandelier_note": "Chandelier Exit: 過去22日高値(1.1056)-3.0xATR",
+        "spread_session": "London/NY overlap",
+        "spread_session_mult": 0.8,
+        "spread_vix_mult": 1.0
+      },
+      "carry_score": {
+        "carry_score": 17.18,
+        "label": "非常に優れたキャリー",
+        "annual_swap_pct": 3.75,
+        "daily_volatility_pct": 0.22,
+        "breakeven_days": 53,
+        "note": "SL幅をスワップで回収: 約53日"
+      },
+      "support_resistance": {
+        "resistance": [
+          {
+            "price": 1.1056,
+            "strength": 1,
+            "label": "弱いレジスタンス",
+            "distance_pct": 0.12
+          },
+          {
+            "price": 1.109,
+            "strength": 1,
+            "label": "弱いレジスタンス",
+            "distance_pct": 0.43
+          }
+        ],
+        "support": [
+          {
+            "price": 1.0505,
+            "strength": 2,
+            "label": "サポート",
+            "distance_pct": 4.87
+          },
+          {
+            "price": 1.0912,
+            "strength": 2,
+            "label": "サポート",
+            "distance_pct": 1.19
+          },
+          {
+            "price": 1.0389,
+            "strength": 1,
+            "label": "弱いサポート",
+            "distance_pct": 5.92
+          },
+          {
+            "price": 1.041,
+            "strength": 1,
+            "label": "弱いサポート",
+            "distance_pct": 5.73
+          }
+        ],
+        "nearest_resistance": {
+          "price": 1.1056,
+          "strength": 1,
+          "label": "弱いレジスタンス",
+          "distance_pct": 0.12
+        },
+        "nearest_support": {
+          "price": 1.0912,
+          "strength": 2,
+          "label": "サポート",
+          "distance_pct": 1.19
+        },
+        "context": "レジスタンス(1.1056)まで0.12%（非常に近い・注意） / サポート(1.0912)まで1.19%"
+      },
+      "market_regime": {
+        "adx": 7.2,
+        "plus_di": 53.6,
+        "minus_di": 46.4,
+        "regime": "ranging",
+        "regime_label": "レンジ相場",
+        "trend_direction": "up",
+        "note": "順張りは機能しにくい・逆張り向き"
+      },
+      "performance": {
+        "win_rate": 75.0,
+        "total_trades": 4,
+        "adjustment": 0,
+        "note": "動的実績調整は凍結中(サンプル4件・2026-08-25〜)"
+      },
+      "ambush": {
+        "has_alert": true,
+        "nearest": {
+          "type": "ピボットPP",
+          "price": 1.103567,
+          "role": "ピボットPP",
+          "kind": "support",
+          "distance": 0.000733,
+          "distance_pct": 0.066
+        },
+        "approaching": [
+          {
+            "type": "ピボットPP",
+            "price": 1.103567,
+            "role": "ピボットPP",
+            "kind": "support",
+            "distance": 0.000733,
+            "distance_pct": 0.066
+          },
+          {
+            "type": "ピボットR1",
+            "price": 1.105133,
+            "role": "ピボットR1",
+            "kind": "resistance",
+            "distance": 0.000833,
+            "distance_pct": 0.075
+          }
+        ],
+        "message": "ピボットPP（1.103567）に接近 あと0.07% → 反発でのロング候補"
+      },
+      "high_confidence_zone": true,
+      "ambush_quality": "整合（シグナル方向とPOIが一致）",
+      "cb_meeting_blackout": {
+        "active": false,
+        "severity": "none",
+        "reason": ""
+      },
+      "strength_context": {
+        "base_currency": "GBP",
+        "quote_currency": "CHF",
+        "base_score": 9.9,
+        "base_label": "中立",
+        "base_rank": 4,
+        "quote_score": 7.6,
+        "quote_label": "中立",
+        "quote_rank": 6,
+        "spread": 2.3,
+        "context": "通貨強弱が拮抗（中立）",
+        "bias": "neutral"
+      },
+      "ai_exit_advice": "# ポジション状況分析\n\n## 1. 現状整理\nADX7.2のレンジ相場で方向感に乏しく、テクニカルスコアは堅牢（TA98）ですが、値動きが限定的です。一方、+3.75%の金利差がスワップ収益源となり、時間が味方になる構造です。\n\n## 2. 利益を伸ばす選択肢\n\n**A) OCO固定型の継続**\n- 狙い：TP3（1.11876）狙いで上値トライ、SL設定で下値を守る\n- リスク：レンジ上限到達前に反転する可能性\n\n**B) 部分利確＋トレール切替**\n- 狙い：TP2（1.115145）で30-50%利確し、残ポジはADXが上昇（トレンド転換）時にトレール導入\n- リスク：トレンド初期の微益取りになるリスク\n\n**C) 金利差活用の長期保有**\n- 狙い：SL下限で回収損が年間スワップで相殺される場合、ポジ維持してキャリー利益を積み重ねる\n- リスク：金利差縮小や要人発言による急落（SNB介入リスク）\n\n## 3. 留意点\nSNB（スイス中銀）の独立的行動や欧州政策変更による金利差縮小、テクニカルがレンジ上限でも反転パターンが見られやすいため、ニュース監視が必須です。"
     }
   ],
   "dropped": [
@@ -754,6 +979,58 @@
         "units": 11300,
         "current_price": 1.5847,
         "current_stars": 1
+      },
+      "update": {
+        "sl": 1.589385
+      }
+    },
+    {
+      "pair": "EURAUD",
+      "trade": {
+        "pair": "EURAUD",
+        "entry_time": "2026-10-21T23:08:49.435964+00:00",
+        "entry_date": "2026-10-21",
+        "entry_price": 1.598763,
+        "direction": "SHORT",
+        "initial_stars": 5,
+        "sl": 1.589385,
+        "initial_sl": 1.61283,
+        "tp": 1.589385,
+        "trail_distance": 0.01042,
+        "trail_atr_mult": 2.0,
+        "be_target_after_tp": 1.589385,
+        "max_target": 1.56594,
+        "tp_mode": "single_with_trail",
+        "tp_hit": true,
+        "trail_active": true,
+        "extreme_price": 1.5793,
+        "tp1": 1.589385,
+        "tp2": 1.573755,
+        "tp3": 1.56594,
+        "ta_score": 34.7,
+        "fa_score": 31.4,
+        "fa_rate_diff": -1.95,
+        "regime": "normal",
+        "rsi_reversal_confirmed": false,
+        "ta_score_overheated": false,
+        "entry_source": "pending_limit_order",
+        "pending_created_time": "2026-10-21T16:43:54.552041+00:00",
+        "pending_scan_price": 1.5972,
+        "pyramid_seq": 1,
+        "position_sizing": {
+          "tradable": true,
+          "units": 11300,
+          "margin_required_jpy": 80279.0,
+          "risk_amount_jpy": 28995.0,
+          "estimated_loss_jpy": 17654.0,
+          "existing_margin_jpy": 209388.0,
+          "exposure_multiplier": 1.0,
+          "confidence_multiplier": 1.0,
+          "note": "11300EUR単位（証拠金約¥80279・想定損失¥17654）"
+        },
+        "units": 11300,
+        "current_price": 1.5863,
+        "current_stars": 3
       },
       "update": {
         "sl": 1.589385
