@@ -217,7 +217,278 @@
       "ai_exit_advice": "# EURNZD SHORT ポジション状況整理\n\n**1. 現状整理**\nレンジ相場（ADX2.6）で方向性が弱く、テクニカルスコア33.7と中程度。NZDサイクル加速によるファンダ優位性がある一方、金利差は縮小傾向(-0.10%)で長期保有の収益性が限定的です。\n\n**2. 利益を伸ばす選択肢**\n\n**A) トレール切替で利伸ばし**\n- 狙い：レンジ脱出時の追撃機会を確保。TP1(1.98254)で初期利益確定後、残玉をトレールに切替えて上値追い\n- リスク：レンジ相場では騙しで損失拡大の可能性\n\n**B) 部分利確＋ポジ保有（スワップ補填戦略）**\n- 狙い：TP1で50%利確して初期資金回収後、残50%はNZD加速シナリオに賭ける。スワップ負担は減った利益で相殺\n- リスク：金利差縮小が加速すればスワップ侵食が進む（SL回収日数不明が課題）\n\n**C) 全量OCO固定で損切り損益確定**\n- 狙い：テクニカル方向性が弱い局面のため、期待値が明確な設定で確定リターンを確保\n- リスク：トレンド転換時の利益機会を完全喪失\n\n**3. 留意点**\nECB・RBNZ金利差が0%に向かう環境では、キャリー長期保有の期待値低下が加速する可能性があり、判断の時間軸を明確にすることが重要です。"
     }
   ],
-  "dropped": [],
-  "closed": [],
+  "dropped": [
+    {
+      "pair": "EURNZD",
+      "label": "EUR/NZD",
+      "price": 1.995,
+      "ta_score": 38.7,
+      "dma_score": 70,
+      "macd_score": 65,
+      "rsi_score": 65,
+      "trend_strength": -20,
+      "atr_quality": 0,
+      "breakout_bonus": 0,
+      "divergence_adj": 0,
+      "ema_short_bonus": -8,
+      "dma200": 1.98204,
+      "dma50": 1.98929,
+      "rsi": 55.78,
+      "macd": -0.00239,
+      "macd_signal": -0.00401,
+      "atr": 0.00595,
+      "rsi_reversal_confirmed": true,
+      "ta_score_overheated": false,
+      "fa_score": 37.2,
+      "fa_direction": "sell",
+      "fa_rate_diff": -0.1,
+      "fa_detail": "ECB(2.65% tighten/decelerating) vs RBNZ(2.75% tighten/accelerating) 差-0.10% / NZDサイクル強化(accelerating)",
+      "stars": 2,
+      "verdict": "△ 弱シグナル",
+      "direction": "LIGHT_SHORT",
+      "pair_type": "major",
+      "intervention_news": {
+        "EUR": {
+          "score": 0,
+          "level": "none",
+          "hits": [],
+          "reason": "関連報道なし",
+          "headlines": [],
+          "cached": true,
+          "timestamp": "2026-11-03T01:29:40.534229+00:00"
+        }
+      },
+      "upcoming_events": [
+        {
+          "name": "Employment Change q/q",
+          "currency": "NZD",
+          "importance": "high",
+          "hours_until": 20.3,
+          "date": "2026-11-03T21:45:00Z"
+        },
+        {
+          "name": "Unemployment Rate",
+          "currency": "NZD",
+          "importance": "critical",
+          "hours_until": 20.3,
+          "date": "2026-11-03T21:45:00Z"
+        },
+        {
+          "name": "Parliamentary Elections",
+          "currency": "NZD",
+          "importance": "high",
+          "hours_until": 92.3,
+          "date": "2026-11-06T21:45:00Z"
+        }
+      ],
+      "volatility_regime": {
+        "regime": "normal",
+        "regime_label": "通常ボラ相場",
+        "atr_ratio": 1.12,
+        "atr_90d": 0.00529,
+        "sl_multiplier": 3.0,
+        "tp1_multiplier": 1.5,
+        "tp2_multiplier": 4.5,
+        "tp3_multiplier": 6.0,
+        "note": "ATR比率1.1 → TP=1.5×ATR（Phase1出口改善・到達率向上）"
+      },
+      "staged_tp": {
+        "sl": 2.01285,
+        "tp": 1.986075,
+        "trail_atr_mult": 2.0,
+        "trail_distance": 0.0119,
+        "be_plus_offset": 0.008925,
+        "be_target_after_tp": 1.986075,
+        "max_target": 1.9593,
+        "rr_tp": 0.5,
+        "tp_mode": "single_with_trail",
+        "tp1": 1.986075,
+        "tp2": 1.968225,
+        "tp3": 1.9593,
+        "sl_width": 0.01785,
+        "tp1_width": 0.008925,
+        "rr_tp1": 0.5,
+        "rr_tp2": 1.5,
+        "rr_tp3": 2.0,
+        "spread_price": 0.000504,
+        "spread_pips": 5.0,
+        "spread_atr_ratio": 0.085,
+        "sl_dist_effective": 0.018102,
+        "tp_dist_effective": 0.008673,
+        "rr_effective": 0.48,
+        "spread_is_dynamic": true,
+        "spread_pips_dynamic": 5.04,
+        "regime_label": "通常ボラ相場",
+        "strategy": "TP(1.986075)到達 → SLを BE+0.5R(1.986075) へ移動 → トレーリング(2.0×ATR=0.0119)発動 → 利を伸ばす（理論最大: 1.9593）",
+        "chandelier_sl_active": false,
+        "chandelier_note": "",
+        "spread_session": "Asian/Tokyo",
+        "spread_session_mult": 1.4,
+        "spread_vix_mult": 1.2
+      },
+      "carry_score": {
+        "carry_score": 0.34,
+        "label": "キャリー効率が低い",
+        "annual_swap_pct": 0.1,
+        "daily_volatility_pct": 0.3,
+        "breakeven_days": 2721,
+        "note": "SL幅をスワップで回収: 約2721日"
+      },
+      "support_resistance": {
+        "resistance": [
+          {
+            "price": 1.9981,
+            "strength": 1,
+            "label": "弱いレジスタンス",
+            "distance_pct": 0.16
+          },
+          {
+            "price": 2.0121,
+            "strength": 1,
+            "label": "弱いレジスタンス",
+            "distance_pct": 0.86
+          },
+          {
+            "price": 2.0181,
+            "strength": 1,
+            "label": "弱いレジスタンス",
+            "distance_pct": 1.16
+          },
+          {
+            "price": 2.027,
+            "strength": 1,
+            "label": "弱いレジスタンス",
+            "distance_pct": 1.6
+          }
+        ],
+        "support": [
+          {
+            "price": 1.954438,
+            "strength": 8,
+            "label": "強いサポート",
+            "distance_pct": 2.03
+          },
+          {
+            "price": 1.9686,
+            "strength": 1,
+            "label": "弱いサポート",
+            "distance_pct": 1.32
+          },
+          {
+            "price": 1.985,
+            "strength": 1,
+            "label": "弱いサポート",
+            "distance_pct": 0.5
+          }
+        ],
+        "nearest_resistance": {
+          "price": 1.9981,
+          "strength": 1,
+          "label": "弱いレジスタンス",
+          "distance_pct": 0.16
+        },
+        "nearest_support": {
+          "price": 1.985,
+          "strength": 1,
+          "label": "弱いサポート",
+          "distance_pct": 0.5
+        },
+        "context": "レジスタンス(1.9981)まで0.16%（非常に近い・注意） / サポート(1.985)まで0.50%"
+      },
+      "market_regime": {
+        "adx": 0.9,
+        "plus_di": 50.5,
+        "minus_di": 49.5,
+        "regime": "ranging",
+        "regime_label": "レンジ相場",
+        "trend_direction": "neutral",
+        "note": "順張りは機能しにくい・逆張り向き"
+      },
+      "performance": {
+        "win_rate": 100.0,
+        "total_trades": 1,
+        "adjustment": 0,
+        "note": "動的実績調整は凍結中(サンプル1件・2026-08-25〜)"
+      },
+      "ambush": {
+        "has_alert": false,
+        "approaching": []
+      },
+      "cb_meeting_blackout": {
+        "active": false,
+        "severity": "none",
+        "reason": ""
+      },
+      "strength_context": {
+        "base_currency": "EUR",
+        "quote_currency": "NZD",
+        "base_score": -27.3,
+        "base_label": "やや弱い",
+        "base_rank": 15,
+        "quote_score": -7.5,
+        "quote_label": "中立",
+        "quote_rank": 12,
+        "spread": -19.8,
+        "context": "やや弱い通貨 vs 強め（ショート寄り）",
+        "bias": "slight_short"
+      }
+    }
+  ],
+  "closed": [
+    {
+      "pair": "GBPCHF",
+      "entry_time": "2026-10-22T19:06:55.668237+00:00",
+      "entry_date": "2026-10-22",
+      "entry_price": 1.099797,
+      "direction": "LONG",
+      "initial_stars": 4,
+      "sl": 1.09167,
+      "initial_sl": 1.09167,
+      "tp": 1.105215,
+      "trail_distance": 0.00602,
+      "trail_atr_mult": 2.0,
+      "be_target_after_tp": 1.105215,
+      "max_target": 1.11876,
+      "tp_mode": "single_with_trail",
+      "tp_hit": false,
+      "trail_active": false,
+      "extreme_price": 1.099797,
+      "tp1": 1.105215,
+      "tp2": 1.114245,
+      "tp3": 1.11876,
+      "ta_score": 86.7,
+      "fa_score": 78.1,
+      "fa_rate_diff": 3.75,
+      "regime": "normal",
+      "rsi_reversal_confirmed": false,
+      "ta_score_overheated": false,
+      "entry_source": "pending_limit_order",
+      "pending_created_time": "2026-10-22T16:44:16.531485+00:00",
+      "pending_scan_price": 1.1007,
+      "pyramid_seq": 1,
+      "position_sizing": {
+        "tradable": true,
+        "units": 300,
+        "margin_required_jpy": 2522.0,
+        "risk_amount_jpy": 28995.0,
+        "estimated_loss_jpy": 466.0,
+        "existing_margin_jpy": 287205.0,
+        "exposure_multiplier": 1.0,
+        "confidence_multiplier": 1.0,
+        "note": "300GBP単位（証拠金約¥2522・想定損失¥466）"
+      },
+      "units": 300,
+      "current_price": 1.098,
+      "current_stars": 2,
+      "exit_time": "2026-11-03T01:29:34.048582+00:00",
+      "exit_date": "2026-11-03",
+      "hold_hours": 270.4,
+      "exit_reason": "SIGNAL_LOST",
+      "exit_price": 1.098,
+      "pips": -0.001797,
+      "result": "LOSS",
+      "pnl_jpy": -104.0
+    }
+  ],
   "state_changes": []
 }
