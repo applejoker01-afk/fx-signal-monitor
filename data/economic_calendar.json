@@ -1,6 +1,6 @@
 {
-  "last_updated": "2026-11-08",
-  "last_auto_run": "2026-11-08T05:30:07.095517+00:00",
+  "last_updated": "2026-11-09",
+  "last_auto_run": "2026-11-09T05:41:22.846010+00:00",
   "last_auto_source": "forexfactory",
   "notes": "月初に1ヶ月分の重要イベントを手動追加。importance: critical/high/medium",
   "importance_guide": {
@@ -11,40 +11,70 @@
   "data_source": "ForexFactory (auto, Finnhub 403のためフォールバック中) + 手動編集",
   "events": [
     {
-      "date": "2026-11-06T13:30:00Z",
-      "country": "CAD",
-      "currency": "CAD",
-      "name": "Employment Change",
-      "importance": "high",
-      "affects_pairs": [
-        "CADJPY",
-        "USDCAD"
-      ],
-      "source": "forexfactory",
-      "actual": null,
-      "estimate": "14.6K",
-      "previous": "-68.3K"
-    },
-    {
-      "date": "2026-11-06T13:30:00Z",
-      "country": "CAD",
-      "currency": "CAD",
-      "name": "Unemployment Rate",
-      "importance": "critical",
-      "affects_pairs": [
-        "CADJPY",
-        "USDCAD"
-      ],
-      "source": "forexfactory",
-      "actual": null,
-      "estimate": "6.5%",
-      "previous": "6.5%"
-    },
-    {
-      "date": "2026-11-06T13:30:00Z",
+      "date": "2026-11-10T13:30:00Z",
       "country": "USD",
       "currency": "USD",
-      "name": "Average Hourly Earnings m/m",
+      "name": "Core CPI m/m",
+      "importance": "critical",
+      "affects_pairs": [
+        "USDJPY",
+        "EURUSD",
+        "GBPUSD",
+        "AUDUSD",
+        "NZDUSD",
+        "USDCAD",
+        "USDCHF",
+        "USDCNY"
+      ],
+      "source": "forexfactory",
+      "actual": null,
+      "estimate": "0.2%",
+      "previous": "0.3%"
+    },
+    {
+      "date": "2026-11-10T13:30:00Z",
+      "country": "USD",
+      "currency": "USD",
+      "name": "CPI m/m",
+      "importance": "critical",
+      "affects_pairs": [
+        "USDJPY",
+        "EURUSD",
+        "GBPUSD",
+        "AUDUSD",
+        "NZDUSD",
+        "USDCAD",
+        "USDCHF",
+        "USDCNY"
+      ],
+      "source": "forexfactory",
+      "actual": null,
+      "estimate": "0.3%",
+      "previous": "0.6%"
+    },
+    {
+      "date": "2026-11-12T07:00:00Z",
+      "country": "GBP",
+      "currency": "GBP",
+      "name": "GDP m/m",
+      "importance": "critical",
+      "affects_pairs": [
+        "GBPJPY",
+        "GBPUSD",
+        "EURGBP",
+        "GBPAUD",
+        "GBPCHF"
+      ],
+      "source": "forexfactory",
+      "actual": null,
+      "estimate": "0.0%",
+      "previous": "0.1%"
+    },
+    {
+      "date": "2026-11-13T13:30:00Z",
+      "country": "USD",
+      "currency": "USD",
+      "name": "Core PPI m/m",
       "importance": "high",
       "affects_pairs": [
         "USDJPY",
@@ -59,13 +89,13 @@
       "source": "forexfactory",
       "actual": null,
       "estimate": "0.3%",
-      "previous": "0.1%"
+      "previous": "0.7%"
     },
     {
-      "date": "2026-11-06T13:30:00Z",
+      "date": "2026-11-13T13:30:00Z",
       "country": "USD",
       "currency": "USD",
-      "name": "Non-Farm Employment Change",
+      "name": "PPI m/m",
       "importance": "high",
       "affects_pairs": [
         "USDJPY",
@@ -79,78 +109,8 @@
       ],
       "source": "forexfactory",
       "actual": null,
-      "estimate": "65K",
-      "previous": "29K"
-    },
-    {
-      "date": "2026-11-06T13:30:00Z",
-      "country": "USD",
-      "currency": "USD",
-      "name": "Unemployment Rate",
-      "importance": "critical",
-      "affects_pairs": [
-        "USDJPY",
-        "EURUSD",
-        "GBPUSD",
-        "AUDUSD",
-        "NZDUSD",
-        "USDCAD",
-        "USDCHF",
-        "USDCNY"
-      ],
-      "source": "forexfactory",
-      "actual": null,
-      "estimate": "4.2%",
-      "previous": "4.2%"
-    },
-    {
-      "date": "2026-11-06T16:00:00Z",
-      "country": "JPY",
-      "currency": "JPY",
-      "name": "BOJ Gov Ueda Speaks",
-      "importance": "critical",
-      "affects_pairs": [
-        "USDJPY",
-        "EURJPY",
-        "GBPJPY",
-        "AUDJPY",
-        "NZDJPY",
-        "CADJPY",
-        "CHFJPY",
-        "SGDJPY",
-        "HKDJPY",
-        "CNYJPY",
-        "MXNJPY",
-        "TRYJPY",
-        "ZARJPY",
-        "INRJPY",
-        "SEKJPY",
-        "NOKJPY",
-        "BRLJPY",
-        "PLNJPY",
-        "KRWJPY"
-      ],
-      "source": "forexfactory",
-      "actual": null,
-      "estimate": null,
-      "previous": null
-    },
-    {
-      "date": "2026-11-06T21:45:00Z",
-      "country": "NZD",
-      "currency": "NZD",
-      "name": "Parliamentary Elections",
-      "importance": "high",
-      "affects_pairs": [
-        "NZDJPY",
-        "NZDUSD",
-        "AUDNZD",
-        "EURNZD"
-      ],
-      "source": "forexfactory",
-      "actual": null,
-      "estimate": null,
-      "previous": null
+      "estimate": "0.4%",
+      "previous": "1.3%"
     }
   ]
 }
