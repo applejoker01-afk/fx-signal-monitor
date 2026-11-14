@@ -5,7 +5,7 @@ must be recorded here before another variant of the same idea is tested.
 
 | ID | Hypothesis | Fixed candidate rules | Status | Required evidence before production review |
 |---|---|---|---|---|
-| EXP-001 | RSI reversal plus MACD confirmation improves entry quality | RSI recovers above 40 after dipping below 40 within 10 bars; MACD line crosses above signal for longs, inverse for shorts | queued | Cost-inclusive rolling OOS improvement versus current baseline; multiple-testing adjustment |
+| EXP-001 | RSI reversal plus MACD confirmation improves entry quality | RSI recovers above 40 after dipping below 40 within 10 bars; MACD line crosses above signal for longs, inverse for shorts | hold (2026-11-14) | Cost-inclusive rolling OOS improvement versus current baseline; multiple-testing adjustment |
 | EXP-002 | Bollinger squeeze followed by directional break identifies tradable expansion | 20-period, 2-sigma bandwidth below its trailing 20th percentile; close breaks the matching band with trend confirmation | queued | Same as EXP-001, evaluated separately by volatility regime |
 | EXP-003 | 50/200 moving-average regime filter reduces trend-following false positives | Long only when 50DMA is above 200DMA and price is above both; inverse condition for shorts | queued | Same as EXP-001, with a no-filter baseline |
 | EXP-004 | Bearish TA/FA agreement produces viable short signals | Mirror the existing long score thresholds only where technical and fundamental directions agree | queued | Long/short-separated, cost-inclusive rolling OOS improvement |
@@ -179,6 +179,12 @@ long_only は高リターンだが全期間DD 59.3%、ボラ管理併用で36.1%
 本調査で累計33変種を検証（フェーズ1:12 / フェーズ2:8 / キャリー:5 / 実装可能版:7 / EXP-008:1）。
 単発の t≈2 は有意とみなさない。EXP-007を他と区別して扱う根拠は t値ではなく、
 ①全パラメータで一貫 ②train/testで符号反転なし ③経済的機序が文献で確立、の三条件。
+
+### EXP-001: hold（2026-11-14）
+
+既存のコスト調整済みバックテスト（`run_cost_adjusted_backtest.py`, `data/cost_adjusted_backtest_latest.json`）を点検した結果、
+コスト込みのローリングOOS検定を支えられないため hold。代理の性能主張は作成していない。
+詳細: `research/results/2026-11-14_EXP-001_hold.md`
 
 ## Status vocabulary
 
