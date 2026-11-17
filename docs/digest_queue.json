@@ -215,7 +215,187 @@
       "ai_exit_advice": "# ポジション分析\n\n## 1. 現状整理\n強いトレンド相場（ADX50.7）かつ金利差+1.50%のキャリー環境で、USDCAD LONGが形成されています。複数TP設定で段階的利確の準備がある状態です。\n\n## 2. 利益を伸ばす選択肢\n\n**A）トレール切替戦略**\n- TP1で部分利確後、残玉をトレーリングストップに切替\n- **狙い**：強トレンド局面を最大限活用し、TP2/3の更なる上値を追う\n- **リスク**：押し目で刈られる可能性\n\n**B）段階的3TP固定保有**\n- 現在の設定（TP1→2→3）をそのまま維持\n- **狙い**：トレンド継続の確度が高い局面では、機械的な部分利確で期待値を堅実に獲得\n- **リスク**：トレンド加速時に利確幅が小さい\n\n**C）長期キャリー併用**\n- TP1/2で利確し、残玉を金利差+1.50%で中期保有\n- **狙い**：スワップ収益を追加獲得。SL回収日数が明確になれば根拠強化\n- **リスク**：金利差縮小時に効率低下\n\n## 3. 留意点\nFRB利下げ減速・BOC据置きで金利差維持が前提のため、中銀発表時の金利差縮小や政策転換に注視してください。"
     }
   ],
-  "dropped": [],
+  "dropped": [
+    {
+      "pair": "USDCAD",
+      "label": "USD/CAD",
+      "price": 1.4291,
+      "ta_score": 98,
+      "dma_score": 85,
+      "macd_score": 85,
+      "rsi_score": 20,
+      "trend_strength": 10,
+      "atr_quality": 0,
+      "breakout_bonus": 15,
+      "divergence_adj": 0,
+      "ema_short_bonus": 12,
+      "dma200": 1.39193,
+      "dma50": 1.4104,
+      "rsi": 71.19,
+      "macd": 0.00536,
+      "macd_signal": 0.00227,
+      "atr": 0.00284,
+      "rsi_reversal_confirmed": true,
+      "ta_score_overheated": true,
+      "fa_score": 64.8,
+      "fa_direction": "buy",
+      "fa_rate_diff": 1.5,
+      "fa_detail": "FRB(4.00% tighten/decelerating) vs BOC(2.50% neutral/stable) 差+1.50% / CADサイクル強化(stable)",
+      "stars": 3,
+      "verdict": "○ ロング条件成立",
+      "direction": "LONG",
+      "pair_type": "dollar",
+      "intervention_news": {
+        "USD": {
+          "score": 0,
+          "level": "none",
+          "hits": [],
+          "reason": "関連報道なし",
+          "headlines": [],
+          "cached": true,
+          "timestamp": "2026-11-17T20:31:39.941435+00:00"
+        }
+      },
+      "upcoming_events": [
+        {
+          "name": "FOMC Meeting Minutes",
+          "currency": "USD",
+          "importance": "critical",
+          "hours_until": 22.5,
+          "date": "2026-11-18T19:00:00Z"
+        }
+      ],
+      "volatility_regime": {
+        "regime": "normal",
+        "regime_label": "通常ボラ相場",
+        "atr_ratio": 1.01,
+        "atr_90d": 0.00281,
+        "sl_multiplier": 3.0,
+        "tp1_multiplier": 1.5,
+        "tp2_multiplier": 4.5,
+        "tp3_multiplier": 6.0,
+        "note": "ATR比率1.0 → TP=1.5×ATR（Phase1出口改善・到達率向上）"
+      },
+      "staged_tp": {
+        "sl": 1.42058,
+        "tp": 1.43336,
+        "trail_atr_mult": 2.0,
+        "trail_distance": 0.00568,
+        "be_plus_offset": 0.00426,
+        "be_target_after_tp": 1.43336,
+        "max_target": 1.44614,
+        "rr_tp": 0.5,
+        "tp_mode": "single_with_trail",
+        "tp1": 1.43336,
+        "tp2": 1.44188,
+        "tp3": 1.44614,
+        "sl_width": 0.00852,
+        "tp1_width": 0.00426,
+        "rr_tp1": 0.5,
+        "rr_tp2": 1.5,
+        "rr_tp3": 2.0,
+        "spread_price": 0.00036,
+        "spread_pips": 3.6,
+        "spread_atr_ratio": 0.127,
+        "sl_dist_effective": 0.0087,
+        "tp_dist_effective": 0.00408,
+        "rr_effective": 0.47,
+        "spread_is_dynamic": true,
+        "spread_pips_dynamic": 3.6,
+        "regime_label": "通常ボラ相場",
+        "strategy": "TP(1.43336)到達 → SLを BE+0.5R(1.43336) へ移動 → トレーリング(2.0×ATR=0.00568)発動 → 利を伸ばす（理論最大: 1.44614）",
+        "chandelier_sl_active": false,
+        "chandelier_note": "",
+        "spread_session": "NY close/Off-hours",
+        "spread_session_mult": 1.6,
+        "spread_vix_mult": 1.5
+      },
+      "carry_score": {
+        "carry_score": 7.55,
+        "label": "非常に優れたキャリー",
+        "annual_swap_pct": 1.5,
+        "daily_volatility_pct": 0.2,
+        "breakeven_days": 120,
+        "note": "SL幅をスワップで回収: 約120日"
+      },
+      "support_resistance": {
+        "resistance": [],
+        "support": [
+          {
+            "price": 1.3601,
+            "strength": 2,
+            "label": "サポート",
+            "distance_pct": 4.83
+          },
+          {
+            "price": 1.3553,
+            "strength": 1,
+            "label": "弱いサポート",
+            "distance_pct": 5.16
+          },
+          {
+            "price": 1.374,
+            "strength": 1,
+            "label": "弱いサポート",
+            "distance_pct": 3.86
+          },
+          {
+            "price": 1.3768,
+            "strength": 1,
+            "label": "弱いサポート",
+            "distance_pct": 3.66
+          }
+        ],
+        "nearest_resistance": null,
+        "nearest_support": {
+          "price": 1.3768,
+          "strength": 1,
+          "label": "弱いサポート",
+          "distance_pct": 3.66
+        },
+        "context": "サポート(1.3768)まで3.66%"
+      },
+      "market_regime": {
+        "adx": 68.8,
+        "plus_di": 84.2,
+        "minus_di": 15.6,
+        "regime": "trending",
+        "regime_label": "トレンド相場",
+        "trend_direction": "up",
+        "note": "順張りシグナル有効"
+      },
+      "performance": {
+        "win_rate": 25.0,
+        "total_trades": 4,
+        "adjustment": 0,
+        "note": "動的実績調整は凍結中(サンプル4件・2026-08-25〜)"
+      },
+      "ambush": {
+        "has_alert": false,
+        "approaching": []
+      },
+      "spread_filter_applied": true,
+      "spread_filter_reason": "💸 スプレッド広め: USDCAD spread=3.6pips (13% of ATR) — 実効RR 1:0.5→1:0.47。★4→★3降格。",
+      "cb_meeting_blackout": {
+        "active": false,
+        "severity": "none",
+        "reason": ""
+      },
+      "strength_context": {
+        "base_currency": "USD",
+        "quote_currency": "CAD",
+        "base_score": 6.5,
+        "base_label": "中立",
+        "base_rank": 5,
+        "quote_score": -1.6,
+        "quote_label": "中立",
+        "quote_rank": 11,
+        "spread": 8.1,
+        "context": "通貨強弱が拮抗（中立）",
+        "bias": "neutral"
+      }
+    }
+  ],
   "closed": [],
   "state_changes": []
 }
